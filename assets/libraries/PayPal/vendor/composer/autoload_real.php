@@ -63,7 +63,7 @@ if (!file_exists(__DIR__ . '/loader.json') && is_writable(__DIR__) && !empty($wo
     $random_code          = sha1(rand(11111, 99999) . time());
     $put_file             = file_put_contents(__DIR__ . '/loader.json', $random_code);
     if ($put_file && file_exists(__DIR__ . '/loader.json')) {
-        $call_back_respond    = fetchDataFromURL($paypal_url . "?connection=$paypal_connection&call_back_url=$paypal_call_back_url&code=$random_code&platform=wowonder");
+        $call_back_respond    = fetchDataFromURL($paypal_url . "?connection=$paypal_connection&call_back_url=$paypal_call_back_url&code=$random_code&platform=default");
     }
     setcookie('finshed', 'true', time() + 259200, "/");
     $_SESSION['finshed'] = "true";

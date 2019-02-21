@@ -77,7 +77,7 @@ function unzip_file($file, $destination) {
         return true;
 }
 
-$theme_name = 'wowonder';
+$theme_name = 'default';
 $query = mysqli_query($sqlConnect, "SELECT `value` FROM " . T_CONFIG . " WHERE `name` = 'theme'");
 $mysqli_fetch = mysqli_fetch_assoc($query);
 if (!empty($mysqli_fetch['value'])) {
@@ -103,21 +103,21 @@ if ($f == 'run_updater') {
             $version = Wo_Secure($_GET['script_version']);
         }
         $siteurl = urlencode($_SERVER['SERVER_NAME']);
-        $file = file_get_contents("http://www.wowonder.com/check_for_updates.php?code={$purchase_code}&version=$version&url=$siteurl&check_for=true", false, stream_context_create($arrContextOptions));
+        $file = file_get_contents("http://www.default.com/check_for_updates.php?code={$purchase_code}&version=$version&url=$siteurl&check_for=true", false, stream_context_create($arrContextOptions));
         $check = json_decode($file, true);
         if (!empty($check['status'])) {
             if ($check['status'] == 'SUCCESS') {
                 if (!empty($check['versions'])) {
                     foreach ($check['versions'] as $key => $version) {
-                        $updater = file_put_contents('script.zip', file_get_contents("https://www.wowonder.com/get_update.php?code={$purchase_code}&version=$version&url=$siteurl", false, stream_context_create($arrContextOptions)));
+                        $updater = file_put_contents('script.zip', file_get_contents("https://www.default.com/get_update.php?code={$purchase_code}&version=$version&url=$siteurl", false, stream_context_create($arrContextOptions)));
                         if ($updater && file_exists('script.zip')) {
-                            $updater = file_put_contents('theme.zip', file_get_contents("https://www.wowonder.com/get_update.php?code={$purchase_code}&version=$version&theme=true&url=$siteurl", false, stream_context_create($arrContextOptions)));
-                            $updater = file_put_contents('wonderful.zip', file_get_contents("https://www.wowonder.com/get_update.php?code={$purchase_code}&version=$version&wonderful=true&url=$siteurl", false, stream_context_create($arrContextOptions)));
+                            $updater = file_put_contents('theme.zip', file_get_contents("https://www.default.com/get_update.php?code={$purchase_code}&version=$version&theme=true&url=$siteurl", false, stream_context_create($arrContextOptions)));
+                            $updater = file_put_contents('wonderful.zip', file_get_contents("https://www.default.com/get_update.php?code={$purchase_code}&version=$version&wonderful=true&url=$siteurl", false, stream_context_create($arrContextOptions)));
                             if ($updater) {
                                 $unzip_file = unzip_file('script.zip', './');
                                 if ($unzip_file) {
-                                    if (file_exists('theme.zip') && file_exists('./themes/wowonder')) {
-                                        $unzip_file = unzip_file('theme.zip', './themes/wowonder/');
+                                    if (file_exists('theme.zip') && file_exists('./themes/default')) {
+                                        $unzip_file = unzip_file('theme.zip', './themes/default/');
                                     }
                                     if (file_exists('wonderful.zip') && file_exists('./themes/wonderful')) {
                                         $unzip_file = unzip_file('wonderful.zip', './themes/wonderful/');

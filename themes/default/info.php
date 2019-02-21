@@ -1,7 +1,7 @@
 <?php
 $themeName = 'WoWonder';
 
-$themeFolder = 'wowonder';
+$themeFolder = 'default';
 
 $themeAuthor = 'Deen Doughouz';
 

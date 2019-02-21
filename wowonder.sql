@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `wowonder`
+-- Database: `default`
 --
 
 -- --------------------------------------------------------
@@ -446,7 +446,7 @@ CREATE TABLE `Wo_Config` (
 INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES
 (1, 'siteName', 'WoWonder'),
 (2, 'siteTitle', 'WoWonder'),
-(3, 'siteKeywords', 'social, wowonder, social site'),
+(3, 'siteKeywords', 'social, default, social site'),
 (4, 'siteDesc', 'WoWonder v1.5.6.2 is a Social Networking Platform. With our new feature, user can wonder posts, photos,'),
 (5, 'siteEmail', 'deendoughouz@gmail.com'),
 (6, 'defualtLang', 'english'),
@@ -488,7 +488,7 @@ INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES
 (42, 'linkedinAppKey', ''),
 (43, 'VkontakteAppId', ''),
 (44, 'VkontakteAppKey', ''),
-(45, 'theme', 'wowonder'),
+(45, 'theme', 'default'),
 (46, 'second_post_button', 'wonder'),
 (47, 'instagramAppId', ''),
 (48, 'instagramAppkey', ''),
@@ -1470,7 +1470,7 @@ INSERT INTO `Wo_Langs` (`id`, `lang_key`, `english`, `arabic`, `dutch`, `french`
 (442, 'group_title', 'Group title', 'عنوان المجموعة', 'Groep titel', 'Titre de groupe', 'Gruppentitel', 'Titolo del gruppo', 'T&amp;iacute;tulo do grupo', 'Название группы', 'Título del Grupo', 'Grup başlık'),
 (443, 'my_groups', 'My Groups', 'مجموعاتي', 'Mijn Groepen', 'Mes Groupes', 'Meine Gruppen', 'I miei gruppi', 'Meus grupos', 'Мои группы', 'Mis grupos', 'Gruplar'),
 (444, 'school', 'School', 'المدرسة', 'School', 'L&#39;école', 'Schule', 'Scuola', 'Escola', 'Школа', 'Colegio', 'Okul'),
-(445, 'site_keywords_help', 'Example: social, wowonder, social site', 'Example: social, wowonder, social site', 'Example: social, wowonder, social site', 'Example: social, wowonder, social site', 'Beispiel: soziale, wen-kennt-wer, soziale Website', 'Esempio: sociale, wowonder, sito di social', 'Exemplo: social, wowonder, site social', 'Пример: социальная сеть, pintter, социальный сайт', 'Ejemplo:, wowonder, sitio social sociales', 'Örnek: Sosyal, wowonder, sosyal sitesi'),
+(445, 'site_keywords_help', 'Example: social, default, social site', 'Example: social, default, social site', 'Example: social, default, social site', 'Example: social, default, social site', 'Beispiel: soziale, wen-kennt-wer, soziale Website', 'Esempio: sociale, default, sito di social', 'Exemplo: social, default, site social', 'Пример: социальная сеть, pintter, социальный сайт', 'Ejemplo:, default, sitio social sociales', 'Örnek: Sosyal, default, sosyal sitesi'),
 (446, 'message_seen', 'Message Seen', 'الرسائل المقروئة', 'Bericht Seen', 'Vu message', 'Nachricht gesehen', 'Messaggio Visto', 'Mensagem lida', 'Прочитал@', 'Mensaje Seen', 'İleti Seen'),
 (447, 'recommended_for_powerful', 'Recommended for powerful servers', 'مستحسن للاسيرفرات القوية', 'Aanbevolen voor krachtige servers', 'Recommandé pour les puissants serveurs', 'Empfohlen für leistungsstarke Server', 'Consigliato per potenti server', 'Recomendado para servi&amp;ccedil;os pesados', 'Рекомендуется для мощных серверов', 'Recomendado para servidores de gran alcance', 'Güçlü sunucular için önerilen'),
 (448, 'message_typing', 'Chat typing system', 'نظام &quot;يكتب&quot; للشات', 'Chat typering systeem', 'Système de typage chat', 'Chat Typisierungssystem', 'Sistema di digitazione Chat', 'Sistema de digita&amp;ccedil;&amp;atilde;o', 'Набирает сообщение', 'Sistema de tipificación de Chat', 'Sohbet yazarak sistemi'),

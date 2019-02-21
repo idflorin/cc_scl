@@ -3247,7 +3247,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         $data['android_native_status'] = 0;
         if (!empty($_POST['android_purchase_code'])) {
             $android_code = Wo_Secure($_POST['android_purchase_code']);
-            $file         = file_get_contents("http://www.wowonder.com/access_token.php?code={$android_code}&type=android", false, stream_context_create($arrContextOptions));
+            $file         = file_get_contents("http://www.default.com/access_token.php?code={$android_code}&type=android", false, stream_context_create($arrContextOptions));
             $check        = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -3261,7 +3261,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         }
         if (!empty($_POST['android_native_purchase_code'])) {
             $android_code = Wo_Secure($_POST['android_native_purchase_code']);
-            $file         = file_get_contents("http://www.wowonder.com/access_token.php?code={$android_code}&type=android", false, stream_context_create($arrContextOptions));
+            $file         = file_get_contents("http://www.default.com/access_token.php?code={$android_code}&type=android", false, stream_context_create($arrContextOptions));
             $check        = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -3275,7 +3275,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         }
         if (!empty($_POST['windows_purchase_code'])) {
             $windows_code = Wo_Secure($_POST['windows_purchase_code']);
-            $file         = file_get_contents("http://www.wowonder.com/access_token.php?code={$windows_code}&type=windows_desktop", false, stream_context_create($arrContextOptions));
+            $file         = file_get_contents("http://www.default.com/access_token.php?code={$windows_code}&type=windows_desktop", false, stream_context_create($arrContextOptions));
             $check        = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -3289,7 +3289,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         }
         if (!empty($_POST['ios_purchase_code'])) {
             $windows_code = Wo_Secure($_POST['ios_purchase_code']);
-            $file         = file_get_contents("http://www.wowonder.com/access_token.php?code={$windows_code}&type=ios", false, stream_context_create($arrContextOptions));
+            $file         = file_get_contents("http://www.default.com/access_token.php?code={$windows_code}&type=ios", false, stream_context_create($arrContextOptions));
             $check        = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -9940,7 +9940,7 @@ if ($f == 'update_order_by') {
 }
 if ($f == 'check_for_updates') {
     $false = false;
-    if (!is_dir('themes/wowonder')) {
+    if (!is_dir('themes/default')) {
         $false = true;
     }
     if (!is_dir('themes/wonderful') && $false == true) {
@@ -9950,7 +9950,7 @@ if ($f == 'check_for_updates') {
     }
     if ($false == true) {
         $data['status']     = 400;
-        $data['ERROR_NAME'] = 'It looks like you have renamed your themes, please rename them back to "wowonder", "wonderful" to use the auto update system, otherwise please update your site manually.';
+        $data['ERROR_NAME'] = 'It looks like you have renamed your themes, please rename them back to "default", "wonderful" to use the auto update system, otherwise please update your site manually.';
         header("Content-type: application/json");
         echo json_encode($data);
         exit();
@@ -9966,7 +9966,7 @@ if ($f == 'check_for_updates') {
             $purchase_code = Wo_Secure($_GET['purchase_code']);
             $version       = Wo_Secure($wo['script_version']);
             $siteurl       = urlencode($_SERVER['SERVER_NAME']);
-            $file          = file_get_contents("http://www.wowonder.com/check_for_updates.php?code={$purchase_code}&version=$version&url=$siteurl", false, stream_context_create($arrContextOptions));
+            $file          = file_get_contents("http://www.default.com/check_for_updates.php?code={$purchase_code}&version=$version&url=$siteurl", false, stream_context_create($arrContextOptions));
             $check         = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -10000,7 +10000,7 @@ if ($f == 'download_updates') {
             $purchase_code = Wo_Secure($_GET['purchase_code']);
             $version       = Wo_Secure($wo['script_version']);
             $siteurl       = urlencode($_SERVER['SERVER_NAME']);
-            $file          = file_get_contents("http://www.wowonder.com/check_for_updates.php?code={$purchase_code}&version=$version&full=true&url=$siteurl", false, stream_context_create($arrContextOptions));
+            $file          = file_get_contents("http://www.default.com/check_for_updates.php?code={$purchase_code}&version=$version&full=true&url=$siteurl", false, stream_context_create($arrContextOptions));
             $check         = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -10024,7 +10024,7 @@ if ($f == 'download_updates') {
                             //     @fwrite($f, "");
                             //     @fclose($f);
                             // }
-                            $updater = file_put_contents('updates/' . $version . '/script.zip', file_get_contents("https://www.wowonder.com/get_update.php?code={$purchase_code}&version=$version&full=true", false, stream_context_create($arrContextOptions)));
+                            $updater = file_put_contents('updates/' . $version . '/script.zip', file_get_contents("https://www.default.com/get_update.php?code={$purchase_code}&version=$version&full=true", false, stream_context_create($arrContextOptions)));
                             if ($updater) {
                                 $unzip_file = unzip_file('updates/' . $version . '/script.zip', 'updates/' . $version . '/');
                                 if ($unzip_file) {
