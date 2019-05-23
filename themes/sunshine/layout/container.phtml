@@ -28,17 +28,29 @@
       <meta name="twitter:description" content="<?php echo $wo['movie']['description']; ?>" />
       <meta name="twitter:image" content="<?php echo $wo['movie']['cover']; ?>" />
       <?php } ?>
+      <?php if ($wo['page'] == 'game' && !empty($wo['game'])) { ?>
+      <meta property="og:title" content="<?php echo $wo['game']['game_name']; ?>" />
+      <meta property="og:type" content="game" />
+      <meta property="og:url" content="<?php echo $wo['game']['game_link']; ?>" />
+      <meta property="og:image" content="<?php echo $wo['game']['game_avatar']; ?>" />
+      <meta property="og:image:secure_url" content="<?php echo $wo['game']['game_avatar']; ?>" />
+      <meta property="og:description" content="<?php echo $wo['game']['game_name']; ?>" />
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="<?php echo $wo['game']['game_name']; ?>" />
+      <meta name="twitter:description" content="<?php echo $wo['game']['game_name']; ?>" />
+      <meta name="twitter:image" content="<?php echo $wo['game']['game_avatar']; ?>" />
+      <?php } ?>
       <?php if ($wo['page'] == 'welcome') { ?>
       <meta property="og:title" content="<?php echo $wo['title'];?>" />
       <meta property="og:type" content="article" />
       <meta property="og:url" content="<?php echo $wo['config']['site_url'];?>" />
-      <meta property="og:image" content="<?php echo $wo['config']['theme_url'];?>/img/og.png" />
-      <meta property="og:image:secure_url" content="<?php echo $wo['config']['theme_url'];?>/img/og.png" />
+      <meta property="og:image" content="<?php echo $wo['config']['theme_url'];?>/img/og.jpg" />
+      <meta property="og:image:secure_url" content="<?php echo $wo['config']['theme_url'];?>/img/og.jpg" />
       <meta property="og:description" content="<?php echo $wo['description'];?>" />
       <meta name="twitter:card" content="summary">
       <meta name="twitter:title" content="<?php echo $wo['title'];?>" />
       <meta name="twitter:description" content="<?php echo $wo['description'];?>" />
-      <meta name="twitter:image" content="<?php echo $wo['config']['theme_url'];?>/img/og.png" />
+      <meta name="twitter:image" content="<?php echo $wo['config']['theme_url'];?>/img/og.jpg" />
       <?php } ?>
       <?php 
       if (!empty($wo['story']['postFile'])) { 
@@ -293,6 +305,8 @@
                      }
                      if (json_data.is_footer == 1 && $('.second-footer').css('display') == 'none') {
                         $('footer .footer-wrapper').show();
+                     }else if(json_data.is_footer == 1 && $('.second-footer').css('display') != 'none'){
+
                      } else {
                       if ($(window).width() < 720) {
                         $('footer .footer-wrapper').show();
@@ -305,6 +319,7 @@
                      $("html, body").animate({ scrollTop: 0 }, 150);
                      Wo_FinishBar();
                      $('#hidden-content').empty();
+                     $('#users-reacted-modal').modal("hide");
                  });
                  $('.user-details, .pac-container, .lightbox-container').remove();
                }

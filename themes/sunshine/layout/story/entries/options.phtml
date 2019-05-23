@@ -1,4 +1,7 @@
 <?php 
+if (!empty($wo['story']['parent_id'])) {
+	$wo['story'] = $wo['post_shared_from'];
+}
 $is_voted = false;
 if ($wo['loggedin'] == true) {
 	$is_voted = Wo_IsPostVoted($wo['story']['id'], $wo['user']['user_id']); 
@@ -11,7 +14,7 @@ if ($wo['loggedin'] == true) {
     	$is_option_voted = Wo_IsOptionVoted($value['id'], $wo['user']['user_id']);
     } 
 	?>
-	<div id="option-<?php echo $value['id']?>" class="wo_votes <?php echo ($is_option_voted) ? 'active':'';?>" onclick="Wo_VoteUp(<?php echo $value['id']?>);" data-post-id="<?php echo $wo['story']['id'];?>">
+	<div id="option-<?php echo $value['id']?>" class="wo_votes <?php echo ($is_option_voted) ? 'active':'';?>" onclick="Wo_VoteUp(<?php echo $value['id']?>);" data-post-id="<?php echo $wo['current_post']['id'];?>">
 		<div class="poll-option">
 			<div class="bold <?php echo Wo_RightToLeft('pull-left');?>">
 				<?php echo $value['text'];?>
@@ -31,3 +34,4 @@ if ($wo['loggedin'] == true) {
 	<?php endforeach ?>
 	<div class="total-votes"><span id="total-votes"><?php echo $value['all'];?></span> <?php echo $wo['lang']['total_votes'] ?></div>
 </div>
+<?php $wo['story'] = $wo['current_post']; ?>

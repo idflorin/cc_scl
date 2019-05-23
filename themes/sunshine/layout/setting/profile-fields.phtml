@@ -8,13 +8,12 @@
 				$fid = Wo_Secure( $_GET[ $wo['field']['fid'] ] );
 			}
 		?>
-		<label class="col-md-12" for="<?php echo $wo['field']['fid'];?>"></label>  
+		<label class="col-md-12" for="<?php echo $wo['field']['fid'];?>"><?php echo $wo['field']['name']; ?></label>  
 		<div class="col-md-12" <?php if( isset( $wo['field']['issearch'] ) ){ ?> style="padding-left: 0px;padding-right: 0px;" <?php } ?>>
 			<?php 
 				if ($wo['field']['select_type'] == 'yes') {
 				$options = @explode(',', $wo['field']['type']); ?>
 			<select name="<?php echo $wo['field']['fid'];?>" class="form-control">
-				<option value=""></option>
 				<?php
 					foreach ($options as $key => $value) {
 					$selected = (($key + 1) == $fid) ? 'selected' : '';

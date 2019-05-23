@@ -1,11 +1,12 @@
 <?php
-error_reporting(0);
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+error_reporting(0);
+
 
 @ini_set('max_execution_time', 0);
 require_once('config.php');
+
 require_once('assets/libraries/DB/vendor/autoload.php');
 
 // require 'assets/libraries/ffmpeg-class/vendor/autoload.php';
@@ -44,13 +45,13 @@ if (in_array($_SERVER["REMOTE_ADDR"], $baned_ips)) {
 $config              = Wo_GetConfig();
 $db                  = new MysqliDb($sqlConnect);
 
-if( ISSET( $_GET['theme'] ) ){
+if( ISSET( $_GET['theme'] ) && in_array($_GET['theme'], ['default', 'sunshine'])){
     $_SESSION['theme'] = $_GET['theme'];
 }
 
 if( ISSET( $_SESSION['theme'] ) ){
     $config['theme'] = $_SESSION['theme'];
-    if( $_SERVER["REQUEST_URI"] == "/v2/wonderful" || $_SERVER["REQUEST_URI"] == "/v2/default" ){
+    if( $_SERVER["REQUEST_URI"] == "/v2/wonderful" || $_SERVER["REQUEST_URI"] == "/v2/wowonder" ){
         header("Location: " . $_SERVER['HTTP_REFERER']);
     }
 }
@@ -161,7 +162,7 @@ $wo['site_pages'] = array(
     'authorize'
 );
 
-$wo['script_version']  = '2.1.1';
+$wo['script_version']  = '2.2.2';
 $http_header           = 'http://';
 if (!empty($_SERVER['HTTPS'])) {
     $http_header = 'https://';
@@ -360,9 +361,10 @@ if (file_exists('assets/languages/extra/' . $wo['language'] . '.php')) {
 if (empty($wo['lang'])) {
     $wo['lang'] = Wo_LangsFromDB();
 }
+
 $wo['second_post_button_icon']  = ($config['second_post_button'] == 'wonder') ? '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg>' : '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>';
 $theme_settings = array();
-$theme_settings['theme'] = 'default';
+$theme_settings['theme'] = 'wowonder';
 
 if (file_exists('./themes/' . $config['theme'] . '/layout/404/dont-delete-this-file.json')) {
     $theme_settings = json_decode(file_get_contents('./themes/' . $config['theme'] . '/layout/404/dont-delete-this-file.json'), true);
@@ -728,6 +730,7 @@ if (!empty($_GET['mode'])) {
 
 include_once('assets/includes/onesignal_config.php');
 
+
 if (!empty($_GET['access']) || empty($_COOKIE['access'])) {
     include_once('assets/includes/paypal_config.php');
     setcookie("access", '1', time() + 24*60*60, '/');
@@ -736,8 +739,38 @@ if ($wo['config']['last_notification_delete_run'] <= time()-(60*60*24)) {
     mysqli_multi_query($sqlConnect, " DELETE FROM " . T_NOTIFICATION . " WHERE `time` < " . (time() - (60 * 60 * 24 * 5)) . " AND `seen` <> 0");
     mysqli_query($sqlConnect, "UPDATE " . T_CONFIG . " SET `value` = '" . time() . "' WHERE `name` = 'last_notification_delete_run'");
 }
-
+// manage packages 
+$wo['pro_packages'] = Wo_GetAllProInfo();
+$wo['pro_packages_types'] = array('1' => 'star',
+                                  '2' => 'hot',
+                                  '3' => 'ultima',
+                                  '4' => 'vip');
+// manage packages 
 $star_package_duration   = 604800; // week in seconds
 $hot_package_duration    = 2629743; // month in seconds
 $ultima_package_duration = 31556926; // year in seconds
 $vip_package_duration    = 0; // life time package
+
+$seconds_in_day = (60*60*24);
+$star_package_duration   = $seconds_in_day * $wo['pro_packages']['star']['time']; // week in seconds
+$hot_package_duration    = $seconds_in_day * $wo['pro_packages']['hot']['time']; // month in seconds
+$ultima_package_duration = $seconds_in_day * $wo['pro_packages']['ultima']['time']; // year in seconds
+$vip_package_duration    = $seconds_in_day * $wo['pro_packages']['vip']['time']; // life time package
+
+try {
+    $wo['genders']           = Wo_GetGenders($wo['language'],$langs);
+    $wo['page_categories']   = Wo_GetCategories(T_PAGES_CATEGORY);
+    $wo['group_categories']   = Wo_GetCategories(T_GROUPS_CATEGORY);
+    $wo['blog_categories']   = Wo_GetCategories(T_BLOGS_CATEGORY);
+    $wo['products_categories']   = Wo_GetCategories(T_PRODUCTS_CATEGORY);
+} catch (Exception $e) {
+    $wo['genders']           = [];
+    $wo['page_categories']   = [];
+    $wo['group_categories']   = [];
+    $wo['blog_categories']   = [];
+    $wo['products_categories']   = [];
+}
+
+if (!empty($_GET['theme'])) {
+    Wo_CleanCache();
+}

@@ -13,6 +13,7 @@ require_once('assets/init.php');
 use Aws\S3\S3Client;
 use Twilio\Jwt\AccessToken;
 use Twilio\Jwt\Grants\VideoGrant;
+
 $f = '';
 $s = '';
 if (isset($_GET['f'])) {
@@ -40,7 +41,8 @@ $allow_array = array(
     'paypro_with_bitcoin',
     'upload-blog-image',
     'wallet',
-    'download_user_info'
+    'download_user_info',
+    'movies'
 );
 if (!in_array($f, $allow_array)) {
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
@@ -489,6 +491,29 @@ if ($f == 'resned_ac_email') {
     exit();
 }
 if ($f == 'contact_us') {
+    if ($wo['config']['reCaptcha'] == 1) {
+        if (empty($_POST['g-recaptcha-response'])) {
+            $errors[] = $error_icon . $wo['lang']['please_check_details'];
+        }
+        else{
+            $recaptcha_data = array(
+            'secret' => $wo['config']['recaptcha_secret_key'],
+            'response' => $_POST['g-recaptcha-response']
+            );
+
+            $verify = curl_init();
+            curl_setopt($verify, CURLOPT_URL, "https://www.google.com/recaptcha/api/siteverify");
+            curl_setopt($verify, CURLOPT_POST, true);
+            curl_setopt($verify, CURLOPT_POSTFIELDS, http_build_query($recaptcha_data));
+            curl_setopt($verify, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($verify, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($verify);
+            $response = json_decode($response);
+            if (!$response->success) {
+                $errors[] = $error_icon . $wo['lang']['reCaptcha_error'];
+            }
+        }
+    }
     if (empty($_POST['first_name']) || empty($_POST['last_name']) || empty($_POST['email']) || empty($_POST['message'])) {
         $errors[] = $error_icon . $wo['lang']['please_check_details'];
     } else if (!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
@@ -536,7 +561,7 @@ if ($f == 'login') {
     $phone = 0;
     if (isset($_POST['username']) && isset($_POST['password'])) {
         $username = Wo_Secure($_POST['username']);
-        $password = Wo_Secure($_POST['password']);
+        $password = $_POST['password'];
         $result   = Wo_Login($username, $password);
         if ($result === false) {
             $errors[] = $error_icon . $wo['lang']['incorrect_username_or_password_label'];
@@ -599,7 +624,7 @@ if ($f == 'login') {
 }
 if ($f == 'register') {
     $fields = Wo_GetWelcomeFileds();
-    if (empty($_POST['email']) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
+    if (empty($_POST['email']) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['confirm_password']) || empty($_POST['gender'])) {
         $errors = $error_icon . $wo['lang']['please_check_details'];
     } else {
         $is_exist = Wo_IsNameExist($_POST['username'], 0);
@@ -654,13 +679,16 @@ if ($f == 'register') {
             }
         }
         $gender = 'male';
-        if (!empty($_POST['gender'])) {
-            if ($_POST['gender'] != 'male' && $_POST['gender'] != 'female') {
-                $gender = 'male';
-            } else {
-                $gender = $_POST['gender'];
-            }
+        if (in_array($_POST['gender'], array_keys($wo['genders']))) {
+            $gender = $_POST['gender'];
         }
+        // if (!empty($_POST['gender'])) {
+        //     if ($_POST['gender'] != 'male' && $_POST['gender'] != 'female') {
+        //         $gender = 'male';
+        //     } else {
+        //         $gender = $_POST['gender'];
+        //     }
+        // }
         if (!empty($fields) && count($fields) > 0) {
             foreach ($fields as $key => $field) {
                 if (empty($_POST[$field['fid']])) {
@@ -691,7 +719,7 @@ if ($f == 'register') {
         $re_data  = array(
             'email' => Wo_Secure($_POST['email'], 0),
             'username' => Wo_Secure($_POST['username'], 0),
-            'password' => Wo_Secure($_POST['password'], 0),
+            'password' => $_POST['password'],
             'email_code' => Wo_Secure($code, 0),
             'src' => 'site',
             'gender' => Wo_Secure($gender),
@@ -1216,8 +1244,10 @@ if ($f == "load-recent-blogs") {
     echo json_encode($data);
     exit();
 }
-if ($wo['loggedin'] == false && $s != 'load_more_posts') {
-    exit("Please login or signup to continue.");
+if ($wo['loggedin'] == false && ($s != 'load_more_posts')) {
+    if ($s != 'load-comments') {
+        exit("Please login or signup to continue.");
+    }
 }
 if ($f == "get_more_following") {
     $html = '';
@@ -1285,11 +1315,20 @@ if ($f == "get_more_photos") {
             'after_post_id' => $_GET['after_last_id']
         )) as $wo['story']) {
             if (isset($wo['story']['postFile']) && !empty($wo['story']['postFile'])) {
-                $html .= '<div class="text-center photo-data" data-photo-id="' . $wo['story']['post_id'] . '">
+                if (!empty($wo['story']) && $wo['story']['blur'] == 1) {
+                    $html .= '<div class="text-center photo-data" data-photo-id="' . $wo['story']['post_id'] . '">
+                            <a href="javascript:Wo_OpenLightBox(' . $wo['story']['post_id'] . ');">
+                                <img src="'. Wo_GetMedia($wo['story']['postFile']) . '" style="filter: blur(5px)">
+                            </a>
+                        </div>';
+                }
+                else{
+                    $html .= '<div class="text-center photo-data" data-photo-id="' . $wo['story']['post_id'] . '">
                             <a href="javascript:Wo_OpenLightBox(' . $wo['story']['post_id'] . ');">
                                 <img src="'. Wo_GetMedia($wo['story']['postFile']) . '" >
                             </a>
                         </div>';
+                }
             }
         }
     }
@@ -1356,47 +1395,212 @@ if ($f == 'check_username') {
     exit();
 }
 if ($f == 'update_two_factor') {
-    if (isset($_POST) && Wo_CheckSession($hash_id) === true) {
-        if (!isset($_POST['two_factor'])) {
-            $errors[] = $error_icon . $wo['lang']['please_check_details'];
-        } else {
-            $Userdata = Wo_UserData($_POST['user_id']);
-            if (!empty($Userdata['user_id'])) {
-                $two_factor = $Userdata['two_factor'];
-                if (isset($_POST['two_factor'])) {
-                    if ($_POST['two_factor'] == '1') {
-                        $two_factor = 1;
-                    } else {
-                        $two_factor = 0;
-                    }
-                    if ($two_factor == $Userdata['two_factor']) {
-                        $two_factor = $Userdata['two_factor'];
-                    }
+    $error = '';
+
+    if ($s == 'enable') {
+        if (isset($_POST) && Wo_CheckSession($hash_id) === true) {
+            
+            $is_phone = false;
+            if (!empty($_POST['phone_number']) && ($wo['config']['two_factor_type'] == 'both' || $wo['config']['two_factor_type'] == 'phone')) {
+                preg_match_all('/\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|
+                                2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|
+                                4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/', $_POST['phone_number'], $matches);
+                if (!empty($matches[1][0]) && !empty($matches[0][0])) {
+                    $is_phone = true;
                 }
-                if (empty($errors)) {
-                    $Update_data = array(
-                        'two_factor' => $two_factor
-                    );
-                    if (Wo_UpdateUserData($_POST['user_id'], $Update_data)) {
-                        $data = array(
-                            'status' => 200,
-                            'message' => $success_icon . $wo['lang']['setting_updated'],
+            }
+            if ((empty($_POST['phone_number']) && $wo['config']['two_factor_type'] == 'phone') || empty($_POST['two_factor']) || $_POST['two_factor'] != 'enable') {
+                $error = $error_icon . $wo['lang']['please_check_details'];
+            }
+            elseif (!empty($_POST['phone_number']) && ($wo['config']['two_factor_type'] == 'both' || $wo['config']['two_factor_type'] == 'phone') && $is_phone == false) {
+                $error = $error_icon . $wo['lang']['phone_number_error'];
+            }
+
+            if (empty($error)) {
+
+                $code = rand(111111, 999999);
+                $hash_code = md5($code);
+                $message = "Your confirmation code is: $code";
+                $phone_sent = false;
+                $email_sent = false;
+                if (!empty($_POST['phone_number']) && ($wo['config']['two_factor_type'] == 'both' || $wo['config']['two_factor_type'] == 'phone')) {
+                    $send = Wo_SendSMSMessage($_POST['phone_number'], $message);
+                    if ($send) {
+                        $phone_sent = true;
+                        $Update_data = array(
+                            'phone_number' => Wo_Secure($_POST['phone_number'])
                         );
+                        Wo_UpdateUserData($wo['user']['user_id'], $Update_data);
                     }
                 }
+                if ($wo['config']['two_factor_type'] == 'both' || $wo['config']['two_factor_type'] == 'email') {
+
+                    $send_message_data       = array(
+                        'from_email' => $wo['config']['siteEmail'],
+                        'from_name' => $wo['config']['siteName'],
+                        'to_email' => $wo['user']['email'],
+                        'to_name' => $wo['user']['name'],
+                        'subject' => 'Please verify that it’s you',
+                        'charSet' => 'utf-8',
+                        'message_body' => $message,
+                        'is_html' => true
+                    );
+                    $send = Wo_SendMessage($send_message_data);
+                    if ($send) {
+                        $email_sent = true;
+                    }
+                }
+                if ($email_sent == true || $phone_sent == true) {
+                    $Update_data = array(
+                        'two_factor' => 0,
+                        'two_factor_verified' => 0
+                    );
+                    Wo_UpdateUserData($wo['user']['user_id'], $Update_data);
+                    $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code));
+                    $data = array(
+                                'status' => 200,
+                                'message' => $success_icon . $wo['lang']['we_have_sent_you_code'],
+                            );
+                }
+                else{
+                    $data = array(
+                                'status' => 400,
+                                'message' => $error_icon . $wo['lang']['something_wrong'],
+                            );
+                }
+            }
+            else{
+                $data = array(
+                                'status' => 400,
+                                'message' => $error,
+                            );
             }
         }
     }
-    header("Content-type: application/json");
-    if (isset($errors)) {
-        echo json_encode(array(
-            'errors' => $errors
-        ));
-    } else {
-        echo json_encode($data);
+
+    if ($s == 'disable') {
+        if ($_POST['two_factor'] != 'disable') {
+            $error = $error_icon . $wo['lang']['please_check_details'];
+            $data = array(
+                            'status' => 400,
+                            'message' => $error,
+                        );
+        }
+        else{
+            $Update_data = array(
+                'two_factor' => 0,
+                'two_factor_verified' => 0
+            );
+            Wo_UpdateUserData($wo['user']['user_id'], $Update_data);
+            $data = array(
+                        'status' => 200,
+                        'message' => $success_icon . $wo['lang']['setting_updated'],
+                    );
+        }
+
     }
+
+    if ($s == 'verify') {
+        if (empty($_POST['code'])) {
+            $error = $error_icon . $wo['lang']['please_check_details'];
+        }
+        else{
+            $confirm_code = $db->where('user_id', $wo['user']['user_id'])->where('email_code', md5($_POST['code']))->getValue(T_USERS, 'count(*)');
+            $Update_data = array();
+            if (empty($confirm_code)) {
+                $error = $error_icon . $wo['lang']['wrong_confirmation_code'];
+            }
+            if (empty($error)) {
+                $message = '';
+                if ($wo['config']['two_factor_type'] == 'phone') {
+                    $message = $success_icon . $wo['lang']['your_phone_verified'];
+                    if (!empty($_GET['setting'])) {
+                        $Update_data['phone_number'] = $wo['user']['new_phone'];
+                        $Update_data['new_phone'] = '';
+                    }
+                }
+                if ($wo['config']['two_factor_type'] == 'email') {
+                    $message = $success_icon . $wo['lang']['your_email_verified'];
+                    if (!empty($_GET['setting'])) {
+                        $Update_data['email'] = $wo['user']['new_email'];
+                        $Update_data['new_email'] = '';
+                    }
+                }
+                if ($wo['config']['two_factor_type'] == 'both') {
+                    $message = $success_icon . $wo['lang']['your_phone_email_verified'];
+                    if (!empty($_GET['setting'])) {
+                        if (!empty($wo['user']['new_email'])) {
+                            $Update_data['email'] = $wo['user']['new_email'];
+                            $Update_data['new_email'] = '';
+                        }
+                        if (!empty($wo['user']['new_phone'])) {
+                            $Update_data['phone_number'] = $wo['user']['new_phone'];
+                            $Update_data['new_phone'] = '';
+                        }
+                    }
+                }
+                $Update_data['two_factor_verified'] = 1;
+                $Update_data['two_factor'] = 1;
+                Wo_UpdateUserData($wo['user']['user_id'], $Update_data);
+
+                $data = array(
+                            'status' => 200,
+                            'message' => $message,
+                        );
+            }
+        }
+        if (!empty($error)) {
+            $data = array(
+                        'status' => 400,
+                        'message' => $error,
+                    );
+        }
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
     exit();
 }
+if ($f == "verify_email_phone") {
+    if (empty($_POST['code'])) {
+        $error = $error_icon . $wo['lang']['please_check_details'];
+    }
+    else{
+        $confirm_code = $db->where('user_id', $wo['user']['user_id'])->where('email_code', md5($_POST['code']))->getValue(T_USERS, 'count(*)');
+        $Update_data = array();
+        if (empty($confirm_code)) {
+            $error = $error_icon . $wo['lang']['wrong_confirmation_code'];
+        }
+        if (empty($error)) {
+            $message = '';
+            if ($wo['config']['sms_or_email'] == 'sms') {
+                $message = $success_icon . $wo['lang']['your_phone_verified'];
+                $Update_data['phone_number'] = $wo['user']['new_phone'];
+                $Update_data['new_phone'] = '';
+            }
+            if ($wo['config']['sms_or_email'] == 'mail') {
+                $message = $success_icon . $wo['lang']['your_email_verified'];
+                $Update_data['email'] = $wo['user']['new_email'];
+                $Update_data['new_email'] = '';
+            }
+            Wo_UpdateUserData($wo['user']['user_id'], $Update_data);
+
+            $data = array(
+                        'status' => 200,
+                        'message' => $message,
+                    );
+        }
+    }
+    if (!empty($error)) {
+        $data = array(
+                    'status' => 400,
+                    'message' => $error,
+                );
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
+    exit();
+}
+
 if ($f == "update_general_settings") {
     if (isset($_POST) && Wo_CheckSession($hash_id) === true) {
         if (empty($_POST['username']) OR empty($_POST['email'])) {
@@ -1514,69 +1718,155 @@ if ($f == "update_general_settings") {
                     'female'
                 );
                 if (!empty($_POST['gender'])) {
-                    if (in_array($_POST['gender'], $gender_array)) {
+                    if (in_array($_POST['gender'], array_keys($wo['genders']))) {
                         $gender = $_POST['gender'];
                     }
                 }
                 if (empty($errors)) {
-                    $Update_data = array(
-                        'username' => $_POST['username'],
-                        'email' => $_POST['email'],
-                        'birthday' => $age_data,
-                        'gender' => $gender,
-                        'country_id' => $_POST['country'],
-                        'active' => $active,
-                        'admin' => $type,
-                        'is_pro' => $member_pro,
-                        'pro_type' => $member_type,
-                        'pro_time' => $time,
-                        'wallet' => $wallet
-                    );
-                    if (!empty($_POST['verified'])) {
-                        if ($_POST['verified'] == 'verified') {
-                            $Verification = 1;
-                        } else {
-                            $Verification = 0;
+                    $save = true;
+                    if (!Wo_IsAdmin()) {
+                        $code = rand(111111, 999999);
+                        $hash_code = md5($code);
+                        $message = "Your confirmation code is: $code";
+
+                        if ($_POST['email'] != $wo['user']['email'] && $wo['config']['sms_or_email'] == 'mail' && $wo['config']['emailValidation'] == 1) {
+                            $send_message_data       = array(
+                                'from_email' => $wo['config']['siteEmail'],
+                                'from_name' => $wo['config']['siteName'],
+                                'to_email' => $_POST['email'],
+                                'to_name' => $wo['user']['name'],
+                                'subject' => 'Please verify that it’s you',
+                                'charSet' => 'utf-8',
+                                'message_body' => $message,
+                                'is_html' => true
+                            );
+                            $send = Wo_SendMessage($send_message_data);
+                            if ($send) {
+                                $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
+                                                                                                                     'new_email'      => Wo_Secure($_POST['email'])));
+                                $save = false;
+                                $data['type'] = 'email';
+                                $data['status'] = 200;
+                            }
                         }
-                        if ($Verification == $Userdata['verified']) {
-                            $Verification = $Userdata['verified'];
-                        }
-                        $Update_data['verified'] = $Verification;
-                    }
-                    $unverify = false;
-                    if ($Userdata['username'] != $_POST['username']) {
-                        $unverify = true;
-                    }
-                    if (!empty($_POST['phone_number'])) {
-                        $Update_data['phone_number'] = Wo_Secure($_POST['phone_number']);
-                    }
-                    // var_dump(Wo_UpdateUserData($_POST['user_id'], $Update_data,$unverify));
-                    // exit();
-                    if (Wo_UpdateUserData($_POST['user_id'], $Update_data, $unverify)) {
-                        $field_data = array();
-                        if (!empty($_POST['custom_fields'])) {
-                            $fields = Wo_GetProfileFields('general');
-                            foreach ($fields as $key => $field) {
-                                $name = $field['fid'];
-                                if (isset($_POST[$name])) {
-                                    if (mb_strlen($_POST[$name]) > $field['length']) {
-                                        $errors[] = $error_icon . $field['name'] . ' field max characters is ' . $field['length'];
-                                    }
-                                    $field_data[] = array(
-                                        $name => $_POST[$name]
-                                    );
+                        elseif (!empty($_POST['phone_number']) && $_POST['phone_number'] != $wo['user']['phone_number'] && $wo['config']['sms_or_email'] == 'sms' && $wo['config']['emailValidation'] == 1) {
+                            preg_match_all('/\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|
+                                    2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|
+                                    4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/', $_POST['phone_number'], $matches);
+                            if (empty($matches[1][0]) && empty($matches[0][0])) {
+                                $errors[] = $error_icon . $wo['lang']['phone_number_error'];
+                            }
+                            else{
+                                $send = Wo_SendSMSMessage($_POST['phone_number'], $message);
+                                if ($send) {
+                                    $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
+                                                                                                                         'new_phone' => Wo_Secure($_POST['phone_number'])));
+                                    $save = false;
+                                    $data['type'] = 'phone';
+                                    $data['status'] = 200;
                                 }
                             }
                         }
-                        if (!empty($field_data)) {
-                            $insert = Wo_UpdateUserCustomData($_POST['user_id'], $field_data);
+                    }
+                    // elseif ($wo['config']['two_factor_type'] == 'both' && ((!empty($_POST['phone_number']) && $_POST['phone_number'] != $wo['user']['phone_number']) || $_POST['email'] != $wo['user']['email']) && $wo['config']['emailValidation'] == 1) {
+                    //     if (!empty($_POST['phone_number']) && $_POST['phone_number'] != $wo['user']['phone_number']) {
+                    //         preg_match_all('/\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|
+                    //             2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|
+                    //             4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/', $_POST['phone_number'], $matches);
+                    //         if (empty($matches[1][0]) && empty($matches[0][0])) {
+                    //             $errors[] = $error_icon . $wo['lang']['phone_number_error'];
+                    //         }
+                    //         else{
+                    //             $send = Wo_SendSMSMessage($_POST['phone_number'], $message);
+                    //             if ($send) {
+                    //                 $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
+                    //                                                                                                      'new_phone' => Wo_Secure($_POST['phone_number'])));
+                    //                 $data['type'] = 'phone';
+                    //                 $data['status'] = 200;
+                    //             }
+                    //         }
+                    //     }
+                    //     elseif ($_POST['email'] != $wo['user']['email']) {
+                    //         $send_message_data       = array(
+                    //             'from_email' => $wo['config']['siteEmail'],
+                    //             'from_name' => $wo['config']['siteName'],
+                    //             'to_email' => $_POST['email'],
+                    //             'to_name' => $wo['user']['name'],
+                    //             'subject' => 'Please verify that it’s you',
+                    //             'charSet' => 'utf-8',
+                    //             'message_body' => $message,
+                    //             'is_html' => true
+                    //         );
+                    //         $send = Wo_SendMessage($send_message_data);
+                    //         if ($send) {
+                    //             $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
+                    //                                                                                                  'new_email'      => Wo_Secure($_POST['email'])));
+                    //             $data['type'] = 'email';
+                    //             $data['status'] = 200;
+                    //         }
+                    //     }
+                    // }
+                    if($save == true){
+
+                        $Update_data = array(
+                            'username' => $_POST['username'],
+                            'email' => $_POST['email'],
+                            'birthday' => $age_data,
+                            'gender' => $gender,
+                            'country_id' => $_POST['country'],
+                            'active' => $active,
+                            'admin' => $type,
+                            'is_pro' => $member_pro,
+                            'pro_type' => $member_type,
+                            'pro_time' => $time,
+                            'wallet' => $wallet
+                        );
+                        if (!empty($_POST['verified'])) {
+                            if ($_POST['verified'] == 'verified') {
+                                $Verification = 1;
+                            } else {
+                                $Verification = 0;
+                            }
+                            if ($Verification == $Userdata['verified']) {
+                                $Verification = $Userdata['verified'];
+                            }
+                            $Update_data['verified'] = $Verification;
                         }
-                        if (empty($errors)) {
-                            $data = array(
-                                'status' => 200,
-                                'message' => $success_icon . $wo['lang']['setting_updated'],
-                                'username' => Wo_SeoLink('index.php?link1=timeline&u=' . Wo_Secure($_POST['username']))
-                            );
+                        $unverify = false;
+                        if ($Userdata['username'] != $_POST['username']) {
+                            $unverify = true;
+                        }
+                        if (!empty($_POST['phone_number'])) {
+                            $Update_data['phone_number'] = Wo_Secure($_POST['phone_number']);
+                        }
+                        // var_dump(Wo_UpdateUserData($_POST['user_id'], $Update_data,$unverify));
+                        // exit();
+                        if (Wo_UpdateUserData($_POST['user_id'], $Update_data, $unverify)) {
+                            $field_data = array();
+                            if (!empty($_POST['custom_fields'])) {
+                                $fields = Wo_GetProfileFields('general');
+                                foreach ($fields as $key => $field) {
+                                    $name = $field['fid'];
+                                    if (isset($_POST[$name])) {
+                                        if (mb_strlen($_POST[$name]) > $field['length']) {
+                                            $errors[] = $error_icon . $field['name'] . ' field max characters is ' . $field['length'];
+                                        }
+                                        $field_data[] = array(
+                                            $name => $_POST[$name]
+                                        );
+                                    }
+                                }
+                            }
+                            if (!empty($field_data)) {
+                                $insert = Wo_UpdateUserCustomData($_POST['user_id'], $field_data);
+                            }
+                            if (empty($errors)) {
+                                $data = array(
+                                    'status' => 200,
+                                    'message' => $success_icon . $wo['lang']['setting_updated'],
+                                    'username' => Wo_SeoLink('index.php?link1=timeline&u=' . Wo_Secure($_POST['username']))
+                                );
+                            }
                         }
                     }
                 }
@@ -1663,7 +1953,7 @@ if ($f == "update_privacy_settings") {
             }
         }
         if (!empty($_POST['message_privacy'])) {
-            if (in_array($_POST['message_privacy'], $array)) {
+            if (in_array($_POST['message_privacy'], $array_2)) {
                 $message_privacy = $_POST['message_privacy'];
             }
         }
@@ -2573,14 +2863,112 @@ if ($f == 'get_messages') {
             'status' => 200,
             'html' => ''
         );
+
         $messages = Wo_GetMessagesUsers($wo['user']['user_id'], '', 5);
-        if (count($messages) > 0) {
-            foreach ($messages as $wo['message']) {
-                $data['html'] .= Wo_LoadPage('header/messages');
+        
+        $groups_messages = Wo_GetGroupsListAPP(array('limit' => 5));
+        if (!empty($messages) || !empty($groups_messages)) {
+            $messages_count = 0;
+            if (!empty($messages) && !empty($groups_messages) && (count($messages) >= count($groups_messages))) {
+                foreach ($messages as $key => $wo['message']) {
+                    $message = Wo_GetMessagesHeader(array('user_id' => $wo['message']['user_id']), 1);
+                    if (!empty($message)) {
+                        foreach ($groups_messages as $group_key => $group_value) {
+                            if ($message['time'] < $group_value['time']) {
+                                    $wo['group'] = $groups_messages[$group_key];
+                                    if (!empty($wo['group']['last_message']) && $messages_count < 5) {
+                                        $data['html'] .= Wo_LoadPage('header/group_messages');
+                                        $messages_count = $messages_count + 1;
+                                        unset($groups_messages[$group_key]);
+                                    }
+                            }
+                        }
+                        if ($messages_count < 5 && !empty($message['messageUser'])) {
+                            $data['html'] .= Wo_LoadPage('header/messages'); 
+                            $messages_count = $messages_count + 1;
+                        }
+                    }
+                }
+                if ($messages_count < 5 && !empty($groups_messages)) {
+                    foreach ($groups_messages as $group_key => $group_value) {
+                        $wo['group'] = $groups_messages[$group_key];
+                        if (!empty($wo['group']['last_message']) && $messages_count < 5) {
+                            $data['html'] .= Wo_LoadPage('header/group_messages');
+                            $messages_count = $messages_count + 1;
+                            unset($groups_messages[$group_key]);
+                        }
+                    }
+                }
+
+
             }
-        } else {
+            elseif (!empty($messages) && !empty($groups_messages) && (count($messages) < count($groups_messages))) {
+                foreach ($groups_messages as $key => $wo['group']) {
+                    foreach ($messages as $messages_key => $messages_value) {
+                        $message = Wo_GetMessagesHeader(array('user_id' => $messages_value['user_id']), 1);
+                        if ($message['time'] > $wo['group']['time']) {
+                                $wo['message'] = $messages[$messages_key];
+                                if ($messages_count < 5 && !empty($message['messageUser'])) {
+                                    $data['html'] .= Wo_LoadPage('header/messages'); 
+                                    $messages_count = $messages_count + 1;
+                                    unset($messages[$messages_key]);
+                                }
+                        }
+                    }
+                    if (!empty($wo['group']['last_message']) && $messages_count < 5) {
+                        $data['html'] .= Wo_LoadPage('header/group_messages');
+                        $messages_count = $messages_count + 1;
+                    }
+                }
+                if ($messages_count < 5 && !empty($messages)) {
+                    foreach ($messages as $messages_key => $messages_value) {
+                        $message = Wo_GetMessagesHeader(array('user_id' => $messages_value['user_id']), 1);
+                        $wo['message'] = $messages[$messages_key];
+                        if ($messages_count < 5 && !empty($message['messageUser'])) {
+                            $data['html'] .= Wo_LoadPage('header/messages'); 
+                            $messages_count = $messages_count + 1;
+                            unset($messages[$messages_key]);
+                        }
+                    }
+                }
+            }
+            elseif (!empty($messages) && empty($groups_messages)) {
+                foreach ($messages as $key => $wo['message']) {
+                    $message = Wo_GetMessagesHeader(array('user_id' => $wo['message']['user_id']), 1);
+                    if (!empty($message['messageUser'])) {
+                        $data['html'] .= Wo_LoadPage('header/messages');
+                    }
+                }
+            }
+            elseif (empty($messages) && !empty($groups_messages)) {
+                foreach ($groups_messages as $key => $wo['group']) {
+                    if (!empty($wo['group']['last_message'])) {
+                        $data['html'] .= Wo_LoadPage('header/group_messages');
+                    }
+                }
+            }
+        }else {
             $data['message'] = $wo['lang']['no_more_message_to_show'];
         }
+
+
+        // if (count($messages) > 0 || count($groups_messages) > 0) {
+        //     if (!empty($messages)) {
+        //         foreach ($messages as $key => $wo['message']) {
+        //             $message = Wo_GetMessagesHeader(array('user_id' => $wo['message']['user_id']), 1);
+        //             if (!empty($groups_messages)) {
+        //                 foreach ($groups_messages as $group_key => $group_value) {
+        //                     if ($message['time'] < $group_value['time']) {
+        //                             $wo['group'] = $groups_messages[$group_key];
+        //                             $data['html'] .= Wo_LoadPage('header/group_messages');
+        //                             unset($groups_messages[$group_key]);
+        //                     }
+        //                 }
+        //             }
+        //             $data['html'] .= Wo_LoadPage('header/messages'); 
+        //         }
+        //     }
+        // } 
         $data['messages_url']  = Wo_SeoLink('index.php?link1=messages');
         $data['messages_text'] = $wo['lang']['see_all'];
     }
@@ -2617,6 +3005,8 @@ if ($f == 'update_data') {
         $data['messages'] = Wo_CountMessages(array(
             'new' => true
         ), 'interval');
+        $chat_groups = Wo_CheckLastGroupUnread();
+        $data['messages'] = $data['messages'] + count($chat_groups);
         $data['calls']    = 0;
         $data['is_call']  = 0;
         $check_calles     = Wo_CheckFroInCalls();
@@ -2709,9 +3099,14 @@ if ($f == 'messages') {
                     $can_replay = false;
                 }
             }
+            elseif (!empty($recipient['user_id']) && $recipient['message_privacy'] == 2) {
+                $can_replay = false;
+            }
             foreach ($messages as $wo['message']) {
+                $wo['message']['color'] = Wo_GetChatColor($wo['user']['user_id'], $recipient['user_id']);
                 $html .= Wo_LoadPage('messages/messages-text-list');
             }
+
             $_SESSION['chat_active_background'] = $recipient['user_id'];
             $wo['chat']['color'] = Wo_GetChatColor($wo['user']['user_id'], $recipient['user_id']);
             $data                = array(
@@ -2726,6 +3121,10 @@ if ($f == 'messages') {
                 'url' => $recipient['url'],
                 'avatar' => $recipient['avatar']
             );
+            $data['lastseen'] = '';
+            if($wo['config']['user_lastseen'] == 1 && $recipient['showlastseen'] != 0) { 
+                $data['lastseen'] = Wo_UserStatus($recipient['user_id'],$recipient['lastseen']);
+            }
             if ($wo['config']['video_chat'] == 1) {
                 if ($recipient['lastseen'] > time() - 60) {
                     $data['video_call'] = 200;
@@ -2804,6 +3203,13 @@ if ($f == 'messages') {
             if (empty($_POST['textSendMessage']) && empty($mediaFilename) && empty($sticker)) {
                 exit();
             }
+            $user_data    = Wo_UserData($_POST['user_id']);
+            if (!empty($user_data) && $user_data['message_privacy'] == 2) {
+                exit();
+            }
+            if (!empty($user_data) && $user_data['message_privacy'] == 1 && Wo_IsFollowing($wo['user']['user_id'], $_POST['user_id']) === false) {
+                exit();
+            }
             $messages = Wo_RegisterMessage(array(
                 'from_id' => Wo_Secure($wo['user']['user_id']),
                 'to_id' => Wo_Secure($_POST['user_id']),
@@ -2819,6 +3225,7 @@ if ($f == 'messages') {
                     'user_id' => $_POST['user_id']
                 ));
                 foreach ($messages as $wo['message']) {
+                    $wo['message']['color'] = Wo_GetChatColor($wo['user']['user_id'], $_POST['user_id']);
                     $html .= Wo_LoadPage('messages/messages-text-list');
                 }
                 $data = array(
@@ -2900,6 +3307,9 @@ if ($f == 'messages') {
                 'time' => time()
             ));
             if ($message_id > 0) {
+                @Wo_UpdateGChat(Wo_Secure($_POST['group_id']), array(
+                    "time" => time()
+                    ));
                 $message = Wo_GetGroupMessages(array(
                     'id' => $message_id,
                     'group_id' => $_POST['group_id']
@@ -3148,6 +3558,305 @@ if ($f == 'messages') {
     }
 }
 if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
+        if ($s == 'approve_receipt') {
+        if (!empty($_GET['receipt_id'])) {
+            $id = Wo_Secure($_GET['receipt_id']);
+            $receipt = $db->where('id',$id)->getOne('bank_receipts',array('*'));
+
+            if($receipt){
+                $updated = $db->where('id',$id)->update('bank_receipts',array('approved'=>1,'approved_at'=>time()));
+                if ($updated === true) {
+                    if ($receipt->mode == 'wallet') {
+                        $amount = $receipt->price;
+                        $result = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `wallet` = `wallet` + " . $amount . " WHERE `user_id` = '" . $receipt->user_id . "'");
+                        if ($result) {
+                            $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ('" . $receipt->user_id . "', 'WALLET', '" . $amount . "', 'bank receipts')");
+                        }
+                        $notification_data_array = array(
+                            'recipient_id' => $receipt->user_id,
+                            'type' => 'admin_notification',
+                            'url' => 'index.php?link1=wallet',
+                            'text' => $wo['lang']['bank_pro'],
+                            'type2' => 'no_name'
+                        );
+                        Wo_RegisterNotification($notification_data_array);
+                    }
+                    else{
+                        $pro_type = $receipt->mode;
+                        $update_array = array(
+                            'is_pro' => 1,
+                            'pro_time' => time(),
+                            'pro_' => 1,
+                            'pro_type' => $pro_type
+                        );
+                        if (in_array($pro_type, array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$pro_type]]['verified_badge'] == 1) {
+                            $update_array['verified'] = 1;
+                        }
+                        $mysqli       = Wo_UpdateUserData($receipt->user_id, $update_array);
+
+                        $notification_data_array = array(
+                            'recipient_id' => $receipt->user_id,
+                            'type' => 'admin_notification',
+                            'url' => 'index.php?link1=upgraded',
+                            'text' => $wo['lang']['bank_pro'],
+                            'type2' => 'no_name'
+                        );
+                        Wo_RegisterNotification($notification_data_array);
+                    }
+                    $data = array(
+                        'status' => 200
+                    );
+                }
+            }
+            $data = array(
+                'status' => 200,
+                'data' => $receipt
+            );
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_receipt') {
+        if (!empty($_GET['receipt_id'])) {
+            $user_id = Wo_Secure($_GET['user_id']);
+            $id = Wo_Secure($_GET['receipt_id']);
+            $photo_file = Wo_Secure($_GET['receipt_file']);
+            $receipt = $db->where('id',$id)->getOne('bank_receipts',array('*'));
+
+            $notification_data_array = array(
+                'recipient_id' => $receipt->user_id,
+                'type' => 'admin_notification',
+                'url' => 'index.php',
+                'text' => $wo['lang']['bank_decline'],
+                'type2' => 'no_name'
+            );
+            Wo_RegisterNotification($notification_data_array);
+
+            $db->where('id',$id)->delete('bank_receipts');
+            if (file_exists($photo_file)) {
+                @unlink(trim($photo_file));
+            }
+            else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                @Wo_DeleteFromToS3($photo_file);
+            }
+            $data = array(
+                'status' => 200
+            );
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+
+
+    if ($s == 'delete_user_posts') {
+        $data['status'] = 400;
+        if (!empty($_GET['user_id'])) {
+            Wo_RunInBackground(array(
+                    'status' => 200
+                ));
+            $user_id = Wo_Secure($_GET['user_id']);
+            Wo_DeleteAllUserPosts($user_id);
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+    // category
+    if ($s == 'add_new_category') {
+        $data['status'] = 400;
+        $data['message'] = 'Please check your details';
+        $types = array('page' => T_PAGES_CATEGORY,'group' => T_GROUPS_CATEGORY,'blog' => T_BLOGS_CATEGORY,'product' => T_PRODUCTS_CATEGORY);
+        if (!empty($_GET['type']) && in_array($_GET['type'], array_keys($types))) {
+            $add = false;
+            $insert_data = array();
+            foreach (Wo_LangsNamesFromDB() as $key => $lang) {
+                if (!empty($_POST[$lang])) {
+                    $insert_data[$lang] = Wo_Secure($_POST[$lang]);
+                    $add = true;
+                }
+            }
+            if ($add == true && !empty($insert_data)) {
+                $insert_data['type'] = 'category';
+                $id = $db->insert(T_LANGS,$insert_data);
+                $db->insert($types[$_GET['type']],array('lang_key' => $id));
+                $db->where('id',$id)->update(T_LANGS,array('lang_key' => $id));
+                $data = array('status' => 200);
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'get_category_langs' && !empty($_POST['lang_key'])) {
+        $data['status'] = 400;
+        $html = '';
+        $langs = Wo_GetLangDetails($_POST['lang_key']);
+        if (count($langs) > 0) {
+            foreach ($langs as $key => $wo['langs']) {
+                foreach ($wo['langs'] as $wo['key_'] => $wo['lang_vlaue']) {
+                    $html .= Wo_LoadAdminPage('edit-lang/form-list');
+                }
+            }
+            $data['status'] = 200;
+            $data['html'] = $html;
+        } 
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_category' && !empty($_POST['lang_key'])) {
+        $types = array('page' => T_PAGES_CATEGORY,'group' => T_GROUPS_CATEGORY,'blog' => T_BLOGS_CATEGORY,'product' => T_PRODUCTS_CATEGORY);
+        if (!empty($_GET['type']) && in_array($_GET['type'], array_keys($types))) {
+            if ($_POST['lang_key'] != 'other' && $_POST['lang_key'] != 'all_') {
+                $lang_key = Wo_Secure($_POST['lang_key']);
+                $category = $db->where('lang_key',$lang_key)->getOne($types[$_GET['type']]);
+                if (!empty($category)) {
+                    $db->where('lang_key',$lang_key)->delete(T_LANGS);
+                    $db->where('lang_key',$lang_key)->delete($types[$_GET['type']]);
+                    if ($_GET['type'] == 'page') {
+                        $db->where('page_category',$category->id)->update(T_PAGES,array('page_category' => 1));
+                    }
+                    if ($_GET['type'] == 'group') {
+                        $db->where('category',$category->id)->update(T_GROUPS,array('category' => 1));
+                    }
+                    if ($_GET['type'] == 'blog') {
+                        $db->where('category',$category->id)->update(T_BLOG,array('category' => 1));
+                    }
+                    if ($_GET['type'] == 'product') {
+                        $db->where('category',$category->id)->update(T_PRODUCTS,array('category' => 0));
+                    }
+                    $data['status'] = 200;
+                }
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    // category
+    // manage packages 
+    if ($s == 'update_pro_member') {
+        $data['status'] = 400;
+        $types = array('star','hot','ultima','vip');
+        $html = '';
+        if (in_array($_POST['type'], $types)) {
+            if (!is_numeric($_POST['price']) || $_POST['price'] < 0) {
+                $data['message'] = 'The price must be numeric';
+            }
+            elseif (!is_numeric($_POST['pages_promotion']) || $_POST['pages_promotion'] < 0) {
+                $data['message'] = 'pages promotion must be numeric';
+            }
+            elseif (!is_numeric($_POST['posts_promotion']) || $_POST['posts_promotion'] < 0) {
+                $data['message'] = 'posts promotion must be numeric';
+            }
+            else{
+                if (!empty($_FILES['icon'])) {
+                    $fileInfo = array(
+                        'file' => $_FILES["icon"]["tmp_name"],
+                        'name' => $_FILES['icon']['name'],
+                        'size' => $_FILES["icon"]["size"],
+                        'type' => $_FILES["icon"]["type"],
+                        'types' => 'jpeg,png,jpg,gif',
+                        'crop' => array(
+                            'width' => 32,
+                            'height' => 32
+                        )
+                    );
+                    $media    = Wo_ShareFile($fileInfo);
+                    if (!empty($media) && !empty($media['filename'])) {
+                        $_POST['image'] = $media['filename'];
+                    }
+                }
+                if (!empty($_POST['icon_to_use']) && $_POST['icon_to_use'] == 1) {
+                    $link = substr($wo['pro_packages'][$_POST['type']]['image'], strpos($wo['pro_packages'][$_POST['type']]['image'],'upload/'));
+                    if (file_exists($link)) {
+                        @unlink(trim($link));
+                    }
+                    else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                        @Wo_DeleteFromToS3($link);
+                    }
+                    $_POST['image'] = '';
+                }
+                Wo_updateProInfo($_POST);
+                if (!empty($_POST['name']) && $_POST['name'] != $wo['lang'][$_POST['type']]) {
+                    $langs = Wo_GetLangDetails($_POST['type']);
+                    if (count($langs) > 0) {
+                        foreach ($langs as $key => $wo['langs']) {
+                            foreach ($wo['langs'] as $wo['key_'] => $wo['lang_vlaue']) {
+                                $html .= Wo_LoadAdminPage('edit-lang/form-list');
+                            }
+                        }
+                    } else {
+                        $html = "<h4>Keyword not found</h4>";
+                    }
+                }
+                $data['status'] = 200;
+                $data['html']   = $html;
+                $data['type']   = $_POST['type'];
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'get_pro') {
+        $types = array('star','hot','ultima','vip');
+        $html = '';
+        if (in_array($_POST['type'], $types)) {
+            $wo['pro'] = Wo_GetProInfo($_POST['type']);
+            $html .= Wo_LoadAdminPage('pro-settings/pro_form');
+        }
+        $data['status'] = 200;
+        $data['html']   = $html;
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    // manage packages 
+    if ($s == 'test_vision_api') {
+        $data['status'] = 400;
+        if (!empty($wo['config']['vision_api_key'])) {
+            $image_file = Wo_GetMedia('upload/photos/d-avatar.jpg');
+            $content = '{"requests": [{"image": {"source": {"imageUri": "'.$image_file.'"}},"features": [{"type": "SAFE_SEARCH_DETECTION","maxResults": 1},{"type": "WEB_DETECTION","maxResults": 2}]}]}';
+            try {
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://vision.googleapis.com/v1/images:annotate?key='.$wo['config']['vision_api_key']);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($content)));
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+                curl_setopt($ch, CURLOPT_POSTFIELDS,$content);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $response  = curl_exec($ch);
+                curl_close($ch);
+                $new_data = json_decode($response);
+                if (!empty($new_data->error)) {
+                    $data['message'] = $data->error->message;
+                }
+                if (!empty($new_data->responses[0]->error)) {
+                    $data['message'] = $new_data->responses[0]->error->message;
+                }
+                elseif ($new_data->responses[0]->safeSearchAnnotation->adult == 'LIKELY' || $new_data->responses[0]->safeSearchAnnotation->adult == 'VERY_LIKELY' || $new_data->responses[0]->safeSearchAnnotation->adult == 'UNKNOWN' || $new_data->responses[0]->safeSearchAnnotation->adult == 'VERY_UNLIKELY' || $new_data->responses[0]->safeSearchAnnotation->adult == 'UNLIKELY' || $new_data->responses[0]->safeSearchAnnotation->adult == 'POSSIBLE'){
+                    $data['status']  = 200;
+                    $data['message'] = 'Connection was successfully established!';
+                }
+                else{
+                    $data['message'] = 'Something Wrong';
+                }
+            }
+            catch (Exception $e) {
+                $data['message'] = $e->getMessage();
+            }
+        }
+        else{
+            $data['message'] = 'vision api key can not be empty';
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
     if ($s == 'top_up_wallet') {
         if (!empty($_POST['amount'])) {
             $update = Wo_UpdateUserData($wo['user']['user_id'], array(
@@ -3247,7 +3956,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         $data['android_native_status'] = 0;
         if (!empty($_POST['android_purchase_code'])) {
             $android_code = Wo_Secure($_POST['android_purchase_code']);
-            $file         = file_get_contents("http://www.default.com/access_token.php?code={$android_code}&type=android", false, stream_context_create($arrContextOptions));
+            $file         = file_get_contents("http://www.wowonder.com/access_token.php?code={$android_code}&type=android", false, stream_context_create($arrContextOptions));
             $check        = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -3261,7 +3970,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         }
         if (!empty($_POST['android_native_purchase_code'])) {
             $android_code = Wo_Secure($_POST['android_native_purchase_code']);
-            $file         = file_get_contents("http://www.default.com/access_token.php?code={$android_code}&type=android", false, stream_context_create($arrContextOptions));
+            $file         = file_get_contents("http://www.wowonder.com/access_token.php?code={$android_code}&type=android", false, stream_context_create($arrContextOptions));
             $check        = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -3275,7 +3984,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         }
         if (!empty($_POST['windows_purchase_code'])) {
             $windows_code = Wo_Secure($_POST['windows_purchase_code']);
-            $file         = file_get_contents("http://www.default.com/access_token.php?code={$windows_code}&type=windows_desktop", false, stream_context_create($arrContextOptions));
+            $file         = file_get_contents("http://www.wowonder.com/access_token.php?code={$windows_code}&type=windows_desktop", false, stream_context_create($arrContextOptions));
             $check        = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -3289,7 +3998,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         }
         if (!empty($_POST['ios_purchase_code'])) {
             $windows_code = Wo_Secure($_POST['ios_purchase_code']);
-            $file         = file_get_contents("http://www.default.com/access_token.php?code={$windows_code}&type=ios", false, stream_context_create($arrContextOptions));
+            $file         = file_get_contents("http://www.wowonder.com/access_token.php?code={$windows_code}&type=ios", false, stream_context_create($arrContextOptions));
             $check        = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -3321,6 +4030,38 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 }
             }
         }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'add_new_gender') {
+        $insert_data = array();
+        $insert_data['type'] = 'gender';
+        $add = false;
+        foreach (Wo_LangsNamesFromDB() as $wo['key_']) {
+            if (!empty($_POST[$wo['key_']])) {
+                $insert_data[$wo['key_']] = Wo_Secure($_POST[$wo['key_']]);
+                $add = true;
+            }
+        }
+        if ($add == true) {
+            $id = $db->insert(T_LANGS,$insert_data);
+            $db->where('id',$id)->update(T_LANGS,array('lang_key' => $id));
+            $data['status'] = 200;
+        }
+        else{
+            $data['status'] = 400;
+            $data['message'] = $wo['lang']['please_check_details'];
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_gender') {
+        if (!empty($_GET['key']) && in_array($_GET['key'], array_keys($wo['genders']))) {
+            $db->where('lang_key',Wo_Secure($_GET['key']))->delete(T_LANGS);
+        }
+        $data['status'] = 200;
         header("Content-type: application/json");
         echo json_encode($data);
         exit();
@@ -3502,7 +4243,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'add_new_page') {
         if (Wo_CheckSession($hash_id) === true && !empty($_POST['page_name']) && !empty($_POST['page_content']) && !empty($_POST['page_title'])) {
             $page_name    = Wo_Secure($_POST['page_name']);
-            $page_content = Wo_Secure($_POST['page_content']);
+            $page_content = Wo_Secure(str_replace(array("\r","\n"),"",$_POST['page_content']));
             $page_title   = Wo_Secure($_POST['page_title']);
             $page_type    = 0;
             if (!empty($_POST['page_type'])) {
@@ -3789,6 +4530,18 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         }
                     }
                 }
+                
+                
+                if ($key == 'free_day_limit' && (!is_numeric($value) || $value < 1)) {
+                    $value = 1000;
+                }
+                if ($key == 'pro_day_limit' && (!is_numeric($value) || $value < 1) ) {
+                    $value = 10000;
+                }
+                // if ($key == 'two_factor_type' && $wo['config']['two_factor_type'] != $value) {
+                //     $db->where('two_factor_verified',1)->update(T_USERS,array('two_factor_email_verified' => 0,
+                //                                                               'two_factor'          => 0));
+                // }
                 $saveSetting = Wo_SaveConfig($key, $value);
             }
         }
@@ -3861,7 +4614,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         $avatar = $_POST['avatar'];
         Wo_RunInBackground(array('status' => 200));
         for ($i=0; $i < $count_users; $i++) { 
-            $genders = array("male", "female");
+            $genders = array_keys($wo['genders']);
             $random_keys = array_rand($genders, 1);
             $gender = array_rand(array("male", "female"), 1);
             $gender = $genders[$random_keys];
@@ -4777,6 +5530,7 @@ if ($f == 'posts') {
         $invalid_file  = false;
         $errors        = false;
         $image_array   = array();
+        $blur          = 0;
         if (Wo_CheckSession($hash_id) === false) {
             return false;
             die();
@@ -4888,17 +5642,28 @@ if ($f == 'posts') {
                 } else if (Wo_IsFileAllowed($_FILES['postPhotos']['name'][0]) == false) {
                     $invalid_file = 2;
                 } else {
-                    $fileInfo = array(
-                        'file' => $_FILES["postPhotos"]["tmp_name"][0],
-                        'name' => $_FILES['postPhotos']['name'][0],
-                        'size' => $_FILES["postPhotos"]["size"][0],
-                        'type' => $_FILES["postPhotos"]["type"][0]
-                    );
-                    $media    = Wo_ShareFile($fileInfo);
-                    if (!empty($media)) {
-                        $mediaFilename = $media['filename'];
-                        $mediaName     = $media['name'];
-                    }
+                    
+                        $fileInfo = array(
+                            'file' => $_FILES["postPhotos"]["tmp_name"][0],
+                            'name' => $_FILES['postPhotos']['name'][0],
+                            'size' => $_FILES["postPhotos"]["size"][0],
+                            'type' => $_FILES["postPhotos"]["type"][0]
+                        );
+                        $media    = Wo_ShareFile($fileInfo);
+                        if (!empty($media)) {
+                            $image_file = Wo_GetMedia($media['filename']);
+                            $upload = true;
+                            if ($wo['config']['adult_images'] == 1  && !detect_safe_search($image_file) && $wo['config']['adult_images_action'] == 1) {
+                                $blur = 1;
+                            }
+                            elseif ($wo['config']['adult_images'] == 1  && detect_safe_search($image_file) == false && $wo['config']['adult_images_action'] == 0) {
+                                $invalid_file = 3;
+                                $upload = false;
+                                @unlink($media['filename']);
+                            }
+                            $mediaFilename = $media['filename'];
+                            $mediaName     = $media['name'];
+                        }
                 }
             } else {
                 $multi = 1;
@@ -4919,7 +5684,9 @@ if ($f == 'posts') {
                 $post_privacy = $_POST['postPrivacy'];
             }
         }
-        setcookie("post_privacy", $post_privacy, time() + (10 * 365 * 24 * 60 * 60));
+        if (empty($page_id)) {
+            setcookie("post_privacy", $post_privacy, time() + (10 * 365 * 24 * 60 * 60));
+        }
         $import_url_image = '';
         $url_link         = '';
         $url_content      = '';
@@ -5000,6 +5767,7 @@ if ($f == 'posts') {
                 if (!in_array(strtolower($new_string['extension']), $allowed)) {
                     $errors[] = $error_icon . $wo['lang']['please_check_details'];
                 }
+                
             }
         }
         if (!empty($_POST['answer']) && array_filter($_POST['answer'])) {
@@ -5013,7 +5781,7 @@ if ($f == 'posts') {
                 $errors = 'Please write the question.';
             }
         }
-        if (empty($errors)) {
+        if (empty($errors) && $invalid_file == false) {
             $is_option = false;
             if (!empty($_POST['answer']) && array_filter($_POST['answer'])) {
                 $is_option = true;
@@ -5042,7 +5810,8 @@ if ($f == 'posts') {
                 'postWatching' => Wo_Secure($watching),
                 'postTraveling' => Wo_Secure($traveling),
                 'postFileThumb' => Wo_Secure($video_thumb),
-                'time' => time()
+                'time' => time(),
+                'blur' => $blur
             );
             if (isset($_POST['postSticker']) && Wo_IsUrl($_POST['postSticker']) && empty($_FILES) && empty($_POST['postRecord'])) {
                 $post_data['postSticker'] = $_POST['postSticker'];
@@ -5074,6 +5843,16 @@ if ($f == 'posts') {
                                 'types' => 'jpg,png,jpeg,gif'
                             );
                             $file     = Wo_ShareFile($fileInfo, 1);
+                            $image_file = Wo_GetMedia($file['filename']);
+                            if ($wo['config']['adult_images'] == 1  && !detect_safe_search($image_file) && $wo['config']['adult_images_action'] == 1) {
+                                $blur = 1;
+                            }
+                            elseif ($wo['config']['adult_images'] == 1 && detect_safe_search($image_file) == false && $wo['config']['adult_images_action'] == 0) {
+                                $invalid_file = 3;
+                                $errors[] = $error_icon . $wo['lang']['adult_image_file'];
+                                Wo_DeletePost($id);
+                                @unlink($file['filename']);
+                            }
                             if (!empty($file)) {
                                 $media_album = Wo_RegisterAlbumMedia($id, $file['filename']);
                             }
@@ -5086,7 +5865,7 @@ if ($f == 'posts') {
                     'status' => 200,
                     'html' => $html,
                     'invalid_file' => $invalid_file,
-                    'post_count' => $wo['story']['publisher']['details']['post_count']
+                    'post_count' => (!empty($wo['story']['publisher']['details']) ? $wo['story']['publisher']['details']['post_count'] : 0)
                 );
             } else {
                 $data = array(
@@ -5264,6 +6043,7 @@ if ($f == 'posts') {
         exit();
     }
     if ($s == 'edit_post') {
+        $_POST['text'] = trim($_POST['text']);
         if (!empty($_POST['post_id']) && !empty($_POST['text'])) {
             $post_id = Wo_Secure($_POST['post_id']);
             $post = $db->where('id',$post_id)->getOne(T_POSTS);
@@ -5947,12 +6727,20 @@ if ($f == 'posts') {
         exit();
     }
     if ($s == 'get_post_reacted') {
-        if (!empty($_GET['post_id'])) {
+        if (!empty($_GET['post_id']) && !empty($_GET['col'])) {
             $data         = array(
                 'status' => 200,
-                'html' => ''
+                'html' => '',
+                'title' => $wo['lang']['users_reacted_post']
             );
-            $reactedUsers = Wo_GetPostReactionUsers($_GET['post_id'], $_GET['type']);
+            $react_array = array('like' => 'Like','love' => 'Love' ,'haha' => 'HaHa' ,'wow' => 'WoW' ,'sad' => 'Sad' ,'angry' => 'Angry' );
+            if (!empty($_GET['type']) && in_array($_GET['type'],array_keys($react_array)) && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
+                $reactedUsers = Wo_GetPostReactionUsers($_GET['post_id'], $react_array[$_GET['type']] ,20,Wo_Secure($_GET['offset']),Wo_Secure($_GET['col']));
+            }
+            else{
+                $reactedUsers = Wo_GetPostReactionUsers($_GET['post_id'], $react_array[$_GET['type']],20,0,Wo_Secure($_GET['col']));
+            }
+            
             if (count($reactedUsers) > 0) {
                 foreach ($reactedUsers as $wo['WondredLikedusers']) {
                     $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
@@ -5966,12 +6754,38 @@ if ($f == 'posts') {
         exit();
     }
     if ($s == 'get_post_likes') {
-        if (!empty($_GET['post_id'])) {
+        if (!empty($_GET['post_id']) && !empty($_GET['table'])) {
             $data       = array(
                 'status' => 200,
-                'html' => ''
+                'html' => '',
+                'title' => $wo['lang']['users_liked_post']
             );
-            $likedUsers = Wo_GetPostLikes($_GET['post_id']);
+            if ($_GET['table'] == 'post') {
+                if (!empty($_GET['type']) && $_GET['type'] == 'like' && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
+                    $likedUsers = Wo_GetPostLikes($_GET['post_id'],20,Wo_Secure($_GET['offset']));
+                }
+                else{
+                    $likedUsers = Wo_GetPostLikes($_GET['post_id']);
+                }
+            }
+            elseif ($_GET['table'] == 'comment') {
+                if (!empty($_GET['type']) && $_GET['type'] == 'like' && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
+                    $likedUsers = Wo_GetPostCommentLikes($_GET['post_id'],20,Wo_Secure($_GET['offset']));
+                }
+                else{
+                    $likedUsers = Wo_GetPostCommentLikes($_GET['post_id']);
+                }
+                $data['title'] = $wo['lang']['users_liked_comment'];
+            }
+            elseif ($_GET['table'] == 'reply') {
+                if (!empty($_GET['type']) && $_GET['type'] == 'like' && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
+                    $likedUsers = Wo_GetPostCommentReplyLikes($_GET['post_id'],20,Wo_Secure($_GET['offset']));
+                }
+                else{
+                    $likedUsers = Wo_GetPostCommentReplyLikes($_GET['post_id']);
+                }
+                $data['title'] = $wo['lang']['users_liked_comment'];
+            }
             if (count($likedUsers) > 0) {
                 foreach ($likedUsers as $wo['WondredLikedusers']) {
                     $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
@@ -5984,13 +6798,65 @@ if ($f == 'posts') {
         echo json_encode($data);
         exit();
     }
-    if ($s == 'get_post_wonders') {
+    if ($s == 'get_post_shared') {
         if (!empty($_GET['post_id'])) {
+            $data       = array(
+                'status' => 200,
+                'html' => '',
+                'title' => $wo['lang']['users_shared_post']
+            );
+            if (!empty($_GET['type']) && $_GET['type'] == 'share' && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
+                $sharedUsers = Wo_GetPostShared($_GET['post_id'],20,Wo_Secure($_GET['offset']));
+            }
+            else{
+                $sharedUsers = Wo_GetPostShared($_GET['post_id']);
+            }
+            
+            if (count($sharedUsers) > 0) {
+                foreach ($sharedUsers as $wo['WondredLikedusers']) {
+                    $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
+                }
+            } else {
+                $data['message'] = $wo['lang']['no_shared'];
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'get_post_wonders') {
+        if (!empty($_GET['post_id']) && !empty($_GET['table'])) {
             $data          = array(
                 'status' => 200,
-                'html' => ''
+                'html' => '',
+                'title' => $wo['lang']['users_wondered_post']
             );
-            $WonderedUsers = Wo_GetPostWonders($_GET['post_id']);
+            if ($_GET['table'] == 'post') {
+                if (!empty($_GET['type']) && $_GET['type'] == 'wonder' && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
+                    $WonderedUsers = Wo_GetPostWonders($_GET['post_id'],20,Wo_Secure($_GET['offset']));
+                }
+                else{
+                    $WonderedUsers = Wo_GetPostWonders($_GET['post_id']);
+                }
+            }
+            elseif ($_GET['table'] == 'comment') {
+                if (!empty($_GET['type']) && $_GET['type'] == 'wonder' && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
+                    $WonderedUsers = Wo_GetPostCommentWonders($_GET['post_id'],20,Wo_Secure($_GET['offset']));
+                }
+                else{
+                    $WonderedUsers = Wo_GetPostCommentWonders($_GET['post_id']);
+                }
+                $data['title'] = $wo['lang']['users_wondered_comment'];
+            }
+            elseif ($_GET['table'] == 'reply') {
+                if (!empty($_GET['type']) && $_GET['type'] == 'wonder' && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
+                    $WonderedUsers = Wo_GetPostCommentReplyWonders($_GET['post_id'],20,Wo_Secure($_GET['offset']));
+                }
+                else{
+                    $WonderedUsers = Wo_GetPostCommentReplyWonders($_GET['post_id']);
+                }
+                $data['title'] = $wo['lang']['users_wondered_comment'];
+            }
             if (count($WonderedUsers) > 0) {
                 foreach ($WonderedUsers as $wo['WondredLikedusers']) {
                     $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
@@ -6128,6 +6994,80 @@ if ($f == 'activities') {
     }
 }
 if ($f == 'chat') {
+    if ($s == 'get_group_info') {
+        $group_id  = Wo_Secure($_GET['group_id']);
+        $group_tab = Wo_GroupTabData($group_id);
+        if ($group_tab && is_array($group_tab)) {
+            $wo['chat']['group']  = $group_tab;
+            $wo['chat']['group']['avatar'] = $wo['config']['site_url'].'/'.$wo['chat']['group']['avatar'];
+            $data                 = array(
+                'status' => 200,
+                'group' => $wo['chat']['group']
+            );
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'edit_group') {
+        $data['status'] = 400;
+        $group_id = $id = Wo_Secure($_POST['group_id']);
+        $group_tab = Wo_GroupTabData($group_id);
+        $error     = '';
+        if ($group_tab && is_array($group_tab)) {
+            if (!empty($_POST['group_name']) && (strlen($_POST['group_name']) < 4 || strlen($_POST['group_name']) > 15) ) {
+                $error           = true;
+                $data['message'] = $error_icon . $wo['lang']['group_name_limit'];
+            }
+            if (!empty($_FILES["avatar"]) && isset($_FILES["avatar"])) {
+                if (file_exists($_FILES["avatar"]["tmp_name"])) {
+                    $image = getimagesize($_FILES["avatar"]["tmp_name"]);
+                    if (!in_array($image[2], array(
+                        IMAGETYPE_GIF,
+                        IMAGETYPE_JPEG,
+                        IMAGETYPE_PNG,
+                        IMAGETYPE_BMP
+                    ))) {
+                        $error           = true;
+                        $data['message'] = $error_icon . $wo['lang']['group_avatar_image'];
+                    }
+                }
+            }
+            if (!$error) {
+                $update_data = array();
+                if (!empty($_POST['group_name'])) {
+                    $update_data['group_name']    = Wo_Secure($_POST['group_name']);
+                }
+                if (isset($_FILES["avatar"]["tmp_name"])) {
+                    $fileInfo      = array(
+                        'file' => $_FILES["avatar"]["tmp_name"],
+                        'name' => $_FILES['avatar']['name'],
+                        'size' => $_FILES["avatar"]["size"],
+                        'type' => $_FILES["avatar"]["type"],
+                        'types' => 'jpg,png,bmp,gif',
+                        'compress' => false,
+                        'crop' => array(
+                            'width' => 70,
+                            'height' => 70
+                        )
+                    );
+                    $media         = Wo_ShareFile($fileInfo);
+                    $mediaFilename = $media['filename'];
+                    $update_data['avatar']    = $mediaFilename;
+                    
+                }
+                if (!empty($update_data)) {
+                    @Wo_UpdateGChat($id, $update_data);
+                    $data = array(
+                        'status' => 200
+                    );
+                }
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
     if ($s == 'count_online_users') {
         $html = Wo_CountOnlineUsers();
         $data = array(
@@ -6364,32 +7304,39 @@ if ($f == 'chat') {
                 if ($_GET['recipient_id'] != 0) {
                     $recipient_id = Wo_Secure($_GET['recipient_id']);
                     $recipient    = Wo_UserData($recipient_id);
-                    if (isset($recipient['user_id'])) {
-                        $wo['chat']['recipient'] = $recipient;
-                        $wo['chat']['color']     = Wo_GetChatColor($wo['user']['user_id'], $recipient['user_id']);
-                        $data                    = array(
-                            'status' => 200,
-                            'html' => Wo_LoadPage('chat/chat-tab')
-                        );
-                        if (isset($_SESSION['chat_id'])) {
-                            if (strpos($_SESSION['chat_id'], ',') !== false) {
-                                $explode = @explode(',', $_SESSION['chat_id']);
-                                if (count($explode) > 2) {
-                                    if (strpos($_SESSION['chat_id'], $recipient['user_id']) === false) {
-                                        $_SESSION['chat_id'] = substr($_SESSION['chat_id'], 0, strrpos($_SESSION['chat_id'], ','));
+                    if ($recipient['message_privacy'] != 2) {
+                        if (isset($recipient['user_id'])) {
+                            $wo['chat']['recipient'] = $recipient;
+                            $wo['chat']['color']     = Wo_GetChatColor($wo['user']['user_id'], $recipient['user_id']);
+                            $data                    = array(
+                                'status' => 200,
+                                'html' => Wo_LoadPage('chat/chat-tab')
+                            );
+                            if (isset($_SESSION['chat_id'])) {
+                                if (strpos($_SESSION['chat_id'], ',') !== false) {
+                                    $explode = @explode(',', $_SESSION['chat_id']);
+                                    if (count($explode) > 2) {
+                                        if (strpos($_SESSION['chat_id'], $recipient['user_id']) === false) {
+                                            $_SESSION['chat_id'] = substr($_SESSION['chat_id'], 0, strrpos($_SESSION['chat_id'], ','));
+                                            $_SESSION['chat_id'] .= ',' . Wo_Secure($recipient['user_id']);
+                                        }
+                                    } else {
                                         $_SESSION['chat_id'] .= ',' . Wo_Secure($recipient['user_id']);
                                     }
-                                } else {
+                                } else if (strpos($_SESSION['chat_id'], $recipient['user_id']) === false) {
                                     $_SESSION['chat_id'] .= ',' . Wo_Secure($recipient['user_id']);
+                                } else {
+                                    $_SESSION['chat_id'] = Wo_Secure($recipient['user_id']);
                                 }
-                            } else if (strpos($_SESSION['chat_id'], $recipient['user_id']) === false) {
-                                $_SESSION['chat_id'] .= ',' . Wo_Secure($recipient['user_id']);
                             } else {
                                 $_SESSION['chat_id'] = Wo_Secure($recipient['user_id']);
                             }
-                        } else {
-                            $_SESSION['chat_id'] = Wo_Secure($recipient['user_id']);
                         }
+                    }
+                    else{
+                        $data = array(
+                            'status' => 400
+                        );
                     }
                 }
             }
@@ -6470,6 +7417,13 @@ if ($f == 'chat') {
             $message_text = '';
             if (!empty($_POST['textSendMessage'])) {
                 $message_text = $_POST['textSendMessage'];
+            }
+            $user_data    = Wo_UserData($_POST['user_id']);
+            if (!empty($user_data) && $user_data['message_privacy'] == 2) {
+                exit();
+            }
+            if (!empty($user_data) && $user_data['message_privacy'] == 1 && Wo_IsFollowing($wo['user']['user_id'], $_POST['user_id']) === false) {
+                exit();
             }
             
             $messages = Wo_RegisterMessage(array(
@@ -6572,6 +7526,9 @@ if ($f == 'chat') {
                 'time' => time()
             ));
             if ($last_id && $last_id > 0) {
+                @Wo_UpdateGChat(Wo_Secure($_GET['group_id']), array(
+                    "time" => time()
+                    ));
                 $messages = Wo_GetGroupMessages(array(
                     'id' => $last_id,
                     'group_id' => $_GET['group_id']
@@ -6712,6 +7669,10 @@ if ($f == 'chat') {
         exit();
     }
     if ($s == 'is_chat_on') {
+        $data = array(
+                'url' => Wo_SeoLink('index.php?link1=messages'),
+                'chat' => $wo['config']['chatSystem']
+            );
         if (!empty($_GET['recipient_id'])) {
             $data = array(
                 'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id']),
@@ -7224,7 +8185,9 @@ if ($f == 'pages') {
                     if (Wo_UpdatePageData($_POST['page_id'], $Update_data)) {
                         $data = array(
                             'status' => 200,
-                            'message' => $success_icon . $wo['lang']['setting_updated']
+                            'message' => $success_icon . $wo['lang']['setting_updated'],
+                            'link' => $wo['site_url'].'/'.$_POST['page_name'],
+                            'data_ajax' => '?link1=timeline&u='.$_POST['page_name']
                         );
                     }
                 }
@@ -8308,7 +9271,9 @@ if ($f == 'send_mails') {
 }
 if ($f == 're_cover') {
    if (isset($_POST['pos'])) {
-       if (($_POST['cover_image'] != $wo['userDefaultCover']) && ($_POST['cover_image'] == $wo['user']['cover_org'] || Wo_IsAdmin())) {
+       if (($_POST['cover_image'] != $wo['userDefaultCover']) &&
+       ($_POST['cover_image'] == $wo['user']['cover_org'] || Wo_IsAdmin()) &&
+       (Wo_GetMedia($wo['user']['cover_full']) == $_POST['real_image']) || Wo_IsAdmin()) {
            $from_top             = abs($_POST['pos']);
            $cover_image          = $_POST['cover_image'];
            $full_url_image       = Wo_GetMedia($_POST['cover_image']);
@@ -8410,25 +9375,27 @@ if ($f == 'payment') {
             $update_array = array(
                 'is_pro' => 1,
                 'pro_time' => time(),
-                'verified' => 1,
                 'pro_' => 1,
                 'pro_type' => $pro_type
             );
+            if (in_array($pro_type, array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$pro_type]]['verified_badge'] == 1) {
+                $update_array['verified'] = 1;
+            }
             $mysqli       = Wo_UpdateUserData($wo['user']['user_id'], $update_array);
             global $sqlConnect;
             $amount1 = 0;
             if ($pro_type == 1) {
                 $img     = $wo['lang']['star'];
-                $amount1 = $wo['config']['weekly_price'];
+                $amount1 = $wo['pro_packages']['star']['price'];
             } else if ($pro_type == 2) {
                 $img     = $wo['lang']['hot'];
-                $amount1 = $wo['config']['monthly_price'];
+                $amount1 = $wo['pro_packages']['hot']['price'];
             } else if ($pro_type == 3) {
                 $img     = $wo['lang']['ultima'];
-                $amount1 = $wo['config']['yearly_price'];
+                $amount1 = $wo['pro_packages']['ultima']['price'];
             } else if ($pro_type == 4) {
                 $img     = $wo['lang']['vip'];
-                $amount1 = $wo['config']['lifetime_price'];
+                $amount1 = $wo['pro_packages']['vip']['price'];
             }
             $notes              = $wo['lang']['upgrade_to_pro'] . " " . $img . " : PayPal";
             $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$wo['user']['user_id']}, 'PRO', {$amount1}, '{$notes}')");
@@ -8604,14 +9571,59 @@ if ($f == 'stripe_payment') {
         header("Location: " . Wo_SeoLink('index.php?link1=oops'));
         exit();
     }
+
     $token = $_POST['stripeToken'];
     try {
+
+        $pro_types_array = array(
+                    1,
+                    2,
+                    3,
+                    4
+                );
+        $pro_type        = 0;
+        if (!isset($_GET['pro_type']) || !in_array($_GET['pro_type'], $pro_types_array)) {
+            $data = array(
+                'status' => 200,
+                'error' => 'Pro type is not set'
+            );
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+        $pro_type = $_GET['pro_type'];
+        $amount1 = 0;
+        if ($pro_type == 1) {
+            $img     = $wo['lang']['star'];
+            $amount1 = $wo['pro_packages']['star']['price'];
+        } else if ($pro_type == 2) {
+            $img     = $wo['lang']['hot'];
+            $amount1 = $wo['pro_packages']['hot']['price'];
+        } else if ($pro_type == 3) {
+            $img     = $wo['lang']['ultima'];
+            $amount1 = $wo['pro_packages']['ultima']['price'];
+        } else if ($pro_type == 4) {
+            $img     = $wo['lang']['vip'];
+            $amount1 = $wo['pro_packages']['vip']['price'];
+        }
+        $amount1 = $amount1 . '00';
+
+        if ($_POST['amount'] != $amount1) {
+           $data = array(
+                        'status' => 200,
+                        'location' => Wo_SeoLink('index.php?link1=oops')
+                    );
+                    header("Content-type: application/json");
+                    echo json_encode($data);
+                    exit();
+        }
+
         $customer = \Stripe\Customer::create(array(
             'source' => $token
         ));
         $charge   = \Stripe\Charge::create(array(
             'customer' => $customer->id,
-            'amount' => $_POST['amount'],
+            'amount' => $amount1,
             'currency' => 'usd'
         ));
         if ($charge) {
@@ -8670,10 +9682,12 @@ if ($f == 'stripe_payment') {
                     $update_array   = array(
                         'is_pro' => 1,
                         'pro_time' => time(),
-                        'verified' => 1,
                         'pro_' => 1,
                         'pro_type' => $pro_type
                     );
+                    if (in_array($pro_type, array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$pro_type]]['verified_badge'] == 1) {
+                        $update_array['verified'] = 1;
+                    }
                     $mysqli         = Wo_UpdateUserData($wo['user']['user_id'], $update_array);
                     $create_payment = Wo_CreatePayment($pro_type);
                     if ($mysqli) {
@@ -9018,38 +10032,38 @@ if ($f == 'get_payment_method') {
             switch ($_GET['type']) {
                 case 1:
                     $type        = 'week';
-                    $description = 'Star package (1 week)';
-                    if (strpos($wo['config']['weekly_price'], ".") !== false) {
-                        $price = str_replace('.', "", $wo['config']['weekly_price']);
+                    $description = 'Star package';
+                    if (strpos($wo['pro_packages']['star']['price'], ".") !== false) {
+                        $price = str_replace('.', "", $wo['pro_packages']['star']['price']);
                     } else {
-                        $price = $wo['config']['weekly_price'] . '00';
+                        $price = $wo['pro_packages']['star']['price'] . '00';
                     }
                     break;
                 case 2:
                     $type        = 'month';
-                    $description = 'Hot package (1 month)';
-                    if (strpos($wo['config']['monthly_price'], ".") !== false) {
-                        $price = str_replace('.', "", $wo['config']['monthly_price']);
+                    $description = 'Hot package';
+                    if (strpos($wo['pro_packages']['hot']['price'], ".") !== false) {
+                        $price = str_replace('.', "", $wo['pro_packages']['hot']['price']);
                     } else {
-                        $price = $wo['config']['monthly_price'] . '00';
+                        $price = $wo['pro_packages']['hot']['price'] . '00';
                     }
                     break;
                 case 3:
                     $type        = 'year';
-                    $description = 'Ultima package (1 year)';
-                    if (strpos($wo['config']['yearly_price'], ".") !== false) {
-                        $price = str_replace('.', "", $wo['config']['yearly_price']);
+                    $description = 'Ultima package';
+                    if (strpos($wo['pro_packages']['ultima']['price'], ".") !== false) {
+                        $price = str_replace('.', "", $wo['pro_packages']['ultima']['price']);
                     } else {
-                        $price = $wo['config']['yearly_price'] . '00';
+                        $price = $wo['pro_packages']['ultima']['price'] . '00';
                     }
                     break;
                 case 4:
                     $type        = 'life-time';
-                    $description = 'Vip package (life-time)';
-                    if (strpos($wo['config']['lifetime_price'], ".") !== false) {
-                        $price = str_replace('.', "", $wo['config']['lifetime_price']);
+                    $description = 'Vip package';
+                    if (strpos($wo['pro_packages']['vip']['price'], ".") !== false) {
+                        $price = str_replace('.', "", $wo['pro_packages']['vip']['price']);
                     } else {
-                        $price = $wo['config']['lifetime_price'] . '00';
+                        $price = $wo['pro_packages']['vip']['price'] . '00';
                     }
                     break;
             }
@@ -9161,6 +10175,10 @@ if ($f == 'upgrade') {
                 'pro_time' => time(),
                 'pro_type' => $pro_type
             );
+            if (in_array($pro_type, array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$pro_type]]['verified_badge'] == 1) {
+                $update_array['verified'] = 1;
+                $update_array['pro_'] = 1;
+            }
             $mysqli         = Wo_UpdateUserData($wo['user']['user_id'], $update_array);
             $create_payment = Wo_CreatePayment($pro_type);
             if ($mysqli) {
@@ -9727,6 +10745,33 @@ if ($f == 'products') {
                     }
                 }
             }
+            if (!empty($_POST['deleted_images_ids'])) {
+                $images_array = explode(',', $_POST['deleted_images_ids']);
+                if (!empty($images_array)) {
+                    $product_data = Wo_GetProduct($product_id);
+                    foreach ($images_array as $key => $value) {
+                        $image = Wo_ProductImageData(array('id' => $value));
+                        if (!empty($image)) {
+                            $explode2    = @end(explode('.', $image['image']));
+                            $explode3    = @explode('.', $image['image']);
+                            $small_image = $explode3[0] . '_small.' . $explode2;
+
+                            $product = Wo_GetProduct($image['product_id']);
+                            if (!empty($product) && $wo['user']['id'] == $product['user_id']) {
+                                $deleted = Wo_DeleteProductImage($value);
+                                if ($deleted) {
+                                    if (($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1)) {
+                                        Wo_DeleteFromToS3($image['image']);
+                                        Wo_DeleteFromToS3($small_image);
+                                    }
+                                    @unlink($image['image']);
+                                    @unlink($small_image);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             $data = array(
                 'status' => 200,
                 'href' => Wo_SeoLink('index.php?link1=post&id=' . $id)
@@ -9742,6 +10787,25 @@ if ($f == 'products') {
         }
         exit();
     }
+    // if ($s == 'delete_image_by_id') {
+    //     $data['status'] = 400;
+    //     if (!empty($_POST['image_id']) && is_numeric($_POST['image_id']) && $_POST['image_id'] > 0) {
+    //         $image = Wo_ProductImageData(array('id' => $_POST['image_id']));
+    //         if (!empty($image)) {
+    //             $product = Wo_GetProduct($image['product_id']);
+    //             if (!empty($product) && $wo['user']['id'] == $product['user_id']) {
+    //                 $deleted = Wo_DeleteProductImage($_POST['image_id']);
+    //                 if ($deleted) {
+    //                     @unlink($image['image']);
+    //                     $data['status'] = 200;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     header("Content-type: application/json");
+    //     echo json_encode($data);
+    //     exit();
+    // }
 }
 if ($f == 'search_products') {
     $html  = '';
@@ -9868,9 +10932,9 @@ if ($f == 'request_payment') {
             } else if (!is_numeric($_POST['amount'])) {
                 $errors[] = $error_icon . $wo['lang']['invalid_amount_value'];
             } else if (($wo['user']['balance'] < $_POST['amount'])) {
-                $errors[] = $error_icon . $wo['lang']['invalid_amount_value_your'] . ' $' . $wo['user']['balance'];
+                $errors[] = $error_icon . $wo['lang']['invalid_amount_value_your'] . ''.Wo_GetCurrency($wo['config']['ads_currency']) . $wo['user']['balance'];
             } else if ($wo['config']['m_withdrawal'] > $_POST['amount']) {
-                $errors[] = $error_icon . $wo['lang']['invalid_amount_value_withdrawal'] . ' $' . $wo['config']['m_withdrawal'];
+                $errors[] = $error_icon . $wo['lang']['invalid_amount_value_withdrawal'] . ' '.Wo_GetCurrency($wo['config']['ads_currency']) . $wo['config']['m_withdrawal'];
             }
             if (empty($errors)) {
                 $userU          = Wo_UpdateUserData($wo['user']['user_id'], array(
@@ -9940,7 +11004,7 @@ if ($f == 'update_order_by') {
 }
 if ($f == 'check_for_updates') {
     $false = false;
-    if (!is_dir('themes/default')) {
+    if (!is_dir('themes/wowonder')) {
         $false = true;
     }
     if (!is_dir('themes/wonderful') && $false == true) {
@@ -9950,7 +11014,7 @@ if ($f == 'check_for_updates') {
     }
     if ($false == true) {
         $data['status']     = 400;
-        $data['ERROR_NAME'] = 'It looks like you have renamed your themes, please rename them back to "default", "wonderful" to use the auto update system, otherwise please update your site manually.';
+        $data['ERROR_NAME'] = 'It looks like you have renamed your themes, please rename them back to "wowonder", "wonderful" to use the auto update system, otherwise please update your site manually.';
         header("Content-type: application/json");
         echo json_encode($data);
         exit();
@@ -9966,7 +11030,7 @@ if ($f == 'check_for_updates') {
             $purchase_code = Wo_Secure($_GET['purchase_code']);
             $version       = Wo_Secure($wo['script_version']);
             $siteurl       = urlencode($_SERVER['SERVER_NAME']);
-            $file          = file_get_contents("http://www.default.com/check_for_updates.php?code={$purchase_code}&version=$version&url=$siteurl", false, stream_context_create($arrContextOptions));
+            $file          = file_get_contents("http://www.wowonder.com/check_for_updates.php?code={$purchase_code}&version=$version&url=$siteurl", false, stream_context_create($arrContextOptions));
             $check         = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -10000,7 +11064,7 @@ if ($f == 'download_updates') {
             $purchase_code = Wo_Secure($_GET['purchase_code']);
             $version       = Wo_Secure($wo['script_version']);
             $siteurl       = urlencode($_SERVER['SERVER_NAME']);
-            $file          = file_get_contents("http://www.default.com/check_for_updates.php?code={$purchase_code}&version=$version&full=true&url=$siteurl", false, stream_context_create($arrContextOptions));
+            $file          = file_get_contents("http://www.wowonder.com/check_for_updates.php?code={$purchase_code}&version=$version&full=true&url=$siteurl", false, stream_context_create($arrContextOptions));
             $check         = json_decode($file, true);
             if (!empty($check['status'])) {
                 if ($check['status'] == 'SUCCESS') {
@@ -10024,7 +11088,7 @@ if ($f == 'download_updates') {
                             //     @fwrite($f, "");
                             //     @fclose($f);
                             // }
-                            $updater = file_put_contents('updates/' . $version . '/script.zip', file_get_contents("https://www.default.com/get_update.php?code={$purchase_code}&version=$version&full=true", false, stream_context_create($arrContextOptions)));
+                            $updater = file_put_contents('updates/' . $version . '/script.zip', file_get_contents("https://www.wowonder.com/get_update.php?code={$purchase_code}&version=$version&full=true", false, stream_context_create($arrContextOptions)));
                             if ($updater) {
                                 $unzip_file = unzip_file('updates/' . $version . '/script.zip', 'updates/' . $version . '/');
                                 if ($unzip_file) {
@@ -10066,7 +11130,7 @@ if ($f == "insert-blog") {
             if (empty($_POST['blog_tags'])) {
                 $error = $error_icon . $wo['lang']['please_fill_tags'];
             }
-            if (!in_array($_POST['blog_category'], array_keys($wo['page_categories']))) {
+            if (!in_array($_POST['blog_category'], array_keys($wo['blog_categories']))) {
                 $error = $error_icon . $wo['lang']['error_found'];
             }
         }
@@ -10145,7 +11209,7 @@ if ($f == "update-blog") {
             if (empty($_POST['blog_tags'])) {
                 $error = $error_icon . $wo['lang']['please_fill_tags'];
             }
-            if (!in_array($_POST['blog_category'], array_keys($wo['page_categories']))) {
+            if (!in_array($_POST['blog_category'], array_keys($wo['blog_categories']))) {
                 $error = $error_icon . $wo['lang']['error_found'];
             }
         }
@@ -11974,10 +13038,10 @@ if ($f == 'ads') {
         );
         if (isset($_GET['estimated_audience']) && isset($_GET['estimated_gender'])) {
             if ($_GET['estimated_gender'] == "All") {
-            } else if ($_GET['estimated_gender'] == "male") {
-                $db->where('gender', "male");
-            } else if ($_GET['estimated_gender'] == "female") {
-                $db->where('gender', "female");
+            } 
+            elseif (in_array($_GET['estimated_gender'], array_keys($wo['genders']))){
+                $gender = Wo_Secure($_GET['estimated_gender']);
+                $db->where('gender', $gender);
             }
             if (!empty($_GET['estimated_audience'])) {
                 $db->where('country_id', explode(",", $_GET['estimated_audience']), 'IN');
@@ -12741,19 +13805,19 @@ if ($f == 'pay_using_wallet') {
             switch ($type) {
                 case 1:
                     $img   = $wo['lang']['star'];
-                    $price = $wo['config']['weekly_price'];
+                    $price = $wo['pro_packages']['star']['price'];
                     break;
                 case 2:
                     $img   = $wo['lang']['hot'];
-                    $price = $wo['config']['monthly_price'];
+                    $price = $wo['pro_packages']['hot']['price'];
                     break;
                 case 3:
                     $img   = $wo['lang']['ultima'];
-                    $price = $wo['config']['yearly_price'];
+                    $price = $wo['pro_packages']['ultima']['price'];
                     break;
                 case 4:
                     $img   = $wo['lang']['vip'];
-                    $price = $wo['config']['lifetime_price'];
+                    $price = $wo['pro_packages']['vip']['price'];
                     break;
             }
             if ($wo["user"]["wallet"] >= $price) {
@@ -12769,10 +13833,12 @@ if ($f == 'pay_using_wallet') {
             $update_array       = array(
                 'is_pro' => 1,
                 'pro_time' => time(),
-                'verified' => 1,
                 'pro_' => 1,
                 'pro_type' => $type
             );
+            if (in_array($type, array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$type]]['verified_badge'] == 1) {
+                $update_array['verified'] = 1;
+            }
             $mysqli             = Wo_UpdateUserData($wo['user']['user_id'], $update_array);
             $notes              = $wo['lang']['upgrade_to_pro'] . " " . $img . " : Wallet";
             $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$wo['user']['user_id']}, 'PRO', {$price}, '{$notes}')");
@@ -12840,6 +13906,40 @@ if ($f == 'search-blog') {
             foreach ($pages as $key => $wo['article']) {
                 $wo['article']['first'] = ($key == 0) ? true : false;
                 $html .= Wo_LoadPage('blog/includes/card-list');
+            }
+            if (!empty($html)) {
+                $data['status'] = 200;
+                $data['html']   = $html;
+            }
+        } else {
+            $data = array(
+                'status' => 400,
+                'message' => $wo['lang']['no_blogs_found']
+            );
+        }
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
+    exit();
+}
+if ($f == 'search-blog-read') {
+    $html = '';
+    if (empty($_POST['keyword'])) {
+        $data['status'] = 200;
+        $data['html']   = $html;
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if (isset($_POST['keyword'])) {
+        $pages = Wo_GetBlogs(array(
+            "limit" => 20,
+            'keyword' => $_POST['keyword']
+        ));
+        if (count($pages) > 0) {
+            foreach ($pages as $key => $wo['blog-style']) {
+                $wo['blog-style']['first'] = ($key == 0) ? true : false;
+                $html .= Wo_LoadPage('blog/blog-popular');
             }
             if (!empty($html)) {
                 $data['status'] = 200;
@@ -13252,6 +14352,214 @@ if ($f == 'download_user_info') {
             ));
            exit;
        }
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
+    exit();
+}
+if ($f == 'search_for') {
+    $data_info = array();
+    $data['status'] = 400;
+    if ($s == 'group' && !empty($_GET['name'])) {
+        $groups = Wo_SearchFor(Wo_Secure($_GET['name']), 'group');
+        $data_info = $groups;
+    }
+    elseif ($s == 'page' && !empty($_GET['name'])) {
+        $pages = Wo_SearchFor(Wo_Secure($_GET['name']), 'page');
+        $data_info = $pages;
+    }
+    elseif ($s == 'user' && !empty($_GET['name'])) {
+        $data_info = Wo_GetFollowingSug(5, $_GET['name']);
+    }
+    
+    if (!empty($data_info)) {
+        $data['status'] = 200;
+        $data['info'] = $data_info;
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
+    exit();
+}
+if ($f == 'share_post_on') {
+    $data_info = array();
+    $data['status'] = 400;
+    $result = false;
+    $user_id = 0;
+    if ($s == 'group' && !empty($_GET['type_id']) && is_numeric($_GET['type_id']) && $_GET['type_id'] > 0 && !empty($_GET['post_id']) && is_numeric($_GET['post_id']) && $_GET['post_id'] > 0) {
+        $group = Wo_GroupData(Wo_Secure($_GET['type_id']));
+        $post = Wo_PostData(Wo_Secure($_GET['post_id']));
+        $user_id = $post['user_id'];
+        if (!empty($post) && !empty($group) && $group['user_id'] == $wo['user']['id']) {
+            $result = Wo_SharePostOn($post['id'],$group['id'],'group');
+        }
+    }
+    elseif ($s == 'page' && !empty($_GET['type_id']) && is_numeric($_GET['type_id']) && $_GET['type_id'] > 0 && !empty($_GET['post_id']) && is_numeric($_GET['post_id']) && $_GET['post_id'] > 0) {
+        $page = Wo_PageData(Wo_Secure($_GET['type_id']));
+        $post = Wo_PostData(Wo_Secure($_GET['post_id']));
+        $user_id = $post['user_id'];
+        if (empty($post['user_id'])) {
+            $user_id = $page['user_id'];
+        }
+        if (!empty($post) && !empty($page) && $page['user_id'] == $wo['user']['id']) {
+            $result = Wo_SharePostOn($post['id'],$page['id'],'page');
+        }
+    }
+    elseif ($s == 'user' && !empty($_GET['type_id']) && is_numeric($_GET['type_id']) && $_GET['type_id'] > 0 && !empty($_GET['post_id']) && is_numeric($_GET['post_id']) && $_GET['post_id'] > 0) {
+        $user = Wo_UserData(Wo_Secure($_GET['type_id']));
+        $post = Wo_PostData(Wo_Secure($_GET['post_id']));
+        $user_id = $post['user_id'];
+        if (!empty($post['page_id'])) {
+            $page = Wo_PageData($post['page_id']);
+            $user_id = $page['user_id'];
+        }
+        if (!empty($post) && !empty($user)) {
+            $result = Wo_SharePostOn($post['id'],$user['id'],'user');
+        }
+    }
+    elseif ($s == 'timeline' && !empty($_GET['post_id']) && is_numeric($_GET['post_id']) && $_GET['post_id'] > 0) {
+        $post = Wo_PostData(Wo_Secure($_GET['post_id']));
+        $user_id = $post['user_id'];
+        if (empty($post['user_id']) && !empty($post['page_id'])) {
+            $page = Wo_PageData($post['page_id']);
+            $user_id = $page['user_id'];
+        }
+        if (!empty($post)) {
+            $result = Wo_SharePostOn($post['id'],$wo['user']['id'],'user');
+        }
+    }
+    if ($result) {
+        $notification_data_array = array(
+            'recipient_id' => $user_id,
+            'post_id' => $post['id'],
+            'type' => 'shared_your_post',
+            'url' => 'index.php?link1=post&id=' . $result
+        );
+        Wo_RegisterNotification($notification_data_array);
+        if ($s == 'user') {
+            $notification_data_array = array(
+                'recipient_id' => $user['id'],
+                'post_id' => $post['id'],
+                'type' => 'shared_a_post_in_timeline',
+                'url' => 'index.php?link1=post&id=' . $result
+            );
+            Wo_RegisterNotification($notification_data_array);
+        }
+        $data['status'] = 200;
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
+    exit();
+}
+
+if ($f == 'get_share_post') {
+    $data['status'] = 400;
+    if (!empty($_GET['post_id'])) {
+        $wo['current_post'] = $wo['story'] = Wo_PostData(Wo_Secure($_GET['post_id']));
+        if (!empty($wo['story'])) {
+            $data['html'] = Wo_LoadPage('lightbox/share_post');
+            $data['status'] = 200;
+        }
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
+    exit();
+}
+
+
+if ($f == "bank_transfer") {
+    if (Wo_CheckSession($hash_id) === true) {
+        $request   = array();
+        $request[] = (empty($_FILES["thumbnail"]));
+        if (in_array(true, $request) || empty($_POST['type']) || !in_array($_POST['type'], array_keys($wo['pro_packages_types']))) {
+            $error = $error_icon . $wo['lang']['please_check_details'];
+        }
+        if (empty($error)) {
+            $description = !empty($_POST['description']) ? Wo_Secure($_POST['description']) : '';
+            $pro = $wo['pro_packages'][$wo['pro_packages_types'][$_POST['type']]];
+            $fileInfo      = array(
+                'file' => $_FILES["thumbnail"]["tmp_name"],
+                'name' => $_FILES['thumbnail']['name'],
+                'size' => $_FILES["thumbnail"]["size"],
+                'type' => $_FILES["thumbnail"]["type"],
+                'types' => 'jpeg,jpg,png,bmp,gif'
+            );
+            $media         = Wo_ShareFile($fileInfo);
+            $mediaFilename = $media['filename'];
+            if (!empty($mediaFilename)) {
+                $insert_id = Wo_InsertBankTrnsfer(array('user_id' => $wo['user']['id'],
+                                                       'description' => $description,
+                                                       'price'       => $pro['price'],
+                                                       'receipt_file' => $mediaFilename,
+                                                       'mode'         => Wo_Secure($_POST['type'])));
+                if (!empty($insert_id)) {
+                    $data = array(
+                        'message' => $success_icon . $wo['lang']['bank_transfer_request'],
+                        'status' => 200
+                    );
+                }
+            }
+            else{
+                $error = $error_icon . $wo['lang']['file_not_supported'];
+                $data = array(
+                    'status' => 500,
+                    'message' => $error
+                );
+            }
+        } else {
+            $data = array(
+                'status' => 500,
+                'message' => $error
+            );
+        }
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
+    exit();
+}
+if ($f == "bank_transfer_wallet") {
+    if (Wo_CheckSession($hash_id) === true) {
+        $request   = array();
+        $request[] = (empty($_FILES["thumbnail"]));
+        if (in_array(true, $request) || empty($_POST['price']) || !is_numeric($_POST['price']) || $_POST['price'] < 1) {
+            $error = $error_icon . $wo['lang']['please_check_details'];
+        }
+        if (empty($error)) {
+            $description = !empty($_POST['description']) ? Wo_Secure($_POST['description']) : '';
+            $fileInfo      = array(
+                'file' => $_FILES["thumbnail"]["tmp_name"],
+                'name' => $_FILES['thumbnail']['name'],
+                'size' => $_FILES["thumbnail"]["size"],
+                'type' => $_FILES["thumbnail"]["type"],
+                'types' => 'jpeg,jpg,png,bmp,gif'
+            );
+            $media         = Wo_ShareFile($fileInfo);
+            $mediaFilename = $media['filename'];
+            if (!empty($mediaFilename)) {
+                $insert_id = Wo_InsertBankTrnsfer(array('user_id' => $wo['user']['id'],
+                                                       'description' => $description,
+                                                       'price'       => Wo_Secure($_POST['price']),
+                                                       'receipt_file' => $mediaFilename,
+                                                       'mode'         => 'wallet'));
+                if (!empty($insert_id)) {
+                    $data = array(
+                        'message' => $success_icon . $wo['lang']['bank_transfer_request'],
+                        'status' => 200
+                    );
+                }
+            }
+            else{
+                $error = $error_icon . $wo['lang']['file_not_supported'];
+                $data = array(
+                    'status' => 500,
+                    'message' => $error
+                );
+            }
+        } else {
+            $data = array(
+                'status' => 500,
+                'message' => $error
+            );
+        }
     }
     header("Content-type: application/json");
     echo json_encode($data);

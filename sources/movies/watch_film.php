@@ -1,5 +1,5 @@
 <?php 
-if ($wo['loggedin'] == false || !isset($_GET['film-id']) || !is_numeric($_GET['film-id']) || $wo['config']['movies'] == 0) {
+if (!isset($_GET['film-id']) || !is_numeric($_GET['film-id']) || $wo['config']['movies'] == 0) {
   header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
   exit();
 }

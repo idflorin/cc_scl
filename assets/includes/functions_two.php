@@ -12,6 +12,10 @@
 // functions_tww.php
 require_once('app_start.php'); 
 use Twilio\Rest\Client;
+if (!empty($wo['config']['adult_images_file'])) {
+    putenv('GOOGLE_APPLICATION_CREDENTIALS='.$wo['config']['adult_images_file']);
+}
+use Google\Cloud\Vision\V1\ImageAnnotatorClient;
 function Wo_ReportPost($post_data = array()) {
     global $wo, $sqlConnect;
     if ($wo['loggedin'] == false) {
@@ -1659,7 +1663,7 @@ function Wo_IsPoked($received_user_id = 0, $send_user_id = 0){
         return false;
     }
     $query_one = mysqli_query($sqlConnect, "SELECT COUNT(`id`) FROM " . T_POKES . " WHERE `received_user_id` = '{$received_user_id}' AND `send_user_id` = {$send_user_id}");
-    return (Wo_Sql_Result($query_one, 0) == 1) ? true : false;
+    return (Wo_Sql_Result($query_one, 0) > 0) ? true : false;
 }
 
 function Wo_IsPageLiked($page_id = 0, $user_id = 0) {
@@ -2044,7 +2048,7 @@ function Wo_RegisterGroup($registration_data = array()) {
         return false;
     }
     if (!empty($registration_data['category'])) {
-        if (!in_array($registration_data['category'], array_keys($wo['page_categories']))) {
+        if (!in_array($registration_data['category'], array_keys($wo['group_categories']))) {
             $registration_data['category'] = 1;
         }
     }
@@ -2145,7 +2149,7 @@ function Wo_GroupData($group_id = 0) {
     $fetched_data['category_id'] = $fetched_data['category'];
     $fetched_data['type']        = 'group';
     $fetched_data['username']    = $fetched_data['group_name'];
-    $fetched_data['category']    = $wo['page_categories'][$fetched_data['category']];
+    $fetched_data['category']    = $wo['group_categories'][$fetched_data['category']];
     return $fetched_data;
 }
 function Wo_GroupActive($group_name) {
@@ -2398,7 +2402,7 @@ function Wo_UpdateGroupData($group_id = 0, $update_data) {
         }
     }
     if (!empty($update_data['category'])) {
-        if (!array_key_exists($update_data['category'], $wo['page_categories'])) {
+        if (!array_key_exists($update_data['category'], $wo['group_categories'])) {
             $update_data['category'] = 1;
         }
     }
@@ -2975,39 +2979,44 @@ function Wo_GetMyGames() {
     return $data;
 }
 function Wo_IsNameExist($username, $active = 0) {
-    global $wo, $sqlConnect;
-    $data = array();
-    if (empty($username)) {
-        return false;
-    }
-    $active_text = '';
-    if ($active == 1) {
-        $active_text = "AND `active` = '1'";
-    }
-    $username     = Wo_Secure($username);
-    $query_text   = "SELECT (SELECT COUNT(`user_id`) FROM " . T_USERS . " WHERE `username` = '{$username}' {$active_text}) as users, (SELECT COUNT(`page_id`) FROM " . T_PAGES . " WHERE `page_name` = '{$username}' {$active_text}) as pages, (SELECT COUNT(`id`) FROM " . T_GROUPS . " WHERE `group_name` = '{$username}' {$active_text}) as groups";
-    $query        = mysqli_query($sqlConnect, $query_text);
-    $fetched_data = mysqli_fetch_assoc($query);
-    if ($fetched_data['users'] == 1) {
-        return array(
-            true,
-            'type' => 'user'
-        );
-    } else if ($fetched_data['pages'] == 1) {
-        return array(
-            true,
-            'type' => 'page'
-        );
-    } else if ($fetched_data['groups'] == 1) {
-        return array(
-            true,
-            'type' => 'group'
-        );
-    } else {
-        return array(
-            false
-        );
-    }
+   global $wo, $sqlConnect;
+   $data = array();
+   if (empty($username)) {
+       return false;
+   }
+   $active_text = '';
+   if ($active == 1) {
+       $active_text = "AND `active` = '1'";
+   }
+   $username     = Wo_Secure($username);
+    
+   $query   = mysqli_query($sqlConnect, "SELECT COUNT(`user_id`) as users FROM " . T_USERS . " WHERE `username` = '{$username}' {$active_text}");
+   $fetched_data = mysqli_fetch_assoc($query);
+   if ($fetched_data['users'] == 1) {
+       return array(
+           true,
+           'type' => 'user'
+       );
+   }
+    $query   = mysqli_query($sqlConnect, "SELECT COUNT(`page_id`) as pages FROM " . T_PAGES . " WHERE `page_name` = '{$username}' {$active_text}");
+   $fetched_data = mysqli_fetch_assoc($query);
+    if ($fetched_data['pages'] == 1) {
+       return array(
+           true,
+           'type' => 'page'
+       );
+   }
+    $query   = mysqli_query($sqlConnect, "SELECT COUNT(`id`) as usergroups FROM " . T_GROUPS . " WHERE `group_name` = '{$username}' {$active_text}") or die(mysqli_error($sqlConnect));
+   $fetched_data = mysqli_fetch_assoc($query);
+    if ($fetched_data['usergroups'] > 0) {
+       return array(
+           true,
+           'type' => 'group'
+       );
+   }
+    return array(
+       false
+   );
 }
 function Wo_IsPhoneExist($phone) {
     global $wo, $sqlConnect;
@@ -3037,6 +3046,31 @@ function Wo_GetGroupRequests($group_id) {
     $sql       = mysqli_query($sqlConnect, $query_one);
     while ($fetched_data = mysqli_fetch_assoc($sql)) {
         $data[] = Wo_UserData($fetched_data['user_id']);
+    }
+    return $data;
+}
+function Wo_GetGroupRequestsWithOffset($request = array()) {
+    global $wo, $sqlConnect;
+    if (empty($request) || !is_array($request) || empty($request['group_id'])) {
+        return false;
+    }
+    $data      = array();
+    $group_id  = Wo_Secure($request['group_id']);
+    $limit_query = "";
+    $offset_query = "";
+    if (!empty($request['limit'])) {
+        $limit_query = " LIMIT ".Wo_Secure($request['limit']);
+    }
+    if (!empty($request['offset'])) {
+        $offset_query = " AND `id` < '".Wo_Secure($request['offset'])."' ";
+    }
+    $query_one = " SELECT `id`,`user_id` FROM " . T_GROUP_MEMBERS . " WHERE `group_id` = {$group_id} {$offset_query} AND `active` = '0' ORDER BY `id` DESC ".$limit_query;
+    $sql       = mysqli_query($sqlConnect, $query_one);
+    while ($fetched_data = mysqli_fetch_assoc($sql)) {
+        $new_data = array();
+        $new_data['id'] = $fetched_data['id'];
+        $new_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+        $data[] = $new_data;
     }
     return $data;
 }
@@ -3256,9 +3290,9 @@ function Wo_GetCommentReply($reply_id = 0) {
         $fetched_data['publisher'] = Wo_UserData($fetched_data['user_id']);
         $fetched_data['url']       = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['publisher']['username']);
     }
-    $fetched_data['Orginaltext']         = Wo_EditMarkup($fetched_data['text']);
+    $fetched_data['Orginaltext']         = Wo_EditMarkup($fetched_data['text'],true,true,true,0,0,$reply_id);
     $fetched_data['Orginaltext']         = str_replace('<br>', "\n", $fetched_data['Orginaltext']);
-    $fetched_data['text']                = Wo_Markup($fetched_data['text']);
+    $fetched_data['text']                = Wo_Markup($fetched_data['text'],true,true,true,0,0,$reply_id);
     $fetched_data['text']                = Wo_Emo($fetched_data['text']);
     $fetched_data['onwer']               = false;
     $fetched_data['post_onwer']          = false;
@@ -3934,11 +3968,10 @@ function Wo_CountUserData($type) {
     $type_table = T_USERS;
     $type_id    = 'user_id';
     $where      = '';
-    if ($type == 'male') {
-        $where = "`gender` = 'male'";
-    } else if ($type == 'female') {
-        $where = "`gender` = 'female'";
-    } else if ($type == 'active') {
+    if (in_array($type, array_keys($wo['genders']))) {
+        $where = "`gender` = '".$type."'";
+    }
+    else if ($type == 'active') {
         $where = "`active` = '1'";
     } else if ($type == 'not_active') {
         $where = "`active` <> '1'";
@@ -4255,16 +4288,19 @@ function Wo_SendMessage($data = array()) {
 }
 function Wo_CheckBirthdays($user_id = 0) {
     global $wo, $sqlConnect;
+
     if ($wo['loggedin'] == false) {
         return false;
     }
+
     $user_id = Wo_Secure($wo['user']['user_id']);
     if (empty($user_id) || !is_numeric($user_id) || $user_id < 1) {
         return false;
     }
+
     $data  = array();
-    $date  = date('m') . '-' . date('d');
-    $query = mysqli_query($sqlConnect, "SELECT `user_id` FROM " . T_USERS . " WHERE `birthday` LIKE '%-{$date}%' AND `user_id` <> {$user_id} AND `user_id` IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `active` = '1') ORDER BY RAND() LIMIT 5");
+    $date  = date('d') . '-' . date('m');
+    $query = mysqli_query($sqlConnect, "SELECT `user_id` FROM " . T_USERS . " WHERE `birthday` LIKE '%{$date}-%' AND `user_id` <> {$user_id} AND `user_id` IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `active` = '1') ORDER BY RAND() LIMIT 5");
     if ($query) {
         while ($fetched_data = mysqli_fetch_assoc($query)) {
             $user_data = Wo_UserData($fetched_data['user_id']);
@@ -4276,16 +4312,12 @@ function Wo_CheckBirthdays($user_id = 0) {
     return $data;
 }
 
-if (strlen(base64_encode(file_get_contents("./assets/libraries/s3/JmesPath/Parser.php"))) != 19016) {
-    die ();
-}
-
 function Wo_SendSMSMessage($to, $message) {
     global $wo, $sqlConnect;
     if (empty($to)) {
         return false;
     }
-    if ($wo['config']['sms_provider'] == 'twilio') {
+    if ($wo['config']['sms_provider'] == 'twilio' && !empty($wo['config']['sms_twilio_username']) && !empty($wo['config']['sms_twilio_password']) && !empty($wo['config']['sms_t_phone_number'])) {
         include_once('assets/libraries/twilio/vendor/autoload.php');
         $account_sid = $wo['config']['sms_twilio_username'];
         $auth_token  = $wo['config']['sms_twilio_password'];
@@ -4301,10 +4333,10 @@ function Wo_SendSMSMessage($to, $message) {
             }
         }
         catch (Exception $e) {
-            return $e->getMessage();
+            return false;
         }
         return false;
-    } else if ($wo['config']['sms_provider'] == 'infobip') {
+    } else if ($wo['config']['sms_provider'] == 'infobip' && !empty($wo['config']['infobip_username']) && !empty($wo['config']['infobip_password'])) {
         $username = $wo['config']['infobip_username'];
         $password  = $wo['config']['infobip_password'];
         $to          = Wo_Secure($to);
@@ -4344,10 +4376,10 @@ function Wo_SendSMSMessage($to, $message) {
             }
         }
         catch (Exception $e) {
-            return $e->getMessage();
+            return false;
         }
         return false;
-    } else if ($wo['config']['sms_provider'] == 'bulksms') {
+    } else if ($wo['config']['sms_provider'] == 'bulksms' && !empty($wo['config']['sms_username']) && !empty($wo['config']['sms_password'])) {
         $username = $wo['config']['sms_username'];
         $password = $wo['config']['sms_password'];
         if (empty($to)) {
@@ -4503,16 +4535,16 @@ function Wo_PayPal($type = 'week', $type2 = '') {
     $price    = $wo['config']['weekly_price'];
     $pro_type = 1;
     if ($type == 'week') {
-        $price    = $wo['config']['weekly_price'];
+        $price    = $wo['pro_packages']['star']['price'];
         $pro_type = 1;
     } else if ($type == 'year') {
-        $price    = $wo['config']['yearly_price'];
+        $price    = $wo['pro_packages']['ultima']['price'];
         $pro_type = 3;
     } else if ($type == 'month') {
-        $price    = $wo['config']['monthly_price'];
+        $price    = $wo['pro_packages']['hot']['price'];
         $pro_type = 2;
     } else if ($type == 'life-time') {
-        $price    = $wo['config']['lifetime_price'];
+        $price    = $wo['pro_packages']['vip']['price'];
         $pro_type = 4;
     }
     $total = $price;
@@ -4674,7 +4706,7 @@ function Wo_IsUserPro($user_pro = 0) {
     }
     return false;
 }
-function Wo_GetUserProType($user_type = 0) {
+function Wo_GetUserProType($user_type = 0,$type = 'post') {
     global $wo;
     if ($wo['loggedin'] == false) {
         return false;
@@ -4689,30 +4721,50 @@ function Wo_GetUserProType($user_type = 0) {
     $data = array();
     switch ($pro_type) {
         case '1':
-            $data['type_name']  = $wo['lang']['star_member'];
-            $data['can_boost']  = 0;
+            $data['type_name']  = $wo['lang']['star'].' '.$wo['lang']['member'];
+            if ($type == 'post') {
+                $data['can_boost']  = $wo['pro_packages'][$wo['pro_packages_types'][1]]['posts_promotion'];
+            }
+            else{
+                $data['can_boost']  = $wo['pro_packages'][$wo['pro_packages_types'][1]]['pages_promotion'];
+            }
             $data['color_name'] = '#4c7737';
             $data['type_url']   = Wo_SeoLink('index.php?link1=upgrade-to');
             $data['icon']       = 'star';
             break;
         case '2':
-            $data['type_name']  = $wo['lang']['hot_member'];
-            $data['can_boost']  = $wo['config']['monthly_boosts'];
+            $data['type_name']  = $wo['lang']['hot'].' '.$wo['lang']['member'];
+            if ($type == 'post') {
+                $data['can_boost']  = $wo['pro_packages'][$wo['pro_packages_types'][2]]['posts_promotion'];
+            }
+            else{
+                $data['can_boost']  = $wo['pro_packages'][$wo['pro_packages_types'][2]]['pages_promotion'];
+            }
             $data['color_name'] = '#ffbb42';
             $data['type_url']   = Wo_SeoLink('index.php?link1=upgrade-to');
             $data['icon']       = 'fire';
             break;
         case '3':
-            $data['type_name']  = $wo['lang']['ultima_member'];
+            $data['type_name']  = $wo['lang']['ultima'].' '.$wo['lang']['member'];
             $data['color_name'] = '#e13c4c';
-            $data['can_boost']  = $wo['config']['yearly_boosts'];
+            if ($type == 'post') {
+                $data['can_boost']  = $wo['pro_packages'][$wo['pro_packages_types'][3]]['posts_promotion'];
+            }
+            else{
+                $data['can_boost']  = $wo['pro_packages'][$wo['pro_packages_types'][3]]['pages_promotion'];
+            }
             $data['type_url']   = Wo_SeoLink('index.php?link1=upgrade-to');
             $data['icon']       = 'bolt';
             break;
         case '4':
-            $data['type_name']  = $wo['lang']['vip_member'];
+            $data['type_name']  = $wo['lang']['vip'].' '.$wo['lang']['member'];
             $data['color_name'] = '#3f4bb8';
-            $data['can_boost']  = $wo['config']['lifetime_boosts'];
+            if ($type == 'post') {
+                $data['can_boost']  = $wo['pro_packages'][$wo['pro_packages_types'][4]]['posts_promotion'];
+            }
+            else{
+                $data['can_boost']  = $wo['pro_packages'][$wo['pro_packages_types'][4]]['pages_promotion'];
+            }
             $data['type_url']   = Wo_SeoLink('index.php?link1=upgrade-to');
             $data['icon']       = 'rocket';
             break;
@@ -4740,24 +4792,51 @@ function Wo_GetAvUpgrades($user_id) {
     if (empty($user)) {
         return false;
     }
-    $hot_member    = $wo['lang']['hot_member'] . ' ' . $wo['config']['monthly_price'] . Wo_GetCurrency($wo['config']['currency']) . ' ' . $wo['lang']['per_month'];
-    $ultima_member = $wo['lang']['ultima_member'] . ' ' . $wo['config']['yearly_price'] . Wo_GetCurrency($wo['config']['currency']) . ' ' .  $wo['lang']['per_year'];
-    $vip_member    = $wo['lang']['vip_member'] . ' ' . $wo['config']['lifetime_price'] . Wo_GetCurrency($wo['config']['currency']) . ' ' .  $wo['lang']['life_time'];
+    if ($wo['pro_packages']['hot']['status'] == 1) {
+        $hot_member    = $wo['lang']['hot'].' '.$wo['lang']['member'] . ' ' . $wo['pro_packages']['hot']['price'] . Wo_GetCurrency($wo['config']['currency']) . ' ' . $wo['lang']['per_month'];
+    }
+    if ($wo['pro_packages']['ultima']['status'] == 1) {
+        $ultima_member = $wo['lang']['ultima'].' '.$wo['lang']['member'] . ' ' . $wo['pro_packages']['ultima']['price'] . Wo_GetCurrency($wo['config']['currency']) . ' ' .  $wo['lang']['per_year'];
+    }
+    if ($wo['pro_packages']['vip']['status'] == 1) {
+        $vip_member    = $wo['lang']['vip'].' '.$wo['lang']['member'] . ' ' . $wo['pro_packages']['vip']['price'] . Wo_GetCurrency($wo['config']['currency']) . ' ' .  $wo['lang']['life_time'];
+    }
     if ($user['pro_type'] == 1) {
-        $can_see = array(
-            'month' => $hot_member,
-            'year' => $ultima_member,
-            'life-time' => $vip_member
-        );
+        $can_see = array();
+        if ($wo['pro_packages']['hot']['status'] == 1) {
+            $can_see['month'] = $hot_member;
+        }
+        if ($wo['pro_packages']['ultima']['status'] == 1) {
+            $can_see['year'] = $ultima_member;
+        }
+        if ($wo['pro_packages']['vip']['status'] == 1) {
+            $can_see['life-time'] = $vip_member;
+        }
+        // $can_see = array(
+        //     'month' => $hot_member,
+        //     'year' => $ultima_member,
+        //     'life-time' => $vip_member
+        // );
     } else if ($user['pro_type'] == 2) {
-        $can_see = array(
-            'year' => $ultima_member,
-            'life-time' => $vip_member
-        );
+        $can_see = array();
+        if ($wo['pro_packages']['ultima']['status'] == 1) {
+            $can_see['year'] = $ultima_member;
+        }
+        if ($wo['pro_packages']['vip']['status'] == 1) {
+            $can_see['life-time'] = $vip_member;
+        }
+        // $can_see = array(
+        //     'year' => $ultima_member,
+        //     'life-time' => $vip_member
+        // );
     } else if ($user['pro_type'] == 3) {
-        $can_see = array(
-            'life-time' => $vip_member
-        );
+        $can_see = array();
+        if ($wo['pro_packages']['vip']['status'] == 1) {
+            $can_see['life-time'] = $vip_member;
+        }
+        // $can_see = array(
+        //     'life-time' => $vip_member
+        // );
     } else if ($user['pro_type'] == 4) {
         $can_see = array();
     }
@@ -4766,32 +4845,39 @@ function Wo_GetAvUpgrades($user_id) {
 function Wo_GetProPackages() {
     global $wo;
     $free_member   = $wo['lang']['free_member'];
-    $star_member   = $wo['lang']['star_member'];
-    $hot_member    = $wo['lang']['hot_member'];
-    $ultima_member = $wo['lang']['ultima_member'];
-    $vip_member    = $wo['lang']['vip_member'];
+    $star_member   = $wo['lang']['star'].' '.$wo['lang']['member'];
+    $hot_member    = $wo['lang']['hot'].' '.$wo['lang']['member'];
+    $ultima_member = $wo['lang']['ultima'].' '.$wo['lang']['member'];
+    $vip_member    = $wo['lang']['vip'].' '.$wo['lang']['member'];
     $data          = array(
         'free' => array(
             'id' => 0,
             'name' => $free_member
-        ),
-        'star' => array(
+    ));
+    if ($wo['pro_packages']['star']['status'] == 1) {
+        $data['star'] = array(
             'id' => 1,
             'name' => $star_member
-        ),
-        'hot' => array(
+        );
+    }
+    if ($wo['pro_packages']['hot']['status'] == 1) {
+        $data['hot'] = array(
             'id' => 2,
             'name' => $hot_member
-        ),
-        'ultima' => array(
+        );
+    }
+    if ($wo['pro_packages']['ultima']['status'] == 1) {
+        $data['ultima'] = array(
             'id' => 3,
             'name' => $ultima_member
-        ),
-        'vip' => array(
+        );
+    }
+    if ($wo['pro_packages']['vip']['status'] == 1) {
+        $data['vip'] = array(
             'id' => 4,
             'name' => $vip_member
-        )
-    );
+        );
+    }
     return $data;
 }
 function Wo_CreatePayment($payment_type = 1) {
@@ -4804,16 +4890,16 @@ function Wo_CreatePayment($payment_type = 1) {
     }
     $user_id = $wo['user']['user_id'];
     if ($payment_type == 1) {
-        $amount = $wo['config']['weekly_price'];
+        $amount = $wo['pro_packages']['star']['price'];
         $type   = 'weekly';
     } else if ($payment_type == 2) {
-        $amount = $wo['config']['monthly_price'];
+        $amount = $wo['pro_packages']['hot']['price'];
         $type   = 'monthly';
     } else if ($payment_type == 3) {
-        $amount = $wo['config']['yearly_price'];
+        $amount = $wo['pro_packages']['ultima']['price'];
         $type   = 'yearly';
     } else if ($payment_type == 4) {
-        $amount = $wo['config']['lifetime_price'];
+        $amount = $wo['pro_packages']['vip']['price'];
         $type   = 'lifetime';
     } else {
         return false;
@@ -5424,22 +5510,28 @@ function Wo_DeleteProMemebership() {
         $update_data = false;
         switch ($fetched_data['pro_type']) {
             case '1':
-                if ($fetched_data['pro_time'] < (time() - $star_package_duration)) {
-                    $update_data = true;
+                if ($wo['pro_packages']['star']['time'] > 0) {
+                    if ($fetched_data['pro_time'] < (time() - $star_package_duration)) {
+                        $update_data = true;
+                    }
                 }
                 break;
             case '2':
-                if ($fetched_data['pro_time'] < (time() - $hot_package_duration)) {
-                    $update_data = true;
+                if ($wo['pro_packages']['hot']['time'] > 0) {
+                    if ($fetched_data['pro_time'] < (time() - $hot_package_duration)) {
+                        $update_data = true;
+                    }
                 }
                 break;
             case '3':
-                if ($fetched_data['pro_time'] < (time() - $ultima_package_duration)) {
-                    $update_data = true;
+                if ($wo['pro_packages']['ultima']['time'] > 0) {
+                    if ($fetched_data['pro_time'] < (time() - $ultima_package_duration)) {
+                        $update_data = true;
+                    }
                 }
                 break;
             case '4':
-                if ($vip_package_duration > 0) {
+                if ($wo['pro_packages']['vip']['time'] > 0) {
                     if ($fetched_data['pro_time'] < (time() - $vip_package_duration)) {
                         $update_data = true;
                     }
@@ -5467,6 +5559,159 @@ function Wo_GetPopularGames($limit = 10, $after = 0) {
         $fetched_data            = Wo_GameData($fetched_data['game_id']);
         $fetched_data['players'] = Wo_CountGamePlayers($fetched_data['id']);
         $data[]                  = $fetched_data;
+    }
+    return $data;
+}
+function Wo_GetGenders($lang = 'english',$langs)
+{
+    global $wo, $db;
+    if (!empty($lang) && in_array($lang, $langs)) {
+        $lang = Wo_Secure($lang);
+    }
+    $genders = $db->where('type','gender')->get(T_LANGS,null,array('lang_key',$lang));
+    $data = array();
+    foreach ($genders as $key => $value) {
+        $data[$value->lang_key] = $value->{$lang};
+    }
+    return $data;
+}
+function detect_safe_search($path)
+{
+    global $wo;
+    $content = '{"requests": [{"image": {"source": {"imageUri": "' . $path . '"}},"features": [{"type": "SAFE_SEARCH_DETECTION","maxResults": 1},{"type": "WEB_DETECTION","maxResults": 2}]}]}';
+    try {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://vision.googleapis.com/v1/images:annotate?key='.$wo['config']['vision_api_key']);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json','Content-Length: ' . strlen($content)));
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS,$content);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response  = curl_exec($ch);
+        curl_close($ch);
+        $data = json_decode($response);
+        if (!empty($data->error)) {
+            return true;
+        }
+        if (!empty($data->responses[0]->error)) {
+            return true;
+        }
+        elseif ($data->responses[0]->safeSearchAnnotation->adult == 'LIKELY' || $data->responses[0]->safeSearchAnnotation->adult == 'VERY_LIKELY'){
+            return false;
+        } 
+        else{
+            return true;
+        }
+    }
+    catch (Exception $e) {
+        return true;
+    }
+}
+
+function Wo_SearchFor($search_qeury, $type, $offset = 0) {
+    global $sqlConnect,$wo;
+    $search_qeury = Wo_Secure($search_qeury);
+    $data         = array();
+    $offset_to    = "";
+    if ($type == 'group') {
+        if ($offset > 0) {
+            $offset_to .= " AND `id` < {$offset} AND `id` <> {$offset} ";
+        }
+        $query = mysqli_query($sqlConnect, " SELECT `id` FROM " . T_GROUPS . " WHERE ((`group_name` LIKE '%$search_qeury%') OR `group_title` LIKE '%$search_qeury%') AND `user_id` = '".$wo['user']['id']."' AND `active` = '1' {$offset_to} ORDER BY `id` DESC LIMIT 10");
+
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $group = Wo_GroupData($fetched_data['id']);
+            $new_data = array();
+            $new_data['id'] = $group['id'];
+            $new_data['label'] = $group['group_name'];
+            $new_data['img'] = $group['avatar'];
+            $data[] = $new_data;
+        }
+    } elseif ($type == 'page') {
+        if ($offset > 0) {
+            $offset_to .= " AND `page_id` < {$offset} AND `page_id` <> {$offset} ";
+        }
+        $query = mysqli_query($sqlConnect, " SELECT `page_id` FROM " . T_PAGES . " WHERE ((`page_name` LIKE '%$search_qeury%') OR `page_title` LIKE '%$search_qeury%') AND `user_id` = '".$wo['user']['id']."' AND `active` = '1' {$offset_to} ORDER BY `page_id` DESC LIMIT 10");
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $page = Wo_PageData($fetched_data['page_id']);
+            $new_data = array();
+            $new_data['id'] = $page['id'];
+            $new_data['label'] = $page['page_name'];
+            $new_data['img'] = $page['avatar'];
+            $data[] = $new_data;
+        }
+    }
+    return $data;
+}
+// manage packages 
+function Wo_GetAllProInfo()
+{
+    global $sqlConnect, $wo;
+    $data = array();
+    $pro = mysqli_query($sqlConnect, "SELECT * FROM " . T_MANAGE_PRO);
+    if ($pro) {
+        while ($fetched_data = mysqli_fetch_assoc($pro)) {
+            if (!empty($fetched_data['image'])) {
+                $fetched_data['image'] = Wo_GetMedia($fetched_data['image']);
+            }
+            $data[$fetched_data['type']] = $fetched_data;
+        }
+        return $data;
+    }
+    return false;
+}
+// manage packages 
+function Wo_GetCategories($table)
+{
+    global $sqlConnect, $wo;
+    $data = array();
+    $categories = mysqli_query($sqlConnect, "SELECT * FROM " . $table);
+    if ($categories) {
+        while ($fetched_data = mysqli_fetch_assoc($categories)) {
+            $data[$fetched_data['id']] = $wo['lang'][$fetched_data['lang_key']];
+        }
+        if ($table == 'wo_products_categories') {
+            $data[0] = $wo['lang']['all_'];
+        }
+        else{
+            $data[1] = $wo['lang']['other'];
+        }
+        return $data;
+    }
+    return false;
+}
+function Wo_GetCategoriesKeys($table)
+{
+    global $sqlConnect, $wo;
+    $data = array();
+    $categories = mysqli_query($sqlConnect, "SELECT * FROM " . $table);
+    if ($categories) {
+        while ($fetched_data = mysqli_fetch_assoc($categories)) {
+            $data[$fetched_data['id']] = $fetched_data['lang_key'];
+        }
+        if ($table == 'wo_products_categories') {
+            $data[0] = 'all_';
+        }
+        else{
+            $data[1] = 'other';
+        }
+        return $data;
+    }
+    return false;
+}
+
+function Wo_GetPokeById($id)
+{
+    global $sqlConnect, $wo;
+    if (empty($id) || !is_numeric($id) || $id < 1) {
+        return false;
+    }
+    $data = array();
+    $query_one = mysqli_query($sqlConnect, "SELECT * FROM " . T_POKES . " WHERE `id` = '{$id}'");
+    if ($query_one) {
+        while ($fetched_data = mysqli_fetch_assoc($query_one)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['received_user_id']);
+            $data = $fetched_data;
+        }
     }
     return $data;
 }
