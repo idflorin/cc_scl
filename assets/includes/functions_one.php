@@ -3352,7 +3352,7 @@ function Wo_Markup($text, $link = true, $hashtag = true, $mention = true,$post_i
         $link_search = '/\[a\](.*?)\[\/a\]/i';
         if (preg_match_all($link_search, $text, $matches)) {
             foreach ($matches[1] as $match) {
-                $match_decode     = urldecode($match);
+                $match_decode     = strtolower(urldecode($match));
                 $match_decode_url = $match_decode;
                 $count_url        = mb_strlen($match_decode);
                 if ($count_url > 50) {
