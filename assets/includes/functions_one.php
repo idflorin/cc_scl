@@ -3362,7 +3362,7 @@ function Wo_Markup($text, $link = true, $hashtag = true, $mention = true,$post_i
                 if (!preg_match("/http(|s)\:\/\//", $match_decode)) {
                     $match_url = 'http://' . $match_url;
                 }
-                $text = str_replace('[a]' . $match . '[/a]', '<a href="' . strip_tags($match_url) . '" target="_blank" class="hash" rel="nofollow">' . $match_decode_url . '</a>', $text);
+                $text = str_replace('[a]' . $match . '[/a]', '<a href="https://go.cungcap.net/goto/' . urlencode(strip_tags($match_url)) . '" target="_blank" class="hash" rel="nofollow">' . $match_decode_url . '</a>', $text);
             }
         }
     }
