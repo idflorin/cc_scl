@@ -105,7 +105,26 @@
 				</div>
 				
 				<div itemprop="articleBody" class="read-content">
-					<?php echo htmlspecialchars_decode($wo['article']['content']); ?>
+                    <?php
+                        $text=$wo['article']['content'];
+                        $link_search = '/\[a\](.*?)\[\/a\]/i';
+                        if (preg_match_all($link_search, $text, $matches)) {
+                            foreach ($matches[1] as $match) {
+                                $match_decode     = strtolower(urldecode($match));
+                                $match_decode_url = $match_decode;
+                                $count_url        = mb_strlen($match_decode);
+                                if ($count_url > 50) {
+                                    $match_decode_url = mb_substr($match_decode_url, 0, 30) . '....' . mb_substr($match_decode_url, 30, 20);
+                                }
+                                $match_url = $match_decode;
+                                if (!preg_match("/http(|s)\:\/\//", $match_decode)) {
+                                    $match_url = 'http://' . $match_url;
+                                }
+                                $text = str_replace('[a]' . $match . '[/a]', '<a href="https://go.cungcap.net/goto/' . urlencode(strip_tags($match_url)) . '" target="_blank" class="hash" rel="nofollow">' . $match_decode_url . '</a>', $text);
+                            }
+                        }
+                    ?>
+					<?php echo htmlspecialchars_decode($text); ?>
 				</div>
               
 				<div class="read-tags main">
