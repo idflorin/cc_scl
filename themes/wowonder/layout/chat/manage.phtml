@@ -27,7 +27,6 @@
               </a>
               <span class="<?php echo Wo_RightToLeft('pull-right');?> pointer status" style="margin-right: 10px;" onclick="Wo_AddGChatPart(<?php echo $wo['group']['group_id']; ?>,<?php echo $wo['part']['id']; ?>);">
               <?php if ($wo['group']['owner']): ?>
-
               <?php if (Wo_IsGChatMemeberExists($wo['group']['group_id'],$wo['part']['id'])): ?>
                   <i class="fa fa-times main"></i>
               <?php else: ?>

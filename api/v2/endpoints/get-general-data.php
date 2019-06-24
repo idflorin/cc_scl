@@ -58,6 +58,7 @@ if (empty($error_code)) {
 
     if (!empty($data['notifications'])) {
     	$final_notifications= array();
+        $offset = (!empty($_POST['offset']) && is_numeric($_POST['offset']) && $_POST['offset'] > 0 ? Wo_Secure($_POST['offset']) : 0);
         $notifications = Wo_GetNotifications(array(
             'remove_notification' => array(
                 'requested_to_join_group',
@@ -66,7 +67,8 @@ if (empty($error_code)) {
                 'invited_event',
                 'forum_reply',
                 'admin_notification',
-            )
+            ),
+            'offset' => $offset
         ));
         
         foreach ($notifications as $notification) {
@@ -259,6 +261,11 @@ if (empty($error_code)) {
                     $wo['notification']['type_text'] = str_replace('{event_name}', $event_data['name'], $wo['lang']['invited_you_event']);
                     $wo['notification']['icon'] .= 'calendar-o';
                 }
+                if ($wo['notification']['type'] == 'poke') {
+                    $page                            = Wo_PageData($wo['notification']['page_id']);
+                    $wo['notification']['type_text'] = $wo['lang']['poked_you'];
+                    $wo['notification']['icon'] .= 'thumbs-up';
+                }
             }
             $wo['notification']['time_text_string'] = Wo_Time_Elapsed_String($wo['notification']['time']);
             $wo['notification']['time_text']        = Wo_Time_Elapsed_String($wo['notification']['time']);
@@ -279,6 +286,20 @@ if (empty($error_code)) {
             }
             foreach ($non_allowed as $key => $value) {
                 unset($wo['notification']['notifier'][$value]);
+            }
+            if (!empty($wo['notification']['event_id'])) {
+                $event = Wo_EventData($wo['notification']['event_id']);
+
+                foreach ($non_allowed as $key => $value) {
+                   unset($event['user_data'][$value]);
+                }
+                $event['is_going'] = Wo_EventGoingExists($event['id']);
+                $event['is_interested'] = Wo_EventInterestedExists($event['id']);
+                $event['going_count'] = Wo_TotalGoingUsers($event['id']);
+                $event['interested_count'] = Wo_TotalInterestedUsers($event['id']);
+                $event['start_date'] = date($wo['config']['date_style'], strtotime($event['start_date']));
+                $event['end_date'] = date($wo['config']['date_style'], strtotime($event['end_date']));
+                $wo['notification']['event'] = $event;
             }
             array_push($final_notifications, $wo['notification']);
         }
@@ -329,5 +350,12 @@ if (empty($error_code)) {
 
     if (!empty($data['count_new_messages'])) {
         $response_data['count_new_messages'] =  Wo_CountMessages(array('new' => true), 'interval');
+    }
+    if (!empty($data['announcement'])) {
+        $response_data['announcement'] =  Wo_GetHomeAnnouncements();
+        if (!empty($response_data['announcement'])) {
+            $response_data['announcement']['text_decode'] = strip_tags($response_data['announcement']['text']);
+            $response_data['announcement']['time_text'] = Wo_Time_Elapsed_String($response_data['announcement']['time']);
+        } 
     }
 }

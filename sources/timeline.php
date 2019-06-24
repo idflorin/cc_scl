@@ -16,16 +16,18 @@ if (isset($_GET['u'])) {
             $name               = $wo['user_profile']['name'];
             $wo['user_profile']['fields'] = Wo_UserFieldsData($user_id);
             $wo['have_stories'] = false;
-            $user_stories = $db->where('user_id', $wo['user_profile']['user_id'])->get(T_USER_STORY,null,array('id'));
-            if (!empty($user_stories)) {
-                $wo['have_stories'] = true;
-                $wo['story_seen_class'] = 'seen_story';
+            if ($wo['loggedin'] == true) {
+                $user_stories = $db->where('user_id', $wo['user_profile']['user_id'])->get(T_USER_STORY,null,array('id'));
+                if (!empty($user_stories)) {
+                    $wo['have_stories'] = true;
+                    $wo['story_seen_class'] = 'seen_story';
 
-                foreach ($user_stories as $key => $value) {
-                    $is_seen = $db->where('story_id',$value->id)->where('user_id',$wo['user']['user_id'])->getValue(T_STORY_SEEN,'COUNT(*)');
+                    foreach ($user_stories as $key => $value) {
+                        $is_seen = $db->where('story_id',$value->id)->where('user_id',$wo['user']['user_id'])->getValue(T_STORY_SEEN,'COUNT(*)');
 
-                    if ($is_seen == 0) {
-                        $wo['story_seen_class'] = 'unseen_story';
+                        if ($is_seen == 0) {
+                            $wo['story_seen_class'] = 'unseen_story';
+                        }
                     }
                 }
             }
@@ -76,7 +78,7 @@ if ($type == 'timeline') {
 if ($type == 'timeline' && $wo['loggedin'] == true) {
     $is_blocked = $wo['is_blocked'] = Wo_IsBlocked($user_id);
     if (isset($_GET['block_user']) && !empty($_GET['block_user'])) {
-        if ($_GET['block_user'] == 'block' && $is_blocked === false && Wo_IsAdmin($user_id) === false) {
+        if ($_GET['block_user'] == 'block' && $is_blocked === false && Wo_IsAdmin($user_id) === false && Wo_IsModerator($user_id) === false) {
             $block = Wo_RegisterBlock($user_id);
             if ($block) {
                 if (!empty($_GET['redirect'])) {
@@ -109,7 +111,7 @@ $can_ = 0;
 if ($wo['loggedin'] == true && $wo['config']['profileVisit'] == 1 && $type == 'timeline' && $con2 == 1) {
     if ($wo['user_profile']['user_id'] != $wo['user']['user_id'] && $wo['user']['visit_privacy'] == 0) {
         if ($wo['config']['pro'] == 1) {
-            if ($wo['user_profile']['is_pro'] == 1) {
+            if ($wo['user_profile']['is_pro'] == 1 && in_array($wo['user_profile']['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$wo['user_profile']['pro_type']]]['profile_visitors'] == 1) {
                 $can_ = 1;
             }
         } else {
@@ -133,16 +135,20 @@ if ($type == 'page') {
                 $query = mysqli_query($sqlConnect, "SELECT COUNT(`page_id`) as count FROM " . T_PAGES . " WHERE `user_id` = {$user_id} AND `boosted` = '1'");
                 $query_select_fetch = mysqli_fetch_assoc($query);
                 $continue = 0;
-                if ($wo['user']['pro_type'] == 2) {
-                     if ($query_select_fetch['count'] > ($wo['config']['monthly_boosts'] - 1)) {
+                if ($wo['user']['pro_type'] == 1) {
+                     if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
+                           $continue = 1;
+                     }
+                } else if ($wo['user']['pro_type'] == 2) {
+                     if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
                            $continue = 1;
                      }
                 } else if ($wo['user']['pro_type'] == 3) {
-                     if ($query_select_fetch['count'] > ($wo['config']['yearly_boosts'] - 1)) {
+                     if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
                            $continue = 1;
                      }
                 } else if ($wo['user']['pro_type'] == 4) {
-                     if ($query_select_fetch['count'] > ($wo['config']['lifetime_boosts'] - 1)) {
+                     if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
                            $continue = 1;
                      }
                 }

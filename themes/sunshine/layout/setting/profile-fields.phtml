@@ -14,6 +14,7 @@
 				if ($wo['field']['select_type'] == 'yes') {
 				$options = @explode(',', $wo['field']['type']); ?>
 			<select name="<?php echo $wo['field']['fid'];?>" class="form-control">
+				<?php if( isset( $wo['field']['issearch'] ) ){ ?> <option value=""><?php echo $wo['lang']['all'];?></option> <?php } ?>
 				<?php
 					foreach ($options as $key => $value) {
 					$selected = (($key + 1) == $fid) ? 'selected' : '';

@@ -53,7 +53,7 @@ $(document).ready(function() {
   });
 
   $(".load-more-my-blogs").click(function () {
-      let offset = (($(".view-blog").length > 0) ? $(".view-blog:last").attr('id') : 0);
+      let offset = (($(".blog-hcard-list").length > 0) ? $(".blog-hcard-list:last").attr('data-rm-blog') : 0);
 
       $.ajax({
          url: Wo_Ajax_Requests_File(),

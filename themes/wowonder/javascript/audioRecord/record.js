@@ -20,17 +20,17 @@ jQuery(document).ready(function($) {
         Wo_CleanRecordNodes();
         recording_time = $('#postRecordingTime');
         recording_node = "post";
-        _SELF.attr('data-record','1').html('<img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgNTggNTgiIHhtbDpzcGFjZT0icHJlc2VydmUiPiA8Y2lyY2xlIHN0eWxlPSJmaWxsOiNENzVBNEE7IiBjeD0iMjkiIGN5PSIyOSIgcj0iMjkiLz4gPGc+IDxyZWN0IHg9IjE2IiB5PSIxNiIgc3R5bGU9ImZpbGw6I0ZGRkZGRjsiIHdpZHRoPSIyNiIgaGVpZ2h0PSIyNiIvPiA8cGF0aCBzdHlsZT0iZmlsbDojRkZGRkZGOyIgZD0iTTQzLDQzSDE1VjE1aDI4VjQzeiBNMTcsNDFoMjRWMTdIMTdWNDF6Ii8+IDwvZz4gPC9zdmc+" />');
+        _SELF.attr('data-record','1').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-stop-circle main"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6"></rect></svg>');
         Wo_startRecording();
       }
       else if(localstream && recorder && _SELF.attr('data-record') == 1 && $("[data-record='1']").length == 1){
         Wo_stopRecording();
-        _SELF.html('<img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDUxMS45OTkgNTExLjk5OSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+IDxjaXJjbGUgc3R5bGU9ImZpbGw6I0UyMUIxQjsiIGN4PSIyNTUuOTk5IiBjeT0iMjU1Ljk5OSIgcj0iMjU1Ljk5OSIvPiA8Zz4gPHJlY3QgeD0iMjQ0LjAwMiIgeT0iMTIwLjAwOCIgdHJhbnNmb3JtPSJtYXRyaXgoMC43MDcxIC0wLjcwNzEgMC43MDcxIDAuNzA3MSAtMTA2LjAzOTcgMjU2LjAwMjIpIiBzdHlsZT0iZmlsbDojRkZGRkZGOyIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI3MS45ODgiLz4gPHJlY3QgeD0iMTIwLjAwOCIgeT0iMjQ0LjAwNyIgdHJhbnNmb3JtPSJtYXRyaXgoMC43MDcxIC0wLjcwNzEgMC43MDcxIDAuNzA3MSAtMTA2LjA0MjggMjU2LjAwMzUpIiBzdHlsZT0iZmlsbDojRkZGRkZGOyIgd2lkdGg9IjI3MS45ODgiIGhlaWdodD0iMjQiLz4gPC9nPiA8L3N2Zz4=" />').attr('data-record','2');    
+        _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>').attr('data-record','2');    
       }
       else if(localstream && recorder && _SELF.attr('data-record') == 2){
         Wo_CleanRecordNodes();
         Wo_StopLocalStream();
-        _SELF.html('<img src="data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgNTcgNTciIHhtbDpzcGFjZT0icHJlc2VydmUiPiA8cGF0aCBzdHlsZT0iZmlsbDpub25lO3N0cm9rZTojNTU2MDgwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwOyIgZD0iTTQzLjUsMjh2NiBjMCw4LjI3MS02LjcyOSwxNS0xNSwxNXMtMTUtNi43MjktMTUtMTV2LTYiLz4gPHBhdGggc3R5bGU9ImZpbGw6I0M3Q0FDNzsiIGQ9Ik0yOC41LDQ0TDI4LjUsNDRjLTUuNSwwLTEwLTQuNS0xMC0xMFYxMGMwLTUuNSw0LjUtMTAsMTAtMTBoMGM1LjUsMCwxMCw0LjUsMTAsMTB2MjQgQzM4LjUsMzkuNSwzNCw0NCwyOC41LDQ0eiIvPiA8bGluZSBzdHlsZT0iZmlsbDpub25lO3N0cm9rZTojNTU2MDgwO3N0cm9rZS13aWR0aDoyO3N0cm9rZS1saW5lY2FwOnJvdW5kO3N0cm9rZS1taXRlcmxpbWl0OjEwOyIgeDE9IjI4LjUiIHkxPSI0OSIgeDI9IjI4LjUiIHkyPSI1NiIvPiA8cG9seWxpbmUgc3R5bGU9ImZpbGw6bm9uZTtzdHJva2U6IzU1NjA4MDtzdHJva2Utd2lkdGg6MjtzdHJva2UtbGluZWNhcDpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoxMDsiIHBvaW50cz0iMzQuNSw1NiAyOC41LDU2IDIyLjUsNTYgIi8+IDxwYXRoIHN0eWxlPSJmaWxsOiNBRkI2QkI7IiBkPSJNMzguNSwzNFYxMGMwLTUuNS00LjUtMTAtMTAtMTB2NDRDMzQsNDQsMzguNSwzOS41LDM4LjUsMzR6Ii8+IDwvc3ZnPg==" />').attr('data-record','0');    
+        _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mic" color="#009da0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>').attr('data-record','0');    
       }
       else{
         return false;
@@ -40,7 +40,6 @@ jQuery(document).ready(function($) {
 
   $(document).on('click',".record-comment-audio",function(event) {
     audio_context          = new AudioContext;
-	  console.log('testststssttss');
     var _SELF = $(this);
     if (!localstream) {
       Wo_CreateUserMedia();  
@@ -51,19 +50,19 @@ jQuery(document).ready(function($) {
         recording_time = $("span[data-comment-rtime='" + _SELF.attr('id') + "']");
         recording_node = "comm";
         comm_field     = _SELF.attr('id');
-        _SELF.attr('data-record','1').html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4M9,9V15H15V9"></path></svg>');  
+        _SELF.attr('data-record','1').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-stop-circle main"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6"></rect></svg>');  
         Wo_startRecording();
       }
 
       else if(recorder && _SELF.attr('data-record') == 1 && $("[data-record='1']").length == 1){
        Wo_stopRecording();
-       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2C6.47,2 2,6.47 2,12C2,17.53 6.47,22 12,22C17.53,22 22,17.53 22,12C22,6.47 17.53,2 12,2M14.59,8L12,10.59L9.41,8L8,9.41L10.59,12L8,14.59L9.41,16L12,13.41L14.59,16L16,14.59L13.41,12L16,9.41L14.59,8Z"></path></svg>').attr('data-record','2');     
+       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>').attr('data-record','2');     
       }
 
       else if(recorder && _SELF.attr('data-record') == 2){
        Wo_CleanRecordNodes();
        Wo_StopLocalStream();
-       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"></path></svg>').attr('data-record','0');  
+       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mic" color="#009da0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>').attr('data-record','0');  
       }
 
       else{
@@ -85,19 +84,19 @@ jQuery(document).ready(function($) {
         recording_time = $("span[data-chat-rtime='" + _SELF.attr('data-chat-tab') + "']");
         recording_node = "chat";
         chat_tab       = _SELF.attr('data-chat-tab');
-        _SELF.attr('data-record','1').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M9,9H15V15H9" /></svg><p><?php echo $wo["lang"]["stop"];?></p>');  
+        _SELF.attr('data-record','1').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-stop-circle main"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6"></rect></svg>');  
         Wo_startRecording();
       }
 
       else if(recorder && _SELF.attr('data-record') == 1 && $("[data-record='1']").length == 1){
        Wo_stopRecording();
-       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20.37,8.91L19.37,10.64L7.24,3.64L8.24,1.91L11.28,3.66L12.64,3.29L16.97,5.79L17.34,7.16L20.37,8.91M6,19V7H11.07L18,11V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19Z" /></svg><p><?php echo $wo["lang"]["delete"];?></p>').attr('data-record','2');     
+       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x-circle"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>').attr('data-record','2');     
       }
 
       else if(recorder && _SELF.attr('data-record') == 2){
        Wo_CleanRecordNodes();
        Wo_StopLocalStream();
-       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" /></svg><p><?php echo $wo["lang"]["voice"];?></p>').attr('data-record','0');  
+       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mic"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>').attr('data-record','0');  
       }
 
       else{
@@ -152,12 +151,12 @@ function Wo_CreateUserMedia(){
 }
 function Wo_CleanRecordNodes(){
   $(".record-comment-audio").each(function(index, el) {
-    $(el).html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"></path></svg>').attr('data-record', '0');
+    $(el).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mic" color="#009da0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>').attr('data-record', '0');
     $('[data-comment-rtime="'+$(el).attr('id')+'"]').text('00:00').addClass('hidden');
   });
 
   $(".record-chat-audio").each(function(index, el) {
-    $(el).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" /></svg><p><?php echo $wo["lang"]["voice"];?></p>').attr('data-record', '0');
+    $(el).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mic"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>').attr('data-record', '0');
     $('[data-chat-rtime="'+$(el).attr('data-chat-tab')+'"]').text('00:00').addClass('hidden');
   });
 
@@ -316,7 +315,7 @@ function Wo_RegisterTabMessageRecord(dataForm,id){
             xhr.upload.addEventListener("progress", function(evt) {
                 if (evt.lengthComputable) {
                     var percentComplete = (evt.loaded / evt.total) * 100;
-                    $('form.chat-sending-form-'+id).find('.loading').removeClass('hidden');
+                    $('form.chat-sending-form-'+id).find('.ball-pulse').fadeIn(100);;
                 }
            }, false);
            return xhr;
@@ -325,7 +324,7 @@ function Wo_RegisterTabMessageRecord(dataForm,id){
       if(data.status == 200){
         $('form.chat-sending-form-'+id).find('input.message-record').val('');   
         $('form.chat-sending-form-'+id).find('input.media-name').val('');
-        $('form.chat-sending-form-'+id).find('.loading').addClass('hidden');
+        $('form.chat-sending-form-'+id).find('.ball-pulse').fadeOut(100);;
         Wo_stopRecording();
         Wo_CleanRecordNodes();
         Wo_StopLocalStream();
@@ -419,8 +418,8 @@ function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
         dataForm.append('text',                  text);
         dataForm.append('user_id',            user_id);
         dataForm.append('page_id',            page_id);
-        dataForm.append('comment_image',comment_image); 
-        $('#charsLeft_'+post_id).text($('#charsLeft_'+post_id).attr('data_num'));
+        dataForm.append('comment_image',comment_image);
+        $('#charsLeft_'+post_id).text($('#charsLeft_'+post_id).attr('data_num')); 
         Wo_InsertComment(dataForm,post_id);
     }
   }
@@ -435,7 +434,8 @@ function Wo_InsertComment(dataForm,post_id){
     comment_list = post_wrapper.find('.comments-list');   
     //event.preventDefault();
     textarea_wrapper.val('');
-    post_wrapper.find('.loading_cont .loading').removeClass('hidden');
+	$('.wo_comment_combo_' + post_id).removeClass('comment-toggle');
+    post_wrapper.find('#wo_comment_combo .ball-pulse').fadeIn(100);
     $.ajax({
         url: Wo_Ajax_Requests_File() + '?f=posts&s=register_comment&hash=' + $('.main_session').val(),
         type:       'POST',
@@ -450,13 +450,12 @@ function Wo_InsertComment(dataForm,post_id){
         post_wrapper.find('.post-footer .comment-container:last-child').after(data.html);
         post_wrapper.find('.comments-list-lightbox .comment-container:first').before(data.html);
         post_wrapper.find('[id=comments]').html(data.comments_num);
-		post_wrapper.find('textarea').attr("style", "height:36px;");
         post_wrapper.find('.lightbox-no-comments').remove();
         Wo_StopLocalStream();
       }
       $('#post-'+ post_id).find('.comment-image-con').empty().addClass('hidden');
       $('#post-'+ post_id).find('#comment_src_image').val('');
-      post_wrapper.find('.loading_cont .loading').addClass('hidden');
+      post_wrapper.find('#wo_comment_combo .ball-pulse').fadeOut(100);
       if (data.can_send == 1) {
         Wo_SendMessages();
       }

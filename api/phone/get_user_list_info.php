@@ -90,7 +90,7 @@ if ($type == 'get_user_list_info') {
                 $json_data['lastseen_time_text'] = Wo_Time_Elapsed_String($user_list['lastseen']);
                 $json_data['lastseen'] = $lastseen;
                 $json_data['user_platform'] = Wo_GetPlatformFromUser_ID($user_list['user_id']);
-                $json_data['is_following'] = (Wo_IsFollowing($wo['user']['user_id'], $user_list['user_id'])) ? 1 : 0;
+                $json_data['is_following'] = (Wo_IsFollowing($user_list['user_id'],$wo['user']['user_id'])) ? 1 : 0;
                 foreach ($non_allowed as $key => $value) {
                     unset($json_data[$value]);
                 }
@@ -105,7 +105,7 @@ if ($type == 'get_user_list_info') {
                 $json_data['lastseen_time_text'] = Wo_Time_Elapsed_String($user_list['lastseen']);
                 $json_data['lastseen'] = $lastseen;
                 $json_data['user_platform'] = Wo_GetPlatformFromUser_ID($user_list['user_id']);
-                $json_data['is_following'] = (Wo_IsFollowing($wo['user']['user_id'], $user_list['user_id'])) ? 1 : 0;
+                $json_data['is_following'] = (Wo_IsFollowing($user_list['user_id'],$wo['user']['user_id'])) ? 1 : 0;
                 foreach ($non_allowed as $key => $value) {
                     unset($json_data[$value]);
                 }

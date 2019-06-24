@@ -53,6 +53,7 @@ if (!empty($_POST['query'])) {
     exit();
 }
 if (!empty($_POST['update_langs'])) {
+    $data  = array();
     $name = md5(microtime()) . '_updated.php';
     rename('update.php', $name);
 }
@@ -119,13 +120,11 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
                <div class="wo_install_wiz">
                  <?php if ($updated == false) { ?>
                   <div>
-                     <h2 class="light">Update to v2.2.2 </span></h2>
+                     <h2 class="light">Update to v2.3.2 </span></h2>
                      <div class="setting-well">
                         <h4>Changelog</h4>
                         <ul class="wo_update_changelog">
-                            <li> [Added] deepsound embed feature, now you can embed the player from deepsound to wowonder.</li>
-                            <li> [Fixed] 20+ reported bugs.</li>
-                            <li> [Fixed] security issue.</li>
+                                <li> [Fixed] 20+ reported bugs.</li>
                         </ul>
                         <p class="hide_print">Note: The update process might take few minutes.</p>
                         <p class="hide_print">Important: If you got any fail queries, please copy them, open a support ticket and send us the details.</p>
@@ -166,13 +165,9 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
 </html>
 <script>  
 var queries = [
-    "UPDATE `Wo_Config` SET `value` = '2.2.2' WHERE `name` = 'script_version'",
-    "UPDATE `Wo_Config` SET `value` = '<?php echo time(); ?>' WHERE `name` = 'last_update'",
-    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'createblog_point', '15');",
-    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'deepsound_url', 'https://deepsoundscript.com');",
-    "ALTER TABLE `Wo_Posts` ADD `postDeepsound` VARCHAR(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `postPlaytube`;"
+"INSERT INTO `Wo_Langs` (`id`, `lang_key`, `type`, `english`, `arabic`, `dutch`, `french`, `german`, `italian`, `portuguese`, `russian`, `spanish`, `turkish`) VALUES (NULL, 'less', 'less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less');",
+    "UPDATE `Wo_Config` SET `value` = '2.3.2' WHERE `name` = 'version';",
 ];
-
 $('#input_code').bind("paste keyup input propertychange", function(e) {
     if (isPurchaseCode($(this).val())) {
         $('#button-update').removeAttr('disabled');

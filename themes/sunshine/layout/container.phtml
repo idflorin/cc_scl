@@ -12,7 +12,9 @@
 	  <?php } else { ?>
 	  <meta name="theme-color" content="#3D8CFA" />
 	  <?php } ?>
-      <?php if ($wo['page'] == 'maintenance') { ?>
+      <?php 
+      //print_r($wo['group_profile']);
+      if ($wo['page'] == 'maintenance') { ?>
       <meta name="robots" content="noindex">
       <meta name="googlebot" content="noindex">
       <?php } ?>
@@ -27,6 +29,30 @@
       <meta name="twitter:title" content="<?php echo $wo['movie']['name']; ?>" />
       <meta name="twitter:description" content="<?php echo $wo['movie']['description']; ?>" />
       <meta name="twitter:image" content="<?php echo $wo['movie']['cover']; ?>" />
+      <?php } ?>
+      <?php if ($wo['page'] == 'page' && !empty($wo['page_profile'])) { ?>
+      <meta property="og:title" content="<?php echo $wo['page_profile']['page_name']; ?>" />
+      <meta property="og:type" content="article" />
+      <meta property="og:url" content="<?php echo $wo['page_profile']['url']; ?>" />
+      <meta property="og:image" content="<?php echo $wo['page_profile']['avatar']; ?>" />
+      <meta property="og:image:secure_url" content="<?php echo $wo['page_profile']['avatar']; ?>" />
+      <meta property="og:description" content="<?php echo $wo['page_profile']['page_description']; ?>" />
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="<?php echo $wo['page_profile']['page_name']; ?>" />
+      <meta name="twitter:description" content="<?php echo $wo['page_profile']['page_description']; ?>" />
+      <meta name="twitter:image" content="<?php echo $wo['page_profile']['avatar']; ?>" />
+      <?php } ?>
+      <?php if ($wo['page'] == 'group' && !empty($wo['group_profile'])) { ?>
+      <meta property="og:title" content="<?php echo $wo['group_profile']['group_name']; ?>" />
+      <meta property="og:type" content="article" />
+      <meta property="og:url" content="<?php echo $wo['group_profile']['url']; ?>" />
+      <meta property="og:image" content="<?php echo $wo['group_profile']['avatar']; ?>" />
+      <meta property="og:image:secure_url" content="<?php echo $wo['group_profile']['avatar']; ?>" />
+      <meta property="og:description" content="<?php echo $wo['group_profile']['about']; ?>" />
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="<?php echo $wo['group_profile']['group_name']; ?>" />
+      <meta name="twitter:description" content="<?php echo $wo['group_profile']['about']; ?>" />
+      <meta name="twitter:image" content="<?php echo $wo['group_profile']['avatar']; ?>" />
       <?php } ?>
       <?php if ($wo['page'] == 'game' && !empty($wo['game'])) { ?>
       <meta property="og:title" content="<?php echo $wo['game']['game_name']; ?>" />
@@ -143,6 +169,13 @@
       <!-- <script src="<?php echo $wo['config']['theme_url'];?>/javascript/bbcode/jquery.bbcode.js"></script>
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/javascript/bbcode/jquery.bbcode.css" media="all"> -->
       <?php endif ?>
+
+      <?php if ($wo['config']['checkout_payment'] == 'yes') { ?>
+        <script type="text/javascript" src="https://www.2checkout.com/checkout/api/2co.min.js"></script>
+      <?php } ?>
+
+
+
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/player/fluidplayer.min.css" type="text/css"/>
       <script src="<?php echo $wo['config']['theme_url'];?>/player/fluidplayer.min.js"></script>
       <?php if ($wo['loggedin'] == true && $wo['page'] == 'home' && $wo['config']['web_push'] == 1) { ?>
@@ -470,6 +503,9 @@
       
       <!-- End 'Audio FILES' -->
       <script>
+        $(window).on("popstate", function (e) {
+          location.reload();
+      });
        /*Language Select*/
         $(document).ready(function(){
           $(".sun_lang_select_menu li a.English").append('<span class="language_initial"><img src="<?php echo $wo['config']['theme_url']; ?>/img/flags/united-states.svg"/></span> ');

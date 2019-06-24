@@ -17,7 +17,7 @@ if (empty($_POST['post_id'])) {
 } else if (empty($_POST['action'])) {
     $error_code    = 5;
     $error_message = 'action (POST) is missing';
-} else if (!in_array($_POST['action'], array('edit', 'delete', 'comment', 'like', 'dislike', 'wonder'))) {
+} else if (!in_array($_POST['action'], array('edit', 'delete', 'comment', 'like', 'dislike', 'wonder','report','save','disable_comments','reaction','boost'))) {
 	$error_code    = 6;
     $error_message = 'Undefined action value';
 }
@@ -95,6 +95,83 @@ if (empty($error_code)) {
             	$action = 'edited';
             }
 		}
+	}  else if ($_POST['action'] == 'report') {
+        $post_data = array(
+            'post_id' => $_POST['post_id']
+        );
+        if (Wo_ReportPost($post_data) == 'unreport') {
+            $code = 0;
+            $action = 'unreport post';
+        } else {
+            $code = 1;
+            $action = 'report post';
+        }
+	}  else if ($_POST['action'] == 'save') {
+        $post_data = array(
+            'post_id' => $_POST['post_id']
+        );
+        if (Wo_SavePosts($post_data) == 'unsaved') {
+            $code = 0;
+            $action = 'unsaved post';
+        } else {
+            $code = 1;
+            $action = 'saved post';
+        }
+	}  else if ($_POST['action'] == 'disable_comments') {
+		$post_id = Wo_Secure($_POST['post_id']);
+		$post = Wo_PostData($post_id);
+		if (Wo_IsPostOnwer($post_id, $wo['user']['user_id'])) {
+			if ($post['comments_status'] == 1) {
+				$db->where('id', $post_id)->update(T_POSTS, array('comments_status' => 0));
+	            $code = 0;
+	            $action = 'post comments disabled';
+			}
+			else{
+				$db->where('id', $post_id)->update(T_POSTS, array('comments_status' => 1));
+	            $code = 1;
+	            $action = 'post comments enabled';
+			}
+		}
+		else{
+			$error_code    = 7;
+		    $error_message = 'You are not the post owner';
+		}
+	}  else if ($_POST['action'] == 'boost') {
+		$post_id = Wo_Secure($_POST['post_id']);
+		$post = Wo_PostData($post_id);
+		if (Wo_IsPostOnwer($post_id, $wo['user']['user_id'])) {
+			if (Wo_BoostPost($post_id) == 'unboosted') {
+	            $code = 0;
+	            $action = 'post unboosted';
+			}
+			else{
+	            $code = 1;
+	            $action = 'post boosted';
+			}
+		}
+		else{
+			$error_code    = 7;
+		    $error_message = 'You are not the post owner';
+		}
+	}  else if ($_POST['action'] == 'reaction') {
+		$reactions_types = array('Like','Love','HaHa','Wow','Sad','Angry');
+		$post_id = Wo_Secure($_POST['post_id']);
+		if (Wo_IsReacted($post_id, $wo['user']['user_id']) == true) {
+			Wo_DeleteReactions($post_id);
+			$code = 0;
+            $action = 'reaction deleted';
+		}
+
+		if (!empty($_POST['reaction']) && in_array($_POST['reaction'], $reactions_types)) {
+			$reaction = Wo_Secure($_POST['reaction']);
+			Wo_AddReactions($post_id, $reaction);
+			$code = 1;
+            $action = 'reaction Added';
+		}
+		elseif (empty($action)){
+			$error_code    = 8;
+			$error_message = 'reaction (POST) is missing';
+		}
 	}
 	if (!empty($action)) {
 		$response_data = array(
@@ -112,6 +189,21 @@ if (empty($error_code)) {
 		}
 		if (!empty($wonder_data)) {
 			$response_data['wonder_data'] = $wonder_data;
+		}
+		if ($_POST['action'] == 'report') {
+			$response_data['code'] = $code;
+		}
+		if ($_POST['action'] == 'save') {
+			$response_data['code'] = $code;
+		}
+		if ($_POST['action'] == 'disable_comments') {
+			$response_data['code'] = $code;
+		}
+		if ($_POST['action'] == 'reaction') {
+			$response_data['code'] = $code;
+		}
+		if ($_POST['action'] == 'boost') {
+			$response_data['code'] = $code;
 		}
 	}
 }

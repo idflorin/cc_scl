@@ -17,6 +17,12 @@ $options['query'] = (!empty($_POST['search_key'])) ? Wo_Secure($_POST['search_ke
 $options['gender'] = (!empty($_POST['gender'])) ? Wo_Secure($_POST['gender']) : '';
 $options['status'] = (!empty($_POST['status'])) ?  Wo_Secure($_POST['status']) : '';
 $options['image'] = (!empty($_POST['image'])) ?  Wo_Secure($_POST['image']) : '';
+$options['country'] = (!empty($_POST['country'])) ?  Wo_Secure($_POST['country']) : '';
+$options['status'] = (!empty($_POST['status'])) ?  Wo_Secure($_POST['status']) : '';
+$options['verified'] = (!empty($_POST['verified'])) ?  Wo_Secure($_POST['verified']) : '';
+$options['filterbyage'] = (!empty($_POST['filterbyage'])) ?  Wo_Secure($_POST['filterbyage']) : '';
+$options['age_from'] = (!empty($_POST['age_from'])) ?  Wo_Secure($_POST['age_from']) : '';
+$options['age_to'] = (!empty($_POST['age_to'])) ?  Wo_Secure($_POST['age_to']) : '';
 
 $user_offset = (!empty($_POST['user_offset'])) ? (int) $_POST['user_offset'] : 0;
 $page_offset = (!empty($_POST['page_offset'])) ? (int) $_POST['page_offset'] : 0;

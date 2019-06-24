@@ -66,6 +66,113 @@ if ($type == 'new_post') {
             echo json_encode($json_error_data, JSON_PRETTY_PRINT);
             exit();
         } else {
+
+            if (!empty($_POST['postText']) && Wo_IsUrl($_POST['postText'])) {
+
+
+                if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $_POST["postText"], $match)) {
+                    $youtube_video = Wo_Secure($match[1]);
+                    $api_request   = file_get_contents('https://www.googleapis.com/youtube/v3/videos?id=' . $youtube_video . '&key=AIzaSyDoOC41IwRzX5XvP7bNiCJXJfcK14HalM0&part=snippet,contentDetails,statistics,status');
+                    $thumbnail     = '';
+                    if (!empty($api_request)) {
+                        $json_decode = json_decode($api_request);
+                        if (!empty($json_decode->items[0]->snippet)) {
+                            if (!empty($json_decode->items[0]->snippet->thumbnails->maxres->url)) {
+                                $thumbnail = $json_decode->items[0]->snippet->thumbnails->maxres->url;
+                            }
+                            if (!empty($json_decode->items[0]->snippet->thumbnails->medium->url)) {
+                                $thumbnail = $json_decode->items[0]->snippet->thumbnails->medium->url;
+                            }
+                            $info        = $json_decode->items[0]->snippet;
+                            $title       = $info->title;
+                            $description = $info->description;
+                            if (!empty($json_decode->items[0]->snippet->tags)) {
+                                if (is_array($json_decode->items[0]->snippet->tags)) {
+                                    foreach ($json_decode->items[0]->snippet->tags as $key => $tag) {
+                                        $tags_array[] = $tag;
+                                    }
+                                    $tags = implode(',', $tags_array);
+                                }
+                            }
+                        }
+                        // $output = array(
+                        //     'title' => $title,
+                        //     'images' => array(
+                        //         $thumbnail
+                        //     ),
+                        //     'content' => $description,
+                        //     'url' => $_POST["postText"]
+                        // );
+
+                        $_POST['url_title'] = $title;
+                        $_POST['url_content'] = $description;
+                        $_POST['url_image'] = $thumbnail;
+                        $_POST['url_link'] = $_POST["postText"];
+                    }
+                } else if (isset($_POST["postText"])) {
+                    $page_title = '';
+                    $image_urls = array();
+                    $page_body  = '';
+                    $get_url    = $_POST["postText"];
+                    include_once("assets/libraries/simple_html_dom.inc.php");
+                    $get_image = getimagesize($get_url);
+                    if (!empty($get_image)) {
+                        $image_urls[] = $get_url;
+                        $page_title   = 'Image';
+                    } else {
+                        $get_content = file_get_html($get_url);
+                        foreach ($get_content->find('title') as $element) {
+                            @$page_title = $element->plaintext;
+                        }
+                        if (empty($page_title)) {
+                            $page_title = '';
+                        }
+                        @$page_body = $get_content->find("meta[name='description']", 0)->content;
+                        $page_body = mb_substr($page_body, 0, 250, "utf-8");
+                        if ($page_body === false) {
+                            $page_body = '';
+                        }
+                        if (empty($page_body)) {
+                            @$page_body = $get_content->find("meta[property='og:description']", 0)->content;
+                            $page_body = mb_substr($page_body, 0, 250, "utf-8");
+                            if ($page_body === false) {
+                                $page_body = '';
+                            }
+                        }
+                        $image_urls = array();
+                        @$page_image = $get_content->find("meta[property='og:image']", 0)->content;
+                        if (!empty($page_image)) {
+                            if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $page_image)) {
+                                $image_urls[] = $page_image;
+                            }
+                        } else {
+                            foreach ($get_content->find('img') as $element) {
+                                if (!preg_match('/blank.(.*)/i', $element->src)) {
+                                    if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $element->src)) {
+                                        $image_urls[] = $element->src;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // $output = array(
+                    //     'title' => $page_title,
+                    //     'images' => $image_urls,
+                    //     'content' => $page_body,
+                    //     'url' => $_POST["postText"]
+                    // );
+
+                    $_POST['url_title'] = $page_title;
+                    $_POST['url_content'] = $page_body;
+                    $_POST['url_image'] = $image_urls[0];
+                    $_POST['url_link'] = $_POST["postText"];
+                }
+
+            }
+
+
+
+
             $media         = '';
             $mediaFilename = '';
             $mediaName     = '';
@@ -305,6 +412,9 @@ if ($type == 'new_post') {
                 if (!empty($is_option)) {
                     $post_data['poll_id'] = 1;
                 }
+                if (!empty($_POST['post_color']) && !empty($post_text) && empty($_POST['postRecord']) && empty($mediaFilename) && empty($mediaName) && empty($post_map) && empty($url_title) && empty($url_content) && empty($url_link) && empty($import_url_image) && empty($album_name) && empty($multi) && empty($video_thumb) && empty($post_data['postPhoto'])) {
+                    $post_data['color_id'] = Wo_Secure($_POST['post_color']);
+                }
                 $id = Wo_RegisterPost($post_data);
                 if ($id) {
                     if ($is_option == true) {
@@ -331,6 +441,79 @@ if ($type == 'new_post') {
                     }
                     $wo['story'] = Wo_PostData($id);
                     $html .= Wo_LoadPage('story/content');
+                    $wo['story']['shared_info'] = null;
+
+                    if (!empty($wo['story']['postFile'])) {
+                        $wo['story']['postFile'] = Wo_GetMedia($wo['story']['postFile']);
+                    }
+                    if (!empty($wo['story']['postFileThumb'])) {
+                        $wo['story']['postFileThumb'] = Wo_GetMedia($wo['story']['postFileThumb']);
+                    }
+                    if (!empty($wo['story']['postPlaytube'])) {
+                        $wo['story']['postText'] = strip_tags($wo['story']['postText']);
+                    }
+
+
+
+                    if (!empty($wo['story']['publisher'])) {
+                        foreach ($non_allowed as $key4 => $value4) {
+                          unset($wo['story']['publisher'][$value4]);
+                        }
+                    }
+                    else{
+                        $wo['story']['publisher'] = null;
+                    }
+
+                    if (!empty($wo['story']['user_data'])) {
+                        foreach ($non_allowed as $key4 => $value4) {
+                          unset($wo['story']['user_data'][$value4]);
+                        }
+                    }
+                    else{
+                        $wo['story']['user_data'] = null;
+                    }
+
+                    if (!empty($wo['story']['parent_id'])) {
+                        $shared_info = Wo_PostData($wo['story']['parent_id']);
+                        if (!empty($shared_info)) {
+                            if (!empty($shared_info['publisher'])) {
+                                foreach ($non_allowed as $key4 => $value4) {
+                                  unset($shared_info['publisher'][$value4]);
+                                }
+                            }
+                            else{
+                                $shared_info['publisher'] = null;
+                            }
+
+                            if (!empty($shared_info['user_data'])) {
+                                foreach ($non_allowed as $key4 => $value4) {
+                                  unset($shared_info['user_data'][$value4]);
+                                }
+                            }
+                            else{
+                                $shared_info['user_data'] = null;
+                            }
+
+                            if (!empty($shared_info['get_post_comments'])) {
+                                foreach ($shared_info['get_post_comments'] as $key3 => $comment) {
+
+                                    foreach ($non_allowed as $key5 => $value5) {
+                                      unset($shared_info['get_post_comments'][$key3]['publisher'][$value5]);
+                                    }
+                                }
+                            }
+                        }
+                        $wo['story']['shared_info'] = $shared_info;
+                    }
+
+                    if (!empty($value['get_post_comments'])) {
+                        foreach ($value['get_post_comments'] as $key3 => $comment) {
+
+                            foreach ($non_allowed as $key5 => $value5) {
+                              unset($wo['story']['get_post_comments'][$key3]['publisher'][$value5]);
+                            }
+                        }
+                    }
                 }
             } else {
                 header("Content-type: application/json");
@@ -353,7 +536,8 @@ $json_success_data22 = array(
     'api_status' => '200',
     'api_text' => 'success',
     'api_version' => $api_version,
-    'post_html' => $html
+    'post_html' => $html,
+    'post_data' => $wo['story']
 );
 header("Content-type: application/json");
 echo json_encode($json_success_data22);
