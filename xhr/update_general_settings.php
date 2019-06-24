@@ -34,7 +34,8 @@ if ($f == "update_general_settings") {
                     $errors[] = $error_icon . $wo['lang']['username_invalid_characters'];
                 }
                 if (!empty($_POST['birthday']) && preg_match('@^\s*(3[01]|[12][0-9]|0?[1-9])\-(1[012]|0?[1-9])\-((?:19|20)\d{2})\s*$@', $_POST['birthday'])) {
-                    $age_data = $_POST['birthday'];
+                    $newDate = date("Y-m-d", strtotime($_POST['birthday']));
+                    $age_data = $newDate;
                 }
                 else{
                     if (!empty($_POST['age_year']) || !empty($_POST['age_day']) || !empty($_POST['age_month'])) {

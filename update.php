@@ -120,12 +120,11 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
                <div class="wo_install_wiz">
                  <?php if ($updated == false) { ?>
                   <div>
-                     <h2 class="light">Update to v2.3.1 </span></h2>
+                     <h2 class="light">Update to v2.3.2 </span></h2>
                      <div class="setting-well">
                         <h4>Changelog</h4>
                         <ul class="wo_update_changelog">
-                                <li> [Fixed] 10+ reported bugs.</li>
-                                <li> [Fixed] API issues.</li>
+                                <li> [Fixed] 20+ reported bugs.</li>
                         </ul>
                         <p class="hide_print">Note: The update process might take few minutes.</p>
                         <p class="hide_print">Important: If you got any fail queries, please copy them, open a support ticket and send us the details.</p>
@@ -166,8 +165,8 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
 </html>
 <script>  
 var queries = [
-    "ALTER TABLE `Wo_Users` CHANGE `password` `password` VARCHAR(70) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '';",
-    "UPDATE `Wo_Config` SET `value` = '2.3.1' WHERE `name` = 'version';",
+"INSERT INTO `Wo_Langs` (`id`, `lang_key`, `type`, `english`, `arabic`, `dutch`, `french`, `german`, `italian`, `portuguese`, `russian`, `spanish`, `turkish`) VALUES (NULL, 'less', 'less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less');",
+    "UPDATE `Wo_Config` SET `value` = '2.3.2' WHERE `name` = 'version';",
 ];
 $('#input_code').bind("paste keyup input propertychange", function(e) {
     if (isPurchaseCode($(this).val())) {

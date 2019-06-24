@@ -443,14 +443,23 @@ function Wo_IsPostSaved($post_id, $user_id) {
         return true;
     }
 }
-function Wo_GetSavedPosts($user_id) {
+function Wo_GetSavedPosts($user_id,$after_post_id = 0,$limit = 0) {
     global $wo, $sqlConnect;
     if ($wo['loggedin'] == false) {
         return false;
     }
     $logged_user_id = Wo_Secure($wo['user']['user_id']);
     $data           = array();
-    $query          = mysqli_query($sqlConnect, "SELECT `post_id` FROM " . T_SAVED_POSTS . " WHERE `user_id` = {$user_id} ORDER BY `id` DESC");
+    $query_one = "SELECT `post_id` FROM " . T_SAVED_POSTS . " WHERE `user_id` = {$user_id} ";
+    if (isset($after_post_id) && !empty($after_post_id) && is_numeric($after_post_id)) {
+        $after_post_id = Wo_Secure($after_post_id);
+        $query_one .= " AND post_id < {$after_post_id}";
+    }
+    $query_one .= " ORDER BY `id` DESC";
+    if (isset($limit) && !empty($limit) && is_numeric($limit)) {
+        $query_one .= " LIMIT {$limit}";
+    }
+    $query          = mysqli_query($sqlConnect, $query_one);
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $post = Wo_PostData($fetched_data['post_id']);
         if (is_array($post)) {
@@ -3449,6 +3458,9 @@ function Wo_GetCommentReply($reply_id = 0) {
         $fetched_data['onwer']               = ($fetched_data['publisher']['user_id'] == $wo['user']['user_id']) ? true : false;
         $fetched_data['is_comment_wondered'] = (Wo_IsCommentReplyWondered($fetched_data['id'], $wo['user']['user_id'])) ? true : false;
         $fetched_data['is_comment_liked']    = (Wo_IsCommentReplyLiked($fetched_data['id'], $wo['user']['user_id'])) ? true : false;
+    }
+    if ($wo['config']['second_post_button'] == 'reaction') {
+        $fetched_data['reaction'] = Wo_GetPostReactionsTypes($fetched_data['id'],'replay');
     }
     return $fetched_data;
 }

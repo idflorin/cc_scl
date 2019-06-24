@@ -681,6 +681,11 @@ $(function () {
         event.preventDefault();
         thumb_drop_block.removeClass('hover');
         var file = event.dataTransfer.files;
+        $("#post_vthumb_droparea").find('.preview').hide(5, function() {
+	      $("#post_vthumb_droparea").find('.image').html($("<img>",{
+	        src:window.URL.createObjectURL(file[0])
+	      })).show(5);
+	    });
         $("#custom-video-thumb").prop('files', file);
     };
   }
@@ -691,7 +696,7 @@ $(function () {
       $("#post_vthumb_droparea").find('.image').html($("<img>",{
         src:window.URL.createObjectURL(event.target.files[0])
       })).show(5);
-    });;
+    });
   });
 
   $(".video-custom-thumb").click(function(event) {

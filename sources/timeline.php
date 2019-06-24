@@ -78,7 +78,7 @@ if ($type == 'timeline') {
 if ($type == 'timeline' && $wo['loggedin'] == true) {
     $is_blocked = $wo['is_blocked'] = Wo_IsBlocked($user_id);
     if (isset($_GET['block_user']) && !empty($_GET['block_user'])) {
-        if ($_GET['block_user'] == 'block' && $is_blocked === false && Wo_IsAdmin($user_id) === false) {
+        if ($_GET['block_user'] == 'block' && $is_blocked === false && Wo_IsAdmin($user_id) === false && Wo_IsModerator($user_id) === false) {
             $block = Wo_RegisterBlock($user_id);
             if ($block) {
                 if (!empty($_GET['redirect'])) {

@@ -310,8 +310,21 @@ function Wo_RegisterTabMessageRecord(dataForm,id){
         data:   dataForm,
         processData: false,
         contentType: false,
+        xhr: function() {
+            var xhr = new window.XMLHttpRequest();
+            xhr.upload.addEventListener("progress", function(evt) {
+                if (evt.lengthComputable) {
+                    var percentComplete = (evt.loaded / evt.total) * 100;
+                    $('form.chat-sending-form-'+id).find('.ball-pulse').fadeIn(100);;
+                }
+           }, false);
+           return xhr;
+        }
     }).done(function(data) {
       if(data.status == 200){
+        $('form.chat-sending-form-'+id).find('input.message-record').val('');   
+        $('form.chat-sending-form-'+id).find('input.media-name').val('');
+        $('form.chat-sending-form-'+id).find('.ball-pulse').fadeOut(100);;
         Wo_stopRecording();
         Wo_CleanRecordNodes();
         Wo_StopLocalStream();
