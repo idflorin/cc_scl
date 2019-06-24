@@ -136,7 +136,7 @@ if ($type == 'update_user_data' || $type == 'u_user_data') {
                             }
                             if (empty($errors)) {
                                 $password_data    = array(
-                                    'password' => sha1($user_data['new_password'])
+                                    'password' => password_hash($user_data['new_password'], PASSWORD_DEFAULT)
                                 );
                                 $update_user_data = Wo_UpdateUserData($user_id, $password_data);
                                 if ($update_user_data) {

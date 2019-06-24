@@ -38,19 +38,6 @@
                                 <label class="form-label">Video ads skip button seconds</label>
                             </div>
                         </div>
-                        <label for="ads_currency">Currency</label>
-                        <select class="form-control show-tick" id="ads_currency" name="ads_currency">
-                          <option value="USD" <?php echo ($wo['config']['ads_currency'] == 'USD')  ? ' selected': '';?>>USD</option>
-                          <option value="EUR" <?php echo ($wo['config']['ads_currency'] == 'EUR')  ? ' selected': '';?>>EUR</option>
-                          <option value="JPY" <?php echo ($wo['config']['ads_currency'] == 'JPY')  ? ' selected': '';?>>JPY</option>
-                          <option value="TRY" <?php echo ($wo['config']['ads_currency'] == 'TRY')  ? ' selected': '';?>>TRY</option>
-                          <option value="GBP" <?php echo ($wo['config']['ads_currency'] == 'GBP')  ? ' selected': '';?>>GBP</option>
-                          <option value="RUB" <?php echo ($wo['config']['ads_currency'] == 'RUB')  ? ' selected': '';?>>RUB</option>
-                          <option value="PLN" <?php echo ($wo['config']['ads_currency'] == 'PLN')  ? ' selected': '';?>>PLN</option>
-                          <option value="ILS" <?php echo ($wo['config']['ads_currency'] == 'ILS')  ? ' selected': '';?>>ILS</option>
-                          <option value="BRL" <?php echo ($wo['config']['ads_currency'] == 'BRL')  ? ' selected': '';?>>BRL</option>
-                          <option value="INR" <?php echo ($wo['config']['ads_currency'] == 'INR')  ? ' selected': '';?>>INR</option>
-                        </select>
                         <div class="clearfix"></div>
                         <br><br>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">

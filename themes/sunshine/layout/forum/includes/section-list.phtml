@@ -21,7 +21,7 @@
 						<td class="forum-meta-d small">
 							<?php 
 							$last_replay = Wo_GetForumThreads(array('forum' => $wo['forum']['id'] , 'limit' => 1));
-							$last_replay = $last_replay[0];
+							$last_replay = !empty($last_replay[0]) ? $last_replay[0] : array();
 							if (!empty($last_replay)) { ?>
 								<div>
 									<span class="avatar"><img src="<?php echo $last_replay['user_data']['avatar']?>" width="30" height="30" alt="User avatar"></span>

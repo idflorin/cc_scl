@@ -1,7 +1,9 @@
 <?php
-if ($wo['loggedin'] == false) {
-  header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
-  exit();
+if ($wo['config']['events_visibility'] == 1) {
+	if ($wo['loggedin'] == false) {
+	  header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
+	  exit();
+	}
 }
 
 if ($wo['config']['events'] == 0) {

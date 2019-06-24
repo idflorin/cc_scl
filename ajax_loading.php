@@ -328,6 +328,7 @@ switch ($page) {
 if (empty($wo['content'])) {
     include('sources/404.php');
 }
+$data = array();
 if (empty($wo['title'])) {
     $data['title'] = $wo['config']['siteTitle'];
 }

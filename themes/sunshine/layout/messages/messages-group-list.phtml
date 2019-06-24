@@ -1,4 +1,4 @@
-<div class="messages-recipients-list mobileopenlist" id="messages-group-<?php echo $wo['group']['group_id']; ?>" onclick="Wo_GetGroupMessages(<?php echo $wo['group']['group_id']; ?>,'<?php echo $wo['group']['group_name']; ?>');">
+<div class="messages-recipients-list mobileopenlist" id="messages-group-<?php echo $wo['group']['group_id']; ?>" onclick="Wo_GetGroupMessages(<?php echo $wo['group']['group_id']; ?>,'<?php echo str_replace(array("&#039;"), "`", $wo['group']['group_name']); ?>');">
    <span class="msg_ava_name" style="cursor:pointer;color:#555;">
       <div class="avatar <?php echo Wo_RightToLeft('pull-left');?>">
          <img alt="<?php echo $wo['group']['group_name']; ?> Group Picture" src="<?php echo $wo['group']['avatar'];?>">

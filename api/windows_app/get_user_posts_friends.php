@@ -124,6 +124,10 @@ if ($type == 'get_user_posts') {
                             }
                         }
                     }
+                    foreach ($non_allowed as $value) {
+                        unset($story['publisher'][$value]); 
+                    }
+                    $story['get_post_comments'] = [];
                     $story['postFile'] = Wo_GetMedia($story['postFile']);
                     if (!empty($story['Orginaltext'])) {
                         if (!empty($_POST['sub_text_limit'])) {

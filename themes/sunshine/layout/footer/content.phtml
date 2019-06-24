@@ -22,12 +22,13 @@ $pages = Wo_GetCustomPages();
                $langs = Wo_LangsNamesFromDB();
                if (count($langs) > 0) {
                    foreach ($langs as $key => $wo['langs']) {
+                   	if ($wo['config'][$wo['langs']] == 1) {
                      $language = $wo['langs'];
                      $languages_name = ucfirst($wo['langs']);
                      $link = ($wo['config']['seoLink'] == 1) ? '?lang=' . $language: '?&lang=' . $language;
                 ?>
                <li class="language_select"><a href="<?php echo $link;?>" rel="nofollow" class="<?php echo $languages_name;?>"><?php echo $languages_name;?></a></li>
-               <?php } } ?>
+               <?php } } } ?>
             </ul>
 		</div>
 		<div class="clear"></div>

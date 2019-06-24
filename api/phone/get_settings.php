@@ -24,6 +24,48 @@ if (empty($_GET['type']) || !isset($_GET['type'])) {
     echo json_encode($json_error_data, JSON_PRETTY_PRINT);
     exit();
 }
+else if (empty($_POST['s'])) {
+    $json_error_data = array(
+        'api_status' => '400',
+        'api_text' => 'failed',
+        'api_version' => $api_version,
+        'errors' => array(
+            'error_id' => '5',
+            'error_text' => 'No session sent.'
+        )
+    );
+    header("Content-type: application/json");
+    echo json_encode($json_error_data, JSON_PRETTY_PRINT);
+    exit();
+}
+else if (empty($_POST['user_id'])) {
+    $json_error_data = array(
+        'api_status' => '400',
+        'api_text' => 'failed',
+        'api_version' => $api_version,
+        'errors' => array(
+            'error_id' => '3',
+            'error_text' => 'No user id sent.'
+        )
+    );
+    header("Content-type: application/json");
+    echo json_encode($json_error_data, JSON_PRETTY_PRINT);
+    exit();
+}
+else if ($wo['loggedin'] == false) {
+    $json_error_data = array(
+        'api_status' => '400',
+        'api_text' => 'failed',
+        'api_version' => $api_version,
+        'errors' => array(
+            'error_id' => '6',
+            'error_text' => 'Session id is wrong.'
+        )
+    );
+    header("Content-type: application/json");
+    echo json_encode($json_error_data, JSON_PRETTY_PRINT);
+    exit();
+}
 $non_allowed_config = array(
     'reCaptchaKey',
     'googleAnalytics',

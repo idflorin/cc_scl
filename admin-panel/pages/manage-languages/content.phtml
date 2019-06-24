@@ -10,6 +10,7 @@
                     <h2>Manage & Edit Languages</h2>
                 </div>
                 <div class="body">
+                    <div class="alert alert-success langs-settings-alert"></div>
                    <div class="table-responsive">
                         <table class="table table-bordered table-striped table-hover">
                             <thead>
@@ -50,5 +51,26 @@ function Wo_DeleteLang(id) {
       $(this).remove();
   });
   $.get(Wo_Ajax_Requests_File(), {f: 'admin_setting', s:'delete_lang', id:id});
+}
+
+function update_lang_status(self,name) {
+    value = 1;
+    if ($(self).attr('data-type') == 'disable') {
+        value = 0;
+    }
+    $.post(Wo_Ajax_Requests_File()+"?f=admin_setting&s=update_lang_status", {name:name,value:value}, function(data, textStatus, xhr) {
+        if ($(self).attr('data-type') == 'disable') {
+            $(self).attr('data-type','enable');
+            $(self).html('<i class="fa fa-check"></i> Enable');
+        }
+        else{
+            $(self).attr('data-type','disable');
+            $(self).html('<i class="fa fa-times"></i> Disable');
+        }
+        $('.langs-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+        setTimeout(function () {
+            $('.langs-settings-alert').empty();
+        }, 2000);
+    });
 }
 </script>

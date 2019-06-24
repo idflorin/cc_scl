@@ -8,7 +8,7 @@
 						<li class="active"><a href="<?php echo Wo_SeoLink('index.php?link1=poke'); ?>" data-ajax="?link1=poke"><?php echo $wo['lang']['my_pokes'] ?></a></li>
 					</ul>
 				</div>
-				<div>
+				<div id="poke_content">
 					<?php
                         $pokes = $wo['poke'];
 						if (count($pokes) > 0) {
@@ -25,6 +25,15 @@
 					?>
 				    <div class="clear"></div>
 				</div>
+                <div class="clear"></div>
+                <?php  if (count($pokes) > 8): ?>
+                <div class="load-more">
+                    <button class="btn btn-default text-center pointer load-more-pokes">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <?php echo $wo['lang']['load_more'] ?>
+                    </button>
+                </div>
+                <?php endif ?>
 			</div>
 		</div>
 		<?php echo Wo_LoadPage('sidebar/content');?>
@@ -60,4 +69,15 @@
             console.log("error");
         })
     }
+    $(document).on('click', '.load-more-pokes', function(event) {
+        var id = $('.wo_poke_users').last().attr('id');
+        $.post(Wo_Ajax_Requests_File()+"?f=load_poke", {id: id}, function(data, textStatus, xhr) {
+            if (data.status == 200 && data.html != '') {
+                $('#poke_content').append(data.html);
+            }
+            else{
+                $('.load-more-pokes').remove();
+            }
+        });
+    });
 </script>

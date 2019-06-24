@@ -12,6 +12,20 @@
                 <div class="body">
                     <div class="alert alert-success site-settings-alert"></div>
                     <form class="site-settings" method="POST">
+                        <label for="afternoon_system">Greeting System<span class="black" data-toggle="popover" data-trigger="hover" data-content="Good Afternoon, good morning messages."><i class="fa fa-question-circle fa-fw"></i></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="afternoon_system" id="afternoon_system-enabled" value="1" <?php echo ($wo['config']['afternoon_system'] == 1) ? 'checked': '';?>>
+                            <label for="afternoon_system-enabled">Enabled</label>
+                            <input type="radio" name="afternoon_system" id="afternoon_system-disabled" value="0" <?php echo ($wo['config']['afternoon_system'] == 0) ? 'checked': '';?>>
+                            <label for="afternoon_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <label for="poke_system">Poke System<span class="black" data-toggle="popover" data-trigger="hover" data-content="Poke System"><i class="fa fa-question-circle fa-fw"></i></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="poke_system" id="poke_system-enabled" value="1" <?php echo ($wo['config']['poke_system'] == 1) ? 'checked': '';?>>
+                            <label for="poke_system-enabled">Enabled</label>
+                            <input type="radio" name="poke_system" id="poke_system-disabled" value="0" <?php echo ($wo['config']['poke_system'] == 0) ? 'checked': '';?>>
+                            <label for="poke_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
                         <label for="point_level_system">Point & level system <span class="black" data-toggle="popover" data-trigger="hover" data-content="Users can earn points from liking / sharing / commenting...."><i class="fa fa-question-circle fa-fw"></i></span></label>
                         <div class="form-group">
                             <input type="radio" name="point_level_system" id="point_level_system-enabled" value="1" <?php echo ($wo['config']['point_level_system'] == 1) ? 'checked': '';?>>
@@ -69,12 +83,33 @@
                             <input type="radio" name="events" id="events-disabled" value="0" <?php echo ($wo['config']['events'] == 0) ? 'checked': '';?>>
                             <label for="events-disabled" class="m-l-20">Disabled</label>
                         </div>
+                        <label for="events_visibility">Events System Visibility<span class="black" data-toggle="popover" data-trigger="hover" data-content="Who can see events?"><i class="fa fa-question-circle fa-fw"></i></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="events_visibility" id="events_visibility-enabled" value="1" <?php echo ($wo['config']['events_visibility'] == 1) ? 'checked': '';?>>
+                            <label for="events_visibility-enabled">Registered Users</label>
+                            <input type="radio" name="events_visibility" id="events_visibility-disabled" value="0" <?php echo ($wo['config']['events_visibility'] == 0) ? 'checked': '';?>>
+                            <label for="events_visibility-disabled" class="m-l-20">Unregistered Users</label>
+                        </div>
+                        <label for="product_visibility">Product System Visibility<span class="black" data-toggle="popover" data-trigger="hover" data-content="Who can see products?"><i class="fa fa-question-circle fa-fw"></i></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="product_visibility" id="product_visibility-enabled" value="1" <?php echo ($wo['config']['product_visibility'] == 1) ? 'checked': '';?>>
+                            <label for="product_visibility-enabled">Registered Users</label>
+                            <input type="radio" name="product_visibility" id="product_visibility-disabled" value="0" <?php echo ($wo['config']['product_visibility'] == 0) ? 'checked': '';?>>
+                            <label for="product_visibility-disabled" class="m-l-20">Unregistered Users</label>
+                        </div>
                         <label for="forum">Forums System <span class="black" data-toggle="popover" data-trigger="hover" data-content="Allow forum system."><i class="fa fa-question-circle fa-fw"></i></span></label>
                         <div class="form-group">
                             <input type="radio" name="forum" id="forum-enabled" value="1" <?php echo ($wo['config']['forum'] == 1) ? 'checked': '';?>>
                             <label for="forum-enabled">Enabled</label>
                             <input type="radio" name="forum" id="forum-disabled" value="0" <?php echo ($wo['config']['forum'] == 0) ? 'checked': '';?>>
                             <label for="forum-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <label for="forum_visibility">Forums System Visibility<span class="black" data-toggle="popover" data-trigger="hover" data-content="Who can see forums?"><i class="fa fa-question-circle fa-fw"></i></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="forum_visibility" id="forum_visibility-enabled" value="1" <?php echo ($wo['config']['forum_visibility'] == 1) ? 'checked': '';?>>
+                            <label for="forum_visibility-enabled">Registered Users</label>
+                            <input type="radio" name="forum_visibility" id="forum_visibility-disabled" value="0" <?php echo ($wo['config']['forum_visibility'] == 0) ? 'checked': '';?>>
+                            <label for="forum_visibility-disabled" class="m-l-20">Unregistered Users</label>
                         </div>
                         <label for="blogs">Movies System <span class="black" data-toggle="popover" data-trigger="hover" data-content="Allow users to watch movies."><i class="fa fa-question-circle fa-fw"></i></span></label>
                         <div class="form-group">

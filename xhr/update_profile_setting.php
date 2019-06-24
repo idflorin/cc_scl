@@ -3,7 +3,7 @@ if ($f == "update_profile_setting") {
     if (isset($_POST['user_id']) && Wo_CheckSession($hash_id) === true) {
         $Userdata = Wo_UserData($_POST['user_id']);
         if (!empty($Userdata['user_id'])) {
-            $pattern = '/^(http|https):\\/\\/[a-z0-9_]+([\\-\\.]{1}[a-z_0-9]+)*\\.[_a-z]{1,100}' . '((:[0-9]{1,5})?\\/.*)?$/i';
+            $pattern = '/^(http|https):\\/\\/[a-z0-9_]+([\\-\\.]{1}[a-z_0-9]+)*\\.[_a-z]{2,5}' . '((:[0-9]{1,5})?\\/.*)?$/i';
             if (!empty($_POST['website'])) {
                 if (!preg_match($pattern, $_POST['website'])) {
                     $errors[] = $error_icon . $wo['lang']['website_invalid_characters'];

@@ -32,6 +32,66 @@
         }
       });
     };
+
+function Wo_RegisterReactionLike(element){
+    var reaction = $(element).attr('data-reaction');
+    var post_id = $(element).attr('data-post-id');
+    if ($('#react_'+post_id).attr('data_react') == 1) {
+      return false;
+    }
+    var path = "<?php echo $wo['config']['theme_url']?>";
+    var lang = $(element).attr('data-reaction-lang');
+    if (!post_id || !reaction) {
+      return false;
+    }
+
+    $('.reactions-box-container-'+post_id).fadeOut(1);
+
+    var reaction_icon = '';
+    var reaction_color = '';
+
+    switch (reaction) {
+      case 'Like':
+          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/like-sm.png" alt="<?php echo $wo['lang']['like'];?>"></div>';
+          reaction_color = '#1da1f2';
+          break;
+      case 'Love':
+          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/love-sm.png" alt="<?php echo $wo['lang']['love'];?>"></div>';
+          reaction_color = '#f25268';
+          break;
+      case 'HaHa':
+          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/haha-sm.png" alt="<?php echo $wo['lang']['haha'];?>"></div>';
+          reaction_color = '#f3b715';
+          break;
+      case 'Wow':
+          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/wow-sm.png" alt="<?php echo $wo['lang']['wow'];?>"></div>';
+          reaction_color = '#f3b715';
+          break;
+      case 'Sad':
+          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/sad-sm.png" alt="<?php echo $wo['lang']['sad'];?>"></div>';
+          reaction_color = '#f3b715';
+          break;
+      case 'Angry':
+          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/angry-sm.png" alt="<?php echo $wo['lang']['angry'];?>"></div>';
+          reaction_color = '#f7806c';
+          break;
+  }
+
+    $('.status-reaction-'+post_id).html(''+reaction_icon+'' + lang).css({"color": reaction_color});
+    $('.status-reaction-'+post_id).addClass("active-like");
+    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_reaction', post_id: post_id, reaction: reaction}, function (data) {
+      if(data.status == 200) {
+        $('.post-reactions-icons-'+post_id).html(data.reactions);
+        
+      }
+      if (data.can_send == 1) {
+        Wo_SendMessages();
+      }
+      $('#react_'+post_id).attr('data_react','1');
+    });
+}
+
+
 function Wo_RegisterReaction(element){
     var reaction = $(element).attr('data-reaction');
     var post_id = $(element).attr('data-post-id');
@@ -83,6 +143,7 @@ function Wo_RegisterReaction(element){
       if (data.can_send == 1) {
         Wo_SendMessages();
       }
+      $('#react_'+post_id).attr('data_react','1');
     });
 }
 
@@ -316,4 +377,180 @@ $(document).on('click', '#night_mode_toggle', function(event) {
   }
   $.post(Wo_Ajax_Requests_File() + '?mode=' + mode);
 });
+
+$(document).on('click', '#share_post_on_btn', function(event) {
+  text = $('#share_post_text').val();
+  type = $('#SearchForInputType').val();
+  post_id = $('#SearchForInputPostId').val();
+  type_id = $('#SearchForInputTypeId').val();
+  self = this;
+  $(this).text('<?php echo($wo['lang']['please_wait']) ?>');
+  $(this).attr('disabled', 'true');
+    $.ajax({
+      url: Wo_Ajax_Requests_File(),
+      type: 'GET',
+      dataType: 'json',
+      data: {f: 'share_post_on',s:type,type_id:type_id,post_id:post_id,text:text},
+    })
+    .done(function(data) {
+      $(self).text('<?php echo($wo['lang']['share']) ?>');
+      $(self).removeAttr('disabled');
+      if (data.status == 200) {
+        $('.share_post_modal_alert').html('<div class="alert alert-success"><?php echo($wo['lang']['post_shared_successfully']) ?></div>');
+
+        setTimeout(function () {
+          $('#share_post_modal').modal('hide');
+        },2000);
+      }
+      else{
+        $('.share_post_modal_alert').html('<div class="alert alert-danger"><?php echo($wo['lang']['please_check_details']) ?></div>');
+        setTimeout(function () {
+          $('.share_post_modal_alert').html('');
+        },2000);
+      }
+    })
+    .fail(function() {
+    })
+    .always(function() {
+    });
+});
+
+$(document).on('change', '#share_type_select', function(event) {
+  var type = $(this).val();
+  if (type == 'user') {
+    $('.search_for_form').hide(400);
+    $('#type_user_name').show(400);
+    $('#SearchForInputType').val('user');
+  }
+  else if(type == 'page'){
+    $('.search_for_form').hide(400);
+    $('#type_page_name').show(400);
+    $('#SearchForInputType').val('page');
+  }
+  else if(type == 'group'){
+    $('.search_for_form').hide(400);
+    $('#type_group_name').show(400);
+    $('#SearchForInputType').val('group');
+  }
+  else if(type == 'timeline'){
+    $('.search_for_form').hide(400);
+    $('#SearchForInputType').val('timeline');
+  }
+});
+
+function Wo_LoadViewsInfo(self) {
+  $('#load_more_info_btn').html('<?php echo $wo['lang']['please_wait'] ?>');
+  var type = $(self).attr('data-type');
+  var table = $(self).attr('table-type');
+  var post_id = $(self).attr('post-id');
+  var id   = $('.views_info_count').last().attr('data-row-id');
+  var request = '';
+  if (type == 'like') {
+    request = 'get_post_likes';
+  }
+  if (type == 'wonder') {
+    request = 'get_post_wonders';
+  }
+  if (type == 'share') {
+    request = 'get_post_shared';
+  }
+  $.get(Wo_Ajax_Requests_File(), {
+    f: 'posts',
+    s: request,
+    type:type,
+    post_id: post_id,
+    offset: id,
+    table:table
+  }, function (data) {
+    if(data.status == 200) {
+      if(data.html.length == 0) {
+        $(self).css('display', 'none');
+      } else {
+        $('#views_info').append(data.html);
+        $('#load_more_info_btn').html('<?php echo $wo['lang']['load_more'] ?>');
+      }
+    }
+    $('#load_more_info_btn').html('<?php echo $wo['lang']['load_more'] ?>');
+  });
+}
+
+function Wo_LoadReactedUsers(type) {
+  $('#reacted_users_box').html('<div class="lb-preloader" style="display:block"><svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg></div>');
+  var post_id = $('.reacted_users_load_more').attr('post-id');
+  var col = $('.reacted_users_load_more').attr('col-type');
+  $.get(Wo_Ajax_Requests_File(), {
+    f: 'posts',
+    s: 'get_post_reacted',
+    type:type,
+    post_id: post_id,
+    col:col
+  }, function (data) {
+    if(data.status == 200) {
+      if(data.html.length == 0) {
+        $('.reacted_users_load_more').css('display', 'none');
+        $('.reacted_users_load_more').attr('data-type', '');
+        $('#reacted_users_box').html('<span class="view-more-wrapper text-center">' + data.message + '</span>');
+      } else {
+        $('.reacted_users_load_more').attr('data-type', type);
+        $('.reacted_users_load_more').attr('post-id', post_id);
+        $('.reacted_users_load_more').attr('col-type', col);
+        $('#load_more_reacted_btn').html('<?php echo $wo['lang']['load_more'] ?>');
+        $('.reacted_users_load_more').css('display', 'inline');
+        $('#reacted_users_box').html(data.html);
+      }
+    }
+    //$('#load_more_info_btn').html('<?php echo $wo['lang']['load_more'] ?>');
+  });
+}
+
+function Wo_LoadMoreReactedUsers(self) {
+  $('.reacted_users_load_more').find('#load_more_reacted_btn').html('<?php echo $wo['lang']['please_wait'] ?>');
+  var type = $(self).attr('data-type');
+  var post_id = $(self).attr('post-id');
+  var id   = $('.views_info_count').last().attr('data-row-id');
+  var col = $('.reacted_users_load_more').attr('col-type');
+  var request = 'get_post_reacted';
+  $.get(Wo_Ajax_Requests_File(), {
+    f: 'posts',
+    s: request,
+    type:type,
+    post_id: post_id,
+    offset: id,
+    col:col
+  }, function (data) {
+    if(data.status == 200) {
+      if(data.html.length == 0) {
+        $(self).css('display', 'none');
+      } else {
+        $('#reacted_users_box').append(data.html);
+        $('.reacted_users_load_more').find('#load_more_reacted_btn').html('<?php echo $wo['lang']['load_more'] ?>');
+      }
+    }
+    $('.reacted_users_load_more').find('#load_more_reacted_btn').html('<?php echo $wo['lang']['load_more'] ?>');
+  });
+}
+
+function Wo_SortComments(type,post_id) {
+  if (type == 'top') {
+    $('.order-text-'+post_id).text('<?php echo($wo['lang']['top']) ?>');
+  }
+  else{
+    $('.order-text-'+post_id).text('<?php echo($wo['lang']['latest']) ?>');
+  }
+  main_wrapper = $('#post-' + post_id);
+  view_more_wrapper = main_wrapper.find('.view-more-wrapper');
+  Wo_progressIconLoader(view_more_wrapper);
+  $('#post-' + post_id).find('.view-more-wrapper .ball-pulse').fadeIn(100);
+  $.get(Wo_Ajax_Requests_File(), {
+    f: 'posts',
+    s: 'load_more_comments_sort',
+    post_id: post_id,
+    type: type
+  }, function (data) {
+    if(data.status == 200) {
+      main_wrapper.find('.comments-list').html(data.html);
+      $('.ball-pulse-'+post_id).fadeOut('100');
+    }
+  });
+}
 </script>

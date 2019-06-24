@@ -140,12 +140,14 @@
 									<?php } ?>
 								</a>
 							</li>
+							<?php if ($wo['config']['audio_upload'] == 1) { ?>
 							<li>
-								<a href="javascript:void(0);" class="btn btn-file record-chat-audio" data-record="0" data-chat-tab="<?php echo $wo['chat']['recipient']['user_id'];?>">
+								<a href="javascript:void(0);" class="btn btn-file record-chat-audio" onclick="function_record(this)" data-record="0"  data-chat-tab="<?php echo $wo['chat']['recipient']['user_id'];?>">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#ff3a55" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" /></svg>
 									<p><?php echo $wo['lang']['voice'];?></p>
 								</a>
 							</li>
+							<?php } ?>
 							<?php if ($wo['config']['stickers'] == 1): ?>
 								<li class="dropdown-submenu sun_cht_dd_menu_sub_<?php echo $wo['chat']['recipient']['user_id'];?>" id="chat-gifs">
 									<a href="javascript:void(0);" class="btn btn-file dropdown-toggle" data-toggle="dropdown" aria-expanded="true" role="button">
@@ -259,7 +261,7 @@ $(function() {
             <?php } else { ?>
               var html_message = '<div class="sended_message"><div class="messages-wrapper pull-right messages-text" id="messageId_" data-message-id=""><div class="message outgoing pull-right"><p class="message-text" dir="auto">' + text_message + '</p><div class="clear"></div><div class="message-media"></div></div><div class="clear"></div><div class="message-seen text-right message-details"></div><div class="clear"></div><div class="message-typing message-details"></div></div><div class="clear"></div></div>';
             <?php } ?>
-            if (!text_message && $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('input.message-record').val() == '' && $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('#chatSticker').val() == '') {
+            if (!text_message && $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('input.message-record').val() == '' && $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('#chatSticker_<?php echo $wo['chat']['recipient']['user_id'];?>').val() == '') {
               $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('#sendMessasgeFile').val('');
               return false;
             }
@@ -290,7 +292,7 @@ $(function() {
                 }
                 $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('input.message-record').val('');   
                 $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('input.media-name').val('');
-                $("#chatSticker").val('');
+                $("#chatSticker_<?php echo $wo['chat']['recipient']['user_id'];?>").val('');
                 $("#chat-gifs").removeClass('open');
                 if (data.invalid_file == 1) {
                   $("#invalid_file").modal('show');
@@ -395,6 +397,40 @@ function Wo_GetChatStickers(self){
       console.log("error");
     })
   },1000);
+}
+
+
+function function_record(self) {
+	audio_context          = new AudioContext;
+    var _SELF = $(self);
+    if (!localstream) {
+      Wo_CreateUserMedia(); 
+    }
+    Wo_Delay(function(){
+      if(recorder && _SELF.attr('data-record') == 0 && Wo_IsRecordingBufferClean() && $("[data-record='1']").length == 0) {
+        Wo_CleanRecordNodes();
+        recording_time = $("span[data-chat-rtime='" + _SELF.attr('data-chat-tab') + "']");
+        recording_node = "chat";
+        chat_tab       = _SELF.attr('data-chat-tab');
+        _SELF.attr('data-record','1').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M9,9H15V15H9" /></svg><p><?php echo $wo["lang"]["stop"];?></p>');  
+        Wo_startRecording();
+      }
+
+      else if(recorder && _SELF.attr('data-record') == 1 && $("[data-record='1']").length == 1){
+       Wo_stopRecording();
+       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20.37,8.91L19.37,10.64L7.24,3.64L8.24,1.91L11.28,3.66L12.64,3.29L16.97,5.79L17.34,7.16L20.37,8.91M6,19V7H11.07L18,11V19A2,2 0 0,1 16,21H8A2,2 0 0,1 6,19Z" /></svg><p><?php echo $wo["lang"]["delete"];?></p>').attr('data-record','2');     
+      }
+
+      else if(recorder && _SELF.attr('data-record') == 2){
+       Wo_CleanRecordNodes();
+       Wo_StopLocalStream();
+       _SELF.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z" /></svg><p><?php echo $wo["lang"]["voice"];?></p>').attr('data-record','0');  
+      }
+
+      else{
+        return false;
+      }
+    },500);
 }
 
 </script>

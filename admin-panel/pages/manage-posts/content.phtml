@@ -119,7 +119,14 @@ if (($page > $db->totalPages) && !empty($_GET['page-id'])) {
                             <?php 
                               foreach ($posts as $post) {
                                 $wo['story'] = $post;
-                                $wo['story']->publisher = Wo_UserData($post->user_id);
+                                if (!empty($post->user_id)) {
+                                  $wo['story']->publisher = Wo_UserData($post->user_id);
+                                }
+                                elseif (!empty($post->page_id)) {
+                                  $user_page = Wo_PageData($post->page_id);
+                                  $wo['story']->publisher = Wo_UserData($user_page['user_id']);
+                                }
+                                
                                 echo Wo_LoadAdminPage('manage-posts/list');
                               }
                             ?>

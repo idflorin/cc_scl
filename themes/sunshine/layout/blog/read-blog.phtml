@@ -4,10 +4,13 @@
 			<div class="read-blog" itemscope itemtype="http://schema.org/BlogPosting">
 				<div class="read-blog-head">
 					<a class="main postCategory" href="<?php echo $wo['article']['category_link']; ?>" data-ajax="?link1=blog-category&id=<?php echo $wo['article']['category']; ?>">
-						<h5><?php echo $wo['page_categories'][$wo['article']['category']]; ?></h5>
+						<h5><?php echo $wo['blog_categories'][$wo['article']['category']]; ?></h5>
 					</a>
 					
 					<h1 itemprop="headline"><?php echo $wo['article']['title']?></h1>
+					<img src="<?php echo($wo['article']['thumbnail']); ?>" width="100%">
+					<div class="clear"></div>
+					<br>
 
 					<div class="read-blog-desc">
 						<p itemprop="description"><?php echo $wo['article']['description']; ?></p>

@@ -17,7 +17,7 @@ if (empty($_POST['post_id'])) {
 } else if (empty($_POST['action'])) {
     $error_code    = 5;
     $error_message = 'action (POST) is missing';
-} else if (!in_array($_POST['action'], array('edit', 'delete', 'comment', 'like', 'dislike', 'wonder','report','save','disable_comments','reaction','boost'))) {
+} else if (!in_array($_POST['action'], array('edit', 'delete', 'comment', 'like', 'dislike', 'wonder','report','save','disable_comments','reaction'))) {
 	$error_code    = 6;
     $error_message = 'Undefined action value';
 }
@@ -136,23 +136,6 @@ if (empty($error_code)) {
 			$error_code    = 7;
 		    $error_message = 'You are not the post owner';
 		}
-	}  else if ($_POST['action'] == 'boost') {
-		$post_id = Wo_Secure($_POST['post_id']);
-		$post = Wo_PostData($post_id);
-		if (Wo_IsPostOnwer($post_id, $wo['user']['user_id'])) {
-			if (Wo_BoostPost($post_id) == 'unboosted') {
-	            $code = 0;
-	            $action = 'post unboosted';
-			}
-			else{
-	            $code = 1;
-	            $action = 'post boosted';
-			}
-		}
-		else{
-			$error_code    = 7;
-		    $error_message = 'You are not the post owner';
-		}
 	}  else if ($_POST['action'] == 'reaction') {
 		$reactions_types = array('Like','Love','HaHa','Wow','Sad','Angry');
 		$post_id = Wo_Secure($_POST['post_id']);
@@ -200,9 +183,6 @@ if (empty($error_code)) {
 			$response_data['code'] = $code;
 		}
 		if ($_POST['action'] == 'reaction') {
-			$response_data['code'] = $code;
-		}
-		if ($_POST['action'] == 'boost') {
 			$response_data['code'] = $code;
 		}
 	}

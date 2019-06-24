@@ -2376,10 +2376,6 @@ function Wo_GetNotifications($data = array()) {
                 $query_one .= ' AND `type` <> "$remove_notification"';
             }
         }
-        if (isset($data['offset']) && is_numeric($data['offset']) && $data['offset'] > 0) {
-            $offset = Wo_Secure($data['offset']);
-            $query_one .= " AND `id` < $offset ";
-        }
         $query_one .= " ORDER BY `id` DESC LIMIT " . $data['limit'];
     }
     if (isset($data['all']) && $data['all'] == true) {
@@ -3403,7 +3399,7 @@ function Wo_Markup($text, $link = true, $hashtag = true, $mention = true,$post_i
         $link_search = '/\[a\](.*?)\[\/a\]/i';
         if (preg_match_all($link_search, $text, $matches)) {
             foreach ($matches[1] as $match) {
-                $match_decode     = strtolower(urldecode($match));
+                $match_decode     = urldecode($match);
                 $match_decode_url = $match_decode;
                 $count_url        = mb_strlen($match_decode);
                 if ($count_url > 50) {
@@ -3413,7 +3409,7 @@ function Wo_Markup($text, $link = true, $hashtag = true, $mention = true,$post_i
                 if (!preg_match("/http(|s)\:\/\//", $match_decode)) {
                     $match_url = 'http://' . $match_url;
                 }
-                $text = str_replace('[a]' . $match . '[/a]', '<a href="https://go.cungcap.net/goto/' . urlencode(strip_tags($match_url)) . '" target="_blank" class="hash" rel="nofollow">' . $match_decode_url . '</a>', $text);
+                $text = str_replace('[a]' . $match . '[/a]', '<a href="' . strip_tags($match_url) . '" target="_blank" class="hash" rel="nofollow">' . $match_decode_url . '</a>', $text);
             }
         }
     }
@@ -3689,9 +3685,7 @@ function Wo_ShareFile($data = array(), $type = 0, $crop = true) {
             }
             if( $crop == true ){
                 if ($type == 1) {
-                    if ($second_file != 'gif') {
-                        @Wo_CompressImage($filename, $filename, 50);
-                    }
+                    @Wo_CompressImage($filename, $filename, 50);
                     $explode2  = @end(explode('.', $filename));
                     $explode3  = @explode('.', $filename);
                     $last_file = $explode3[0] . '_small.' . $explode2;
@@ -3869,16 +3863,6 @@ function Wo_IsModerator($user_id = '') {
     if ($wo['loggedin'] == false) {
         return false;
     }
-    $user_id = Wo_Secure($user_id);
-    if (!empty($user_id) && $user_id > 0) {
-        $query = mysqli_query($sqlConnect, "SELECT COUNT(`user_id`) as count FROM " . T_USERS . " WHERE admin = '2' AND user_id = {$user_id}");
-        $sql   = mysqli_fetch_assoc($query);
-        if ($sql['count'] > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
     if ($wo['user']['admin'] == 2) {
         return true;
     }
@@ -4035,7 +4019,6 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $hashtag_regex = '/#([^`~!@$%^&*\#()\-+=\\|\/\.,<>?\'\":;{}\[\]* ]+)/i';
         preg_match_all($hashtag_regex, $re_data['postText'], $matches);
         foreach ($matches[1] as $match) {
-            $match = strtolower($match);
             if (!is_numeric($match)) {
                 $hashdata = Wo_GetHashtag($match);
                 if (is_array($hashdata)) {
@@ -4490,10 +4473,6 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
     }
     if (!empty($story['blog_id'])) {
         $story['blog'] = Wo_GetArticle($story['blog_id']);
-    }
-
-    if ($wo['config']['second_post_button'] == 'reaction') {
-        $story['reaction'] = Wo_GetPostReactionsTypes($story['id']);
     }
     return $story;
 }
@@ -5847,40 +5826,6 @@ function Wo_GetPostReactions($object_id, $col = "post") {
        return "";
    }
 }
-
-
-
-
-function Wo_GetPostReactionsTypes($object_id, $col = "post") {
-   global $sqlConnect,$wo;
-   if (empty($object_id) or !is_numeric($object_id) or $object_id < 1) {
-       return false;
-   }
-   $reactions_html = "";
-   $reactions     = array('Like' => 0,'Love' => 0,'HaHa' => 0,'Wow' => 0,'Sad' => 0,'Angry' => 0);
-   $reactions_count = 0;
-   $object_id     = Wo_Secure($object_id);
-   $query_one     = "SELECT * FROM " . T_REACTIONS . " WHERE `{$col}_id` = {$object_id}";
-   $sql_query_one = mysqli_query($sqlConnect, $query_one);
-   while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
-       $reactions[$fetched_data['reaction']] = 1;
-       if ($fetched_data['user_id'] == $wo['user']['id']) {
-           $reactions['is_reacted'] = true;
-           $reactions['type'] = $fetched_data['reaction'];
-       }
-       $reactions_count++;
-   }
-   if (empty($reactions['is_reacted'])) {
-        $reactions['is_reacted'] = false;
-        $reactions['type'] = '';
-   }
-   $reactions['count'] = $reactions_count;
-   return $reactions;
-}
-
-
-
-
 function Wo_AddLikes($post_id) {
     global $wo, $sqlConnect;
     if ($wo['loggedin'] == false) {
@@ -6449,7 +6394,7 @@ function Wo_RegisterPostComment($data = array()) {
     }
     
     if (!empty($data['text'])) {
-        if ($wo['config']['maxCharacters'] > 0 && 10000 > $wo['config']['maxCharacters']) {
+        if ($wo['config']['maxCharacters'] > 0) {
             if (mb_strlen($data['text']) - 10 > $wo['config']['maxCharacters']) {
                 return false;
             }
@@ -6583,10 +6528,7 @@ function Wo_RegisterPostComment($data = array()) {
         }
 
         //Register point level system for comments
-        if ($getPost['user_id'] != $wo['user']['id']) {
-            Wo_RegisterPoint(Wo_Secure($data['post_id']), "comments");
-        }
-        
+        Wo_RegisterPoint(Wo_Secure($data['post_id']), "comments");
         return $inserted_comment_id;
     }
 }
@@ -6809,9 +6751,6 @@ function Wo_GetPostComment($comment_id = 0) {
         $fetched_data['is_comment_wondered'] = (Wo_IsCommentWondered($fetched_data['id'], $wo['user']['user_id'])) ? true : false;
         $fetched_data['is_comment_liked']    = (Wo_IsCommentLiked($fetched_data['id'], $wo['user']['user_id'])) ? true : false;
     }
-    if ($wo['config']['second_post_button'] == 'reaction') {
-        $fetched_data['reaction'] = Wo_GetPostReactionsTypes($fetched_data['id'],'comment');
-    }
     return $fetched_data;
 }
 function Wo_CountPostComment($post_id = '') {
@@ -6848,9 +6787,7 @@ function Wo_DeletePostComment($comment_id = '') {
         if (!empty($query_img['c_file'])) {
             @unlink($query_img['c_file']);
         }
-        if (mysqli_num_rows($query_one) > 0) {
-            Wo_RegisterPoint($post_id, "comments", "-");
-        }
+        Wo_RegisterPoint($post_id, "comments", "-");
         $query_delete = mysqli_query($sqlConnect, "DELETE FROM " . T_COMMENTS . " WHERE `id` = {$comment_id}");
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_COMMENT_LIKES . " WHERE `comment_id` = {$comment_id}");
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_COMMENT_WONDERS . " WHERE `comment_id` = {$comment_id}");

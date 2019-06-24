@@ -10,7 +10,7 @@
                     ?>
         </div>
             <?php
-                $stories = Wo_GetPosts(array('filter_by' => 'all','publisher_id' => $wo['user_profile']['user_id'])); 
+                $stories = Wo_GetPosts(array('filter_by' => 'all','publisher_id' => $wo['user_profile']['user_id'],'placement' => 'multi_image_post')); 
                 if (count($stories) == 0 && count($pinedstory) == 0) {
                    echo Wo_LoadPage('story/profile-no-stories');
                 } else {

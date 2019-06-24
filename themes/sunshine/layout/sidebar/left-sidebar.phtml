@@ -62,11 +62,13 @@
 			</a>
 		</li>
 		<?php } ?>
+		<?php if ($wo['config']['poke_system'] == 1) { ?>
 		<li <?php if ($wo['page'] == 'poke') { ?>class="pokeactive"<?php } ?>>
 			<a href="<?php echo Wo_SeoLink('index.php?link1=poke');?>"  data-ajax="?link1=poke">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 30 30"><path fill="#009688" d="M1 20.5zM23 12c-.8 0-1.5.5-1.8 1.2L21 13c0-1.1-.9-2-2-2s-2 .9-2 2v-1c0-1.1-.9-2-2-2s-2 .9-2 2V4c0-1.1-.9-2-2-2s-2 .9-2 2v15.5C6.4 18.2 5.3 18 4 18c-1.5 0-3 .6-3 2.5l4.5 2 3.2 3.2c1.5 1.5 3.5 2.3 5.7 2.3H21c2.2 0 4-1.8 4-4V14c0-1.1-.9-2-2-2z"/></svg> <span><?php echo $wo['lang']['pokes'];?></span>
 			</a>
 		</li>
+		<?php } ?>
 		
 		
 		<?php if ($wo['config']['blogs'] == 1) { ?>

@@ -56,6 +56,7 @@ hr, .lightbox-content .comment-section .stats {border-color: #424242 !important;
 .chat-messages-wrapper .incoming, .chat-messages-wrapper .outgoing, .text-sender-container .message-model .message {color: #cacaca;background-color: #444;}
 .message p {color: #cacaca;}
 .chat_main {color: #969696;}
+.post .post-heading .meta .title span,.post .post-heading .meta .title small,.bs-callout .post-heading  .title span,.bs-callout .post-heading  .title small{color: #cecece !important;}
 .post .post-heading .meta .title a, .user-story-container .ads-meta .title b, .user-ad-container div.post-advertisement .ads-meta .title b {color: #cecece;}
 .post .post-description p, .user-story-container .ads-headline, .user-ad-container div.post-advertisement .ads-headline p {color: #c0c0c0;}
 #wo_post_stat_button .stat-item {color: #b2b2b2;}
@@ -249,6 +250,45 @@ background-color: #333333;}
 .chat-opacity .text-center .empty_state span {
     background-color: #333333;
 }
+.verfy_sett_email_phone_ico {
+    background: #4c4c4c;
+    color: #b7b7b7;
+}
+.share_modal_social_icos > a .social-btn {
+    background: #3d3d3d;
+}
+.share_modal_social_icos, .who_react_to_this_user {
+    border-color: #3b3b3b;
+}
+.select_radio_btn.small_rbtn.share_modal_opts_icos .sr_btn_img {
+    background-color: #393939;
+}
+.who_react_to_this_user .who_react_to_this_user_info a {
+    color: #ececec;
+}
+.bs-callout-default {
+    border-color: #414141;
+}
+.bs-callout .post-heading .title .main-color {
+    color: #cfcfcf !important;
+}
+
+.text-sender-container .message-model .message.wo_msg_prod_prnt .wo_market .market_bottom .product .product-by a, .chat-messages-wrapper .message.wo_msg_prod_prnt .wo_market .market_bottom .product .product-by a {
+    color: #a2a2a2;
+}
+.all_colors {
+	background: #212121;
+}
+.two_check_card .sun_input select option {
+	color: #fff;background: #363636;
+}
+.all_colors_display.selected .all_colors_style, .all_colors_display.selected .all_colors_style_image {
+    box-shadow: 0 0 0 2px #212121, 0 0 0 4px #2196F3;
+}
+.post .wo_shared_doc_file i {
+	background-color: #434343;
+}
+
 
 
 
@@ -302,8 +342,6 @@ background-color: #333333;}
 
 
 
-
-
 @media (max-width: 767px){
 .wo_user_profile .pic-info-cont {background-color: #212121;box-shadow: 0 1px 0 0 #212121, 0 0 0 1px #212121;}
 .wo_user_profile .btn-glossy a, .wo_user_profile .btn-glossy button {color: #ffffff;background: rgba(255, 255, 255, 0.23);}
@@ -340,3 +378,5 @@ body .sun_pub_mid_foot .poster-left-buttons {
 	background: #4c4c4c;
 }
 }
+.dt_bank_trans_modal .dt_user_profile{background: rgba(0, 0, 0, 0.42);}
+.lightbox-content .comment-section .post-info p {color: #ccc !important;}

@@ -33,7 +33,11 @@ if (empty($error_code)) {
 			$data[$value] = $value;
 		}
 		if (!empty($data['groups'])) {
-			$response_data['groups'] = Wo_GetUsersGroups($user_id);
+			$groups = Wo_GetUsersGroups($user_id);
+	        foreach ($groups as $key => $group) {
+	            $groups[$key]['members'] = Wo_CountGroupMembers($group['id']);
+	        }
+			$response_data['groups'] = $groups;
 		}
 		if (!empty($data['pages'])) {
 			$response_data['pages'] = Wo_GetMyPages($user_id);

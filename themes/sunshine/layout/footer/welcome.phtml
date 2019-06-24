@@ -6,6 +6,15 @@
 	<?php  if ($wo['config']['blogs'] == 1) { ?>
 		<a href="<?php echo Wo_SeoLink('index.php?link1=blogs');?>"><?php echo $wo['lang']['blog'];?></a>
 	<?php } ?>
+	<?php  if ($wo['config']['forum'] == 1 && $wo['config']['forum_visibility'] == 0) { ?>
+		<a href="<?php echo Wo_SeoLink('index.php?link1=forum');?>" data-ajax="?link1=forum"><?php echo $wo['lang']['forum'];?></a>
+	<?php } ?>
+	<?php  if ($wo['config']['events'] == 1 && $wo['config']['events_visibility'] == 0) { ?>
+		<a href="<?php echo Wo_SeoLink('index.php?link1=events');?>" data-ajax="?link1=events"><?php echo $wo['lang']['events'];?></a>
+	<?php } ?>
+	<?php  if ($wo['config']['classified'] == 1 && $wo['config']['product_visibility'] == 0) { ?>
+		<a href="<?php echo Wo_SeoLink('index.php?link1=products');?>" data-ajax="?link1=products"><?php echo $wo['lang']['market'];?></a>
+	<?php } ?>
 	<?php
 		$pages = Wo_GetCustomPages();
 		if (count($pages) > 0) {

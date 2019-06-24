@@ -1,8 +1,11 @@
 <?php
-if ($wo['loggedin'] == false) {
-  header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
-  exit();
+if ($wo['config']['forum_visibility'] == 1) {
+	if ($wo['loggedin'] == false) {
+	  header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
+	  exit();
+	}
 }
+
 if ($wo['config']['forum'] == 0) {
 	header("Location: " . $wo['config']['site_url']);
     exit();

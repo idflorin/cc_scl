@@ -53,21 +53,6 @@
 							<textarea class="form-control" name="description" placeholder="Type ads Description"><?php echo $wo['ad-data']['description']; ?></textarea>
 						</div>
 					</div>
-					<div class="form-group col-lg-12">
-						<label class="col-md-12"><?php echo $wo['lang']['media']; ?></label>
-						<div class="col-md-12">
-							<div class="select-admedai-box" id="select-ad-media">
-								<button class="btn btn-default" type="button">
-									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg> <?php echo $wo['lang']['choose_file']; ?>
-								</button>
-								<input type="text" readonly placeholder="<?php echo $wo['lang']['no_file_chosen']; ?>" <?php if (!empty($wo['ad-data']['ad_media'])) {
-								 ?>
-									value="<?php echo(explode('/', $wo['ad-data']['ad_media'])[count(explode('/', $wo['ad-data']['ad_media'])) - 1]) ?>"
-								<?php } ?>>
-							</div>
-						</div>
-						<div class="clear"></div>
-					</div>
 				</div>
 			</div>
 			
@@ -135,20 +120,12 @@
 				<?php echo $wo['lang']['save']; ?>
 			</button>
 		</div>
-		<input type="file" name="media" class="hidden" id="ad-media-file" accept="image/* video/*">
 	</form>
 	<div class="clear"></div>
 </div>
 
 <script>	
 	jQuery(document).ready(function($) {
-		$("#select-ad-media").click(function(event) {
-      		$("#ad-media-file").click();
-        });
-		$("#ad-media-file").change(function(event) {
-	      	var filename = $(this).val().split('\\').pop();
-	      	$("#select-ad-media").find('input').val(filename);
-      	});
 
 	    $('.selectpicker').selectpicker();
 

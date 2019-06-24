@@ -14,7 +14,13 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         }
     }
     $id          = Wo_GetPostIdFromUrl($_GET['id']);
-    $wo['story'] = Wo_PostData($id, $placement, 'not_limited');
+    if (!empty($_GET['ref']) && is_numeric($_GET['ref']) && $_GET['ref'] > 0) {
+        $wo['story'] = Wo_PostData($id, $placement, 'not_limited',Wo_Secure($_GET['ref']));
+    }
+    else{
+        $wo['story'] = Wo_PostData($id, $placement, 'not_limited');
+    }
+    
     if (empty($wo['story'])) {
         header("Location: " . $wo['config']['site_url']);
         exit();

@@ -61,7 +61,7 @@ if (empty($error_code)) {
 	                }
 	            }
 	        }
-	        $recipient_data['is_following_me'] = (Wo_IsFollowing($recipient_data['user_id'], $wo['user']['user_id'] )) ? 1 : 0;
+	        $recipient_data['is_following_me'] = (Wo_IsFollowing( $wo['user']['user_id'], $recipient_data['user_id'])) ? 1 : 0;
 	        $recipient_data['gender_text']        = ($recipient_data['gender'] == 'male') ? $wo['lang']['male'] : $wo['lang']['female'];
         	$recipient_data['lastseen_time_text'] = Wo_Time_Elapsed_String($recipient_data['lastseen']);
         	$recipient_data['is_blocked']         = Wo_IsBlocked($recipient_data['user_id']);
@@ -91,6 +91,15 @@ if (empty($error_code)) {
 		}
 		if (!empty($data['joined_groups'])) {
 			$response_data['joined_groups'] = Wo_GetUsersGroups($recipient_data['user_id'], 50);
+		}
+		if (!empty($data['family'])) {
+			$family = Wo_GetFamaly($recipient_data['user_id'],false,1);
+			foreach ($family as $key => $value) {
+				foreach ($non_allowed as $key1 => $value) {
+			       unset($family[$key]['user_data'][$value]);
+			    }
+			}
+			$response_data['family'] = $family;
 		}
     }
 }

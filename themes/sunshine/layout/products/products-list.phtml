@@ -9,7 +9,7 @@
 				<div class="info-middle">
 					<a class="more-info" href="<?php echo $wo['product']['url']?>"><?php echo $wo['lang']['view'] ?></a>
 					<?php if ($wo['loggedin']) { if ($wo['product']['seller']['id'] != $wo['user']['user_id']) { ?>
-						<span class="contact more-info" onclick="Wo_OpenChatTab(<?php echo $wo['product']['seller']['id']?>)"><?php echo $wo['lang']['buy'] ?></span> 
+						<span class="contact more-info" onclick="Wo_OpenChatTab(<?php echo $wo['product']['seller']['id']?>,0,<?php echo $wo['product']['id']?>)"><?php echo $wo['lang']['buy'] ?></span> 
 					<?php } ?>
 					<?php } ?>
 				</div>

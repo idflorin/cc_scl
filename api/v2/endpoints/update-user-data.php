@@ -20,7 +20,7 @@ if (!empty($_POST)) {
 $escape = array('server_key');
 $genders = array('male', 'female');
 $keys = array();
-$remove_from_list = array('user_id', 'background_image', 'background_image_status', 'last_data_update', 'sidebar_data', 'details', 'id'. 'following_data', 'name', 'url', 'followers_data', 'likes_data', 'groups_data', 'album_data', 'css_file', 'joined');
+$remove_from_list = array('user_id', 'background_image', 'background_image_status', 'last_data_update', 'sidebar_data', 'details', 'id'. 'following_data', 'name', 'url', 'followers_data', 'likes_data', 'groups_data', 'album_data', 'css_file', 'joined', 'admin', 'email_code', 'ip_address', 'active', 'type', 'sms_code', 'is_pro', 'balance', 'referrer', 'wallet', 'points');
 foreach ($wo['user'] as $key => $value) {
 	if (!in_array($key, $remove_from_list )) {
 		$keys[] = $key;
@@ -75,7 +75,7 @@ if (!empty($user_data['new_password']) && !empty($user_data['current_password'])
         $error_message = 'Password is too short';
     }
     if (empty($error_code)) {
-    	$user_data['password'] = sha1($user_data['new_password']);
+    	$user_data['password'] = password_hash($user_data['new_password'], PASSWORD_DEFAULT);
     	unset($user_data['new_password']);
     	unset($user_data['current_password']);
     }
@@ -148,7 +148,11 @@ if (isset($user_data['server_key'])) {
 }
 
 if (empty($error_code)) {
+    foreach ($remove_from_list as $rkey => $rvalue) {
+        unset($user_data[$rvalue]);
+    }
 	foreach ($user_data as $key => $value) {
+
 		if (!isset($wo['user'][$key]) && !in_array($key, $escape)) {
 			$error_code = 1;
 			$error_message = "Key #$key not found, check Wo_Users table to get the correct information, or you can use the following keys: $keys";

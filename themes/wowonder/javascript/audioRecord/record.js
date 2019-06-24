@@ -310,21 +310,8 @@ function Wo_RegisterTabMessageRecord(dataForm,id){
         data:   dataForm,
         processData: false,
         contentType: false,
-        xhr: function() {
-            var xhr = new window.XMLHttpRequest();
-            xhr.upload.addEventListener("progress", function(evt) {
-                if (evt.lengthComputable) {
-                    var percentComplete = (evt.loaded / evt.total) * 100;
-                    $('form.chat-sending-form-'+id).find('.ball-pulse').fadeIn(100);;
-                }
-           }, false);
-           return xhr;
-        }
     }).done(function(data) {
       if(data.status == 200){
-        $('form.chat-sending-form-'+id).find('input.message-record').val('');   
-        $('form.chat-sending-form-'+id).find('input.media-name').val('');
-        $('form.chat-sending-form-'+id).find('.ball-pulse').fadeOut(100);;
         Wo_stopRecording();
         Wo_CleanRecordNodes();
         Wo_StopLocalStream();
@@ -418,8 +405,7 @@ function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
         dataForm.append('text',                  text);
         dataForm.append('user_id',            user_id);
         dataForm.append('page_id',            page_id);
-        dataForm.append('comment_image',comment_image);
-        $('#charsLeft_'+post_id).text($('#charsLeft_'+post_id).attr('data_num')); 
+        dataForm.append('comment_image',comment_image); 
         Wo_InsertComment(dataForm,post_id);
     }
   }

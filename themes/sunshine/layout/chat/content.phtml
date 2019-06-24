@@ -200,7 +200,35 @@ if (isset($_SESSION['open_chat'])) {
 	</div>
 </div>
 
+<div class="modal fade sun_modal" id="edit_group_chat" role="dialog">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<form id="edit_chat_group_form" class="wo_edit_chat_group">
+				<div class="modal-body">
+					<div class="edit_grp_info_modal">
+						<div class="group_chat_avatar__container" onclick="$('#edit_group_chat_avatar_').trigger('click');">
+							<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg></span>
+						</div>
+						<input type="text" class="form-control" name="group_name" placeholder="<?php echo $wo['lang']['name']; ?>" id="edit_group_name">
+						<div class="clear"></div>
+					</div>
+					<div id="edit_chat_group_alert"></div>
+				</div>
+				<div class="modal-footer">
+					<div class="ball-pulse"><div></div><div></div><div></div></div>
+					<button id="delete-all-post" type="submit" class="btn btn-main"><?php echo $wo['lang']['update']; ?></button>
+				</div>
+				<input type="hidden" id="edit_group_id" class="hidden" name="group_id">
+				<input type="file" name="avatar" class="hidden" id="edit_group_chat_avatar_" onchange="change_avatar(this);" accept="image/jpeg,image/png,image/gif">
+			</form>
+		</div>
+	</div>
+</div>
+
 <script type="text/javascript">
+	function change_avatar(self) {
+		$('.group_chat_avatar__container').css('background-image', "url('"+window.URL.createObjectURL(self.files[0])+"')");
+	}
 function Wo_GetGChatParticipants(name){
     if (!name) {
         return false;
@@ -227,6 +255,18 @@ function Wo_GetGChatParticipants(name){
 function Wo_CreateGChat(e){
     e.preventDefault();
     $('#create_group_chat').modal('show');
+}
+function Wo_EditGChat(e,group_id){
+    e.preventDefault();
+    $.get(Wo_Ajax_Requests_File(), {f:'chat', s:'get_group_info',group_id:group_id}, function(data) {
+    	if (data.status == 200) {
+    		//$('#edit_group_chat_avatar').attr('src', data.group.avatar);
+    		$('.group_chat_avatar__container').css('background-image', "url('"+data.group.avatar+"')");
+    		$('#edit_group_name').val(data.group.group_name);
+    		$('#edit_group_id').val(data.group.group_id);
+    		$('#edit_group_chat').modal('show');
+    	}
+    });
 }
 
 function Wo_ChatSide(id) {
@@ -264,7 +304,7 @@ function Wo_ChatSide(id) {
     var count_span = $('.count-online-users');
     $.get(Wo_Ajax_Requests_File(), {f:'chat', s:'chat_side', user_id:user_id, message_id:message_id, last_id:last_id,last_group:last_group}, function(data) {
         if (data.status == 200  && data.chat_groups.length > 0) {
-          chat_groups.append(data.chat_groups);
+          chat_groups.html(data.chat_groups);
         }
         if (data.status == 200) {
             count_span.html(data.count_chat);
@@ -403,6 +443,26 @@ $(function() {
         } 
         $('#insert-caht-parts').find('.modal-footer .ball-pulse').fadeOut(100);
     }});
+
+    
+    $('#edit_chat_group_form').ajaxForm({
+	  url: Wo_Ajax_Requests_File() + '?f=chat&s=edit_group',
+	  type:'POST',
+	  dataType:'json',
+	  beforeSend: function() {
+	    Wo_progressIconLoader($('#edit_chat_group_form').find('button'));
+		$('#edit_chat_group_form').find('.modal-footer .ball-pulse').fadeIn(100);
+	  },
+	  success: function(data) {
+	    if (data['status'] == 200) {
+	        $("#edit_group_chat").modal('hide');
+	        location.reload();
+	    }
+	    else{
+	        $("#edit_chat_group_alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
+	    } 
+	    $('#edit_chat_group_form').find('.modal-footer .ball-pulse').fadeOut(100);
+	}});
 });
 
 function Timeout() {

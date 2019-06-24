@@ -15,23 +15,23 @@ if ($f == 'update_user_avatar_picture') {
             );
         }
     }
-    // else if(isset($_POST['selected_image']) && !empty($_POST['selected_image']) && in_array($_POST['selected_image'], $images)){
-    //     $num = Wo_Secure($_POST['selected_image']);
-    //     $filename = @Wo_ImportImageFromUrl($wo['config']['site_url'].'/upload/photos/'.$num.'.jpg');
-    //     $explode2  = @end(explode('.', $filename));
-    //     $explode3  = @explode('.', $filename);
-    //     $last_file = $explode3[0] . '_full.' . $explode2;
-    //     $compress  = Wo_CompressImage($filename, $last_file, 50);
-    //     $upload_s3      = Wo_UploadToS3($last_file);
-    //     Wo_Resize_Crop_Image($wo['profile_picture_width_crop'], $wo['profile_picture_height_crop'], $filename, $filename, $wo['profile_picture_image_quality']);
-    //     $upload_s3 = Wo_UploadToS3($filename);
-    //     $new = $filename;
+    else if(isset($_POST['selected_image']) && !empty($_POST['selected_image']) && in_array($_POST['selected_image'], $images)){
+        $num = Wo_Secure($_POST['selected_image']);
+        $filename = @Wo_ImportImageFromUrl($wo['config']['site_url'].'/upload/photos/'.$num.'.jpg');
+        $explode2  = @end(explode('.', $filename));
+        $explode3  = @explode('.', $filename);
+        $last_file = $explode3[0] . '_full.' . $explode2;
+        $compress  = Wo_CompressImage($filename, $last_file, 50);
+        $upload_s3      = Wo_UploadToS3($last_file);
+        Wo_Resize_Crop_Image($wo['profile_picture_width_crop'], $wo['profile_picture_height_crop'], $filename, $filename, $wo['profile_picture_image_quality']);
+        $upload_s3 = Wo_UploadToS3($filename);
+        $new = $filename;
         
-    //     $update_data = Wo_UpdateUserData($wo['user']['user_id'], array('avatar' => $new,
-    //                                                                        'startup_image' => 1));
-    //     $data['status'] = 200;
-    //     $data['img'] = '';
-    // }
+        $update_data = Wo_UpdateUserData($wo['user']['user_id'], array('avatar' => $new,
+                                                                           'startup_image' => 1));
+        $data['status'] = 200;
+        $data['img'] = '';
+    }
     Wo_CleanCache();
     header("Content-type: application/json");
     echo json_encode($data);

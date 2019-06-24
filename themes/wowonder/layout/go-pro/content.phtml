@@ -123,7 +123,7 @@
 								<?php if (!empty($wo['pro_packages']['star']['pages_promotion']) && is_numeric($wo['pro_packages']['star']['pages_promotion']) && $wo['pro_packages']['star']['pages_promotion'] > 0) { ?>
 									<i class="fa fa-check green"></i>
 									<?php 
-									$page_promotion_star = str_replace('{monthly_boosts}', $wo['pro_packages']['star']['pages_promotion'], $wo['lang']['page_promotion_hot']);
+									$page_promotion_star = str_replace('{monthly_boosts}', $wo['pro_packages']['star']['pages_promotion'], $wo['lang']['post_promotion_hot']);
 									echo $page_promotion_star;
 									?>
 								<?php }else{ ?>
@@ -213,7 +213,7 @@
 							<?php if (!empty($wo['pro_packages']['hot']['posts_promotion']) && is_numeric($wo['pro_packages']['hot']['posts_promotion']) && $wo['pro_packages']['hot']['posts_promotion'] > 0) { ?>
 								<i class="fa fa-check green"></i>
 								<?php 
-								$post_promotion_hot = str_replace('{monthly_boosts}', $wo['pro_packages']['hot']['posts_promotion'], $wo['lang']['post_promotion_hot']);
+								$post_promotion_hot = str_replace('{monthly_boosts}', $wo['pro_packages']['hot']['posts_promotion'], $wo['lang']['page_promotion_hot']);
 								echo $post_promotion_hot;
 								?>
 							<?php }else{ ?>

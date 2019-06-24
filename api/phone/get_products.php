@@ -111,16 +111,18 @@ if ($type == 'get_products') {
                 $data_products['user_id'] = $user_profile_id;
             }
             $products = Wo_GetProducts($data_products);
+            $final_products = [];
             foreach ($products as $key => $product) {
                 foreach ($non_allowed as $key => $value) {
                    unset($product['seller'][$value]);
                 }
+                $final_products = $product;
             }
             $json_success_data  = array(
                 'api_status' => '200',
                 'api_text' => 'success',
                 'api_version' => $api_version,
-                'products' => $products
+                'products' => $final_products
             );
             header("Content-type: application/json");
             echo json_encode($json_success_data, JSON_PRETTY_PRINT);
