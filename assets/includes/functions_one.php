@@ -6394,7 +6394,7 @@ function Wo_RegisterPostComment($data = array()) {
     }
     
     if (!empty($data['text'])) {
-        if ($wo['config']['maxCharacters'] > 0) {
+        if ($wo['config']['maxCharacters'] > 0 && 10000 > $wo['config']['maxCharacters']) {
             if (mb_strlen($data['text']) - 10 > $wo['config']['maxCharacters']) {
                 return false;
             }
@@ -6528,7 +6528,10 @@ function Wo_RegisterPostComment($data = array()) {
         }
 
         //Register point level system for comments
-        Wo_RegisterPoint(Wo_Secure($data['post_id']), "comments");
+        if ($getPost['user_id'] != $wo['user']['id']) {
+            Wo_RegisterPoint(Wo_Secure($data['post_id']), "comments");
+        }
+        
         return $inserted_comment_id;
     }
 }
@@ -6787,7 +6790,9 @@ function Wo_DeletePostComment($comment_id = '') {
         if (!empty($query_img['c_file'])) {
             @unlink($query_img['c_file']);
         }
-        Wo_RegisterPoint($post_id, "comments", "-");
+        if (mysqli_num_rows($query_one) > 0) {
+            Wo_RegisterPoint($post_id, "comments", "-");
+        }
         $query_delete = mysqli_query($sqlConnect, "DELETE FROM " . T_COMMENTS . " WHERE `id` = {$comment_id}");
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_COMMENT_LIKES . " WHERE `comment_id` = {$comment_id}");
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_COMMENT_WONDERS . " WHERE `comment_id` = {$comment_id}");

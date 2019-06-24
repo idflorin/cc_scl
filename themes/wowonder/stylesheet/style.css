@@ -2961,10 +2961,12 @@ svg {vertical-align: middle;}
 .two_check_card .sun_input input::placeholder {color: #fff;opacity: 0.7;}
 .two_check_card .sun_input input, .two_check_card .sun_input select {border: 0;background-color: rgba(0, 0, 0, 0.2) !important;color: white;border-radius: 5px;height: 40px;}
 .two_check_card .sun_input select option {color: #222;background: white;}
-.post .wo_shared_doc_file {padding: 20px 10px;font-size: 15px;font-family: "Lato", sans-serif;}
-.post .wo_shared_doc_file a {display: block;text-decoration: none;}
-.post .wo_shared_doc_file i {display: block;width: 60px;height: 60px;background-color: #dedede;border-radius: 50%;font-size: 28px;margin: 0 auto 10px;line-height: 60px;color: #4d91ea;}
-
+.post .wo_shared_doc_file {font-size: 15px;font-family: "Lato", sans-serif;}
+.post .wo_shared_doc_file > a {display: block;text-decoration: none;padding: 20px 10px;}
+.post .wo_shared_doc_file > a > i {display: block;width: 60px;height: 60px;background-color: #dedede;border-radius: 50%;font-size: 28px;margin: 0 auto 10px;line-height: 60px;color: #4d91ea;}
+.thumb-image-delete {position:relative;display: inline-block;}
+.thumb-image-delete:not(:last-child) {margin: 0 5px 0 0;}
+.thumb-image-delete-btn {position: absolute;right: 5px;top: 5px;color: white;background-color: rgba(0, 0, 0, 0.3);border-radius: 50%;text-align: center;line-height: 1;padding: 3px;}
 
 
 
@@ -3354,8 +3356,7 @@ to{opacity:1;margin-top:0}
     -ms-user-select: none;
     user-select: none;
 }
-.thumb-image-delete{position:relative;pointer-events:unset !important}
-.thumb-image-delete-btn{position:absolute;right:2px;top:2px;}
+
 .group_chat_avatar__{width:100%;max-height:137px;overflow:hidden;margin:0 0 20px}
 .group_chat_avatar__ img{max-width:100%;max-height:100%}
 .image_blur{filter: blur(10px);}

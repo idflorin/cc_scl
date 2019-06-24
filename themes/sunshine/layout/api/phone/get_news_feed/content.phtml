@@ -72,6 +72,7 @@ if (!empty($_GET['event_id'])) {
 				if (!empty($_GET['hashtag'])) {
 					$stories = Wo_GetHashtagPosts($_GET['hashtag']);
 				} else {
+          $array['placement'] = 'multi_image_post';
 					$stories = Wo_GetPosts($array);
 				}
 				if (count($stories) <= 0) {

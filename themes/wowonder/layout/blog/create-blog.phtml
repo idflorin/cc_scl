@@ -2,36 +2,33 @@
 	<div class="row">
 		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
 		<div class="col-md-10 singlecol wo-create-forms">
+			<h3 class="wo_create_form_cover blog">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+				<?php echo $wo['lang']['create_new_article'];?>
+				<span class="<?php echo Wo_RightToLeft('pull-right');?>">
+					<a data-ajax="?link1=my-blogs" href="<?php echo Wo_SeoLink('index.php?link1=my-blogs');?>">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg><?php echo $wo['lang']['my_articles'];?>
+					</a>
+				</span>
+				<div class="clear"></div>
+			</h3>
+		  
 			<div class="wo_settings_page">
-				<div class="sun_head_onboard shortpwidth blog">
-					<img class="sho_img" src="<?php echo $wo['config']['theme_url'];?>/img/cads/blog.svg" alt="<?php echo $wo['lang']['blog'] ?>" />
-					<span class="go_back_link">
-						<a data-ajax="?link1=my-blogs" href="<?php echo Wo_SeoLink('index.php?link1=my-blogs');?>">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg><?php echo $wo['lang']['my_articles'];?>
-						</a>
-					</span>
-					<div class="sun_head_onboard_innr">
-						<h2><?php echo $wo['lang']['create_new_article'];?></h2>
-					</div>
-				</div>
-				
 				<form class="form form-horizontal create-article-form" method="post" id="insert-blog" action="#">
 					<div class="setting-panel row">
 						<div class="form-group col-lg-12">
 							<label class="col-md-12" for="new-blog-title"><?php echo $wo['lang']['title'] ?></label>
 							<div class="col-md-12">
-								<input id="blog_title" name="blog_title" type="text" class="form-control input-md" autofocus > 
+								<input id="blog_title" name="blog_title" id="new-blog-title" type="text" class="form-control input-md"> 
 							</div>
 						</div>
 						<div class="form-group col-lg-12">
 							<label class="col-md-12" for="new-blog-desc"><?php echo $wo['lang']['description'] ?></label>
 							<div class="col-md-12">
-								<textarea name="blog_description" id="new-blog-desc" rows="3" type="text" class="form-control input-md"></textarea>
+								<textarea name="blog_description" id="new-blog-desc" type="text" class="form-control input-md"></textarea>
 							</div>
 						</div>
-						
-						<div class="create_blog_area_acombo">
-						<div class="form-group th-alert col-sm-7">
+						<div class="form-group th-alert">
 							<div class="col-md-12">
 								<div class="main prv-img pointer" id="select-img" data-block="thumdrop-zone">
 									<div class="thumbnail-rendderer">
@@ -47,8 +44,12 @@
 								</div>
 							</div>
 						</div>
-						<div class="col-sm-5 no-padding-right">
-							<div class="form-group col-lg-12">
+						<div class="form-group">
+							<div class="col-md-12">
+								<textarea name="blog_content" id="blog" placeholder="<?php echo $wo['lang']['content'] ?>"></textarea> 
+							</div>
+						</div>
+						<div class="form-group col-lg-12">
 							<label class="col-md-12" for="blog_category"><?php echo $wo['lang']['category'] ?></label>
 							<div class="col-md-12">
 								<select name="blog_category" class="form-control" id="blog_category">
@@ -69,15 +70,6 @@
 								<input data-role="tagsinput" id="blog_tags" name="blog_tags" type="text" class="form-control input-md" placeholder="<?php echo $wo['lang']['tags']; ?>"> 
 							</div>
 						</div>
-						</div>
-						</div>
-						
-						<div class="form-group">
-							<div class="col-md-12">
-								<textarea name="blog_content" id="blog" placeholder="<?php echo $wo['lang']['content'] ?>"></textarea> 
-							</div>
-						</div>
-						
 						<input type="file" class="hidden" id="thumbnail" name="thumbnail" accept="image/*">
 					</div>
 					
@@ -85,7 +77,10 @@
 
 					<div class="form-group last-sett-btn modal-footer">
 						<div class="ball-pulse"><div></div><div></div><div></div></div>
-						<button type="submit" class="btn btn-main setting-panel-mdbtn"><?php echo $wo['lang']['publish']; ?></button>
+						<button type="submit" class="btn btn-main setting-panel-mdbtn">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> 
+							<?php echo $wo['lang']['publish']; ?>
+						</button>
 					</div>
 					<input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
 					<input name="image" type="file" id="upload" class="hidden">
