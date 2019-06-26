@@ -3,7 +3,7 @@ $post_shared_from = array();
 $current_post = $wo['current_post'] = $wo['story'];
  ?>
 <div class="post-container">
-  <div class="post<?php echo (!empty($wo['story']['post_is_promoted'])) ? ' boosted': '';?>" id="post-<?php echo $wo['story']['id']; ?>" data-post-id="<?php echo $wo['story']['id'];?>" <?php if( isset( $wo['story']['LastTotal'] ) ) { echo 'data-post-total="'.$wo['story']['LastTotal'].'"'; }?> <?php if( isset( $wo['story']['ids'] ) ) { echo 'data-post-ids="'.$wo['story']['ids'].'"'; }?> <?php if( isset( $wo['story']['dt'] ) ) { echo 'data-post-dt="'.$wo['story']['dt'].'"'; }?>>
+  <div class="post<?php echo (!empty($wo['story']['post_is_promoted'])) ? ' boosted': '';?>" id="post-<?php echo $wo['story']['id']; ?>" data-post-id="<?php echo $wo['story']['id'];?>" <?php if( isset( $wo['story']['LastTotal'] ) ) { echo 'data-post-total="'.$wo['story']['LastTotal'].'"'; }?> <?php if( isset( $wo['story']['ids'] ) ) { echo 'data-post-ids="'.$wo['story']['ids'].'"'; }?> <?php if( isset( $wo['story']['dt'] ) ) { echo 'data-post-dt="'.$wo['story']['dt'].'"'; }?> data-post-type="<?php if (!empty($wo['story']['parent_id'])) { echo('share'); } ?>">
     <?php
       if (empty($wo['page'])) {
         $wo['page'] = 'home';
@@ -67,7 +67,6 @@ $current_post = $wo['current_post'] = $wo['story'];
         <?php echo $wo['lang']['open_post_in_new_tab'];?>
                 </a>
               </li>
-        <li><hr></li>
               <?php if (empty($wo['story']['recipient']) && $wo['story']['admin'] === true) { ?>
               <?php if ($wo['story']['is_group_post'] == false) { ?>
               <!-- <li>
@@ -998,6 +997,9 @@ $current_post = $wo['current_post'] = $wo['story'];
     <?php } ?>
 
       <div class="post-description" id="post-description-<?php echo $wo['story']['id']; ?>">
+        <?php if (!empty($wo['story']['parent_id'])) { ?>
+        <div><p class="edited_text"><?php echo $wo['story']['postText']; ?></p></div>
+        <?php } ?>
 		
 		<!-- Hide Post Owner -->
 <?php if (!empty($wo['story']['parent_id'])) {
@@ -1412,7 +1414,7 @@ $current_post = $wo['current_post'] = $wo['story'];
             if (count($wo['story']['photo_album']) == 3) {
               echo "<div class='wo_adaptive_media'>";
               foreach ($wo['story']['photo_album'] as $photo) {
-                if ($wo['story']['admin'] === true) {
+                if ($wo['story']['admin'] === true && empty($wo['story']['parent_id'])) {
                   $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
                   $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
                 }
@@ -1423,7 +1425,7 @@ $current_post = $wo['current_post'] = $wo['story'];
             else if (count($wo['story']['photo_album']) == 4) {
               echo "<div class='wo_adaptive_media_4'>";
               foreach ($wo['story']['photo_album'] as $photo) {
-                if ($wo['story']['admin'] === true) {
+                if ($wo['story']['admin'] === true && empty($wo['story']['parent_id'])) {
                   $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
                   $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
                 }
@@ -1434,7 +1436,7 @@ $current_post = $wo['current_post'] = $wo['story'];
             else if (count($wo['story']['photo_album']) == 5) {
               echo "<div class='wo_adaptive_media_5'>";
               foreach ($wo['story']['photo_album'] as $photo) {
-                if ($wo['story']['admin'] === true) {
+                if ($wo['story']['admin'] === true && empty($wo['story']['parent_id'])) {
                   $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
                   $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
                 }
@@ -1452,7 +1454,7 @@ $current_post = $wo['current_post'] = $wo['story'];
                     "; 
                 }
                 else{
-                  if ($wo['story']['admin'] === true) {
+                  if ($wo['story']['admin'] === true && empty($wo['story']['parent_id'])) {
                     $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
                     $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
                   }
@@ -1460,7 +1462,7 @@ $current_post = $wo['current_post'] = $wo['story'];
                 }
               }
               foreach (array_slice($wo['story']['photo_album'],3) as $photo) {
-                if ($wo['story']['admin'] === true) {
+                if ($wo['story']['admin'] === true && empty($wo['story']['parent_id'])) {
                   $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
                   $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
                 }
@@ -1469,7 +1471,7 @@ $current_post = $wo['current_post'] = $wo['story'];
             }
             else{
               foreach ($wo['story']['photo_album'] as $photo) {
-                if ($wo['story']['admin'] === true) {
+                if ($wo['story']['admin'] === true && empty($wo['story']['parent_id'])) {
                   $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
                   $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
                 }
@@ -2061,6 +2063,15 @@ $current_post = $wo['current_post'] = $wo['story'];
           </div>
     
           <?php if($wo['config']['social_share_twitter'] == 0 && $wo['config']['social_share_google'] == 0 && $wo['config']['social_share_facebook'] == 0 && $wo['config']['social_share_whatsup'] == 0 && $wo['config']['social_share_pinterest'] == 0 && $wo['config']['social_share_linkedin'] == 0 && $wo['config']['social_share_telegram'] == 0) { ?>
+            <?php if (empty($wo['story']['parent_id'])) { ?>
+              <div class="btn btn-default stat-item" title="<?php echo $wo['lang']['share'];?>" onclick="Wo_SharePostOn(<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['user_id']; ?>,'timeline')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18,16.08C17.24,16.08 16.56,16.38 16.04,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.21,8 18,8A3,3 0 0,0 21,5A3,3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.79,9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.79,15 7.5,14.69 8.04,14.19L15.16,18.34C15.11,18.55 15.08,18.77 15.08,19C15.08,20.61 16.39,21.91 18,21.91C19.61,21.91 20.92,20.61 20.92,19A2.92,2.92 0 0,0 18,16.08Z"></path></svg> 
+                <span class="like-btn-mobile"><?php echo $wo['lang']['share'];?></span>
+                <!--<span id="shares">
+                <?php echo $wo['story']['post_shares'];?>
+                </span>-->
+              </div>
+            <?php } ?>
 
       <?php }else{ ?>
         <?php if (empty($wo['story']['parent_id'])) { ?>

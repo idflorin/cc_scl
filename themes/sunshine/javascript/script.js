@@ -851,7 +851,13 @@ function Wo_EditPost(post_id) {
   var edit_box = $('#post-' + post_id).find('#edit-post');
   var edit_textarea = post.find('.edit-textarea-' + post_id + ' textarea');
   var text = edit_textarea.val();
-  var post_text = post.find('.post-description p');
+  var type = post.attr('data-post-type');
+  if (type == 'share') {
+    var post_text = post.find('.post-description .edited_text');
+  }
+  else{
+    var post_text = post.find('.post-description p');
+  }
   Wo_progressIconLoader(post.find('#edit-post-button'));
   $('#post-' + post_id).find('#edit-post .ball-pulse').fadeIn(100);
   $.post(Wo_Ajax_Requests_File() + '?f=posts&s=edit_post', {
@@ -1253,6 +1259,7 @@ function Wo_ClosePostReactedUsers(post_id) {
 
 // open post Reacted users
 function Wo_OpenPostReactedUsers(post_id, type,col) {
+  $('body').append('<div class="lightbox-container"><div class="lightbox-backgrond" onclick="Wo_CloseLightbox();"></div><div class="lb-preloader" style="display:block"><svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg></div></div>');
   $('.reacted_users_load_more').css('display', 'inline');
   $.get(Wo_Ajax_Requests_File(), {
     f: 'posts',
@@ -1262,6 +1269,9 @@ function Wo_OpenPostReactedUsers(post_id, type,col) {
     col:col
   }, function (data) {
     if(data.status == 200) {
+      setTimeout(function () {
+        $('.lightbox-container').remove();
+      },100);
       //$('#views_info_title').html(data.title);
       if(data.html.length == 0) {
         $('.reacted_users_load_more').attr('data-type', '');

@@ -100,7 +100,7 @@ if ($type == 'user_registration') {
     } 
     if (empty($json_error_data['errors'])) {
         $username        = Wo_Secure($_POST['username'], 0);
-        $password        = Wo_Secure($_POST['password'], 0);
+        $password        = $_POST['password'];
         $email           = Wo_Secure($_POST['email'], 0);
         $gender          = 'male';
         if (!empty($_POST['gender'])) {

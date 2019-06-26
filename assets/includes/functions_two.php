@@ -5578,7 +5578,7 @@ function Wo_GetGenders($lang = 'english',$langs)
 function detect_safe_search($path)
 {
     global $wo;
-    $content = '{"requests": [{"image": {"source": {"imageUri": "https://demo.wowonder.com/upload/photos/2019/04/2EaMsrkgRw3NtD53cHYQ_01_0fe89de130fe097abff174f38e736a40_image.jpg"}},"features": [{"type": "SAFE_SEARCH_DETECTION","maxResults": 1},{"type": "WEB_DETECTION","maxResults": 2}]}]}';
+    $content = '{"requests": [{"image": {"source": {"imageUri": "' . $path . '"}},"features": [{"type": "SAFE_SEARCH_DETECTION","maxResults": 1},{"type": "WEB_DETECTION","maxResults": 2}]}]}';
     try {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, 'https://vision.googleapis.com/v1/images:annotate?key='.$wo['config']['vision_api_key']);

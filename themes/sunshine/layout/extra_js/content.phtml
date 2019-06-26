@@ -442,7 +442,7 @@ function Wo_LoadReactedUsers(type) {
 }
 
 function Wo_LoadMoreReactedUsers(self) {
-  $('#load_more_reacted_btn').html('<?php echo $wo['lang']['please_wait'] ?>');
+  $('.reacted_users_load_more').find('#load_more_reacted_btn').html('<?php echo $wo['lang']['please_wait'] ?>');
   var type = $(self).attr('data-type');
   var post_id = $(self).attr('post-id');
   var id   = $('.views_info_count').last().attr('data-row-id');
@@ -461,10 +461,10 @@ function Wo_LoadMoreReactedUsers(self) {
         $(self).css('display', 'none');
       } else {
         $('#reacted_users_box').append(data.html);
-        $('#load_more_reacted_btn').html('<?php echo $wo['lang']['load_more'] ?>');
+        $('.reacted_users_load_more').find('#load_more_reacted_btn').html('<?php echo $wo['lang']['load_more'] ?>');
       }
     }
-    $('#load_more_reacted_btn').html('<?php echo $wo['lang']['load_more'] ?>');
+    $('.reacted_users_load_more').find('#load_more_reacted_btn').html('<?php echo $wo['lang']['load_more'] ?>');
   });
 }
 </script>

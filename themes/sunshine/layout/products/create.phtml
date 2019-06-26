@@ -9,8 +9,9 @@
 				<div class="wo_settings_page">
 					<form class="create-album-form form-horizontal" method="post">
 						<div class="app-general-alert setting-update-alert"></div>
+						<div class="clear"></div>
 						
-						<ul class="sun_cp_cats list-unstyled">
+						<!-- <ul class="sun_cp_cats list-unstyled">
 							<?php 
 								foreach ($wo['products_categories'] as $key => $category) {
 									if ($key > 0) {
@@ -22,7 +23,7 @@
 									</label>
 								</li>
 							<?php } } ?>
-						</ul>
+						</ul> -->
 						
 						<div class="setting-panel row">
 							<!-- Text input-->
@@ -38,7 +39,25 @@
 									<label for="location"><?php echo $wo['lang']['location'] ?></label>  
 								</div>
 							</div>
-							<div class="col-lg-4">
+							<div class="col-lg-6">
+								<div class="sun_input">
+									<select class="form-control" name="category" id="category">
+										<?php 
+										foreach ($wo['products_categories'] as $key => $category) {
+											if ($key > 1) {
+										?>
+										<option value="<?php echo $key;?>"><?php echo $category;?></option>
+										<?php } ?>
+										<?php if ($key == count($wo['products_categories']) && !empty($wo['products_categories'][1]) ) { ?>
+											<option value="1"><?php echo $wo['products_categories'][1];?></option>
+										<?php } ?>
+
+										<?php } ?>
+									</select>
+									<label for="category"><?php echo $wo['lang']['category'] ?></label>  
+								</div>
+							</div>
+							<div class="col-lg-6">
 								<div class="sun_input">
 									<select name="currency" id="currency" class="form-control">
 										<?php foreach ($wo['currencies'] as $key => $currency) { ?>
@@ -48,13 +67,13 @@
 									<label for="currency"><?php echo $wo['lang']['currency'] ?></label>  
 								</div>
 							</div>
-							<div class="col-lg-4">
+							<div class="col-lg-6">
 								<div class="sun_input">
 									<input id="price" name="price" type="text" class="form-control input-md" placeholder="<?php echo $wo['lang']['price'] ?>" value="">
 									<label for="price"><?php echo $wo['lang']['price'] ?></label>  
 								</div>
 							</div>
-							<div class="col-lg-4">
+							<div class="col-lg-6">
 								<div class="sun_input">
 									<select class="form-control" name="type" id="type">
 										<option value="0"><?php echo $wo['lang']['new'] ?></option>

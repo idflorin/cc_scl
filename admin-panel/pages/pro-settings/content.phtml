@@ -138,7 +138,7 @@
                                 <?php if (!empty($wo['pro_packages']['ultima']['image'])) { ?>
                                     <img src="<?php echo($wo['pro_packages']['ultima']['image']) ?>" class="pro_packages_icon_inline">
                                    <?php }else{ ?>
-                                    <i class="fa fa-fire fa-fw"></i> 
+                                    <i class="fa fa-bolt fa-fw"></i> 
                                    <?php } ?>
                                    &nbsp;<?php echo $wo['lang']['ultima']?>
                                </td>
@@ -154,7 +154,7 @@
                                 <?php if (!empty($wo['pro_packages']['vip']['image'])) { ?>
                                     <img src="<?php echo($wo['pro_packages']['vip']['image']) ?>" class="pro_packages_icon_inline">
                                    <?php }else{ ?>
-                                    <i class="fa fa-fire fa-fw"></i> 
+                                    <i class="fa fa-rocket fa-fw"></i> 
                                    <?php } ?>
                                    &nbsp;<?php echo $wo['lang']['vip']?>
                                </td>
@@ -175,8 +175,10 @@
     <!-- #END# Vertical Layout -->
 <script>
 function ShowEditPro(self) {
+    $(self).text('Please wait ..');
     type = $(self).attr('data_pro_type');
     $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=get_pro', {type: type}, function(data, textStatus, xhr) {
+        $(self).text('EDIT');
         if (data.status == 200) {
             $('#pro_form_data').html(data.html);
             $('#proModal').modal('show');
@@ -192,9 +194,12 @@ $(function() {
             form_pro.find('.waves-effect').text('Please wait..');
         },
         success: function(data) {
+            $('#proModal').animate({
+                scrollTop : 0                       // Scroll to top of body
+            }, 500);
+            $('#save_pro_btn').text('SAVE CHANGES');
             if (data.status == 200) {
                 form_pro.find('.waves-effect').text('Save');
-                $("html, body").animate({ scrollTop: 0 }, "slow");
                 $('#proModalAlert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('#proModalAlert').empty();
@@ -229,16 +234,21 @@ $(function() {
             $('.btn-save').text('Please wait..');
         },
         success: function(data) {
-            if (data.status == 200) {
-                $('.btn-save').text('SAVE CHANGES');
-                var value_to_use = $('[data-editable=1]').val();
-                var id_of_key = $('#id_of_key').val();
-                $('#edit_' + id_of_key).text(value_to_use);
-                $('#defaultModal').modal('hide');
-                setTimeout(function () {
-                    location.reload();
-                },1000);
-            }
+            $('#defaultModal').animate({
+                scrollTop : 0                       // Scroll to top of body
+            }, 10);
+            setTimeout(function () {
+                if (data.status == 200) {
+                    $('.btn-save').text('SAVE CHANGES');
+                    var value_to_use = $('[data-editable=1]').val();
+                    var id_of_key = $('#id_of_key').val();
+                    $('#edit_' + id_of_key).text(value_to_use);
+                    $('#defaultModal').modal('hide');
+                    setTimeout(function () {
+                        location.reload();
+                    },1000);
+                }
+            },300);
         }
     });
    var form_site_settings = $('form.pro-settings');
@@ -259,7 +269,8 @@ $(function() {
         }
     });
 });
-function Wo_SubmitProForm() {
+function Wo_SubmitProForm(self) {
+    $('#save_pro_btn').text('Please wait..');
     $('.proModalForm').submit();
 }
 function Wo_SubmitLangForm() {
@@ -280,7 +291,7 @@ function Wo_SubmitLangForm() {
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" onclick="Wo_SubmitProForm();" class="btn-save btn btn-link waves-effect">SAVE CHANGES</button>
+                <button type="submit" onclick="Wo_SubmitProForm(this);" class="btn-save btn btn-link waves-effect" id="save_pro_btn">SAVE CHANGES</button>
                 <button type="button" class="btn btn-link" data-dismiss="modal">CLOSE</button>
             </div>
         </div>

@@ -23,16 +23,16 @@
 			</div>
 			<div class="sun_input col-lg-6">
 				<input name="email" id="email" type="email" class="form-control input-md" value="<?php echo $wo['setting']['email']?>" autocomplete="off" placeholder="<?php echo $wo['lang']['email']; ?>">
-				<?php if (($wo['config']['sms_or_email'] == 'mail') && !empty($wo['user']['new_email']) && $wo['config']['emailValidation'] == 1) { ?>
-						<small class="unverify_color"><?php echo ($wo['user']['new_email']); ?>(<?php echo ($wo['lang']['unverified']); ?>)</small>
+				<?php if (($wo['config']['sms_or_email'] == 'mail') && !empty($wo['setting']['new_email']) && $wo['config']['emailValidation'] == 1) { ?>
+						<small class="unverify_color"><?php echo ($wo['setting']['new_email']); ?>(<?php echo ($wo['lang']['unverified']); ?>)</small>
 					<?php } ?>
 				<label class="plr15" for="email"><?php echo $wo['lang']['email']; ?></label>  
 			</div>
 			<div class="clear"></div>
 			<div class="sun_input col-lg-6">
 				<input name="phone_number" id="phone_number" type="phone_number" class="form-control input-md" value="<?php echo $wo['setting']['phone_number']?>" autocomplete="off" placeholder="<?php echo $wo['lang']['phone_number']; ?>">
-				<?php if (($wo['config']['sms_or_email'] == 'sms') && !empty($wo['user']['new_phone']) && $wo['config']['emailValidation'] == 1) { ?>
-						<small class="unverify_color"><?php echo ($wo['user']['new_phone']); ?>(<?php echo ($wo['lang']['unverified']); ?>)</small>
+				<?php if (($wo['config']['sms_or_email'] == 'sms') && !empty($wo['setting']['new_phone']) && $wo['config']['emailValidation'] == 1) { ?>
+						<small class="unverify_color"><?php echo ($wo['setting']['new_phone']); ?>(<?php echo ($wo['lang']['unverified']); ?>)</small>
 					<?php } ?>
 				<label class="plr15" for="phone_number"><?php echo $wo['lang']['phone_number']; ?></label>  
 			</div>

@@ -560,7 +560,7 @@ if ($f == 'login') {
     $phone = 0;
     if (isset($_POST['username']) && isset($_POST['password'])) {
         $username = Wo_Secure($_POST['username']);
-        $password = Wo_Secure($_POST['password']);
+        $password = $_POST['password'];
         $result   = Wo_Login($username, $password);
         if ($result === false) {
             $errors[] = $error_icon . $wo['lang']['incorrect_username_or_password_label'];
@@ -718,7 +718,7 @@ if ($f == 'register') {
         $re_data  = array(
             'email' => Wo_Secure($_POST['email'], 0),
             'username' => Wo_Secure($_POST['username'], 0),
-            'password' => Wo_Secure($_POST['password'], 0),
+            'password' => $_POST['password'],
             'email_code' => Wo_Secure($code, 0),
             'src' => 'site',
             'gender' => Wo_Secure($gender),
@@ -1720,46 +1720,48 @@ if ($f == "update_general_settings") {
                     }
                 }
                 if (empty($errors)) {
-                    $code = rand(111111, 999999);
-                    $hash_code = md5($code);
-                    $message = "Your confirmation code is: $code";
                     $save = true;
+                    if (!Wo_IsAdmin()) {
+                        $code = rand(111111, 999999);
+                        $hash_code = md5($code);
+                        $message = "Your confirmation code is: $code";
 
-                    if ($_POST['email'] != $wo['user']['email'] && $wo['config']['sms_or_email'] == 'mail' && $wo['config']['emailValidation'] == 1) {
-                        $send_message_data       = array(
-                            'from_email' => $wo['config']['siteEmail'],
-                            'from_name' => $wo['config']['siteName'],
-                            'to_email' => $_POST['email'],
-                            'to_name' => $wo['user']['name'],
-                            'subject' => 'Please verify that it’s you',
-                            'charSet' => 'utf-8',
-                            'message_body' => $message,
-                            'is_html' => true
-                        );
-                        $send = Wo_SendMessage($send_message_data);
-                        if ($send) {
-                            $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
-                                                                                                                 'new_email'      => Wo_Secure($_POST['email'])));
-                            $save = false;
-                            $data['type'] = 'email';
-                            $data['status'] = 200;
-                        }
-                    }
-                    elseif (!empty($_POST['phone_number']) && $_POST['phone_number'] != $wo['user']['phone_number'] && $wo['config']['sms_or_email'] == 'sms' && $wo['config']['emailValidation'] == 1) {
-                        preg_match_all('/\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|
-                                2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|
-                                4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/', $_POST['phone_number'], $matches);
-                        if (empty($matches[1][0]) && empty($matches[0][0])) {
-                            $errors[] = $error_icon . $wo['lang']['phone_number_error'];
-                        }
-                        else{
-                            $send = Wo_SendSMSMessage($_POST['phone_number'], $message);
+                        if ($_POST['email'] != $wo['user']['email'] && $wo['config']['sms_or_email'] == 'mail' && $wo['config']['emailValidation'] == 1) {
+                            $send_message_data       = array(
+                                'from_email' => $wo['config']['siteEmail'],
+                                'from_name' => $wo['config']['siteName'],
+                                'to_email' => $_POST['email'],
+                                'to_name' => $wo['user']['name'],
+                                'subject' => 'Please verify that it’s you',
+                                'charSet' => 'utf-8',
+                                'message_body' => $message,
+                                'is_html' => true
+                            );
+                            $send = Wo_SendMessage($send_message_data);
                             if ($send) {
                                 $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
-                                                                                                                     'new_phone' => Wo_Secure($_POST['phone_number'])));
+                                                                                                                     'new_email'      => Wo_Secure($_POST['email'])));
                                 $save = false;
-                                $data['type'] = 'phone';
+                                $data['type'] = 'email';
                                 $data['status'] = 200;
+                            }
+                        }
+                        elseif (!empty($_POST['phone_number']) && $_POST['phone_number'] != $wo['user']['phone_number'] && $wo['config']['sms_or_email'] == 'sms' && $wo['config']['emailValidation'] == 1) {
+                            preg_match_all('/\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|
+                                    2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|
+                                    4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/', $_POST['phone_number'], $matches);
+                            if (empty($matches[1][0]) && empty($matches[0][0])) {
+                                $errors[] = $error_icon . $wo['lang']['phone_number_error'];
+                            }
+                            else{
+                                $send = Wo_SendSMSMessage($_POST['phone_number'], $message);
+                                if ($send) {
+                                    $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
+                                                                                                                         'new_phone' => Wo_Secure($_POST['phone_number'])));
+                                    $save = false;
+                                    $data['type'] = 'phone';
+                                    $data['status'] = 200;
+                                }
                             }
                         }
                     }
@@ -2860,20 +2862,42 @@ if ($f == 'get_messages') {
         );
 
         $messages = Wo_GetMessagesUsers($wo['user']['user_id'], '', 5);
+        
         $groups_messages = Wo_GetGroupsListAPP(array('limit' => 5));
         if (!empty($messages) || !empty($groups_messages)) {
+            $messages_count = 0;
             if (!empty($messages) && !empty($groups_messages) && (count($messages) >= count($groups_messages))) {
                 foreach ($messages as $key => $wo['message']) {
                     $message = Wo_GetMessagesHeader(array('user_id' => $wo['message']['user_id']), 1);
-                    foreach ($groups_messages as $group_key => $group_value) {
-                        if ($message['time'] < $group_value['time']) {
-                                $wo['group'] = $groups_messages[$group_key];
-                                $data['html'] .= Wo_LoadPage('header/group_messages');
-                                unset($groups_messages[$group_key]);
+                    if (!empty($message)) {
+                        foreach ($groups_messages as $group_key => $group_value) {
+                            if ($message['time'] < $group_value['time']) {
+                                    $wo['group'] = $groups_messages[$group_key];
+                                    if (!empty($wo['group']['last_message']) && $messages_count < 5) {
+                                        $data['html'] .= Wo_LoadPage('header/group_messages');
+                                        $messages_count = $messages_count + 1;
+                                        unset($groups_messages[$group_key]);
+                                    }
+                            }
+                        }
+                        if ($messages_count < 5 && !empty($message['messageUser'])) {
+                            $data['html'] .= Wo_LoadPage('header/messages'); 
+                            $messages_count = $messages_count + 1;
                         }
                     }
-                    $data['html'] .= Wo_LoadPage('header/messages'); 
                 }
+                if ($messages_count < 5 && !empty($groups_messages)) {
+                    foreach ($groups_messages as $group_key => $group_value) {
+                        $wo['group'] = $groups_messages[$group_key];
+                        if (!empty($wo['group']['last_message']) && $messages_count < 5) {
+                            $data['html'] .= Wo_LoadPage('header/group_messages');
+                            $messages_count = $messages_count + 1;
+                            unset($groups_messages[$group_key]);
+                        }
+                    }
+                }
+
+
             }
             elseif (!empty($messages) && !empty($groups_messages) && (count($messages) < count($groups_messages))) {
                 foreach ($groups_messages as $key => $wo['group']) {
@@ -2881,21 +2905,43 @@ if ($f == 'get_messages') {
                         $message = Wo_GetMessagesHeader(array('user_id' => $messages_value['user_id']), 1);
                         if ($message['time'] > $wo['group']['time']) {
                                 $wo['message'] = $messages[$messages_key];
-                                $data['html'] .= Wo_LoadPage('header/messages');
-                                unset($messages[$messages_key]);
+                                if ($messages_count < 5 && !empty($message['messageUser'])) {
+                                    $data['html'] .= Wo_LoadPage('header/messages'); 
+                                    $messages_count = $messages_count + 1;
+                                    unset($messages[$messages_key]);
+                                }
                         }
                     }
-                    $data['html'] .= Wo_LoadPage('header/group_messages');
+                    if (!empty($wo['group']['last_message']) && $messages_count < 5) {
+                        $data['html'] .= Wo_LoadPage('header/group_messages');
+                        $messages_count = $messages_count + 1;
+                    }
+                }
+                if ($messages_count < 5 && !empty($messages)) {
+                    foreach ($messages as $messages_key => $messages_value) {
+                        $message = Wo_GetMessagesHeader(array('user_id' => $messages_value['user_id']), 1);
+                        $wo['message'] = $messages[$messages_key];
+                        if ($messages_count < 5 && !empty($message['messageUser'])) {
+                            $data['html'] .= Wo_LoadPage('header/messages'); 
+                            $messages_count = $messages_count + 1;
+                            unset($messages[$messages_key]);
+                        }
+                    }
                 }
             }
             elseif (!empty($messages) && empty($groups_messages)) {
                 foreach ($messages as $key => $wo['message']) {
-                    $data['html'] .= Wo_LoadPage('header/messages');
+                    $message = Wo_GetMessagesHeader(array('user_id' => $wo['message']['user_id']), 1);
+                    if (!empty($message['messageUser'])) {
+                        $data['html'] .= Wo_LoadPage('header/messages');
+                    }
                 }
             }
             elseif (empty($messages) && !empty($groups_messages)) {
                 foreach ($groups_messages as $key => $wo['group']) {
-                    $data['html'] .= Wo_LoadPage('header/group_messages');
+                    if (!empty($wo['group']['last_message'])) {
+                        $data['html'] .= Wo_LoadPage('header/group_messages');
+                    }
                 }
             }
         }else {
@@ -7620,6 +7666,10 @@ if ($f == 'chat') {
         exit();
     }
     if ($s == 'is_chat_on') {
+        $data = array(
+                'url' => Wo_SeoLink('index.php?link1=messages'),
+                'chat' => $wo['config']['chatSystem']
+            );
         if (!empty($_GET['recipient_id'])) {
             $data = array(
                 'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id']),

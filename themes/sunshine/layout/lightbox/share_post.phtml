@@ -44,13 +44,13 @@
 						</a>
 					<?php endif;?>
 				</div>
-				<?php if (empty($wo['story']['parent_id']) && empty($wo['story']['shared_from']) && $wo['story']['postPrivacy'] == 0 && empty($wo['story']['album_name'])): ?>
+				<?php if (empty($wo['story']['parent_id']) && empty($wo['story']['shared_from']) && $wo['story']['postPrivacy'] == 0): ?>
 				<div class="select_radio_btn small_rbtn share_modal_opts_icos">
 					<h4><?php echo $wo['lang']['share_new_post']?></h4>
 					<div class="select_radio_btn_innr">
-						<?php if ($wo['story']['admin'] != true) { ?>
+						<?php //if ($wo['story']['admin'] != true) { ?>
 
-						<?php if ((!empty($wo['story']['page_id']) || !empty($wo['story']['group_id'])) || (empty($wo['story']['page_id']) && empty($wo['story']['group_id'])) ) { ?>
+						<?php if ((!empty($wo['story']['page_id']) || !empty($wo['story']['group_id'])) || (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && !$wo['story']['admin']) ) { ?>
 						<label>
 							<input type="radio" name="share_type_select" id="share_type_select" value="timeline" checked>
 							<div class="sr_btn_lab_innr">
@@ -61,10 +61,10 @@
 							</div>
 						</label>
 						<?php } ?>
-						<?php } ?>
+						<?php //} ?>
 
 						<?php if (!empty($wo['story']['page_id']) || !empty($wo['story']['group_id']) ) { ?>
-						<label>
+						<!-- <label>
 							<input type="radio" name="share_type_select" id="share_type_select" value="user">
 							<div class="sr_btn_lab_innr">
 								<div class="sr_btn_img">
@@ -72,7 +72,7 @@
 								</div>
 								<span><?php echo $wo['lang']['user'];?></span>
 							</div>
-						</label>
+						</label> -->
 						<?php } ?>
 						<?php if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) ) { ?>
 						<label>

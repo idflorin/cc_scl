@@ -630,7 +630,7 @@ function Wo_RegisterUser($registration_data, $invited = false) {
     }
     $registration_data['registered'] = date('n') . '/' . date("Y");
     $registration_data['joined']     = time();
-    $registration_data['password']   = sha1($registration_data['password']);
+    $registration_data['password']   = Wo_Secure(sha1($registration_data['password']));
     $registration_data['ip_address'] = Wo_Secure($ip);
     $registration_data['language']   = $wo['config']['defualtLang'];
     if (!empty($_SESSION['lang'])) {
@@ -6749,7 +6749,7 @@ function Wo_UpdatePost($data = array()) {
     $post_text = Wo_Secure($data['text']);
     $user_id   = Wo_Secure($wo['user']['user_id']);
     $post_id   = Wo_Secure($data['post_id']);
-    if (Wo_IsPostOnwer($post_id, $user_id) === false || Wo_IsPostShared($post_id)) {
+    if (Wo_IsPostOnwer($post_id, $user_id) === false) {
         return false;
     }
     if (!empty($post_text)) {

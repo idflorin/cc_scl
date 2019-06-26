@@ -98,7 +98,6 @@ if (empty($error_code)) {
                     );
                 }
             } else {
-                $user_id             = Wo_UserIdFromUsername($username);
                 $wo['user']        = $_POST;
                 $wo['code']        = $code;
                 $body              = Wo_LoadPage('emails/activate');
@@ -116,8 +115,7 @@ if (empty($error_code)) {
                 if ($send) {
                     $response_data = array(
                         'api_status' => 220,
-                        'message' => 'Registration successful! We have sent you an email, Please check your inbox/spam to verify your email.',
-                        'user_id' => $user_id
+                        'message' => 'Registration successful! We have sent you an email, Please check your inbox/spam to verify your email.'
                     );
                 } else {
                     $error_code    = 11;

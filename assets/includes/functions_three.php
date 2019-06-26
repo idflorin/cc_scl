@@ -3017,6 +3017,7 @@ function Wo_EventData($id = false) {
         $fetched_data['cover']      = Wo_GetMedia($fetched_data['cover']);
         $fetched_data['is_owner']   = Is_EventOwner($fetched_data['id']);
         //$fetched_data['start_date'] = date($fetched_data['start_date']);
+        $fetched_data['start_edit_date'] = date($fetched_data['start_date']);
         $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
         $fetched_data['end_edit_date'] = date($fetched_data['end_date']);
         $fetched_data['end_date']   = date($wo['config']['date_style'], strtotime($fetched_data['end_date']));
@@ -4867,7 +4868,7 @@ function Wo_GetChatGroups($after_id = false) {
     }
     $sql   = "SELECT * FROM " . T_GROUP_CHAT . " 
                 WHERE (`user_id` = {$user} OR `group_id` IN 
-                   (SELECT `group_id` FROM Wo_GroupChatUsers  WHERE `user_id` = {$user})) {$sub_sql}";
+                   (SELECT `group_id` FROM Wo_GroupChatUsers  WHERE `user_id` = {$user})) {$sub_sql} ORDER BY `time` DESC";
     $query = mysqli_query($sqlConnect, $sql);
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $fetched_data['user_data']    = Wo_UserData($fetched_data['user_id']);
@@ -5997,11 +5998,21 @@ function Wo_SharePostOn($id = false,$type_id,$type) {
         $post_data['boosted']     = 0;
         $post_data['time']        = time();
         $post_data['postText']    = '';
+        $post_data['comments_status']    = 1;
         $fields                   = '`' . implode('`, `', array_keys($post_data)) . '`';
         $data                     = '\'' . implode('\', \'', $post_data) . '\'';
         $sql                      = "INSERT INTO " . T_POSTS . " ({$fields}) VALUES ({$data})";
         $query1                   = mysqli_query($sqlConnect, $sql);
         $last                     = mysqli_insert_id($sqlConnect);
+        if (!empty($post_data['album_name'])) {
+            $query = mysqli_query($sqlConnect,"SELECT `id`,`image`,`post_id` FROM " . T_ALBUMS_MEDIA . " WHERE `post_id` = {$id} ORDER BY `id` DESC");
+            if ($query) {
+                while ($fetched_data = mysqli_fetch_assoc($query)) {
+                    $media = $fetched_data['image'];
+                    mysqli_query($sqlConnect, "INSERT INTO " . T_ALBUMS_MEDIA . " (`post_id`,`image`) VALUES ({$last}, '{$media}')");
+                }
+            } 
+        }
         $query2                   = mysqli_query($sqlConnect, "UPDATE " . T_POSTS . " SET `post_id` = {$last} WHERE `id` = {$last}");
         if ($query1 && $query2) {
             return $last;
