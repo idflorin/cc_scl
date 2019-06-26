@@ -3290,9 +3290,9 @@ function Wo_GetCommentReply($reply_id = 0) {
         $fetched_data['publisher'] = Wo_UserData($fetched_data['user_id']);
         $fetched_data['url']       = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['publisher']['username']);
     }
-    $fetched_data['Orginaltext']         = Wo_EditMarkup($fetched_data['text']);
+    $fetched_data['Orginaltext']         = Wo_EditMarkup($fetched_data['text'],true,true,true,0,0,$reply_id);
     $fetched_data['Orginaltext']         = str_replace('<br>', "\n", $fetched_data['Orginaltext']);
-    $fetched_data['text']                = Wo_Markup($fetched_data['text']);
+    $fetched_data['text']                = Wo_Markup($fetched_data['text'],true,true,true,0,0,$reply_id);
     $fetched_data['text']                = Wo_Emo($fetched_data['text']);
     $fetched_data['onwer']               = false;
     $fetched_data['post_onwer']          = false;
@@ -4317,7 +4317,7 @@ function Wo_SendSMSMessage($to, $message) {
     if (empty($to)) {
         return false;
     }
-    if ($wo['config']['sms_provider'] == 'twilio') {
+    if ($wo['config']['sms_provider'] == 'twilio' && !empty($wo['config']['sms_twilio_username']) && !empty($wo['config']['sms_twilio_password']) && !empty($wo['config']['sms_t_phone_number'])) {
         include_once('assets/libraries/twilio/vendor/autoload.php');
         $account_sid = $wo['config']['sms_twilio_username'];
         $auth_token  = $wo['config']['sms_twilio_password'];
@@ -4333,10 +4333,10 @@ function Wo_SendSMSMessage($to, $message) {
             }
         }
         catch (Exception $e) {
-            return $e->getMessage();
+            return false;
         }
         return false;
-    } else if ($wo['config']['sms_provider'] == 'infobip') {
+    } else if ($wo['config']['sms_provider'] == 'infobip' && !empty($wo['config']['infobip_username']) && !empty($wo['config']['infobip_password'])) {
         $username = $wo['config']['infobip_username'];
         $password  = $wo['config']['infobip_password'];
         $to          = Wo_Secure($to);
@@ -4376,10 +4376,10 @@ function Wo_SendSMSMessage($to, $message) {
             }
         }
         catch (Exception $e) {
-            return $e->getMessage();
+            return false;
         }
         return false;
-    } else if ($wo['config']['sms_provider'] == 'bulksms') {
+    } else if ($wo['config']['sms_provider'] == 'bulksms' && !empty($wo['config']['sms_username']) && !empty($wo['config']['sms_password'])) {
         $username = $wo['config']['sms_username'];
         $password = $wo['config']['sms_password'];
         if (empty($to)) {
@@ -4873,7 +4873,7 @@ function Wo_GetProPackages() {
         );
     }
     if ($wo['pro_packages']['vip']['status'] == 1) {
-        $data['ultima'] = array(
+        $data['vip'] = array(
             'id' => 4,
             'name' => $vip_member
         );

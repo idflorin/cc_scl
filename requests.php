@@ -41,7 +41,8 @@ $allow_array = array(
     'paypro_with_bitcoin',
     'upload-blog-image',
     'wallet',
-    'download_user_info'
+    'download_user_info',
+    'movies'
 );
 if (!in_array($f, $allow_array)) {
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
@@ -623,7 +624,7 @@ if ($f == 'login') {
 }
 if ($f == 'register') {
     $fields = Wo_GetWelcomeFileds();
-    if (empty($_POST['email']) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
+    if (empty($_POST['email']) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['confirm_password']) || empty($_POST['gender'])) {
         $errors = $error_icon . $wo['lang']['please_check_details'];
     } else {
         $is_exist = Wo_IsNameExist($_POST['username'], 0);
@@ -1243,8 +1244,10 @@ if ($f == "load-recent-blogs") {
     echo json_encode($data);
     exit();
 }
-if ($wo['loggedin'] == false && $s != 'load_more_posts') {
-    exit("Please login or signup to continue.");
+if ($wo['loggedin'] == false && ($s != 'load_more_posts')) {
+    if ($s != 'load-comments') {
+        exit("Please login or signup to continue.");
+    }
 }
 if ($f == "get_more_following") {
     $html = '';
@@ -9268,7 +9271,9 @@ if ($f == 'send_mails') {
 }
 if ($f == 're_cover') {
    if (isset($_POST['pos'])) {
-       if (($_POST['cover_image'] != $wo['userDefaultCover']) && ($_POST['cover_image'] == $wo['user']['cover_org'] || Wo_IsAdmin())) {
+       if (($_POST['cover_image'] != $wo['userDefaultCover']) &&
+       ($_POST['cover_image'] == $wo['user']['cover_org'] || Wo_IsAdmin()) &&
+       (Wo_GetMedia($wo['user']['cover_full']) == $_POST['real_image']) || Wo_IsAdmin()) {
            $from_top             = abs($_POST['pos']);
            $cover_image          = $_POST['cover_image'];
            $full_url_image       = Wo_GetMedia($_POST['cover_image']);
@@ -9566,14 +9571,59 @@ if ($f == 'stripe_payment') {
         header("Location: " . Wo_SeoLink('index.php?link1=oops'));
         exit();
     }
+
     $token = $_POST['stripeToken'];
     try {
+
+        $pro_types_array = array(
+                    1,
+                    2,
+                    3,
+                    4
+                );
+        $pro_type        = 0;
+        if (!isset($_GET['pro_type']) || !in_array($_GET['pro_type'], $pro_types_array)) {
+            $data = array(
+                'status' => 200,
+                'error' => 'Pro type is not set'
+            );
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+        $pro_type = $_GET['pro_type'];
+        $amount1 = 0;
+        if ($pro_type == 1) {
+            $img     = $wo['lang']['star'];
+            $amount1 = $wo['pro_packages']['star']['price'];
+        } else if ($pro_type == 2) {
+            $img     = $wo['lang']['hot'];
+            $amount1 = $wo['pro_packages']['hot']['price'];
+        } else if ($pro_type == 3) {
+            $img     = $wo['lang']['ultima'];
+            $amount1 = $wo['pro_packages']['ultima']['price'];
+        } else if ($pro_type == 4) {
+            $img     = $wo['lang']['vip'];
+            $amount1 = $wo['pro_packages']['vip']['price'];
+        }
+        $amount1 = $amount1 . '00';
+
+        if ($_POST['amount'] != $amount1) {
+           $data = array(
+                        'status' => 200,
+                        'location' => Wo_SeoLink('index.php?link1=oops')
+                    );
+                    header("Content-type: application/json");
+                    echo json_encode($data);
+                    exit();
+        }
+
         $customer = \Stripe\Customer::create(array(
             'source' => $token
         ));
         $charge   = \Stripe\Charge::create(array(
             'customer' => $customer->id,
-            'amount' => $_POST['amount'],
+            'amount' => $amount1,
             'currency' => 'usd'
         ));
         if ($charge) {
@@ -10882,9 +10932,9 @@ if ($f == 'request_payment') {
             } else if (!is_numeric($_POST['amount'])) {
                 $errors[] = $error_icon . $wo['lang']['invalid_amount_value'];
             } else if (($wo['user']['balance'] < $_POST['amount'])) {
-                $errors[] = $error_icon . $wo['lang']['invalid_amount_value_your'] . ' $' . $wo['user']['balance'];
+                $errors[] = $error_icon . $wo['lang']['invalid_amount_value_your'] . ''.Wo_GetCurrency($wo['config']['ads_currency']) . $wo['user']['balance'];
             } else if ($wo['config']['m_withdrawal'] > $_POST['amount']) {
-                $errors[] = $error_icon . $wo['lang']['invalid_amount_value_withdrawal'] . ' $' . $wo['config']['m_withdrawal'];
+                $errors[] = $error_icon . $wo['lang']['invalid_amount_value_withdrawal'] . ' '.Wo_GetCurrency($wo['config']['ads_currency']) . $wo['config']['m_withdrawal'];
             }
             if (empty($errors)) {
                 $userU          = Wo_UpdateUserData($wo['user']['user_id'], array(
@@ -13856,6 +13906,40 @@ if ($f == 'search-blog') {
             foreach ($pages as $key => $wo['article']) {
                 $wo['article']['first'] = ($key == 0) ? true : false;
                 $html .= Wo_LoadPage('blog/includes/card-list');
+            }
+            if (!empty($html)) {
+                $data['status'] = 200;
+                $data['html']   = $html;
+            }
+        } else {
+            $data = array(
+                'status' => 400,
+                'message' => $wo['lang']['no_blogs_found']
+            );
+        }
+    }
+    header("Content-type: application/json");
+    echo json_encode($data);
+    exit();
+}
+if ($f == 'search-blog-read') {
+    $html = '';
+    if (empty($_POST['keyword'])) {
+        $data['status'] = 200;
+        $data['html']   = $html;
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if (isset($_POST['keyword'])) {
+        $pages = Wo_GetBlogs(array(
+            "limit" => 20,
+            'keyword' => $_POST['keyword']
+        ));
+        if (count($pages) > 0) {
+            foreach ($pages as $key => $wo['blog-style']) {
+                $wo['blog-style']['first'] = ($key == 0) ? true : false;
+                $html .= Wo_LoadPage('blog/blog-popular');
             }
             if (!empty($html)) {
                 $data['status'] = 200;

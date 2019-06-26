@@ -14,7 +14,7 @@ if ($wo['loggedin'] == true) {
     	$is_option_voted = Wo_IsOptionVoted($value['id'], $wo['user']['user_id']);
     } 
 	?>
-	<div id="option-<?php echo $value['id']?>" class="wo_votes <?php echo ($is_option_voted) ? 'active':'';?>" onclick="Wo_VoteUp(<?php echo $value['id']?>);" data-post-id="<?php echo $wo['story']['id'];?>">
+	<div id="option-<?php echo $value['id']?>" class="wo_votes <?php echo ($is_option_voted) ? 'active':'';?>" onclick="Wo_VoteUp(<?php echo $value['id']?>);" data-post-id="<?php echo $wo['current_post']['id'];?>">
 		<div class="poll-option">
 			<div class="bold <?php echo Wo_RightToLeft('pull-left');?>">
 				<?php echo $value['text'];?>

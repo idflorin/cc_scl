@@ -45,7 +45,7 @@ if (in_array($_SERVER["REMOTE_ADDR"], $baned_ips)) {
 $config              = Wo_GetConfig();
 $db                  = new MysqliDb($sqlConnect);
 
-if( ISSET( $_GET['theme'] ) ){
+if( ISSET( $_GET['theme'] ) && in_array($_GET['theme'], ['default', 'sunshine'])){
     $_SESSION['theme'] = $_GET['theme'];
 }
 
@@ -162,7 +162,7 @@ $wo['site_pages'] = array(
     'authorize'
 );
 
-$wo['script_version']  = '2.2.1';
+$wo['script_version']  = '2.2.2';
 $http_header           = 'http://';
 if (!empty($_SERVER['HTTPS'])) {
     $http_header = 'https://';
@@ -769,4 +769,8 @@ try {
     $wo['group_categories']   = [];
     $wo['blog_categories']   = [];
     $wo['products_categories']   = [];
+}
+
+if (!empty($_GET['theme'])) {
+    Wo_CleanCache();
 }

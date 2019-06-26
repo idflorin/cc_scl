@@ -825,7 +825,7 @@ table tr {outline: 0;}
 .sun_pub_mid_foot {margin: 0 10px;border-top: 1px solid #e8e8e8;padding: 8px 3px;display: flex;align-items: center;}
 .sun_pub_mid_foot .poster-left-buttons {margin-right: 7px;display: flex;max-width: calc((493.5px - 75px) / 3);}
 .sun_pub_mid_foot .poster-left-buttons:last-child {margin: 0;}
-.sun_pub_mid_foot .poster-left-buttons .btn {padding: 0 9px;border-radius: 2em;height: 32px;transition: all 0.15s;font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;font-weight: 500;font-size: 13px;text-overflow: ellipsis;white-space: nowrap;line-height: 28px;background: #f3f3f3;}
+.sun_pub_mid_foot .poster-left-buttons .btn {padding: 0 7px;border-radius: 2em;height: 32px;transition: all 0.15s;font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;font-weight: 500;font-size: 13px;text-overflow: ellipsis;white-space: nowrap;line-height: 28px;background: #f3f3f3;}
 .sun_pub_mid_foot .poster-left-buttons .btn:hover {color: #222;}
 .sun_pub_mid_foot .poster-left-buttons .btn svg {width: 21px;height: 21px;margin-right: 1px;margin-top: -2px;}
 .sun_pub_mid_foot .poster-left-buttons .btn img {width: 20px;height: 20px;margin-right: 1px;margin-top: -1px;border-radius: 3px;object-fit: cover;}

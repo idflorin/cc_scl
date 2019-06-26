@@ -36,7 +36,7 @@ a,button{outline:0!important}
 .active-player {
 	max-height: 100% !important;
 }
-iframe, .post-map img {border:1px solid #ededed;border-radius:3px;}
+iframe, .post-map img {border:none;border-radius:3px;}
 .post-shared,.post-likes,.post-wonders, .post-reacted{display:none;overflow:auto;max-height:300px}
 .comment-text,.reply-text{font-size:13px;color:#777;overflow:hidden;width:85%;word-wrap:break-word}
 .comment-edit input,.comment-reply input{font-size:13px;margin-top:10px;height:30px;border-radius:3px}

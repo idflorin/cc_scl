@@ -66,6 +66,9 @@ function Wo_RegisterPoint($post_id, $type, $action = '+'){
         case "createpost":
             $points = $wo['config']['createpost_point'];
             break;
+        case "createblog":
+            $points = $wo['config']['createblog_point'];
+            break;
         case "blog_comment":
             $query_comments     = "SELECT `id` FROM `" . T_BLOG_COMM . "` WHERE `id` = ".$post_id." AND `user_id` = ".$user_id;
             $sql_query_comments = mysqli_query($sqlConnect, $query_comments);
@@ -3160,9 +3163,9 @@ function Wo_AddBlogCommentDisLikes($id, $blog) {
 }
 function Wo_GetMovies($args = array()) {
     global $sqlConnect, $wo;
-    if ($wo['loggedin'] == false) {
-        return false;
-    }
+    // if ($wo['loggedin'] == false) {
+    //     return false;
+    // }
     $options = array(
         "offset" => 0,
         "limit" => 26,
@@ -3257,9 +3260,9 @@ function Wo_GetMtwFilms($limit = 26) {
 }
 function Wo_SearchFilms($key) {
     global $sqlConnect, $wo;
-    if ($wo['loggedin'] == false || !$key) {
-        return false;
-    }
+    // if ($wo['loggedin'] == false || !$key) {
+    //     return false;
+    // }
     $data  = array();
     $key   = Wo_Secure($key);
     $sql   = "SELECT  *  FROM 
@@ -3424,7 +3427,7 @@ function Wo_IsMovieCommReplyOwner($id) {
 }
 function Wo_GetMovieCommentData($id) {
     global $sqlConnect, $wo;
-    if ($wo['loggedin'] == false || !$id || !is_numeric($id) || $id < 1) {
+    if (!$id || !is_numeric($id) || $id < 1) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_MOVIE_COMMS . " WHERE `id` = '$id'");
@@ -3444,7 +3447,7 @@ function Wo_GetMovieCommentData($id) {
 }
 function Wo_GetMovieCommReplyData($id) {
     global $sqlConnect, $wo;
-    if ($wo['loggedin'] == false || !$id || !is_numeric($id) || $id < 1) {
+    if (!$id || !is_numeric($id) || $id < 1) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_MOVIE_COMM_REPLIES . " WHERE `id` = '$id'");

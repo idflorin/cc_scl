@@ -1102,7 +1102,7 @@ function Wo_UploadImage($file, $name, $type, $type_file, $user_id = 0, $placemen
                         'postFile' => Wo_Secure($last_file, 0),
                         'time' => time(),
                         'postType' => Wo_Secure('profile_cover_picture'),
-                        'postPrivacy' => '2'
+                        'postPrivacy' => '0'
                     ));
                 }
             }
@@ -1149,7 +1149,7 @@ function Wo_UploadImage($file, $name, $type, $type_file, $user_id = 0, $placemen
                             'postFile' => Wo_Secure($last_file, 0),
                             'time' => time(),
                             'postType' => Wo_Secure('profile_picture'),
-                            'postPrivacy' => '2'
+                            'postPrivacy' => '0'
                         ));
                         Wo_Resize_Crop_Image($wo['profile_picture_width_crop'], $wo['profile_picture_height_crop'], $filename, $filename, $wo['profile_picture_image_quality']);
                         $upload_s3 = Wo_UploadToS3($filename);
@@ -3255,7 +3255,32 @@ function Wo_GetMessageButton($user_id = 0) {
         return false;
     }
 }
-function Wo_MarkupAPI($text, $link = true, $hashtag = true, $mention = true) {
+function Wo_MarkupAPI($text, $link = true, $hashtag = true, $mention = true,$post_id = 0) {
+    global $sqlConnect;
+    if ($mention == true) {
+        $Orginaltext = $text;
+        $mention_regex = '/@\[([0-9]+)\]/i';
+        if (preg_match_all($mention_regex, $text, $matches)) {
+            foreach ($matches[1] as $match) {
+                $match         = Wo_Secure($match);
+                $match_user    = Wo_UserData($match);
+                $match_search  = '@[' . $match . ']';
+                
+                if (isset($match_user['user_id'])) {
+                    $match_replace = '<span class="hash" onclick="InjectAPI(\'{&quot;type&quot; : &quot;mention&quot;, &quot;user_id&quot;:&quot;' . $match_user['user_id'] . '&quot;}\');">' . $match_user['name'] . '</span>';
+                    $text = str_replace($match_search, $match_replace, $text);
+                }
+                else{
+                    $match_replace = '';
+                    $Orginaltext = str_replace($match_search, $match_replace, $Orginaltext);
+                    $text = str_replace($match_search, $match_replace, $text);
+                    if (!empty($post_id)) {
+                        mysqli_query($sqlConnect, "UPDATE " . T_POSTS . " SET `postText` = '".$Orginaltext."' WHERE `id` = {$post_id}");
+                    }
+                }
+            }
+        }
+    }
     if ($link == true) {
         $link_search = '/\[a\](.*?)\[\/a\]/i';
         if (preg_match_all($link_search, $text, $matches)) {
@@ -3289,23 +3314,40 @@ function Wo_MarkupAPI($text, $link = true, $hashtag = true, $mention = true) {
             $match_i++;
         }
     }
+    
+    return $text;
+}
+function Wo_Markup($text, $link = true, $hashtag = true, $mention = true,$post_id = 0,$comment_id = 0,$reply_id = 0) {
+    global $sqlConnect;
     if ($mention == true) {
+        $Orginaltext = $text;
         $mention_regex = '/@\[([0-9]+)\]/i';
         if (preg_match_all($mention_regex, $text, $matches)) {
             foreach ($matches[1] as $match) {
                 $match         = Wo_Secure($match);
                 $match_user    = Wo_UserData($match);
                 $match_search  = '@[' . $match . ']';
-                $match_replace = '<span class="hash" onclick="InjectAPI(\'{&quot;type&quot; : &quot;mention&quot;, &quot;user_id&quot;:&quot;' . $match_user['user_id'] . '&quot;}\');">' . $match_user['name'] . '</span>';
                 if (isset($match_user['user_id'])) {
+                    $match_replace = '<span class="user-popover" data-id="' . $match_user['id'] . '" data-type="' . $match_user['type'] . '"><a href="' . Wo_SeoLink('index.php?link1=timeline&u=' . $match_user['username']) . '" class="hash" data-ajax="?link1=timeline&u=' . $match_user['username'] . '">' . $match_user['name'] . '</a></span>';
                     $text = str_replace($match_search, $match_replace, $text);
+                }
+                else{
+                    $match_replace = '';
+                    $Orginaltext = str_replace($match_search, $match_replace, $Orginaltext);
+                    $text = str_replace($match_search, $match_replace, $text);
+                    if (!empty($post_id)) {
+                        mysqli_query($sqlConnect, "UPDATE " . T_POSTS . " SET `postText` = '".$Orginaltext."' WHERE `id` = {$post_id}");
+                    }
+                    elseif (!empty($comment_id)) {
+                        mysqli_query($sqlConnect, "UPDATE " . T_COMMENTS . " SET `text` = '".$Orginaltext."' WHERE `id` = {$comment_id}");
+                    }
+                    elseif (!empty($reply_id)) {
+                        mysqli_query($sqlConnect, "UPDATE " . T_COMMENTS_REPLIES . " SET `text` = '".$Orginaltext."' WHERE `id` = {$reply_id}");
+                    }
                 }
             }
         }
     }
-    return $text;
-}
-function Wo_Markup($text, $link = true, $hashtag = true, $mention = true) {
     if ($link == true) {
         $link_search = '/\[a\](.*?)\[\/a\]/i';
         if (preg_match_all($link_search, $text, $matches)) {
@@ -3339,23 +3381,39 @@ function Wo_Markup($text, $link = true, $hashtag = true, $mention = true) {
             $match_i++;
         }
     }
+    return $text;
+}
+function Wo_EditMarkup($text, $link = true, $hashtag = true, $mention = true,$post_id = 0,$comment_id = 0,$reply_id = 0) {
+    global $sqlConnect;
     if ($mention == true) {
+        $Orginaltext = $text;
         $mention_regex = '/@\[([0-9]+)\]/i';
         if (preg_match_all($mention_regex, $text, $matches)) {
             foreach ($matches[1] as $match) {
                 $match         = Wo_Secure($match);
                 $match_user    = Wo_UserData($match);
                 $match_search  = '@[' . $match . ']';
-                $match_replace = '<span class="user-popover" data-id="' . $match_user['id'] . '" data-type="' . $match_user['type'] . '"><a href="' . Wo_SeoLink('index.php?link1=timeline&u=' . $match_user['username']) . '" class="hash" data-ajax="?link1=timeline&u=' . $match_user['username'] . '">' . $match_user['name'] . '</a></span>';
                 if (isset($match_user['user_id'])) {
+                    $match_replace = '@' . $match_user['username'];
                     $text = str_replace($match_search, $match_replace, $text);
+                }
+                else{
+                    $match_replace = '';
+                    $Orginaltext = str_replace($match_search, $match_replace, $Orginaltext);
+                    $text = str_replace($match_search, $match_replace, $text);
+                    if (!empty($post_id)) {
+                        mysqli_query($sqlConnect, "UPDATE " . T_POSTS . " SET `postText` = '".$Orginaltext."' WHERE `id` = {$post_id}");
+                    }
+                    elseif (!empty($comment_id)) {
+                        mysqli_query($sqlConnect, "UPDATE " . T_COMMENTS . " SET `text` = '".$Orginaltext."' WHERE `id` = {$comment_id}");
+                    }
+                    elseif (!empty($reply_id)) {
+                        mysqli_query($sqlConnect, "UPDATE " . T_COMMENTS_REPLIES . " SET `text` = '".$Orginaltext."' WHERE `id` = {$reply_id}");
+                    }
                 }
             }
         }
     }
-    return $text;
-}
-function Wo_EditMarkup($text, $link = true, $hashtag = true, $mention = true) {
     if ($link == true) {
         $link_search = '/\[a\](.*?)\[\/a\]/i';
         if (preg_match_all($link_search, $text, $matches)) {
@@ -3384,20 +3442,7 @@ function Wo_EditMarkup($text, $link = true, $hashtag = true, $mention = true) {
             $match_i++;
         }
     }
-    if ($mention == true) {
-        $mention_regex = '/@\[([0-9]+)\]/i';
-        if (preg_match_all($mention_regex, $text, $matches)) {
-            foreach ($matches[1] as $match) {
-                $match         = Wo_Secure($match);
-                $match_user    = Wo_UserData($match);
-                $match_search  = '@[' . $match . ']';
-                $match_replace = '@' . $match_user['username'];
-                if (isset($match_user['user_id'])) {
-                    $text = str_replace($match_search, $match_replace, $text);
-                }
-            }
-        }
-    }
+    
     return $text;
 }
 function Wo_Emo($string = '') {
@@ -3808,6 +3853,7 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
     global $wo, $sqlConnect;
     $is_there_video = false;
     $playtube_root  = preg_quote($wo['config']['playtube_url']);
+    $deepsound_root  = preg_quote($wo['config']['deepsound_url']);
     
     if (empty($re_data['user_id']) or $re_data['user_id'] == 0) {
         $re_data['user_id'] = $wo['user']['user_id'];
@@ -3858,6 +3904,9 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         if (Wo_IsUrl($wo['config']['playtube_url']) && preg_match('#'.$playtube_root.'\/(?:watch|embed)\/(.*)#i', $re_data['postText'], $match)) {
             $re_data['postPlaytube'] = ((!empty($match[1])) ? Wo_Secure($match[1]) : '');
             $is_there_video          = true;
+        }
+        if (Wo_IsUrl($wo['config']['deepsound_url']) && preg_match('#'.$deepsound_root.'\/(?:track|embed)\/(.*)#i', $re_data['postText'], $match)) {
+            $re_data['postDeepsound'] = ((!empty($match[1])) ? Wo_Secure($match[1]) : '');
         }
         if (preg_match("#(?<=vine.co/v/)[0-9A-Za-z]+#", $re_data['postText'], $match)) {
             $re_data['postVine'] = Wo_Secure($match[0]);
@@ -3953,6 +4002,15 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $re_data['postDailymotion'] = '';
         $re_data['postFacebook']    = '';
         $re_data['postSoundCloud']  = '';
+        $re_data['postDeepsound']  = '';
+    }
+    if (!empty($re_data['postDeepsound'])) {
+        $re_data['postYoutube']     = '';
+        $re_data['postVimeo']       = '';
+        $re_data['postDailymotion'] = '';
+        $re_data['postFacebook']    = '';
+        $re_data['postSoundCloud']  = '';
+        $re_data['postPlaytube']  = '';
     }
     if (!empty($re_data['postVine'])) {
         $re_data['postYoutube']     = '';
@@ -3961,6 +4019,7 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $re_data['postFacebook']    = '';
         $re_data['postSoundCloud']  = '';
         $re_data['postPlaytube']    = '';
+        $re_data['postDeepsound']    = '';
     }
     else if (!empty($re_data['postYoutube'])) {
         $re_data['postVine']        = '';
@@ -3969,6 +4028,7 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $re_data['postFacebook']    = '';
         $re_data['postSoundCloud']  = '';
         $re_data['postPlaytube']    = '';
+        $re_data['postDeepsound']    = '';
     }
     if (!empty($re_data['postVimeo'])) {
         $re_data['postVine']        = '';
@@ -3977,6 +4037,7 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $re_data['postFacebook']    = '';
         $re_data['postSoundCloud']  = '';
         $re_data['postPlaytube']    = '';
+        $re_data['postDeepsound']    = '';
     }
     if (!empty($re_data['postDailymotion'])) {
         $re_data['postYoutube']    = '';
@@ -3985,6 +4046,7 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $re_data['postFacebook']   = '';
         $re_data['postSoundCloud'] = '';
         $re_data['postPlaytube']   = '';
+        $re_data['postDeepsound']   = '';
     }
     if (!empty($re_data['postFacebook'])) {
         $re_data['postYoutube']     = '';
@@ -3993,6 +4055,7 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $re_data['postVine']        = '';
         $re_data['postSoundCloud']  = '';
         $re_data['postPlaytube']    = '';
+        $re_data['postDeepsound']    = '';
     }
     if (!empty($re_data['postSoundCloud'])) {
         $re_data['postYoutube']     = '';
@@ -4001,11 +4064,12 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $re_data['postFacebook']    = '';
         $re_data['postVine']        = '';
         $re_data['postPlaytube']    = '';
+        $re_data['postDeepsound']    = '';
     }
     if (empty($re_data['multi_image'])) {
         $re_data['multi_image'] = 0;
     }
-    if (empty($re_data['postText']) && empty($re_data['album_name']) && $re_data['multi_image'] == 0 && empty($re_data['postFacebook']) && empty($re_data['postVimeo']) && empty($re_data['postDailymotion']) && empty($re_data['postVine']) && empty($re_data['postYoutube']) && empty($re_data['postFile']) && empty($re_data['postSoundCloud']) && empty($re_data['postFeeling']) && empty($re_data['postListening']) && empty($re_data['postPlaying']) && empty($re_data['postWatching']) && empty($re_data['postTraveling']) && empty($re_data['postMap']) && empty($re_data['product_id']) && empty($re_data['blog_id']) && empty($re_data['page_event_id']) && empty($re_data['postRecord']) && empty($re_data['postSticker']) && empty($re_data['postPlaytube'])) {
+    if (empty($re_data['postText']) && empty($re_data['album_name']) && $re_data['multi_image'] == 0 && empty($re_data['postFacebook']) && empty($re_data['postVimeo']) && empty($re_data['postDailymotion']) && empty($re_data['postVine']) && empty($re_data['postYoutube']) && empty($re_data['postFile']) && empty($re_data['postSoundCloud']) && empty($re_data['postFeeling']) && empty($re_data['postListening']) && empty($re_data['postPlaying']) && empty($re_data['postWatching']) && empty($re_data['postTraveling']) && empty($re_data['postMap']) && empty($re_data['product_id']) && empty($re_data['blog_id']) && empty($re_data['page_event_id']) && empty($re_data['postRecord']) && empty($re_data['postSticker']) && empty($re_data['postPlaytube']) && empty($re_data['postDeepsound'])) {
         return false;
     }
     if (!empty($re_data['recipient_id']) && is_numeric($re_data['recipient_id']) && $re_data['recipient_id'] > 0) {
@@ -4061,7 +4125,13 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         }
 
         //Register point level system for createpost
-        Wo_RegisterPoint($post_id, "createpost");
+        if (!empty($re_data['blog_id'])) {
+            Wo_RegisterPoint($post_id, "createblog");
+        }
+        else{
+            Wo_RegisterPoint($post_id, "createpost");
+        }
+        
 
         return $post_id;
     }
@@ -4230,12 +4300,12 @@ function Wo_PostData($post_id, $placement = '', $limited = '') {
             }
         }
     }
-    $story['postText_API'] = Wo_MarkupAPI($story['postText']);
+    $story['postText_API'] = Wo_MarkupAPI($story['postText'],true,true,true,$story['post_id']);
     $story['postText_API'] = Wo_Emo($story['postText_API']);
-    $story['Orginaltext']  = Wo_EditMarkup($story['postText']);
+    $story['Orginaltext']  = Wo_EditMarkup($story['postText'],true,true,true,$story['post_id']);
     $story['Orginaltext']  = str_replace('<br>', "\n", $story['Orginaltext']);
     $story['postText']     = Wo_Emo($story['postText']);
-    $story['postText']     = Wo_Markup($story['postText']);
+    $story['postText']     = Wo_Markup($story['postText'],true,true,true,$story['post_id']);
     $story['post_time']    = Wo_Time_Elapsed_String($story['time']);
     $story['page']         = 0;
     if (!empty($story['postFeeling'])) {
@@ -6524,9 +6594,9 @@ function Wo_GetPostComment($comment_id = 0) {
         $fetched_data['url']       = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['publisher']['username']);
     }
     $fetched_data['fullurl'] = Wo_SeoLink("index.php?link1=post&id=". $fetched_data['post_id'] . "&ref=". $comment_id);
-    $fetched_data['Orginaltext']         = Wo_EditMarkup($fetched_data['text']);
+    $fetched_data['Orginaltext']         = Wo_EditMarkup($fetched_data['text'],true,true,true,0,$comment_id);
     $fetched_data['Orginaltext']         = str_replace('<br>', "\n", $fetched_data['Orginaltext']);
-    $fetched_data['text']                = Wo_Markup($fetched_data['text']);
+    $fetched_data['text']                = Wo_Markup($fetched_data['text'],true,true,true,0,$comment_id);
     $fetched_data['text']                = Wo_Emo($fetched_data['text']);
     $fetched_data['onwer']               = false;
     $fetched_data['post_onwer']          = false;
