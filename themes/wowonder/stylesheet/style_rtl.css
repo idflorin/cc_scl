@@ -709,6 +709,7 @@ body .all_colors > div {
 	left: 0;
     right: auto;
 }
+body .thumb-image-delete:not(:last-child) {margin: 0 0 0 5px;}
 
 
 

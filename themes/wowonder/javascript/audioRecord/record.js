@@ -405,7 +405,8 @@ function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
         dataForm.append('text',                  text);
         dataForm.append('user_id',            user_id);
         dataForm.append('page_id',            page_id);
-        dataForm.append('comment_image',comment_image); 
+        dataForm.append('comment_image',comment_image);
+        $('#charsLeft_'+post_id).text($('#charsLeft_'+post_id).attr('data_num')); 
         Wo_InsertComment(dataForm,post_id);
     }
   }

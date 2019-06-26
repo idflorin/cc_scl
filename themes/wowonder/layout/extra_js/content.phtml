@@ -557,4 +557,10 @@ function Wo_SortComments(type,post_id) {
     }
   });
 }
+
+function count_char(self,id) {
+  <?php if ($wo['config']['maxCharacters'] != 10000) { ?>
+  $(self).limit("<?php echo $wo['config']['maxCharacters']?>", '#charsLeft_'+id);
+  <?php } ?>
+}
 </script>

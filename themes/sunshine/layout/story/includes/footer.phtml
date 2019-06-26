@@ -147,7 +147,10 @@
       <div id="wo_comment_combo" class="remove_combo_on_click">
          <div style="display: flex;">
             <img class="avatar" src="<?php echo $wo['user']['avatar'];?>"/>
-            <textarea class="form-control comment-textarea textarea" placeholder="<?php echo $wo['lang']['write_comment'];?>" type="text" onkeyup="Wo_RegisterComment(this.value,<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, event, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" onkeydown="textAreaAdjust(this, 31,'comm'); " dir="auto"></textarea>
+            <textarea class="form-control comment-textarea textarea" placeholder="<?php echo $wo['lang']['write_comment'];?>" type="text" onkeyup="Wo_RegisterComment(this.value,<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, event, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" onkeydown="textAreaAdjust(this, 31,'comm'); " dir="auto" oninput="count_char(this,<?php echo $wo['story']['id']; ?>)"></textarea>
+            <div class="<?php echo Wo_RightToLeft('pull-left');?> charsLeft-post"><span id="charsLeft_<?php echo $wo['story']['id']; ?>" data_num="<?php if ($wo['config']['maxCharacters'] != 10000) { echo $wo['config']['maxCharacters']; } ?>">
+                  <?php if ($wo['config']['maxCharacters'] != 10000) { echo $wo['config']['maxCharacters']; } ?>
+               </span></div>
             <nav class="sun_comm_addmore sun_comm_dd_<?php echo $wo['story']['id']; ?> dropdown">
                <div role="button" aria-expanded="false" class="dropdown-toggle">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
