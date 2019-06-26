@@ -122,6 +122,24 @@ if ($f == 'ads') {
             ))) {
                 $error = $error_icon . $wo['lang']['please_check_details'];
             }
+            $img_types = array(
+                'image/png',
+                'image/jpeg',
+                'image/gif',
+                'image/jpg'
+            );
+            $video_types = array(
+                    'video/mp4',
+                    'video/mov',
+                    'video/avi'
+                );
+            if (!empty($_FILES["media"]) && (!in_array($_FILES["media"]["type"], $img_types) && !in_array($_FILES["media"]["type"], $video_types)) ) {
+                $error = $error_icon . $wo['lang']['select_valid_img'];
+            }
+            if (!empty($_FILES["media"]) && $_FILES["media"]["size"] > $wo['config']['maxUpload']) {
+                $maxUpload = Wo_SizeUnits($wo['config']['maxUpload']);
+                $error     = $error_icon . str_replace('{file_size}', $maxUpload, $wo['lang']['file_too_big']);
+            }
         }
         if (empty($error)) {
             $update_data = array(
@@ -135,8 +153,31 @@ if ($f == 'ads') {
                 'bidding' => Wo_Secure($_POST['bidding']),
                 'posted' => time()
             );
-            $table       = T_USER_ADS;
             $adid        = Wo_Secure($_GET['ad-id']);
+
+            if (!empty($_FILES["media"])) {
+                $fileInfo                      = array(
+                    'file' => $_FILES["media"]["tmp_name"],
+                    'name' => $_FILES['media']['name'],
+                    'size' => $_FILES["media"]["size"],
+                    'type' => $_FILES["media"]["type"],
+                    'types' => 'jpg,png,bmp,gif,mp4,avi,mov',
+                    'compress' => false
+                );
+                $media                         = Wo_ShareFile($fileInfo);
+                if (!empty($media['filename'])) {
+                    $update_data['ad_media'] = $media['filename'];
+                    $user_ad = $db->where('id',$adid)->getOne(T_USER_ADS);
+                    if (!empty($user_ad->ad_media)) {
+                        @unlink($user_ad->ad_media);
+                    }
+                }
+            }
+
+
+
+            $table       = T_USER_ADS;
+            
             $user_id     = $wo['user']['id'];
             $db->where("id", $adid)->where("user_id", $user_id)->update($table, $update_data);
             $data = array(

@@ -73,7 +73,7 @@
 							<p class="about-film"><?php echo $wo['movie']['description']; ?></p>
 							<?php if (strlen($wo['movie']['description']) > 650): ?>
 							<div class="slide-film-desc">
-								<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> <?php echo $wo['lang']['more']; ?></span>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> <span><?php echo $wo['lang']['more']; ?></span>
 							</div>
 							<?php endif; ?>
 							<div class="played-film-details">
@@ -258,6 +258,12 @@ $(document).ready(function(){
 });
 	
   $('.slide-film-desc').click(function(event) {
+  	if ($('.about-film').hasClass('unsetheight')) {
+  		$('.slide-film-desc').find('span').html('<?php echo $wo['lang']['more']; ?>');
+  	}
+  	else{
+  		$('.slide-film-desc').find('span').html('<?php echo $wo['lang']['less']; ?>');
+  	}
 	$('.about-film').toggleClass('unsetheight');
   });
 

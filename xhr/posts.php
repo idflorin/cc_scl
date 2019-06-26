@@ -568,7 +568,8 @@ if ($f == 'posts') {
             $postsData = array(
                 'before_post_id' => $_GET['before_post_id'],
                 'publisher_id' => $_GET['user_id'],
-                'limit' => 20
+                'limit' => 20,
+                'placement' => 'multi_image_post'
             );
             $posts     = Wo_GetPosts($postsData);
             foreach ($posts as $wo['story']) {
@@ -1515,7 +1516,8 @@ if ($f == 'posts') {
         if (!empty($_GET['filter_by']) && isset($_GET['id'])) {
             $html    = '';
             $options = array(
-                'filter_by' => Wo_Secure($_GET['filter_by'])
+                'filter_by' => Wo_Secure($_GET['filter_by']),
+                'placement' => 'multi_image_post'
             );
             if (!empty($_GET['type'])) {
                 if ($_GET['type'] == 'page') {
