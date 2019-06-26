@@ -1,4 +1,65 @@
 <script>
+function Wo_RegisterReactionLike(element){
+
+    var reaction = $(element).attr('data-reaction');
+    var post_id = $(element).attr('data-post-id');
+    if ($('#react_'+post_id).attr('data_react') == 1) {
+      return false;
+    }
+    
+    var path = "<?php echo $wo['config']['theme_url']?>";
+    var lang = $(element).attr('data-reaction-lang');
+    if (!post_id || !reaction) {
+      return false;
+    }
+
+    $('.reactions-box-container-'+post_id).fadeOut(1);
+
+    var reaction_icon = '';
+    var reaction_color = '';
+
+    switch (reaction) {
+      case 'Like':
+          reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--like"><div class="emoji__hand"><div class="emoji__thumb"></div></div></div></div>';
+          reaction_color = '#1da1f2';
+          break;
+      case 'Love':
+          reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--love"><div class="emoji__heart"></div></div></div>';
+          reaction_color = '#f25268';
+          break;
+      case 'HaHa':
+          reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--haha"><div class="emoji__face"><div class="emoji__eyes"></div><div class="emoji__mouth"><div class="emoji__tongue"></div></div></div></div></div>';
+          reaction_color = '#f3b715';
+          break;
+      case 'Wow':
+          reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--wow"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div></div>';
+          reaction_color = '#f3b715';
+          break;
+      case 'Sad':
+          reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--sad"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div></div>';
+          reaction_color = '#f3b715';
+          break;
+      case 'Angry':
+          reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--angry"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div></div>';
+          reaction_color = '#f7806c';
+          break;
+  }
+
+    $('.status-reaction-'+post_id).html(''+reaction_icon+'' + lang).css({"color": reaction_color});
+    $('.status-reaction-'+post_id).addClass("active-like");
+    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_reaction', post_id: post_id, reaction: reaction}, function (data) {
+      if(data.status == 200) {
+        $('.post-reactions-icons-'+post_id).html(data.reactions);
+        
+      }
+      if (data.can_send == 1) {
+        Wo_SendMessages();
+      }
+      $('#react_'+post_id).attr('data_react','1');
+    });
+}
+
+
 function Wo_RegisterReaction(element){
     var reaction = $(element).attr('data-reaction');
     var post_id = $(element).attr('data-post-id');
@@ -50,6 +111,7 @@ function Wo_RegisterReaction(element){
       if (data.can_send == 1) {
         Wo_SendMessages();
       }
+      $('#react_'+post_id).attr('data_react','1');
     });
 }
 
@@ -285,6 +347,7 @@ $(document).on('click', '#night_mode_toggle', function(event) {
 });
 
 $(document).on('click', '#share_post_on_btn', function(event) {
+  text = $('#share_post_text').val();
   type = $('#SearchForInputType').val();
   post_id = $('#SearchForInputPostId').val();
   type_id = $('#SearchForInputTypeId').val();
@@ -295,7 +358,7 @@ $(document).on('click', '#share_post_on_btn', function(event) {
       url: Wo_Ajax_Requests_File(),
       type: 'GET',
       dataType: 'json',
-      data: {f: 'share_post_on',s:type,type_id:type_id,post_id:post_id},
+      data: {f: 'share_post_on',s:type,type_id:type_id,post_id:post_id,text:text},
     })
     .done(function(data) {
       $(self).text('<?php echo($wo['lang']['share']) ?>');
@@ -468,6 +531,30 @@ function Wo_LoadMoreReactedUsers(self) {
       }
     }
     $('.reacted_users_load_more').find('#load_more_reacted_btn').html('<?php echo $wo['lang']['load_more'] ?>');
+  });
+}
+
+function Wo_SortComments(type,post_id) {
+  if (type == 'top') {
+    $('.order-text-'+post_id).text('<?php echo($wo['lang']['top']) ?>');
+  }
+  else{
+    $('.order-text-'+post_id).text('<?php echo($wo['lang']['latest']) ?>');
+  }
+  main_wrapper = $('#post-' + post_id);
+  view_more_wrapper = main_wrapper.find('.view-more-wrapper');
+  Wo_progressIconLoader(view_more_wrapper);
+  $('#post-' + post_id).find('.view-more-wrapper .ball-pulse').fadeIn(100);
+  $.get(Wo_Ajax_Requests_File(), {
+    f: 'posts',
+    s: 'load_more_comments_sort',
+    post_id: post_id,
+    type: type
+  }, function (data) {
+    if(data.status == 200) {
+      main_wrapper.find('.comments-list').html(data.html);
+      $('.ball-pulse-'+post_id).fadeOut('100');
+    }
   });
 }
 </script>

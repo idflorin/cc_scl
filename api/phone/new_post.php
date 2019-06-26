@@ -412,6 +412,9 @@ if ($type == 'new_post') {
                 if (!empty($is_option)) {
                     $post_data['poll_id'] = 1;
                 }
+                if (!empty($_POST['post_color']) && !empty($post_text) && empty($_POST['postRecord']) && empty($mediaFilename) && empty($mediaName) && empty($post_map) && empty($url_title) && empty($url_content) && empty($url_link) && empty($import_url_image) && empty($album_name) && empty($multi) && empty($video_thumb) && empty($post_data['postPhoto'])) {
+                    $post_data['color_id'] = Wo_Secure($_POST['post_color']);
+                }
                 $id = Wo_RegisterPost($post_data);
                 if ($id) {
                     if ($is_option == true) {

@@ -39,19 +39,75 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 			$postsData = array(
                 'limit' => $limit,
                 'publisher_id' => 0,
-                'after_post_id' => $after_post_id
+                'after_post_id' => $after_post_id,
+                'placement' => 'multi_image_post'
             );
 			$posts = Wo_GetPosts($postsData);
 			foreach ($posts as $key => $value) {
+				$posts[$key]['shared_info'] = null;
+
+				if (!empty($posts[$key]['postFile'])) {
+					$posts[$key]['postFile'] = Wo_GetMedia($posts[$key]['postFile']);
+				}
+				if (!empty($posts[$key]['postFileThumb'])) {
+					$posts[$key]['postFileThumb'] = Wo_GetMedia($posts[$key]['postFileThumb']);
+				}
+
+				if (!empty($posts[$key]['postPlaytube'])) {
+					$posts[$key]['postText'] = strip_tags($posts[$key]['postText']);
+				}
+
+
+
 				if (!empty($posts[$key]['publisher'])) {
 					foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['publisher'][$value4]);
 			        }
 			    }
+			    else{
+			    	$posts[$key]['publisher'] = null;
+			    }
+
 			    if (!empty($posts[$key]['user_data'])) {
 			    	foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['user_data'][$value4]);
 			        }
+			    }
+			    else{
+			    	$posts[$key]['user_data'] = null;
+			    }
+
+			    if (!empty($posts[$key]['parent_id'])) {
+			    	$shared_info = Wo_PostData($posts[$key]['parent_id']);
+			    	if (!empty($shared_info)) {
+			    		if (!empty($shared_info['publisher'])) {
+							foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['publisher'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['publisher'] = null;
+					    }
+
+					    if (!empty($shared_info['user_data'])) {
+					    	foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['user_data'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['user_data'] = null;
+					    }
+
+					    if (!empty($shared_info['get_post_comments'])) {
+					        foreach ($shared_info['get_post_comments'] as $key3 => $comment) {
+
+						        foreach ($non_allowed as $key5 => $value5) {
+						          unset($shared_info['get_post_comments'][$key3]['publisher'][$value5]);
+						        }
+						    }
+						}
+			    	}
+			    	$posts[$key]['shared_info'] = $shared_info;
 			    }
 
 			    if (!empty($value['get_post_comments'])) {
@@ -77,20 +133,74 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 			$postsData = array(
                 'limit' => $limit,
                 'publisher_id' => $user_id,
-                'after_post_id' => $after_post_id
+                'after_post_id' => $after_post_id,
+                'placement' => 'multi_image_post'
             );
 			$posts = Wo_GetPosts($postsData);
 			foreach ($posts as $key => $value) {
+				$posts[$key]['shared_info'] = null;
+
+				if (!empty($posts[$key]['postFile'])) {
+					$posts[$key]['postFile'] = Wo_GetMedia($posts[$key]['postFile']);
+				}
+				if (!empty($posts[$key]['postFileThumb'])) {
+					$posts[$key]['postFileThumb'] = Wo_GetMedia($posts[$key]['postFileThumb']);
+				}
+				if (!empty($posts[$key]['postPlaytube'])) {
+					$posts[$key]['postText'] = strip_tags($posts[$key]['postText']);
+				}
+
+
+
 				if (!empty($posts[$key]['publisher'])) {
 					foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['publisher'][$value4]);
 			        }
 			    }
+			    else{
+			    	$posts[$key]['publisher'] = null;
+			    }
 
-		        if (!empty($posts[$key]['user_data'])) {
+			    if (!empty($posts[$key]['user_data'])) {
 			    	foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['user_data'][$value4]);
 			        }
+			    }
+			    else{
+			    	$posts[$key]['user_data'] = null;
+			    }
+
+			    if (!empty($posts[$key]['parent_id'])) {
+			    	$shared_info = Wo_PostData($posts[$key]['parent_id']);
+			    	if (!empty($shared_info)) {
+			    		if (!empty($shared_info['publisher'])) {
+							foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['publisher'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['publisher'] = null;
+					    }
+
+					    if (!empty($shared_info['user_data'])) {
+					    	foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['user_data'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['user_data'] = null;
+					    }
+
+					    if (!empty($shared_info['get_post_comments'])) {
+					        foreach ($shared_info['get_post_comments'] as $key3 => $comment) {
+
+						        foreach ($non_allowed as $key5 => $value5) {
+						          unset($shared_info['get_post_comments'][$key3]['publisher'][$value5]);
+						        }
+						    }
+						}
+			    	}
+			    	$posts[$key]['shared_info'] = $shared_info;
 			    }
 
 			    if (!empty($value['get_post_comments'])) {
@@ -116,20 +226,74 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 			$postsData = array(
                 'limit' => $limit,
                 'group_id' => $group_id,
-                'after_post_id' => $after_post_id
+                'after_post_id' => $after_post_id,
+                'placement' => 'multi_image_post'
             );
 			$posts = Wo_GetPosts($postsData);
 			foreach ($posts as $key => $value) {
+				$posts[$key]['shared_info'] = null;
+
+				if (!empty($posts[$key]['postFile'])) {
+					$posts[$key]['postFile'] = Wo_GetMedia($posts[$key]['postFile']);
+				}
+				if (!empty($posts[$key]['postFileThumb'])) {
+					$posts[$key]['postFileThumb'] = Wo_GetMedia($posts[$key]['postFileThumb']);
+				}
+				if (!empty($posts[$key]['postPlaytube'])) {
+					$posts[$key]['postText'] = strip_tags($posts[$key]['postText']);
+				}
+
+
+
 				if (!empty($posts[$key]['publisher'])) {
 					foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['publisher'][$value4]);
 			        }
 			    }
+			    else{
+			    	$posts[$key]['publisher'] = null;
+			    }
 
-		        if (!empty($posts[$key]['user_data'])) {
+			    if (!empty($posts[$key]['user_data'])) {
 			    	foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['user_data'][$value4]);
 			        }
+			    }
+			    else{
+			    	$posts[$key]['user_data'] = null;
+			    }
+
+			    if (!empty($posts[$key]['parent_id'])) {
+			    	$shared_info = Wo_PostData($posts[$key]['parent_id']);
+			    	if (!empty($shared_info)) {
+			    		if (!empty($shared_info['publisher'])) {
+							foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['publisher'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['publisher'] = null;
+					    }
+
+					    if (!empty($shared_info['user_data'])) {
+					    	foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['user_data'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['user_data'] = null;
+					    }
+
+					    if (!empty($shared_info['get_post_comments'])) {
+					        foreach ($shared_info['get_post_comments'] as $key3 => $comment) {
+
+						        foreach ($non_allowed as $key5 => $value5) {
+						          unset($shared_info['get_post_comments'][$key3]['publisher'][$value5]);
+						        }
+						    }
+						}
+			    	}
+			    	$posts[$key]['shared_info'] = $shared_info;
 			    }
 
 			    if (!empty($value['get_post_comments'])) {
@@ -155,20 +319,74 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 			$postsData = array(
                 'limit' => $limit,
                 'page_id' => $page_id,
-                'after_post_id' => $after_post_id
+                'after_post_id' => $after_post_id,
+                'placement' => 'multi_image_post'
             );
 			$posts = Wo_GetPosts($postsData);
 			foreach ($posts as $key => $value) {
+				$posts[$key]['shared_info'] = null;
+
+				if (!empty($posts[$key]['postFile'])) {
+					$posts[$key]['postFile'] = Wo_GetMedia($posts[$key]['postFile']);
+				}
+				if (!empty($posts[$key]['postFileThumb'])) {
+					$posts[$key]['postFileThumb'] = Wo_GetMedia($posts[$key]['postFileThumb']);
+				}
+				if (!empty($posts[$key]['postPlaytube'])) {
+					$posts[$key]['postText'] = strip_tags($posts[$key]['postText']);
+				}
+
+
+
 				if (!empty($posts[$key]['publisher'])) {
 					foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['publisher'][$value4]);
 			        }
 			    }
+			    else{
+			    	$posts[$key]['publisher'] = null;
+			    }
 
-		        if (!empty($posts[$key]['user_data'])) {
+			    if (!empty($posts[$key]['user_data'])) {
 			    	foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['user_data'][$value4]);
 			        }
+			    }
+			    else{
+			    	$posts[$key]['user_data'] = null;
+			    }
+
+			    if (!empty($posts[$key]['parent_id'])) {
+			    	$shared_info = Wo_PostData($posts[$key]['parent_id']);
+			    	if (!empty($shared_info)) {
+			    		if (!empty($shared_info['publisher'])) {
+							foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['publisher'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['publisher'] = null;
+					    }
+
+					    if (!empty($shared_info['user_data'])) {
+					    	foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['user_data'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['user_data'] = null;
+					    }
+
+					    if (!empty($shared_info['get_post_comments'])) {
+					        foreach ($shared_info['get_post_comments'] as $key3 => $comment) {
+
+						        foreach ($non_allowed as $key5 => $value5) {
+						          unset($shared_info['get_post_comments'][$key3]['publisher'][$value5]);
+						        }
+						    }
+						}
+			    	}
+			    	$posts[$key]['shared_info'] = $shared_info;
 			    }
 
 			    if (!empty($value['get_post_comments'])) {
@@ -194,20 +412,74 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 			$postsData = array(
                 'limit' => $limit,
                 'event_id' => $event_id,
-                'after_post_id' => $after_post_id
+                'after_post_id' => $after_post_id,
+                'placement' => 'multi_image_post'
             );
 			$posts = Wo_GetPosts($postsData);
 			foreach ($posts as $key => $value) {
+				$posts[$key]['shared_info'] = null;
+
+				if (!empty($posts[$key]['postFile'])) {
+					$posts[$key]['postFile'] = Wo_GetMedia($posts[$key]['postFile']);
+				}
+				if (!empty($posts[$key]['postFileThumb'])) {
+					$posts[$key]['postFileThumb'] = Wo_GetMedia($posts[$key]['postFileThumb']);
+				}
+				if (!empty($posts[$key]['postPlaytube'])) {
+					$posts[$key]['postText'] = strip_tags($posts[$key]['postText']);
+				}
+
+
+
 				if (!empty($posts[$key]['publisher'])) {
 					foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['publisher'][$value4]);
 			        }
 			    }
+			    else{
+			    	$posts[$key]['publisher'] = null;
+			    }
 
-		        if (!empty($posts[$key]['user_data'])) {
+			    if (!empty($posts[$key]['user_data'])) {
 			    	foreach ($non_allowed as $key4 => $value4) {
 			          unset($posts[$key]['user_data'][$value4]);
 			        }
+			    }
+			    else{
+			    	$posts[$key]['user_data'] = null;
+			    }
+
+			    if (!empty($posts[$key]['parent_id'])) {
+			    	$shared_info = Wo_PostData($posts[$key]['parent_id']);
+			    	if (!empty($shared_info)) {
+			    		if (!empty($shared_info['publisher'])) {
+							foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['publisher'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['publisher'] = null;
+					    }
+
+					    if (!empty($shared_info['user_data'])) {
+					    	foreach ($non_allowed as $key4 => $value4) {
+					          unset($shared_info['user_data'][$value4]);
+					        }
+					    }
+					    else{
+					    	$shared_info['user_data'] = null;
+					    }
+
+					    if (!empty($shared_info['get_post_comments'])) {
+					        foreach ($shared_info['get_post_comments'] as $key3 => $comment) {
+
+						        foreach ($non_allowed as $key5 => $value5) {
+						          unset($shared_info['get_post_comments'][$key3]['publisher'][$value5]);
+						        }
+						    }
+						}
+			    	}
+			    	$posts[$key]['shared_info'] = $shared_info;
 			    }
 
 			    if (!empty($value['get_post_comments'])) {

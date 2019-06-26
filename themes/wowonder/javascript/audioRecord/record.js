@@ -239,6 +239,10 @@ function Wo_clearMRecording(){
 }
 
 function Wo_GetPRecordLink() {
+  var publisher_button = $('#publisher-button');
+  publisher_button.attr('disabled', true);
+  publisher_button.css('color', '#333');
+  $('#publisher-box-focus .pub-footer-bottom').find('.ball-pulse').fadeIn(100);
   if (recorder && recording_node == "post") {
     recorder.exportWAV(function(blob) {
       if (blob instanceof Blob && blob.size > 50) {

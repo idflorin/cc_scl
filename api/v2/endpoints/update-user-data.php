@@ -75,7 +75,7 @@ if (!empty($user_data['new_password']) && !empty($user_data['current_password'])
         $error_message = 'Password is too short';
     }
     if (empty($error_code)) {
-    	$user_data['password'] = sha1($user_data['new_password']);
+    	$user_data['password'] = password_hash($user_data['new_password'], PASSWORD_DEFAULT);
     	unset($user_data['new_password']);
     	unset($user_data['current_password']);
     }

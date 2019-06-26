@@ -143,6 +143,13 @@
       <!-- <script src="<?php echo $wo['config']['theme_url'];?>/javascript/bbcode/jquery.bbcode.js"></script>
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/javascript/bbcode/jquery.bbcode.css" media="all"> -->
       <?php endif ?>
+
+      <?php if ($wo['config']['checkout_payment'] == 'yes') { ?>
+        <script type="text/javascript" src="https://www.2checkout.com/checkout/api/2co.min.js"></script>
+      <?php } ?>
+
+
+
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/player/fluidplayer.min.css" type="text/css"/>
       <script src="<?php echo $wo['config']['theme_url'];?>/player/fluidplayer.min.js"></script>
       <?php if ($wo['loggedin'] == true && $wo['page'] == 'home' && $wo['config']['web_push'] == 1) { ?>
@@ -470,6 +477,9 @@
       
       <!-- End 'Audio FILES' -->
       <script>
+        $(window).on("popstate", function (e) {
+          location.reload();
+      });
        /*Language Select*/
         $(document).ready(function(){
           $(".sun_lang_select_menu li a.English").append('<span class="language_initial"><img src="<?php echo $wo['config']['theme_url']; ?>/img/flags/united-states.svg"/></span> ');

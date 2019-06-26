@@ -44,6 +44,10 @@
 						</a>
 					<?php endif;?>
 				</div>
+				<div>
+					<textarea class="form-control" style="padding: 10px; border-radius: 0" placeholder="<?php echo $wo['lang']['publisher_box_placeholder']?>" dir="auto" rows="5" onkeyup="Wo_Get_Mention(this)" id="share_post_text"></textarea>
+					<br>
+				</div>
 				<?php if (empty($wo['story']['parent_id']) && empty($wo['story']['shared_from']) && $wo['story']['postPrivacy'] == 0): ?>
 				<div class="select_radio_btn small_rbtn share_modal_opts_icos">
 					<h4><?php echo $wo['lang']['share_new_post']?></h4>
@@ -75,6 +79,7 @@
 						</label> -->
 						<?php } ?>
 						<?php if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) ) { ?>
+					    <?php if ($wo['config']['pages'] != 0) { ?>
 						<label>
 							<input type="radio" name="share_type_select" id="share_type_select" value="page">
 							<div class="sr_btn_lab_innr">
@@ -84,6 +89,8 @@
 								<span><?php echo $wo['lang']['page'];?></span>
 							</div>
 						</label>
+						<?php } ?>
+						<?php if ($wo['config']['groups'] != 0) { ?>
 						<label>
 							<input type="radio" name="share_type_select" id="share_type_select" value="group">
 							<div class="sr_btn_lab_innr">
@@ -94,6 +101,7 @@
 							</div>
 						</label>
 						<?php } ?>
+						<?php } ?>
 					</div>
 				</div>
 				<?php endif;?>
@@ -101,15 +109,15 @@
 				<div class="shar_modl_chose_pgrp">
 					<?php if (!empty($wo['story']['page_id']) || !empty($wo['story']['group_id']) ) { ?>
 			        <div class="form-group search_for_form" id="type_user_name" style="display: none;">
-			            <input onkeydown="SearchFor(this,'user')" type="text" class="form-control" name="name" placeholder="<?php echo $wo['lang']['username']; ?>">
+			            <input onkeydown="SearchFor(this,'user')" type="text" class="form-control" name="name" placeholder="<?php echo $wo['lang']['username']; ?>" autocomplete="off">
 			         </div>
 			         <?php } ?>
 			         <?php if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) ) { ?>
 			         <div class="form-group search_for_form" id="type_group_name" style="display: none;">
-			            <input onkeydown="SearchFor(this,'group')" type="text" class="form-control" name="name" placeholder="<?php echo $wo['lang']['please_group_name']; ?>">
+			            <input onkeydown="SearchFor(this,'group')" type="text" class="form-control" name="name" placeholder="<?php echo $wo['lang']['please_group_name']; ?>" autocomplete="off">
 			        </div>
 			        <div class="form-group search_for_form" id="type_page_name" style="display: none;">
-			            <input onkeydown="SearchFor(this,'page')" type="text" class="form-control" name="name" placeholder="<?php echo $wo['lang']['please_page_name']; ?>">
+			            <input onkeydown="SearchFor(this,'page')" type="text" class="form-control" name="name" placeholder="<?php echo $wo['lang']['please_page_name']; ?>" autocomplete="off">
 			        </div>
 			        <?php } ?>
 				</div>

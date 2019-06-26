@@ -16,16 +16,18 @@ if (isset($_GET['u'])) {
             $name               = $wo['user_profile']['name'];
             $wo['user_profile']['fields'] = Wo_UserFieldsData($user_id);
             $wo['have_stories'] = false;
-            $user_stories = $db->where('user_id', $wo['user_profile']['user_id'])->get(T_USER_STORY,null,array('id'));
-            if (!empty($user_stories)) {
-                $wo['have_stories'] = true;
-                $wo['story_seen_class'] = 'seen_story';
+            if ($wo['loggedin'] == true) {
+                $user_stories = $db->where('user_id', $wo['user_profile']['user_id'])->get(T_USER_STORY,null,array('id'));
+                if (!empty($user_stories)) {
+                    $wo['have_stories'] = true;
+                    $wo['story_seen_class'] = 'seen_story';
 
-                foreach ($user_stories as $key => $value) {
-                    $is_seen = $db->where('story_id',$value->id)->where('user_id',$wo['user']['user_id'])->getValue(T_STORY_SEEN,'COUNT(*)');
+                    foreach ($user_stories as $key => $value) {
+                        $is_seen = $db->where('story_id',$value->id)->where('user_id',$wo['user']['user_id'])->getValue(T_STORY_SEEN,'COUNT(*)');
 
-                    if ($is_seen == 0) {
-                        $wo['story_seen_class'] = 'unseen_story';
+                        if ($is_seen == 0) {
+                            $wo['story_seen_class'] = 'unseen_story';
+                        }
                     }
                 }
             }

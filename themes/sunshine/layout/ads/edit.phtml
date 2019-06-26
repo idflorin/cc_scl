@@ -94,12 +94,8 @@
 					
 					<div class="sun_input mb0">
 						<select name="bidding" id="bidding">
-							<option value="clicks" <?php echo ($wo['ad-data']['bidding'] == 'clicks') ? 'selected' : ''; ?>>
-								<?php echo str_replace('{{PRICE}}', $wo['config']['ad_c_price'], $wo['lang']['pay_per_click']); ?>
-							</option>
-							<option value="views" <?php echo ($wo['ad-data']['bidding'] == 'views') ? 'selected' : ''; ?>>
-								<?php echo str_replace('{{PRICE}}', $wo['config']['ad_v_price'], $wo['lang']['pay_per_imprssion']); ?>
-							</option>
+							<option value="clicks" <?php echo ($wo['ad-data']['bidding'] == 'clicks') ? 'selected' : ''; ?>><?php echo str_replace('${{PRICE}}',  Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price'], $wo['lang']['pay_per_click']); ?></option>
+							<option value="views" <?php echo ($wo['ad-data']['bidding'] == 'views') ? 'selected' : ''; ?>><?php echo str_replace('${{PRICE}}', Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price'], $wo['lang']['pay_per_imprssion']); ?></option>
 						</select>
 						<label for="bidding"><?php echo $wo['lang']['bidding']?></label>
 					</div>

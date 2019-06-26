@@ -103,12 +103,8 @@
 						<div class="col-md-12">
 							<label class="col-md-12" style="padding: 0;"><?php echo $wo['lang']['bidding']; ?></label>
 							<select name="bidding" id="bidding" class="form-control">
-								<option value="clicks" <?php echo ($wo['ad-data']['bidding'] == 'clicks') ? 'selected' : ''; ?>>
-									<?php echo str_replace('{{PRICE}}', $wo['config']['ad_c_price'], $wo['lang']['pay_per_click']); ?>
-								</option>
-								<option value="views" <?php echo ($wo['ad-data']['bidding'] == 'views') ? 'selected' : ''; ?>>
-									<?php echo str_replace('{{PRICE}}', $wo['config']['ad_v_price'], $wo['lang']['pay_per_imprssion']); ?>
-								</option>
+								<option value="clicks" <?php echo ($wo['ad-data']['bidding'] == 'clicks') ? 'selected' : ''; ?>><?php echo str_replace('${{PRICE}}',  Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price'], $wo['lang']['pay_per_click']); ?></option>
+								<option value="views" <?php echo ($wo['ad-data']['bidding'] == 'views') ? 'selected' : ''; ?>><?php echo str_replace('${{PRICE}}', Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price'], $wo['lang']['pay_per_imprssion']); ?></option>
 							</select>
 						</div>
 						<div class="clear"></div>

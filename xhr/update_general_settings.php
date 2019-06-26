@@ -5,10 +5,7 @@ if ($f == "update_general_settings") {
             $errors[] = $error_icon . $wo['lang']['please_check_details'];
         } else {
             $Userdata = Wo_UserData($_POST['user_id']);
-            $age_data = '00-00-0000';
-            if ($Userdata['birthday'] != $age_data) {
-                $age_data = $Userdata['birthday'];
-            }
+            $age_data = '0000-00-00';
             if (!empty($Userdata['user_id'])) {
                 if ($_POST['email'] != $Userdata['email']) {
                     if (Wo_EmailExists($_POST['email'])) {
@@ -33,9 +30,8 @@ if ($f == "update_general_settings") {
                 if (!preg_match('/^[\w]+$/', $_POST['username'])) {
                     $errors[] = $error_icon . $wo['lang']['username_invalid_characters'];
                 }
-                if (!empty($_POST['birthday']) && preg_match('@^\s*(3[01]|[12][0-9]|0?[1-9])\-(1[012]|0?[1-9])\-((?:19|20)\d{2})\s*$@', $_POST['birthday'])) {
-                    $newDate = date("Y-m-d", strtotime($_POST['birthday']));
-                    $age_data = $newDate;
+                if (!empty($_POST['birthday'])) {
+                    $age_data = $_POST['birthday'];
                 }
                 else{
                     if (!empty($_POST['age_year']) || !empty($_POST['age_day']) || !empty($_POST['age_month'])) {
