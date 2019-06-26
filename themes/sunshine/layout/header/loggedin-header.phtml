@@ -155,7 +155,7 @@ if ($followers_alert == 0) {
 					</a>
 				</li>
 				<?php } ?>
-				<?php if ($wo['user']['is_pro'] == 1 && in_array($wo['user']['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] > 0 && $wo['config']['pages'] == 1) { ?>
+				<?php if ($wo['user']['is_pro'] == 1 && in_array($wo['user']['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] > 0) { ?>
 				<li>
 					<a href="<?php echo Wo_SeoLink('index.php?link1=boosted-pages');?>" data-ajax="?link1=boosted-pages">
 						<svg xmlns="http://www.w3.org/2000/svg" class="mobi_hd_ico" width="24" height="24" viewBox="0 0 24 24"><path fill="#ffa412" d="M7,2V13H10V22L17,10H13L17,2H7Z" /></svg>

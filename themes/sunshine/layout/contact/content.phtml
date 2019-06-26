@@ -41,6 +41,13 @@
 								<textarea name="message" id="message" rows="5" placeholder="<?php echo $wo['lang']['message']?>"></textarea>
 								<label for="message"><?php echo $wo['lang']['message']?></label>
 							</div>
+							<div class="sun_input">
+								<?php if ($wo['config']['reCaptcha'] == 1 && !empty($wo['config']['reCaptchaKey'])) { ?>
+									<div class="col-md-12">
+										<div class="g-recaptcha" data-sitekey="<?php echo $wo['config']['reCaptchaKey']?>"></div>
+									</div>
+								<?php } ?>
+							</div>
 						</div>
 						<div class="contact-us-alert setting-update-alert"></div>
 						<div class="form-group last-sett-btn modal-footer">

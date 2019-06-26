@@ -288,7 +288,7 @@
 			<?php  if($wo['config']['pro'] == 1 && $wo['page_profile']['is_page_onwer'] == true) {  ?>
 				<li class="list-group-item">
 					<?php if ($wo['user']['is_pro'] == 1) { ?>
-						<?php if ($wo['user']['pro_type'] > 1) {?>
+						<?php if (in_array($wo['user']['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] > 0) {?>
 							<?php if ($wo['page_profile']['boosted'] == 0) {?>
 								<a href="<?php echo $wo['marker'];?>boosted">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="feather" viewBox="0 0 24 24"><path fill="currentColor" d="M7,2V13H10V22L17,10H13L17,2H7Z" /></svg> <?php echo $wo['lang']['boost_page'];?>

@@ -635,7 +635,7 @@ body .sun_head_onboard.shortpwidth span.go_back_link a svg {
     transform: rotate(180deg);
 }
 body .sun_blog_head {
-    /*right: 0;left: 205px;*/
+    right: 0;left: 205px;
 }
 body .create_blog_area_acombo > .th-alert {
     border-right: 0px solid #e5e5e5;
@@ -985,17 +985,6 @@ body .who_react_to_this_user .user-follow-button {
     margin-left: 0;
     margin-right: auto;
 }
-body .all_colors > svg {
-    right: auto;left: 0;
-}
-body .all_colors > div {
-    margin-right: 0px;margin-left: 20px;
-}
-.view-more-wrapper .order-by .dropdown-menu {
-	left: 0;
-    right: auto;
-}
-body .thumb-image-delete:not(:last-child) {margin: 0 0 0 5px;}
 
 
 

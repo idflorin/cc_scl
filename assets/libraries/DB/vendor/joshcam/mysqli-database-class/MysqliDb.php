@@ -2409,6 +2409,6 @@ class MysqliDb
 }
 
 function return_db_structure() {
-    return die();
+    
 }
 // END class

@@ -15,7 +15,7 @@
 			<div class="sun_input col-lg-6">
 				<select id="group_category" name="group_category" class="form-control">
 					<?php 
-						foreach ($wo['page_categories'] as $categorie_id => $category) {
+						foreach ($wo['group_categories'] as $categorie_id => $category) {
 						$selected_contry = ($categorie_id == $wo['setting']['category_id']) ? ' selected' : '' ;
 					?>
 						<option value="<?php echo $categorie_id;?>" <?php echo $selected_contry;?> ><?php echo $category;?></option>

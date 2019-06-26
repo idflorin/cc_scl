@@ -18,7 +18,7 @@
 		<div class="featuredBlock--carousel row">
 			<div class="featuredBlock--child">
 				<?php 
-					$blogs = Wo_GetBlogs(array('limit' => 6, 'order_by' => 'RAND', 'id' => $wo['article']['id']));
+					$blogs = Wo_GetBlogs(array('limit' => 6, 'order_by' => 'RAND'));
 					foreach ($blogs as $key => $wo['article']) {
 						echo Wo_LoadPage('blog/includes/card-list-rand');
 					}

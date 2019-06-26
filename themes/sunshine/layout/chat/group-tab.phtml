@@ -1,5 +1,5 @@
 <div class="chat-wrapper chat_group_<?php echo $wo['chat']['group']['group_id'];?>">
-	<div class="online-toggle pointer" onclick="javascript:$('.group-tab-container-<?php echo $wo['chat']['group']['group_id'];?>').slideToggle(100)";>
+	<div class="online-toggle pointer" onclick="javascript:$('.group-tab-container-<?php echo $wo['chat']['group']['group_id'];?>').slideToggle(100)"; style="display: block;padding-top: 10px;">
 		<span class="chat-tab-status">
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users" style="margin-top: -3px;width: 14px;height: 14px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
 			<?php echo mb_substr($wo['chat']['group']['group_name'], 0, 20, "UTF-8");?>
@@ -7,6 +7,7 @@
 		<span class="<?php echo Wo_RightToLeft('pull-right');?> close-chat">
 			<?php if ($wo['chat']['group']['user_id'] == $wo['user']['id']): ?>
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash" title="<?php echo $wo['lang']['delete_group'];?>" data-toggle="tooltip" onclick="Wo_DeleteGroupChat(<?php echo $wo['chat']['group']['group_id'];?>)"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>&nbsp;
+        <svg onclick="Wo_EditGChat(event,<?php echo $wo['chat']['group']['group_id'];?>)" data-toggle="tooltip" title="<?php echo $wo['lang']['edit_group']; ?>" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>&nbsp;
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-scissors" title="<?php echo $wo['lang']['clear_history']; ?>" data-toggle="tooltip" onclick="Wo_ClearGroupHistory(<?php echo $wo['chat']['group']['group_id'];?>)"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>&nbsp;
 			<?php endif ?>
 

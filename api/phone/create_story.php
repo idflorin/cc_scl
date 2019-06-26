@@ -102,7 +102,7 @@ if ($type == 'create_story') {
                 $registration_data            = array();
                 $registration_data['user_id'] = $wo['user']['id'];
                 $registration_data['posted']  = time();
-                $registration_data['expire']  = date('Y-m-d');
+                $registration_data['expire']  = time()+(60*60*24);
                 if (isset($_POST['title']) && strlen($_POST['title']) >= 2) {
                     $registration_data['title'] = Wo_Secure($_POST['title']);
                 }
@@ -130,7 +130,7 @@ if ($type == 'create_story') {
                                 'story_id' => $last_id,
                                 'type' => Wo_Secure($_POST['file_type']),
                                 'filename' => $filename,
-                                'expire' => date('Y-m-d')
+                                'expire' => time()+(60*60*24)
                             );
                             $thumb     = '';
                             if (empty($thumb)) {

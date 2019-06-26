@@ -806,8 +806,7 @@ function Wo_loadAllComments(post_id) {
   }, function (data) {
     if(data.status == 200) {
       main_wrapper.find('.comments-list').html(data.html);
-      //view_more_wrapper.remove();
-      $('.ball-pulse-'+post_id).fadeOut('100');
+      view_more_wrapper.remove();
     }
   });
 }
@@ -852,13 +851,7 @@ function Wo_EditPost(post_id) {
   var edit_box = $('#post-' + post_id).find('#edit-post');
   var edit_textarea = post.find('.edit-textarea-' + post_id + ' textarea');
   var text = edit_textarea.val();
-  var type = post.attr('data-post-type');
-  if (type == 'share') {
-    var post_text = post.find('.post-description .edited_text');
-  }
-  else{
-    var post_text = post.find('.post-description p');
-  }
+  var post_text = post.find('.post-description p');
   Wo_progressIconLoader(post.find('#edit-post-button'));
   $('#post-' + post_id).find('#edit-post .ball-pulse').fadeIn(100);
   $.post(Wo_Ajax_Requests_File() + '?f=posts&s=edit_post', {
@@ -1260,7 +1253,6 @@ function Wo_ClosePostReactedUsers(post_id) {
 
 // open post Reacted users
 function Wo_OpenPostReactedUsers(post_id, type,col) {
-  $('body').append('<div class="lightbox-container"><div class="lightbox-backgrond" onclick="Wo_CloseLightbox();"></div><div class="lb-preloader" style="display:block"><svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg></div></div>');
   $('.reacted_users_load_more').css('display', 'inline');
   $.get(Wo_Ajax_Requests_File(), {
     f: 'posts',
@@ -1270,9 +1262,6 @@ function Wo_OpenPostReactedUsers(post_id, type,col) {
     col:col
   }, function (data) {
     if(data.status == 200) {
-      setTimeout(function () {
-        $('.lightbox-container').remove();
-      },100);
       //$('#views_info_title').html(data.title);
       if(data.html.length == 0) {
         $('.reacted_users_load_more').attr('data-type', '');
@@ -1586,7 +1575,7 @@ function Wo_UpdatePostPrivacy(post_id, privacy_type, event) {
 }
 
 // open chat tab
-function Wo_OpenChatTab(recipient_id, group_id,product_id = 0) {
+function Wo_OpenChatTab(recipient_id, group_id) {
   if ($(".chat_"+recipient_id).length > 0) {
     return false;
   }
@@ -1678,8 +1667,7 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0) {
         $.get(Wo_Ajax_Requests_File(), {
           f: 'chat',
           s: 'load_chat_messages',
-          recipient_id: recipient_id,
-          product_id: product_id
+          recipient_id: recipient_id
         }, function (data) {
           if (data.messages.length > 0) {
              $('.chat-tab').find('.chat_' + recipient_id).find('.chat-messages').html(data.messages);
@@ -2909,7 +2897,7 @@ $(window).on('load', function() {
             //  post++;
             }
             window.post++;
-      }else if( k == 107 && tag != 'input' && tag != 'textarea' && window.post > 0){
+      }else if( k == 107 && tag != 'input' && tag != 'textarea'){
         $('#shortcut_helper').show();
         window.post--;
         var listItems = $( '.post-container .post' ).eq( post ).find('.panel');
@@ -2955,10 +2943,6 @@ $(window).on('load', function() {
   });
 
   $('body').delegate('.like-btn-post','click', function() {
-    if ($( this ).attr( 'data_react' ) == 0) {
-      return false;
-    }
-    var self = this;
     var post_id = $( this ).attr( 'data-id' );
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_reaction', post_id: post_id}, function (data) {
       if(data.status == 200) {
@@ -2967,7 +2951,6 @@ $(window).on('load', function() {
         $('.status-reaction-'+post_id).removeClass("active-like");
         $('.status-reaction-'+post_id).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> ' + data.like_lang).css({"color": "inherit"});
       }
-      $(self).attr('data_react','0');
     });
   });
   

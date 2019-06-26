@@ -33,11 +33,6 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
         }
 
         if (empty($error_code)) {
-            if (Wo_IsPoked($wo['user']['id'],Wo_Secure($_POST['user_id']))) {
-                $received_user_id = $wo['user']['id'];
-                $send_user_id = Wo_Secure($_POST['user_id']);
-                mysqli_query($sqlConnect, "DELETE FROM " . T_POKES . " WHERE `received_user_id` = '{$received_user_id}' AND `send_user_id` = {$send_user_id}");
-            }
             $received_user_id = Wo_Secure($_POST['user_id']);
             $send_user_id     = $wo['user']['id'];
             $query = mysqli_query($sqlConnect, " INSERT INTO " . T_POKES . " (`received_user_id`,`send_user_id`) VALUES ({$received_user_id},{$send_user_id})");
@@ -103,9 +98,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 foreach ($non_allowed as $key => $value) {
                     unset($fetched_data['user_data'][$value]);
                 }
-                if (!empty($fetched_data['user_data'])) {
-                    $pokes[] = $fetched_data;
-                }
+                $pokes[] = $fetched_data;
             }
         }
         $response_data = array(

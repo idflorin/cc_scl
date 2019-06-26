@@ -208,23 +208,6 @@ iframe, .post-map img {border-color: #4b4b4b;}
 .text-sender-container .msg_usr_info_top_list {
     color: #cbcbcb;
 }
-.text-sender-container .message-model .message.wo_msg_prod_prnt .wo_market .market_bottom .product .product-by a, .chat-messages-wrapper .message.wo_msg_prod_prnt .wo_market .market_bottom .product .product-by a {
-    color: #a2a2a2;
-}
-.all_colors {
-	background: #212121;
-}
-.two_check_card .sun_input select option {
-	color: #fff;background: #363636;
-}
-.all_colors_display.selected .all_colors_style, .all_colors_display.selected .all_colors_style_image {
-    box-shadow: 0 0 0 2px #212121, 0 0 0 4px #2196F3;
-}
-.post .wo_shared_doc_file i {
-	background-color: #434343;
-}
-
-
 
 
 

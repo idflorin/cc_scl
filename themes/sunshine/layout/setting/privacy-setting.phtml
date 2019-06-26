@@ -31,6 +31,7 @@
 						<?php 
 							$selected_meesageP_everyone   = ($wo['setting']['message_privacy'] == 0)   ? ' selected' : '';
 							$selected_meesageP_following  = ($wo['setting']['message_privacy'] == 1)   ? ' selected' : '';
+							$selected_meesageP_nobody  = ($wo['setting']['message_privacy'] == 2)   ? ' selected' : '';
 						?>
 						<option value="0" <?php echo $selected_meesageP_everyone; ?> ><?php echo $wo['lang']['everyone']; ?></option>
 						<option value="1" <?php echo $selected_meesageP_following; ?> >
@@ -42,6 +43,7 @@
 							}
 							?>
 						</option>
+						<option value="2" <?php echo $selected_meesageP_nobody; ?> ><?php echo $wo['lang']['no_body']; ?></option>
 					</select>
 				</div>
 			</div>
@@ -139,7 +141,7 @@
 			<?php
 				$profileVisits = 0;
 				if ($wo['config']['pro'] == 1) {
-					if ($wo['setting']['is_pro'] == 1) {
+					if ($wo['setting']['is_pro'] == 1 && in_array($wo['setting']['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$wo['setting']['pro_type']]]['profile_visitors'] == 1) {
 					$profileVisits = 1;
 					}
 				} else {
@@ -167,7 +169,7 @@
 				</div>
 			</div>
 			<?php } ?>
-			<?php if($wo['config']['user_lastseen'] == 1) { ?>
+			<?php if($wo['config']['user_lastseen'] == 1 && in_array($wo['setting']['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$wo['setting']['pro_type']]]['last_seen'] == 1) { ?>
 			<div class="form-group">
 				<label class="col-md-5" for="showlastseen"> <?php echo $wo['lang']['lastseen_privacy_label']; ?></label>
 				<div class="col-md-5">

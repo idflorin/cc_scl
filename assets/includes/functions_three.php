@@ -66,9 +66,6 @@ function Wo_RegisterPoint($post_id, $type, $action = '+'){
         case "createpost":
             $points = $wo['config']['createpost_point'];
             break;
-        case "createblog":
-            $points = $wo['config']['createblog_point'];
-            break;
         case "blog_comment":
             $query_comments     = "SELECT `id` FROM `" . T_BLOG_COMM . "` WHERE `id` = ".$post_id." AND `user_id` = ".$user_id;
             $sql_query_comments = mysqli_query($sqlConnect, $query_comments);
@@ -1636,7 +1633,6 @@ function Wo_GetForumThreads($args = array()) {
         $fetched_data['user_data']  = Wo_UserData($fetched_data['user']);
         $fetched_data['url']        = Wo_SeoLink("index.php?link1=showthread&tid=" . $fetched_data['id']);
         $fetched_data['author_url'] = Wo_SeoLink("index.php?link1=timeline&u=" . $fetched_data['user_data']['username']);
-        $fetched_data['orginal_headline']   = $fetched_data['headline'];
         $fetched_data['headline']   = Wo_GetShortTitle($fetched_data['headline'], $preview);
         $fetched_data['edit_url']   = Wo_SeoLink('index.php?link1=edithread&tid=' . $fetched_data['id']);
         if (empty($args['threadreplies'])) {
@@ -2788,9 +2784,9 @@ function Wo_UnsetEventGoingUsers($event_id) {
 }
 function Wo_GetEvents($args = array()) {
     global $sqlConnect, $wo;
-    // if ($wo['loggedin'] == false) {
-    //     return false;
-    // }
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
     $options = array(
         "offset" => 0,
         "limit" => 10,
@@ -2801,22 +2797,18 @@ function Wo_GetEvents($args = array()) {
     $total   = "";
     $offset  = $args['offset'];
     $limit   = $args['limit'];
-    
+    $user    = $wo['user']['id'];
     if ($offset > 0) {
         $sub_q .= " AND `id` < {$offset} AND `id` <> {$offset}  ";
     }
     if ($limit && is_numeric($limit)) {
         $total = " LIMIT $limit  ";
     }
-    
     $sql = "SELECT * FROM " . T_EVENTS;
-    if ($wo['config']['events_visibility'] == 1) {
-        $user    = $wo['user']['id'];
-        if (empty($args['is_admin'])) {
-            $sql .= " WHERE `id` NOT IN 
-        (SELECT `event_id` FROM " . T_EVENTS_GOING . " WHERE `user_id` = '$user') 
-        AND `id` NOT IN (SELECT `event_id` FROM " . T_EVENTS_INT . " WHERE `user_id` = '$user') {$sub_q} ORDER BY `id` DESC {$total} ";
-        }
+    if (empty($args['is_admin'])) {
+        $sql .= " WHERE `id` NOT IN 
+    (SELECT `event_id` FROM " . T_EVENTS_GOING . " WHERE `user_id` = '$user') 
+    AND `id` NOT IN (SELECT `event_id` FROM " . T_EVENTS_INT . " WHERE `user_id` = '$user') {$sub_q} ORDER BY `id` DESC {$total} ";
     }
     $query = mysqli_query($sqlConnect, $sql);
     $data  = array();
@@ -2912,35 +2904,6 @@ function Wo_GetInterestedEvents($offset = 0) {
     $data    = array();
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $event = Wo_EventData($fetched_data['event_id']);
-        if ($event && !empty($event)) {
-            $data[] = $event;
-        }
-    }
-    return $data;
-}
-function Wo_GetInterestedEventsUsers($event_id,$offset = 0,$limit = 0) {
-    global $sqlConnect, $wo;
-    if ($wo['loggedin'] == false) {
-        return false;
-    }
-    if (empty($event_id) || !is_numeric($event_id) || $event_id < 1) {
-        return false;
-    }
-    $event_id = Wo_Secure($event_id);
-    $sub_q = "";
-    if ($offset > 0) {
-        $sub_q = " AND `id` < {$offset} AND `id` <> {$offset} ";
-    }
-    $limit_query = '';
-    if (!empty($limit)) {
-        $limit_query = " LIMIT $limit";
-    }
-    $user_id = $wo['user']['id'];
-    $sql     = "SELECT `user_id` FROM " . T_EVENTS_INT . " WHERE `event_id` = '$event_id' {$sub_q} ORDER BY `id` DESC $limit_query";
-    $query   = mysqli_query($sqlConnect, $sql);
-    $data    = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $event = Wo_UserData($fetched_data['user_id']);
         if ($event && !empty($event)) {
             $data[] = $event;
         }
@@ -3044,9 +3007,9 @@ function Wo_DeleteEvent($id = false) {
 }
 function Wo_EventData($id = false) {
     global $sqlConnect, $wo;
-    // if ($wo['loggedin'] == false || !$id || !is_numeric($id)) {
-    //     return false;
-    // }
+    if ($wo['loggedin'] == false || !$id || !is_numeric($id)) {
+        return false;
+    }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM " . T_EVENTS . "  WHERE `id` = '$id'");
     $fetched_data = mysqli_fetch_assoc($query);
     if (!empty($fetched_data)) {
@@ -3054,8 +3017,6 @@ function Wo_EventData($id = false) {
         $fetched_data['cover']      = Wo_GetMedia($fetched_data['cover']);
         $fetched_data['is_owner']   = Is_EventOwner($fetched_data['id']);
         //$fetched_data['start_date'] = date($fetched_data['start_date']);
-        $fetched_data['start_edit_date'] = date($fetched_data['start_date']);
-        $fetched_data['start_date_js'] = date('m/d/y' , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
         $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
         $fetched_data['end_edit_date'] = date($fetched_data['end_date']);
         $fetched_data['end_date']   = date($wo['config']['date_style'], strtotime($fetched_data['end_date']));
@@ -3198,9 +3159,9 @@ function Wo_AddBlogCommentDisLikes($id, $blog) {
 }
 function Wo_GetMovies($args = array()) {
     global $sqlConnect, $wo;
-    // if ($wo['loggedin'] == false) {
-    //     return false;
-    // }
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
     $options = array(
         "offset" => 0,
         "limit" => 26,
@@ -3295,9 +3256,9 @@ function Wo_GetMtwFilms($limit = 26) {
 }
 function Wo_SearchFilms($key) {
     global $sqlConnect, $wo;
-    // if ($wo['loggedin'] == false || !$key) {
-    //     return false;
-    // }
+    if ($wo['loggedin'] == false || !$key) {
+        return false;
+    }
     $data  = array();
     $key   = Wo_Secure($key);
     $sql   = "SELECT  *  FROM 
@@ -3462,7 +3423,7 @@ function Wo_IsMovieCommReplyOwner($id) {
 }
 function Wo_GetMovieCommentData($id) {
     global $sqlConnect, $wo;
-    if (!$id || !is_numeric($id) || $id < 1) {
+    if ($wo['loggedin'] == false || !$id || !is_numeric($id) || $id < 1) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_MOVIE_COMMS . " WHERE `id` = '$id'");
@@ -3482,7 +3443,7 @@ function Wo_GetMovieCommentData($id) {
 }
 function Wo_GetMovieCommReplyData($id) {
     global $sqlConnect, $wo;
-    if (!$id || !is_numeric($id) || $id < 1) {
+    if ($wo['loggedin'] == false || !$id || !is_numeric($id) || $id < 1) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_MOVIE_COMM_REPLIES . " WHERE `id` = '$id'");
@@ -4906,7 +4867,7 @@ function Wo_GetChatGroups($after_id = false) {
     }
     $sql   = "SELECT * FROM " . T_GROUP_CHAT . " 
                 WHERE (`user_id` = {$user} OR `group_id` IN 
-                   (SELECT `group_id` FROM Wo_GroupChatUsers  WHERE `user_id` = {$user})) {$sub_sql} ORDER BY `time` DESC";
+                   (SELECT `group_id` FROM Wo_GroupChatUsers  WHERE `user_id` = {$user})) {$sub_sql}";
     $query = mysqli_query($sqlConnect, $sql);
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $fetched_data['user_data']    = Wo_UserData($fetched_data['user_id']);
@@ -5637,7 +5598,7 @@ function Wo_CountStories($user_id = 0) {
     $fetched_data = mysqli_fetch_assoc($query_run);
     return $fetched_data['count'];
 }
-function Wo_GetFriendsStatus($data_array = array('limit' => 8, 'user_id' => 0,'offset' => 0)) {
+function Wo_GetFriendsStatus($data_array = array('limit' => 8, 'user_id' => 0)) {
     global $wo, $sqlConnect;
     if ($wo['loggedin'] == false) {
         return false;
@@ -5651,56 +5612,8 @@ function Wo_GetFriendsStatus($data_array = array('limit' => 8, 'user_id' => 0,'o
     if (!empty($data_array['api'])) {
         $group_by = "";
     }
-
-    $offset_query = "";
-    if (!empty($data_array['offset'])) {
-        $offset = Wo_Secure($data_array['offset']);
-        $offset_query = " AND `id` < $offset ";
-    }
     // $query     = "SELECT * FROM " . T_USER_STORY . " WHERE (user_id IN (SELECT following_id FROM " . T_FOLLOWERS . " WHERE follower_id = '$user_id') OR user_id = $user_id) AND user_id IN (SELECT user_id FROM " . T_USERS . " WHERE active = '1') $group_by ORDER BY id DESC";
-    $query     = "SELECT DISTINCT user_id,title,description,posted,expire,thumbnail,(SELECT MAX(us.id) FROM " . T_USER_STORY . " us WHERE us.user_id = " . T_USER_STORY . ".user_id) AS id  FROM " . T_USER_STORY . " WHERE (user_id IN (SELECT following_id FROM " . T_FOLLOWERS . " WHERE follower_id = '$user_id') OR user_id = $user_id) AND user_id IN (SELECT user_id FROM " . T_USERS . " WHERE active = '1') $offset_query $group_by ORDER BY id DESC LIMIT ".$data_array['limit'];
-    $query_run = mysqli_query($sqlConnect, $query);
-
-    while ($fetched_data = mysqli_fetch_assoc($query_run)) {
-        $story_images              = Wo_GetStoryMedia($fetched_data['id'], 'image');
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        if (empty($fetched_data['thumbnail'])) {
-            $fetched_data['thumb']['filename'] = $fetched_data['user_data']['avatar_org'];
-        } else {
-            $fetched_data['thumb']             = array();
-            $fetched_data['thumb']['filename'] = $fetched_data['thumbnail'];
-        }
-        $fetched_data['thumb']['filename'] = Wo_GetMedia($fetched_data['thumb']['filename']);
-        $fetched_data['videos']            = Wo_GetStoryMedia($fetched_data['id'], 'video');
-        $fetched_data['is_owner']          = ($fetched_data['user_id'] == $wo['user']['id'] || Wo_IsAdmin() || Wo_IsModerator()) ? true : false;
-        $data[]                            = $fetched_data;
-    }
-
-    return $data;
-}
-
-function Wo_GetFriendsStatusAPI($data_array = array('limit' => 8, 'user_id' => 0,'offset' => 0)) {
-    global $wo, $sqlConnect;
-    if ($wo['loggedin'] == false) {
-        return false;
-    }
-    if (empty($data_array['user_id'])) {
-        $data_array['user_id'] = $wo['user']['user_id'];
-    }
-    $data      = array();
-    $user_id   = Wo_Secure($data_array['user_id']);
-    $group_by = "GROUP BY user_id";
-    if (!empty($data_array['api'])) {
-        $group_by = "";
-    }
-
-    $offset_query = "";
-    if (!empty($data_array['offset'])) {
-        $offset = Wo_Secure($data_array['offset']);
-        $offset_query = " AND `user_id` < $offset ";
-    }
-    // $query     = "SELECT * FROM " . T_USER_STORY . " WHERE (user_id IN (SELECT following_id FROM " . T_FOLLOWERS . " WHERE follower_id = '$user_id') OR user_id = $user_id) AND user_id IN (SELECT user_id FROM " . T_USERS . " WHERE active = '1') $group_by ORDER BY id DESC";
-    $query     = "SELECT DISTINCT user_id,title,description,posted,expire,thumbnail,(SELECT MAX(us.id) FROM " . T_USER_STORY . " us WHERE us.user_id = " . T_USER_STORY . ".user_id) AS id  FROM " . T_USER_STORY . " WHERE (user_id IN (SELECT following_id FROM " . T_FOLLOWERS . " WHERE follower_id = '$user_id') OR user_id = $user_id) AND user_id IN (SELECT user_id FROM " . T_USERS . " WHERE active = '1') $offset_query $group_by ORDER BY user_id DESC LIMIT ".$data_array['limit'];
+    $query     = "SELECT DISTINCT user_id,title,description,posted,expire,thumbnail,(SELECT MAX(us.id) FROM " . T_USER_STORY . " us WHERE us.user_id = " . T_USER_STORY . ".user_id) AS id  FROM " . T_USER_STORY . " WHERE (user_id IN (SELECT following_id FROM " . T_FOLLOWERS . " WHERE follower_id = '$user_id') OR user_id = $user_id) AND user_id IN (SELECT user_id FROM " . T_USERS . " WHERE active = '1') $group_by ORDER BY id DESC LIMIT ".$data_array['limit'];
     $query_run = mysqli_query($sqlConnect, $query);
 
     while ($fetched_data = mysqli_fetch_assoc($query_run)) {
@@ -5731,16 +5644,8 @@ function Wo_HashPassword($password = '', $hashed_password) {
         $hash = 'md5';
     } else if (preg_match('/^[0-9a-f]{40}$/i', $hashed_password)) {
         $hash = 'sha1';
-    } else if (strlen($hashed_password) == 60) {
-        $hash = 'password_hash';
     }
-    if ($hash == 'password_hash') {
-        if (password_verify($password, $hashed_password)) {
-            return true;
-        }
-    } else {
-        $password = $hash($password);
-    }
+    $password = $hash($password);
     if ($password == $hashed_password) {
         return true;
     }
@@ -6092,21 +5997,11 @@ function Wo_SharePostOn($id = false,$type_id,$type) {
         $post_data['boosted']     = 0;
         $post_data['time']        = time();
         $post_data['postText']    = '';
-        $post_data['comments_status']    = 1;
         $fields                   = '`' . implode('`, `', array_keys($post_data)) . '`';
         $data                     = '\'' . implode('\', \'', $post_data) . '\'';
         $sql                      = "INSERT INTO " . T_POSTS . " ({$fields}) VALUES ({$data})";
         $query1                   = mysqli_query($sqlConnect, $sql);
         $last                     = mysqli_insert_id($sqlConnect);
-        if (!empty($post_data['album_name'])) {
-            $query = mysqli_query($sqlConnect,"SELECT `id`,`image`,`post_id` FROM " . T_ALBUMS_MEDIA . " WHERE `post_id` = {$id} ORDER BY `id` DESC");
-            if ($query) {
-                while ($fetched_data = mysqli_fetch_assoc($query)) {
-                    $media = $fetched_data['image'];
-                    mysqli_query($sqlConnect, "INSERT INTO " . T_ALBUMS_MEDIA . " (`post_id`,`image`) VALUES ({$last}, '{$media}')");
-                }
-            } 
-        }
         $query2                   = mysqli_query($sqlConnect, "UPDATE " . T_POSTS . " SET `post_id` = {$last} WHERE `id` = {$last}");
         if ($query1 && $query2) {
             return $last;

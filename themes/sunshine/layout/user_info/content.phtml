@@ -103,7 +103,7 @@ footer {
 	<body>
 		<header>
 			<a class="brand header-brand" href="<?php echo $wo['config']['site_url']; ?>">
-				<img width="120" src="<?php echo $wo['config']['theme_url'];?>/img/logo.svg" alt="<?php echo $wo['config']['siteName'];?> Logo">
+				<img width="130" src="<?php echo $wo['config']['theme_url'];?>/img/logo.<?php echo $wo['config']['logo_extension'];?>" alt="<?php echo $wo['config']['siteName'];?> Logo">
 			</a>
 		</header>
 		<div class="container">
@@ -173,11 +173,11 @@ footer {
 				<?php if (!empty($wo['user_info']['setting']['gender'])) { ?>
 					<tr>
 						<td><?php echo $wo['lang']['gender']; ?></td>
-						<?php if (!empty($wo['user_info']['setting']['gender']) == 'male') { ?>
-							<td><?php echo $wo['lang']['male']; ?></td>
-						<?php }else{ ?>
-							<td><?php echo $wo['lang']['female']; ?></td>
-						<?php } ?>
+						<?php foreach ($wo['genders'] as $key => $gender) { 
+							if ($wo['user_info']['setting']['gender'] == $key) {
+							?>
+							<td><?php echo $gender; ?></td>
+						<?php } } ?>
 					</tr>
 				<?php } ?>
 				<?php if (!empty($wo['user_info']['setting']['pro_type']) && $wo['user_info']['setting']['is_pro'] == 1) { ?>

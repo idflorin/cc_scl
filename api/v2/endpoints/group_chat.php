@@ -84,20 +84,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 ));
             }
             if ($id && is_numeric($id)) {
-                $group_data = Wo_GetChatGroupData($id);
-                foreach ($group_data as $key_g => $group) {
-                    foreach ($non_allowed as $key => $value) {
-                        unset($group_data[$key_g]['user_data'][$value]);
-                    }
-                    foreach ($group_data[$key_g]['parts'] as $key1 => $part) {
-                        foreach ($non_allowed as $key => $value) {
-                            unset($group_data[$key_g]['parts'][$key1][$value]);
-                        }
-                    }
-                }
                 $response_data = array(
                     'api_status' => 200,
-                    'data' => $group_data
+                    'data' => Wo_GetChatGroupData($id)
                 );
             }
         }
@@ -180,20 +169,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 }
                 if (!empty($update_data)) {
                     @Wo_UpdateGChat($id, $update_data);
-                    $group_data = Wo_GetChatGroupData($id);
-                    foreach ($group_data as $key_g => $group) {
-                        foreach ($non_allowed as $key => $value) {
-                            unset($group_data[$key_g]['user_data'][$value]);
-                        }
-                        foreach ($group_data[$key_g]['parts'] as $key1 => $part) {
-                            foreach ($non_allowed as $key => $value) {
-                                unset($group_data[$key_g]['parts'][$key1][$value]);
-                            }
-                        }
-                    }
                     $response_data = array(
                         'api_status' => 200,
-                        'data' => $group_data
+                        'data' => Wo_GetChatGroupData($id)
                     );
                 }
             }
@@ -416,11 +394,6 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     }
                     array_push($messages, $message);
                 }
-                foreach ($messages as $m_id => $value) {
-                    foreach ($non_allowed as $key => $value) {
-                        unset($messages[$m_id]['user_data'][$value]);
-                    }
-                }
                 if (!empty($messages)) {
                     $response_data = array(
                         'api_status' => 200,
@@ -522,11 +495,6 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             }
             $send_messages_to_phones = Wo_MessagesPushNotifier();
             $group_tab['messages'] = $group_messages;
-            foreach ($group_tab['messages'] as $m_id => $value) {
-                foreach ($non_allowed as $key => $value) {
-                    unset($group_tab['messages'][$m_id]['user_data'][$value]);
-                }
-            }
 
             $response_data = array(
                                 'api_status' => 200,

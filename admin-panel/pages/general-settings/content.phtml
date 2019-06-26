@@ -68,7 +68,7 @@
                 <div class="body">
                     <div class="alert alert-success user-settings-alert"></div>
                     <form class="user-settings" method="POST">
-                        <label for="user_registration">User Registration <span class="black" data-toggle="popover" data-trigger="hover" data-content="Allow users to create accounts"><i class="fa fa-question-circle fa-fw"></i></span></label>
+                        <label for="user_registration">User Registration <span class="black" data-toggle="popover" data-trigger="hover" data-content="Allow users to create accounts"></span></label>
                         <div class="form-group">
                             <input type="radio" name="user_registration" id="user_registration-enabled" value="1" <?php echo ($wo['config']['user_registration'] == 1) ? 'checked': '';?>>
                             <label for="user_registration-enabled">Enabled</label>
@@ -89,6 +89,7 @@
                             <input type="radio" name="login_auth" id="login_auth-disabled" value="0" <?php echo ($wo['config']['login_auth'] == 0) ? 'checked': '';?>>
                             <label for="login_auth-disabled" class="m-l-20">Disabled</label>
                         </div>
+                        
                         <label for="login_auth">Two-factor authentication<span class="black" data-toggle="popover" data-trigger="hover" data-content="Send confirmation code to email or to SMS when user logins"><i class="fa fa-question-circle fa-fw"></i></span></label>
                         <div class="form-group">
                             <input type="radio" name="two_factor" id="two_factor-enabled" value="1" <?php echo ($wo['config']['two_factor'] == 1) ? 'checked': '';?>>
@@ -133,6 +134,12 @@
                             <div class="form-line">
                                 <input type="text" id="reCaptchaKey" name="reCaptchaKey" class="form-control" value="<?php echo $wo['config']['reCaptchaKey']?>">
                                 <label class="form-label">Recaptcha Key</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="recaptcha_secret_key" name="recaptcha_secret_key" class="form-control" value="<?php echo $wo['config']['recaptcha_secret_key']?>">
+                                <label class="form-label">Recaptcha Secret Key</label>
                             </div>
                         </div>
                         <label for="online_sidebar">Online Users <span class="black" data-toggle="popover" data-trigger="hover" data-content="Show active users in home sidebar."><i class="fa fa-question-circle fa-fw"></i></span></label>
@@ -304,11 +311,92 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-4 col-md-4 float-right">
+            <div class="card">
+                <div class="header">
+                    <h2>Adult Images System</h2>
+                </div>
+                <div class="body">
+
+                    <div class="alert alert-success adult-settings-alert"></div>
+                    <div class="alert adult-settings-test-alert"></div>
+                    <form class="adult-settings" method="POST">
+                        <p>Please Follow the steps to active the system</p>
+                        <p>1- Select or create a GCP project from <a href="https://console.cloud.google.com/projectcreate?previousPage=%2Fcloud-resource-manager%3F_ga%3D2.239227332.-679302599.1549629461&defaultProjectName=&project=robotic-subject-231114&folder=&organizationId=">Here</a></p>
+                        <p>2- Make sure that billing is enabled for your project <a href="https://cloud.google.com/billing/docs/how-to/modify-project">From Here</a> Or <a href="https://console.cloud.google.com/freetrial/signup/tos">Create a new billing account</a></p>
+                        <p>3- Enable the Cloud Vision API. <a href="https://console.cloud.google.com/flows/enableapi?apiid=vision-json.googleapis.com&_ga=2.132996809.-679302599.1549629461">From Here</a></p>
+                        <p>4- Create an API key:</p>
+                        <p>- Navigate to the <a href="https://console.cloud.google.com/apis/credentials?_ga=2.194723562.-679302599.1549629461">APIs & Services→Credentials</a> panel in GCP Console.</p>
+                        <p>- Select Create credentials, then select API key from the dropdown menu .</p>
+                        <p>- Click the Create button. The API key created dialog box displays your newly created key.</p>
+                        <br>
+                        <label for="adult_images">Adult Images <span class="black" data-toggle="popover" data-trigger="hover"></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="adult_images" id="adult_images-enabled" value="1" <?php echo ($wo['config']['adult_images'] == 1) ? 'checked': '';?>>
+                            <label for="adult_images-enabled">Enabled</label>
+                            <input type="radio" name="adult_images" id="adult_images-disabled" value="0" <?php echo ($wo['config']['adult_images'] == 0) ? 'checked': '';?>>
+                            <label for="adult_images-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <label for="adult_images_action">Action For Adult Images <span class="black" data-toggle="popover" data-trigger="hover"></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="adult_images_action" id="adult_images_action-enabled" value="1" <?php echo ($wo['config']['adult_images_action'] == 1) ? 'checked': '';?>>
+                            <label for="adult_images_action-enabled">Blur</label>
+                            <input type="radio" name="adult_images_action" id="adult_images_action-disabled" value="0" <?php echo ($wo['config']['adult_images_action'] == 0) ? 'checked': '';?>>
+                            <label for="adult_images_action-disabled" class="m-l-20">Delete Image</label>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="vision_api_key" name="vision_api_key" class="form-control" value="<?php echo $wo['config']['vision_api_key']?>">
+                                <label class="form-label">Vision API key</label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                        <span class="btn btn-warning m-t-15 waves-effect" id="test_btn" onclick="Wo_TestVisionApi();">Test API</span>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="clearfix"></div>
     </div>
     <!-- #END# Vertical Layout -->
 <script>
+function Wo_TestVisionApi() {
+    $('#test_btn').text('Please wait..');
+    $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=test_vision_api', function(data, textStatus, xhr) {
+        if (data.status == 400) {
+            $(".adult-settings-test-alert").html('<div class="alert alert-danger">' + data.message + '</div>');
+            setTimeout(function (argument) {
+                $(".adult-settings-test-alert").html('');
+            },2000);
+        }
+        else{
+            $(".adult-settings-test-alert").html('<div class="alert alert-success">' + data.message + '</div>');
+            setTimeout(function (argument) {
+                $(".adult-settings-test-alert").html('');
+            },2000);
+        }
+        $('#test_btn').text('Test API');
+    });
+}
 $(function() {
+    var form_adult_settings = $('form.adult-settings');
+    form_adult_settings.ajaxForm({
+        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
+        beforeSend: function() {
+            form_adult_settings.find('button').text('Please wait..');
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_adult_settings.find('button').text('Save');
+                $('.adult-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                setTimeout(function () {
+                    $('.adult-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+
     var form_general_settings = $('form.general-settings');
     form_general_settings.ajaxForm({
         url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',

@@ -30,6 +30,7 @@ if (isset($notificationType2) && !empty($notificationType2)) {
     }
 } else {
     $type2 = $wo['lang']['post_n_label'];
+    
 }
 $orginal_txt  = array(
     "{postType}",
@@ -217,9 +218,11 @@ if (!empty($wo['notification']['type'])) {
     if ($wo['notification']['type'] == 'admin_notification') {
         $theme                                    = $wo['config']['theme'];
         $wo['notification']['type_text']          = $wo['notification']['text'];
-        $wo['notification']['url']                = $wo['notification']['full_link']; 
-        $wo['notification']['ajax_url']           = $wo['notification']['full_link']; 
-        $wo['notification']['wo_url']             = false; 
+        if ($wo['notification']['type2'] != 'no_name' ) {
+            $wo['notification']['url']                = $wo['notification']['full_link']; 
+            $wo['notification']['ajax_url']           = $wo['notification']['full_link']; 
+            $wo['notification']['wo_url']             = false; 
+        }
         $wo['notification']['notifier']['name']   = $wo['config']['siteName']; 
         $wo['notification']['notifier']['avatar'] = $wo['config']['theme_url'] . "/img/icon.png"; 
         $wo['notification']['icon']              .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye active"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
@@ -265,6 +268,24 @@ if (!empty($wo['notification']['type'])) {
         $wo['notification']['url']       = $wo['notification']['url']; 
         $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle active"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';;
     }
+    // Share post
+    if ($wo['notification']['type'] == 'shared_your_post') {
+        $wo['notification']['type_text'] = $wo['lang']['shared_your_post'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user active"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+    }
+    if ($wo['notification']['type'] == 'shared_a_post_in_timeline') {
+        $wo['notification']['type_text'] = $wo['lang']['shared_a_post_in_timeline'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user active"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+    }
+    // Share post
+    if ($wo['notification']['type'] == 'bank_pro' || $wo['notification']['type'] == 'bank_wallet') {
+        $wo['notification']['type_text'] = $wo['lang']['bank_pro'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user active"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+    } 
+    if ($wo['notification']['type'] == 'bank_decline') {
+        $wo['notification']['type_text'] = $wo['lang']['bank_decline'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user active"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+    }
 }
 ?>
 
@@ -276,7 +297,10 @@ if (!empty($wo['notification']['type'])) {
          </div>
          <div class="notification-text">
             <span class="main-color">
-            <?php echo $wo['notification']['notifier']['name']; ?>
+            <?php if ($wo['notification']['type2'] != 'no_name') {
+                echo $wo['notification']['notifier']['name'];
+            }
+             ?>
             </span>
             <?php echo $wo['notification']['type_text']; ?>
             <div class="notification-time active">

@@ -825,7 +825,7 @@ table tr {outline: 0;}
 .sun_pub_mid_foot {margin: 0 10px;border-top: 1px solid #e8e8e8;padding: 8px 3px;display: flex;align-items: center;}
 .sun_pub_mid_foot .poster-left-buttons {margin-right: 7px;display: flex;max-width: calc((493.5px - 75px) / 3);}
 .sun_pub_mid_foot .poster-left-buttons:last-child {margin: 0;}
-.sun_pub_mid_foot .poster-left-buttons .btn {padding: 0 6px;border-radius: 2em;height: 32px;transition: all 0.15s;font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;font-weight: 500;font-size: 13px;text-overflow: ellipsis;white-space: nowrap;line-height: 28px;background: #f3f3f3;}
+.sun_pub_mid_foot .poster-left-buttons .btn {padding: 0 9px;border-radius: 2em;height: 32px;transition: all 0.15s;font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;font-weight: 500;font-size: 13px;text-overflow: ellipsis;white-space: nowrap;line-height: 28px;background: #f3f3f3;}
 .sun_pub_mid_foot .poster-left-buttons .btn:hover {color: #222;}
 .sun_pub_mid_foot .poster-left-buttons .btn svg {width: 21px;height: 21px;margin-right: 1px;margin-top: -2px;}
 .sun_pub_mid_foot .poster-left-buttons .btn img {width: 20px;height: 20px;margin-right: 1px;margin-top: -1px;border-radius: 3px;object-fit: cover;}
@@ -1062,8 +1062,7 @@ table tr {outline: 0;}
 .who_react_to_this_user .who_react_to_this_user_info .user-popover p {max-height: 35px;overflow: hidden;margin: 0;}
 .who_react_to_this_user .avatar {width: 40px;min-width: 40px;margin-right: 15px;height: 40px;border-radius: 50%;}
 .who_react_to_this_user .avatar img {width: 100%;height: 100%;object-fit: cover;border-radius: 50%;}
-.who_react_to_this_user .avatar .wo_who_react_this {top: auto !important;bottom: -4px;right: -4px !important;background: transparent !important;width: 18px !important;height: 18px !important;line-height: 1;}
-.who_react_to_this_user .avatar .wo_who_react_this .inline_act_emoji {min-width: 18px;}
+.who_react_to_this_user .avatar .wo_who_react_this {top: auto !important;bottom: -4px;right: -4px !important;background: transparent !important;width: 18px !important;height: 18px !important;}
 .who_react_to_this_user .user-follow-button {margin-left: auto;}
 .who_react_to_this_user .user-follow-button button {padding: 3px 9px !important;}
 .wo_react_ursrs_list {max-height: 450px;overflow-y: auto;}
@@ -1133,9 +1132,9 @@ svg {vertical-align: middle;}
 #wo_nw_msg_page .wo_msg_tabs .active a {color: #4d91ea;}
 .user-status-home {overflow: hidden;}
 .user-status-home ul.status-list {/*overflow-x: scroll;margin-bottom: -28px;padding-bottom: 10px;*/}
-.user-status-home ul.status-list::-webkit-scrollbar, #wo_nw_msg_page .messages-users-list::-webkit-scrollbar, #wo_nw_msg_page .messages-container::-webkit-scrollbar, .wo_react_ursrs_list::-webkit-scrollbar {height:12px;width:12px}
-.user-status-home ul.status-list::-webkit-scrollbar-button, #wo_nw_msg_page .messages-users-list::-webkit-scrollbar-button, #wo_nw_msg_page .messages-container::-webkit-scrollbar-button, .wo_react_ursrs_list::-webkit-scrollbar-button {height:0;width:0}
-.user-status-home ul.status-list::-webkit-scrollbar-thumb, #wo_nw_msg_page .messages-users-list::-webkit-scrollbar-thumb, #wo_nw_msg_page .messages-container::-webkit-scrollbar-thumb, .wo_react_ursrs_list::-webkit-scrollbar-thumb {background-clip:padding-box;background-color:rgba(0,0,0,.3);border:4px solid transparent;-webkit-border-radius:10px;border-radius:10px;min-height:20px;min-width:20px;height:5px;width:5px}
+.user-status-home ul.status-list::-webkit-scrollbar, #wo_nw_msg_page .messages-users-list::-webkit-scrollbar, #wo_nw_msg_page .messages-container::-webkit-scrollbar {height:12px;width:12px}
+.user-status-home ul.status-list::-webkit-scrollbar-button, #wo_nw_msg_page .messages-users-list::-webkit-scrollbar-button, #wo_nw_msg_page .messages-container::-webkit-scrollbar-button {height:0;width:0}
+.user-status-home ul.status-list::-webkit-scrollbar-thumb, #wo_nw_msg_page .messages-users-list::-webkit-scrollbar-thumb, #wo_nw_msg_page .messages-container::-webkit-scrollbar-thumb {background-clip:padding-box;background-color:rgba(0,0,0,.3);border:4px solid transparent;-webkit-border-radius:10px;border-radius:10px;min-height:20px;min-width:20px;height:5px;width:5px}
 }
 
 @media (min-width: 1420px) {
@@ -1307,7 +1306,7 @@ form#navbar-searchbox+.dropdown-menu .search-dropdown-result {max-height: 340px;
 .wo_imagecombo_lbox.story_lightbox {height: 100%;}
 }
 
-@media (max-width: 600px) {
+@media (max-width: 395px) {
 .select_radio_btn .select_radio_btn_innr {flex-direction: column;align-items: center;}
 .select_radio_btn .select_radio_btn_innr label {margin: 0 0 10px;}
 .select_radio_btn .select_radio_btn_innr label .sr_btn_lab_innr {width: 200px;}

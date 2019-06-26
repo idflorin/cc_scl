@@ -3,7 +3,7 @@ if ($wo['loggedin'] == false) {
   header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
   exit();
 }
-if ($wo['config']['pages'] == 0) {
+if ($wo['config']['groups'] == 0) {
 	header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
     exit();
 }

@@ -34,28 +34,19 @@ if (($page > $db->totalPages) && !empty($_GET['page-id'])) {
     </div>
     <!-- Vertical Layout -->
     <div class="row">
-        <div class="col-lg-3 col-md-3">
-            <div class="info-box bg-light-green hover-expand-effect">
-                <div class="icon">
-                    <i class="material-icons">account_box</i>
-                </div>
-                <div class="content">
-                    <div class="text">MALE</div>
-                    <div class="number count-to" data-from="0" data-to="<?php echo Wo_CountUserData('male'); ?>" data-speed="1000" data-fresh-interval="20"></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-3 ">
-            <div class="info-box bg-light-green hover-expand-effect">
-                <div class="icon">
-                    <i class="material-icons">account_circle</i>
-                </div>
-                <div class="content">
-                    <div class="text">FEMALE</div>
-                    <div class="number count-to" data-from="0" data-to="<?php echo Wo_CountUserData('female'); ?>" data-speed="1000" data-fresh-interval="20"></div>
+      <?php foreach ($wo['genders'] as $key => $gender) { ?>
+            <div class="col-lg-3 col-md-3">
+                <div class="info-box bg-light-green hover-expand-effect">
+                    <div class="icon">
+                        <i class="material-icons">account_box</i>
+                    </div>
+                    <div class="content">
+                        <div class="text"><?php echo $gender; ?></div>
+                        <div class="number count-to" data-from="0" data-to="<?php echo Wo_CountUserData($key); ?>" data-speed="1000" data-fresh-interval="20"></div>
+                    </div>
                 </div>
             </div>
-        </div>
+          <?php } ?>
         <div class="col-lg-3 col-md-3 ">
             <div class="info-box bg-light-green hover-expand-effect">
                 <div class="icon">
@@ -223,6 +214,21 @@ if (($page > $db->totalPages) && !empty($_GET['page-id'])) {
         <div class="clearfix"></div>
     </div>
 <script>
+
+function Wo_DeleteUserPosts(user_id) {
+  if (confirm("Are you sure you want to delete all user posts?") == false) {
+    return false;
+  }
+  hash_id = $('#hash_id').val();
+  $.get(Wo_Ajax_Requests_File(),{f:'admin_setting', s:'delete_user_posts', user_id: user_id, hash_id: hash_id},function(data) {
+    if (data.status == 200) {
+      $('.site-settings-alert.alert-success').html('<i class="fa fa-check"></i> User`s posts are being deleted in the background, please check in a while.');
+      setTimeout(function () {
+        $('.site-settings-alert.alert-success').html('');
+      },3000);
+    }
+  });
+}
 
 function Wo_DeleteUser(user_id) {
   if (confirm("Are you sure you want to delete this user?") == false) {

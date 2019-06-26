@@ -42,7 +42,7 @@ if (empty($error_code)) {
     $story_data        = array(
         'user_id' => $wo['user']['id'],
         'posted' => time(),
-        'expire' => date('Y-m-d'),
+        'expire' => time()+(60*60*24),
         'title' => $story_title,
         'description' => $story_description
     );
@@ -66,7 +66,7 @@ if (empty($error_code)) {
                 'story_id' => $last_id,
                 'type' => Wo_Secure($file_type),
                 'filename' => $filename,
-                'expire' => date('Y-m-d')
+                'expire' => time()+(60*60*24)
             );
             $thumb     = '';
             if (empty($thumb)) {

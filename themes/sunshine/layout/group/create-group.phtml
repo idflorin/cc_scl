@@ -45,7 +45,7 @@
 							<label class="col-md-12" for="category"><?php echo $wo['lang']['category'];?> *</label>  
 							<div class="col-md-12">
 								<select name="category" id="category" class="form-control">
-									<?php foreach ($wo['page_categories'] as $category_id => $category_name) {?>
+									<?php foreach ($wo['group_categories'] as $category_id => $category_name) {?>
 									<option value="<?php echo $category_id?>"><?php echo $category_name; ?></option>
 									<?php } ?>
 								</select>

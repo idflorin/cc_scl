@@ -17,10 +17,16 @@ if (strpos($wo['story']['postFile'],',') !== false) {
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right" color="#fff"><polyline points="9 18 15 12 9 6"></polyline></svg>
 		</span>
 		<div id="draggableHelper" style="display: table-cell;vertical-align: middle;">
-			<img src="<?php echo $image. "?cache=" . time();?>" alt="media"class="" id="wo_zoom_<?php echo $wo['story']['id'];?>">
+			<?php if ($wo['story']['blur'] == 1) { ?>
+				<button class='btn btn-main image_blur_btn remover_blur_btn_<?php echo $wo['story']['id']; ?>' onclick='Wo_RemoveBlur(this,<?php echo $wo['story']['id']; ?>)'><?php echo $wo['lang']['view_image']; ?></button>
+				<img src="<?php echo $image. "?cache=" . time();?>" alt="media"class="image_blur remover_blur_<?php echo $wo['story']['id']; ?>" id="wo_zoom_<?php echo $wo['story']['id'];?>"> 
+	      	<?php }else{ ?>
+	      		<img src="<?php echo $image. "?cache=" . time();?>" alt="media"class="" id="wo_zoom_<?php echo $wo['story']['id'];?>">
+	      	<?php } ?>
 		</div>
 		</div>
 		<div class="wo_lbox_topbar sun_light_tool">
+			<?php if ($wo['story']['blur'] == 0) { ?>
 			<span class="lbox_topbar_child">
 				<span>
 					<a href="<?php echo $image;?>" download><?php echo $wo['lang']['download'];?></a>
@@ -30,6 +36,7 @@ if (strpos($wo['story']['postFile'],',') !== false) {
 					<a href="<?php echo $image;?>" target="_blank"><?php echo $wo['lang']['open_original'];?></a>
 				</span>
 			</span>
+		<?php } ?>
 			<span class="lbox_topbar_child right">
 				<?php
 				$fileType = strtolower(substr($image, strrpos($image, '.') + 1));

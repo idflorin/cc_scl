@@ -31,12 +31,6 @@ if (!empty($_GET['user'])) {
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M14,10H2V12H14V10M14,6H2V8H14V6M2,16H10V14H2V16M21.5,11.5L23,13L16,20L11.5,15.5L13,14L16,17L21.5,11.5Z"></path></svg>
                         </button>
                     </div>
-                    <div class="msg_mrk_rd">
-                        <span class="pointer" style="margin-right: 5px;" onclick="Wo_CreateGChat(event)">
-							<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="currentColor" d="M13,13C11,13 7,14 7,16V18H19V16C19,14 15,13 13,13M19.62,13.16C20.45,13.88 21,14.82 21,16V18H24V16C24,14.46 21.63,13.5 19.62,13.16M13,11A3,3 0 0,0 16,8A3,3 0 0,0 13,5A3,3 0 0,0 10,8A3,3 0 0,0 13,11M18,11A3,3 0 0,0 21,8A3,3 0 0,0 18,5C17.68,5 17.37,5.05 17.08,5.14C17.65,5.95 18,6.94 18,8C18,9.06 17.65,10.04 17.08,10.85C17.37,10.95 17.68,11 18,11M8,10H5V7H3V10H0V12H3V15H5V12H8V10Z" /></svg>
-						</span>
-                    </div>
-                    
                 </div>
 				<ul class="nav nav-tabs wo_msg_tabs">
 					<li class="active pointer">
@@ -185,13 +179,11 @@ if (!empty($_GET['user'])) {
 											</ul>
 										</span>
 									<?php endif; ?>
-									<?php if ($wo['config']['audio_upload'] == 1) { ?>
 
 									<span class="btn btn-file MS-File" disabled id="messages-record" data-record="0">
 										<svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5V11A3,3 0 0,1 12,14A3,3 0 0,1 9,11V5A3,3 0 0,1 12,2M19,11C19,14.53 16.39,17.44 13,17.93V21H11V17.93C7.61,17.44 5,14.53 5,11H7A5,5 0 0,0 12,16A5,5 0 0,0 17,11H19Z"></path></svg>
 									</span>
 									<span class="btn btn-file MS-File messages-rtime hidden" style="padding: 14px 1px;">00:00</span>
-									<?php } ?>
 								</span>
 							</div>
 							<span class="input-group-btn">
@@ -845,76 +837,6 @@ if (st > lastScrollTop){
        lastScrollTop = st;
     });
 });
-function Wo_CreateGChat(e){
-    e.preventDefault();
-    $('#create_group_chat').modal('show');
-}
-function Wo_GetGChatParticipants(name){
-    if (!name) {
-        return false;
-    }
-    $.ajax({
-        url: Wo_Ajax_Requests_File(),
-        type: 'GET',
-        dataType: 'json',
-        data: {f: 'chat',s:'get_parts',name:name},
-    })
-    .done(function(data) {
-        if (data.status == 200) {
-            $('.group_chat_mbr_list').html(data.html);
-        }
-        else{
-          $('.group_chat_mbr_list').html('<p class="no_participant"><?php echo $wo['lang']['no_result']; ?></p>');
-        }
-    })
-    .fail(function() {
-        console.log("error");
-    })   
-}
-var chat_part_array = [];
-$(document).on('click', '.group_chat_mbr_part', function(event) {
-        event.preventDefault();
-        var self_id    = $(this).attr('id');
-        if ($.inArray(self_id, chat_part_array) == -1) {
-            chat_part_array.push(self_id);
-            $("#group_chat_mbrs").text(chat_part_array.length);
-            
-            $(this).fadeOut(100,function(){
-                $("#chat_group_users").val(chat_part_array.join());
-                $(this).remove();
-            })
-        }
-        else{
-          $(this).addClass('disabled').removeAttr('title');
-        }
-    });
-
-jQuery(document).ready(function($) {
-	$('#insert-caht-parts').ajaxForm({
-      url: Wo_Ajax_Requests_File() + '?f=chat&s=create_group',
-      type:'POST',
-      dataType:'json',
-
-      beforeSend: function() {
-        Wo_progressIconLoader($('#insert-caht-parts').find('button'));
-		$('#insert-caht-parts').find('.modal-footer .ball-pulse').fadeIn(100);
-      },
-      success: function(data) {
-        if (data['status'] == 200) {
-            $("#create_group_chat").modal('hide');
-            Wo_OpenChatTab(0,data.group_id);
-            $("#insert-caht-parts").find('#reset').trigger('click');
-            $(".group_chat_mbr_list").empty();
-            $(".group_chat_avatar").empty();
-            chat_part_array = [];
-        }
-        else if (data.status == 500){
-            $("#insert-caht-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
-        } 
-        $('#insert-caht-parts').find('.modal-footer .ball-pulse').fadeOut(100);
-    }});
-});
-
 </script>
 <style>.message-text a.hash{color: #a84849 !important;}</style>
 
@@ -924,48 +846,3 @@ jQuery(document).ready(function($) {
 .text-sender-container .messagejoint{position: fixed;bottom: 0;right: 0;left: 0;}
 }
 </style>
-<div class="modal fade" id="create_group_chat" role="dialog">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
-				<h4 class="modal-title">
-					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-					<?php echo $wo['lang']['create_new_group']; ?>
-				</h4>
-			</div>
-			<form id="insert-caht-parts" class="wo_create_chat_group">
-				<div class="modal-body">
-					<div id="insert-caht-alert"></div>
-					<div class="form-group input-group">
-						<span class="input-group-addon pointer" onclick="$('#group_chat_avatar').trigger('click');">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-						</span>
-						<input type="text" class="form-control" name="group_name" placeholder="<?php echo $wo['lang']['name']; ?>">
-					</div>
-					<div class="w100">
-						<div class="group_chat_avatar"></div>
-						<div class="clear"></div>
-					</div>
-					<div class="form-group input-group">
-						<span class="input-group-addon" id="group_chat_mbrs">0</span>
-						<input type="text" class="form-control" placeholder="<?php echo $wo['lang']['add_parts']; ?>" onkeydown="Wo_GetGChatParticipants(this.value)">
-					</div>
-					<div class="form-group">
-						<div class="group_chat_mbr_list"></div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<div class="ball-pulse"><div></div><div></div><div></div></div>
-					<button id="delete-all-post" type="submit" class="btn btn-main">
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-						<?php echo $wo['lang']['create']; ?>
-					</button>
-				</div>
-				<input type="hidden" name="parts" id="chat_group_users">
-				<input type="reset" id="reset" class="hidden">
-				<input type="file" name="avatar" class="hidden" id="group_chat_avatar" onchange="$('.group_chat_avatar').html('<img src=\'' + window.URL.createObjectURL(this.files[0]) + '\' alt=\'Picture\'>');" accept="image/jpeg,image/png,image/gif">
-			</form>
-		</div>
-	</div>
-</div>

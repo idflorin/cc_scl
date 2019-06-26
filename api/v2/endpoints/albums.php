@@ -13,8 +13,7 @@ $response_data = array(
 );
 
 $required_fields =  array(
-                        'create',
-                        'fetch'
+                        'create'
                     );
 
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
@@ -78,37 +77,6 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_code    = 5;
             $error_message = 'album_name and postPhotos can not be empty';
         }
-    }
-    if ($_POST['type'] == 'fetch') {
-        if (!empty($_POST['user_id'])) {
-            $offset = (!empty($_POST['offset']) && is_numeric($_POST['offset']) && $_POST['offset'] > 0 ? Wo_Secure($_POST['offset']) : 0);
-            $limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);
-
-            $user_id = Wo_Secure($_POST['user_id']);
-            $albums = Wo_GetUserAlbums($user_id,'', $limit,$offset);
-            foreach ($albums as $key => $album) {
-                foreach ($non_allowed as $key1 => $value) {
-                   unset($albums[$key]['publisher'][$value]);
-                }
-                if (!empty($album['get_post_comments'])) {
-                    foreach ($album['get_post_comments'] as $key3 => $comment) {
-
-                        foreach ($non_allowed as $key5 => $value5) {
-                          unset($albums[$key]['get_post_comments'][$key3]['publisher'][$value5]);
-                        }
-                    }
-                }
-            }
-            $response_data = array(
-                                'api_status' => 200,
-                                'data' => $albums
-                            );
-        }
-        else{
-            $error_code    = 4;
-            $error_message = 'user_id (POST) is missing';
-        }
-        $albums = Wo_GetUserAlbums($wo['user_id']);
     }
 }
 else{

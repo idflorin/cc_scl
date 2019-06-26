@@ -79,6 +79,10 @@ function Wo_GetMessagesUsersAPP($fetch_array = array()) {
     }
     $data     = array();
     $excludes = array();
+    $offset_query = "";
+    if (!empty($fetch_array['offset'])) {
+        $offset_query = " AND `time` < ".$fetch_array['offset'];
+    }
     if (isset($searchQuery) AND !empty($searchQuery)) {
         $query_one = "SELECT `user_id` as `conversation_user_id` FROM " . T_USERS . " WHERE (`user_id` IN (SELECT `from_id` FROM " . T_MESSAGES . " WHERE `to_id` = {$user_id} AND `user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}') AND `active` = '1' ";
         if (isset($fetch_array['new']) && $fetch_array['new'] == true) {
@@ -94,7 +98,7 @@ function Wo_GetMessagesUsersAPP($fetch_array = array()) {
             $query_one .= "LIMIT {$limit}";
         }
     } else {
-        $query_one = "SELECT `conversation_user_id` FROM " . T_U_CHATS . " WHERE `user_id` = '$user_id' AND (`conversation_user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `conversation_user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}')) ORDER BY `time` DESC";
+        $query_one = "SELECT * FROM " . T_U_CHATS . " WHERE `user_id` = '$user_id' AND (`conversation_user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `conversation_user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}')) {$offset_query}  ORDER BY `time` DESC";
     }
     if (!empty($fetch_array['limit'])) {
         $limit = Wo_Secure($fetch_array['limit']);
@@ -103,11 +107,16 @@ function Wo_GetMessagesUsersAPP($fetch_array = array()) {
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
     if (mysqli_num_rows($sql_query_one) > 0) {
         while ($sql_fetch_one = mysqli_fetch_assoc($sql_query_one)) {
-            $data[] = Wo_UserData($sql_fetch_one['conversation_user_id']);
+            $new_data = Wo_UserData($sql_fetch_one['conversation_user_id']);
+            $new_data['chat_time'] = $sql_fetch_one['time'];
+            $data[] = $new_data;
         }
     }
     return $data;
 }
+
+
+
 function Wo_GetMessagesNotifications($data = array()) {
     global $wo, $sqlConnect;
     $message_data   = array();

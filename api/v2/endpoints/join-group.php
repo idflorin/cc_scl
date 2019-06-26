@@ -17,7 +17,7 @@ if (empty($_POST['group_id'])) {
 }
 if (empty($error_code)) {
     $group_id   = Wo_Secure($_POST['group_id']);
-    $group_data = Wo_PageData($group_id);
+    $group_data = Wo_GroupData($group_id);
     if (empty($group_data)) {
         $error_code    = 6;
         $error_message = 'Group not found';
@@ -29,7 +29,12 @@ if (empty($error_code)) {
             }
         } else {
             if (Wo_RegisterGroupJoin($group_id, $wo['user']['user_id'])) {
-               $join_message = 'joined';
+                if ($group_data['join_privacy'] == 2) {
+                    $join_message = 'requested';
+                }
+                else{
+                    $join_message = 'joined';
+                }
             }
         }
         $response_data = array(

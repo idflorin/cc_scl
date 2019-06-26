@@ -16,18 +16,16 @@ if (isset($_GET['u'])) {
             $name               = $wo['user_profile']['name'];
             $wo['user_profile']['fields'] = Wo_UserFieldsData($user_id);
             $wo['have_stories'] = false;
-            if ($wo['loggedin'] == true) {
-                $user_stories = $db->where('user_id', $wo['user_profile']['user_id'])->get(T_USER_STORY,null,array('id'));
-                if (!empty($user_stories)) {
-                    $wo['have_stories'] = true;
-                    $wo['story_seen_class'] = 'seen_story';
+            $user_stories = $db->where('user_id', $wo['user_profile']['user_id'])->get(T_USER_STORY,null,array('id'));
+            if (!empty($user_stories)) {
+                $wo['have_stories'] = true;
+                $wo['story_seen_class'] = 'seen_story';
 
-                    foreach ($user_stories as $key => $value) {
-                        $is_seen = $db->where('story_id',$value->id)->where('user_id',$wo['user']['user_id'])->getValue(T_STORY_SEEN,'COUNT(*)');
+                foreach ($user_stories as $key => $value) {
+                    $is_seen = $db->where('story_id',$value->id)->where('user_id',$wo['user']['user_id'])->getValue(T_STORY_SEEN,'COUNT(*)');
 
-                        if ($is_seen == 0) {
-                            $wo['story_seen_class'] = 'unseen_story';
-                        }
+                    if ($is_seen == 0) {
+                        $wo['story_seen_class'] = 'unseen_story';
                     }
                 }
             }
@@ -78,7 +76,7 @@ if ($type == 'timeline') {
 if ($type == 'timeline' && $wo['loggedin'] == true) {
     $is_blocked = $wo['is_blocked'] = Wo_IsBlocked($user_id);
     if (isset($_GET['block_user']) && !empty($_GET['block_user'])) {
-        if ($_GET['block_user'] == 'block' && $is_blocked === false && Wo_IsAdmin($user_id) === false && Wo_IsModerator($user_id) === false) {
+        if ($_GET['block_user'] == 'block' && $is_blocked === false && Wo_IsAdmin($user_id) === false) {
             $block = Wo_RegisterBlock($user_id);
             if ($block) {
                 if (!empty($_GET['redirect'])) {

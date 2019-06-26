@@ -871,23 +871,7 @@ $current_post = $wo['current_post'] = $wo['story'];
           </h6>
     </div>
     <div>
-      <?php if (empty($wo['story']['color_id']) || (!empty($wo['story']['color_id']) && empty($wo['post_colors'][$wo['story']['color_id']]))) { ?>
-         <p style="margin-top: 15px;"><?php echo $wo['story']['postText']; ?></p>
-         <?php } ?>
-         <?php if (!empty($wo['story']['color_id']) && !empty($wo['post_colors'][$wo['story']['color_id']])) { ?>
-        <div dir="auto" 
-		<?php if($wo['config']['colored_posts_system'] == 1){ ?>
-			class="wo_actual_colrd_post" style="
-			<?php if (!empty($wo['post_colors'][$wo['story']['color_id']]) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_1) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_2) && !empty($wo['post_colors'][$wo['story']['color_id']]->text_color)) { ?>
-				background-image: linear-gradient(45deg, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_1; ?> 0%, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_2; ?> 100%);margin: 10px -10px -5px;
-			<?php }else{ ?>
-				background-image:url('<?php echo Wo_GetMedia($wo['post_colors'][$wo['story']['color_id']]->image); ?>');margin: 10px -10px -5px; <?php } ?>
-			<?php if(strlen($wo['story']['postText']) > 330){ ?>font-size: 16px;font-weight: normal;<?php } ?>"
-		<?php } ?>
-	>
-	<span <?php if($wo['config']['colored_posts_system'] == 1){ ?> style="<?php if (!empty($wo['post_colors'][$wo['story']['color_id']]) && !empty($wo['post_colors'][$wo['story']['color_id']]->text_color)) { ?>color:<?php echo $wo['post_colors'][$wo['story']['color_id']]->text_color; ?><?php } ?>"<?php } ?>> <?php echo $wo['story']['postText']; ?></span>
-	</div>
-        <?php } ?>
+      <p style="margin-top: 15px;"><?php echo $wo['story']['postText']; ?></p>
     </div>
 
       <div class="clear"></div>
@@ -954,11 +938,6 @@ $current_post = $wo['current_post'] = $wo['story'];
 						<iframe id="ptplayer" type="text/html" width="100%" height="340" src="<?php echo $wo['config']['playtube_url']; ?>/embed/<?php echo $wo['story']['postPlaytube']; ?>?autoplay=0" frameborder="0"/></iframe>
 					</div>
 				<?php } ?>
-				<?php if(!empty($wo['story']['postDeepsound'])) {  ?>
-		          <div class="post-youtube">
-		            <iframe id="ptplayer" type="text/html" width="100%" height="340" src="<?php echo $wo['config']['deepsound_url']; ?>/embed/<?php echo $wo['story']['postDeepsound']; ?>?autoplay=0&fullscreen=1" frameborder="0" style="height: 140px !important;"/></iframe>
-		          </div>
-		        <?php } ?>
 				<?php if(!empty($wo['story']['postVimeo'])) {  ?>
 					<div class="post-youtube">
 						<iframe src="https://player.vimeo.com/video/<?php echo $wo['story']['postVimeo'];?>?byline=0&portrait=0" width="100%" height="340" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
@@ -980,13 +959,13 @@ $current_post = $wo['current_post'] = $wo['story'];
 				<?php if(!empty($wo['story']['postSoundCloud'])) { ?>
 					<iframe width="100%" src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/<?php echo $wo['story']['postSoundCloud'];?>&auto_play=false"></iframe>
 				<?php } ?>
-				<?php if(!empty($wo['story']['postMap']) && empty($wo['story']['postText']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postVimeo']) && empty($wo['story']['postDailymotion']) && empty($wo['story']['postDeepsound']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postFile']) && $wo['config']['google_map'] == 1) { ?>
+				<?php if(!empty($wo['story']['postMap']) && empty($wo['story']['postText']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postVimeo']) && empty($wo['story']['postDailymotion']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postFile']) && $wo['config']['google_map'] == 1) { ?>
 					<div class="post-map" onclick="InjectAPI('{&quot;type&quot; : &quot;map&quot;, &quot;location&quot;:&quot;<?php echo $wo['story']['postMap'];?>&quot;}', event);">
 						<img src="https://maps.googleapis.com/maps/api/staticmap?center=<?php echo $wo['story']['postMap'];?>&zoom=13&size=600x250&maptype=roadmap&markers=color:red%7C<?php echo $wo['story']['postMap'];?>&key=<?php echo $wo['config']['google_map_api'];?>" width="100%">
 					</div>
 				<?php } ?>
 		
-				<?php if(!empty($wo['story']['postLink']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postFile']) && empty($wo['story']['postDeepsound'])) { ?>
+				<?php if(!empty($wo['story']['postLink']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postFile'])) { ?>
 					<div class="post-fetched-url wo_post_fetch_link">
 						<div onclick="InjectAPI('{&quot;type&quot; : &quot;url&quot;, &quot;link&quot;:&quot;<?php echo $wo['story']['postLink'];?>&quot;}', event);">
 							<?php if (!empty($wo['story']['postLinkImage'])) {?>
@@ -1033,7 +1012,7 @@ $current_post = $wo['current_post'] = $wo['story'];
 					</div>
 				<?php } ?>
 				<?php if(!empty($wo['story']['postFile'])) { ?>
-					<div class="post-file wo_shared_doc_file">
+					<div class="post-file" id="fullsizeimg">
 						<?php
 							$media = array(
 								'type' => 'post',
@@ -1158,8 +1137,6 @@ $current_post = $wo['current_post'] = $wo['story'];
 						echo '<div class="product-name"><span class="product_row_title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package" color="#9C27B0"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.1-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"></path><polyline points="2.32 6.16 12 11 21.68 6.16"></polyline><line x1="12" y1="22.76" x2="12" y2="11"></line><line x1="7" y1="3.5" x2="17" y2="8.5"></line></svg>' . $wo['lang']['status'] . '</span> ' . $status . '</div></div>';
 					} 
 				?>
-				<?php 
-if (empty($wo['story']['color_id']) || (!empty($wo['story']['color_id']) && empty($wo['post_colors'][$wo['story']['color_id']]))) { ?>
 				<p dir="auto"><?php echo $wo['story']['postText_API']; ?><?php if (!empty($wo['story']['postFeeling']) && $extra_exists == 1) { ?>
 						<span class="feeling-text"> — <i class="twa-lg twa twa-<?php echo $wo['story']['postFeelingIcon'];?>"></i> <?php echo $wo['lang']['feeling'];?> <?php echo $wo['lang'][$wo['story']['postFeeling']];?></span>
 					<?php } ?><?php if (!empty($wo['story']['postTraveling']) && $extra_exists == 1) { ?>
@@ -1171,36 +1148,6 @@ if (empty($wo['story']['color_id']) || (!empty($wo['story']['color_id']) && empt
 					<?php } ?><?php if (!empty($wo['story']['postListening']) && $extra_exists == 1) { ?>
 						<span class="feeling-text"> — <i class="fa fa-headphones"></i> <?php echo $wo['lang']['listening'];?> <?php echo $wo['story']['postListening'];?></span>
 					<?php } ?></p>
-					<?php } ?>
-					<?php if (!empty($wo['story']['color_id']) && !empty($wo['post_colors'][$wo['story']['color_id']])) { ?>
-						<div dir="auto" 
-							<?php if($wo['config']['colored_posts_system'] == 1){ ?>
-								class="wo_actual_colrd_post" style="
-								<?php if (!empty($wo['post_colors'][$wo['story']['color_id']]) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_1) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_2) && !empty($wo['post_colors'][$wo['story']['color_id']]->text_color)) { ?>
-									background-image: linear-gradient(45deg, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_1; ?> 0%, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_2; ?> 100%);
-								<?php }else{ ?>
-									background-image:url('<?php echo Wo_GetMedia($wo['post_colors'][$wo['story']['color_id']]->image); ?>'); <?php } ?>
-								<?php if(strlen($wo['story']['postText']) > 330){ ?>font-size: 16px;font-weight: normal;<?php } ?>"
-							<?php } ?>
-						>
-							<span data-translate-text="<?php echo $wo['story']['id']; ?>" <?php if($wo['config']['colored_posts_system'] == 1){ ?> style="<?php if (!empty($wo['post_colors'][$wo['story']['color_id']]) && !empty($wo['post_colors'][$wo['story']['color_id']]->text_color)) { ?>color:<?php echo $wo['post_colors'][$wo['story']['color_id']]->text_color; ?><?php } ?>"<?php } ?>> <?php echo $wo['story']['postText']; ?></span>
-							<?php if (!empty($wo['story']['postFeeling']) && $extra_exists == 1) { ?>
-								<span class="feeling-text"> — <i class="twa-lg twa twa-<?php echo $wo['story']['postFeelingIcon'];?>"></i> <?php echo $wo['lang']['feeling'];?> <?php echo $wo['lang'][$wo['story']['postFeeling']];?></span>
-							<?php } ?>
-							<?php if (!empty($wo['story']['postTraveling']) && $extra_exists == 1) { ?>
-								<span class="feeling-text"> — <i class="fa fa-plane"></i> <?php echo $wo['lang']['traveling'];?><?php echo $wo['story']['postTraveling'];?></span>
-							<?php } ?>
-							<?php if (!empty($wo['story']['postWatching']) && $extra_exists == 1) { ?>
-								<span class="feeling-text"> — <i class="fa fa-eye"></i> <?php echo $wo['lang']['watching'];?> <?php echo $wo['story']['postWatching'];?></span>
-							<?php } ?>
-							<?php if (!empty($wo['story']['postPlaying']) && $extra_exists == 1) { ?>
-								<span class="feeling-text"> — <i class="fa fa-gamepad"></i> <?php echo $wo['lang']['playing'];?> <?php echo $wo['story']['postPlaying'];?></span>
-							<?php } ?>
-							<?php if (!empty($wo['story']['postListening']) && $extra_exists == 1) { ?>
-								<span class="feeling-text"> — <i class="fa fa-headphones"></i> <?php echo $wo['lang']['listening'];?> <?php echo $wo['story']['postListening'];?></span>
-							<?php } ?>
-						</div>
-					<?php } ?>
 				
 				<?php if(!empty($wo['story']['postYoutube'])) {  ?>
 					<div class="post-youtube youtube-player" data-postapi-id="<?php echo $wo['story']['id'];?>">
@@ -1212,11 +1159,6 @@ if (empty($wo['story']['color_id']) || (!empty($wo['story']['color_id']) && empt
 						<iframe id="ptplayer" type="text/html" width="100%" height="340" src="<?php echo $wo['config']['playtube_url']; ?>/embed/<?php echo $wo['story']['postPlaytube']; ?>?autoplay=0" frameborder="0"/></iframe>
 					</div>
 				<?php } ?>
-				<?php if(!empty($wo['story']['postDeepsound'])) {  ?>
-		          <div class="post-youtube">
-		            <iframe id="ptplayer" type="text/html" width="100%" height="340" src="<?php echo $wo['config']['deepsound_url']; ?>/embed/<?php echo $wo['story']['postDeepsound']; ?>?autoplay=0&fullscreen=1" frameborder="0" style="height: 140px !important;"/></iframe>
-		          </div>
-		        <?php } ?>
 				<?php if(!empty($wo['story']['postVimeo'])) {  ?>
 					<div class="post-youtube">
 						<iframe src="https://player.vimeo.com/video/<?php echo $wo['story']['postVimeo'];?>?byline=0&portrait=0" width="100%" height="340" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
@@ -1238,13 +1180,13 @@ if (empty($wo['story']['color_id']) || (!empty($wo['story']['color_id']) && empt
 				<?php if(!empty($wo['story']['postSoundCloud'])) { ?>
 					<iframe width="100%" src="https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/<?php echo $wo['story']['postSoundCloud'];?>&auto_play=false"></iframe>
 				<?php } ?>
-				<?php if(!empty($wo['story']['postMap']) && empty($wo['story']['postText']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postVimeo']) && empty($wo['story']['postDailymotion']) && empty($wo['story']['postDeepsound']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postFile']) && $wo['config']['google_map'] == 1) { ?>
+				<?php if(!empty($wo['story']['postMap']) && empty($wo['story']['postText']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postVimeo']) && empty($wo['story']['postDailymotion']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postFile']) && $wo['config']['google_map'] == 1) { ?>
 					<div class="post-map" onclick="InjectAPI('{&quot;type&quot; : &quot;map&quot;, &quot;location&quot;:&quot;<?php echo $wo['story']['postMap'];?>&quot;}', event);">
 						<img src="https://maps.googleapis.com/maps/api/staticmap?center=<?php echo $wo['story']['postMap'];?>&zoom=13&size=600x250&maptype=roadmap&markers=color:red%7C<?php echo $wo['story']['postMap'];?>&key=<?php echo $wo['config']['google_map_api'];?>" width="100%">
 					</div>
 				<?php } ?>
 		
-				<?php if(!empty($wo['story']['postLink']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postFile']) && empty($wo['story']['postDeepsound'])) { ?>
+				<?php if(!empty($wo['story']['postLink']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postFile'])) { ?>
 					<div class="post-fetched-url wo_post_fetch_link">
 						<div onclick="InjectAPI('{&quot;type&quot; : &quot;url&quot;, &quot;link&quot;:&quot;<?php echo $wo['story']['postLink'];?>&quot;}', event);">
 							<?php if (!empty($wo['story']['postLinkImage'])) {?>
@@ -1291,7 +1233,7 @@ if (empty($wo['story']['color_id']) || (!empty($wo['story']['color_id']) && empt
 					</div>
 				<?php } ?>
 				<?php if(!empty($wo['story']['postFile'])) { ?>
-					<div class="post-file wo_shared_doc_file">
+					<div class="post-file" id="fullsizeimg">
 						<?php
 							$media = array(
 								'type' => 'post',

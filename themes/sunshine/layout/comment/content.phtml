@@ -103,7 +103,7 @@
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up active-like"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
 						<?php } ?>
 					</span>
-					<span id="comment-likes"><?php echo $wo['comment']['comment_likes'];?></span> · 
+					<span id="comment-likes" class="pointer" onclick="Wo_OpenPostLikedUsers(<?php echo $wo['comment']['id']; ?>,'comment')"><?php echo $wo['comment']['comment_likes'];?></span> · 
 				</span>
 				<span class="pointer" id="WonderComment" onclick="Wo_RegisterCommentWonder(<?php echo $wo['comment']['id']; ?>);">
 					<?php if($wo['comment']['is_comment_wondered'] !== true) { ?>
@@ -112,7 +112,7 @@
 						<span class="active-wonder"><?php echo $wo['second_post_button_icon'];?></span>
 					<?php } ?>
 				</span>
-				<span id="comment-wonders"><?php echo $wo['comment']['comment_wonders'];?></span>
+				<span id="comment-wonders" class="pointer" onclick="Wo_OpenPostWonderedUsers(<?php echo $wo['comment']['id']; ?>,'comment')"><?php echo $wo['comment']['comment_wonders'];?></span>
 			<?php } ?>
 			<?php if ($replies == 0) { ?>
 				 · 

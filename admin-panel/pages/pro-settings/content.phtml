@@ -62,6 +62,19 @@
                             </div>
                         </div> -->
                         <br>
+                        <label for="currency">Currency</label>
+                        <select class="form-control show-tick" id="currency" name="currency">
+                          <option value="USD" <?php echo ($wo['config']['currency'] == 'USD')  ? ' selected': '';?>>USD</option>
+		                  <option value="EUR" <?php echo ($wo['config']['currency'] == 'EUR')  ? ' selected': '';?>>EUR</option>
+		                  <option value="JPY" <?php echo ($wo['config']['currency'] == 'JPY')  ? ' selected': '';?>>JPY</option>
+		                  <option value="TRY" <?php echo ($wo['config']['currency'] == 'TRY')  ? ' selected': '';?>>TRY</option>
+		                  <option value="GBP" <?php echo ($wo['config']['currency'] == 'GBP')  ? ' selected': '';?>>GBP</option>
+		                  <option value="RUB" <?php echo ($wo['config']['currency'] == 'RUB')  ? ' selected': '';?>>RUB</option>
+		                  <option value="PLN" <?php echo ($wo['config']['currency'] == 'PLN')  ? ' selected': '';?>>PLN</option>
+		                  <option value="ILS" <?php echo ($wo['config']['currency'] == 'ILS')  ? ' selected': '';?>>ILS</option>
+		                  <option value="BRL" <?php echo ($wo['config']['currency'] == 'BRL')  ? ' selected': '';?>>BRL</option>
+                          <option value="INR" <?php echo ($wo['config']['currency'] == 'INR')  ? ' selected': '';?>>INR</option>
+                        </select>
                         <div class="clearfix"></div>
                         <br><br>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -125,7 +138,7 @@
                                 <?php if (!empty($wo['pro_packages']['ultima']['image'])) { ?>
                                     <img src="<?php echo($wo['pro_packages']['ultima']['image']) ?>" class="pro_packages_icon_inline">
                                    <?php }else{ ?>
-                                    <i class="fa fa-bolt fa-fw"></i> 
+                                    <i class="fa fa-fire fa-fw"></i> 
                                    <?php } ?>
                                    &nbsp;<?php echo $wo['lang']['ultima']?>
                                </td>
@@ -141,7 +154,7 @@
                                 <?php if (!empty($wo['pro_packages']['vip']['image'])) { ?>
                                     <img src="<?php echo($wo['pro_packages']['vip']['image']) ?>" class="pro_packages_icon_inline">
                                    <?php }else{ ?>
-                                    <i class="fa fa-rocket fa-fw"></i> 
+                                    <i class="fa fa-fire fa-fw"></i> 
                                    <?php } ?>
                                    &nbsp;<?php echo $wo['lang']['vip']?>
                                </td>
@@ -162,10 +175,8 @@
     <!-- #END# Vertical Layout -->
 <script>
 function ShowEditPro(self) {
-    $(self).text('Please wait ..');
     type = $(self).attr('data_pro_type');
     $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=get_pro', {type: type}, function(data, textStatus, xhr) {
-        $(self).text('EDIT');
         if (data.status == 200) {
             $('#pro_form_data').html(data.html);
             $('#proModal').modal('show');
@@ -181,12 +192,9 @@ $(function() {
             form_pro.find('.waves-effect').text('Please wait..');
         },
         success: function(data) {
-            $('#proModal').animate({
-                scrollTop : 0                       // Scroll to top of body
-            }, 500);
-            $('#save_pro_btn').text('SAVE CHANGES');
             if (data.status == 200) {
                 form_pro.find('.waves-effect').text('Save');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
                 $('#proModalAlert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('#proModalAlert').empty();
@@ -221,21 +229,16 @@ $(function() {
             $('.btn-save').text('Please wait..');
         },
         success: function(data) {
-            $('#defaultModal').animate({
-                scrollTop : 0                       // Scroll to top of body
-            }, 10);
-            setTimeout(function () {
-                if (data.status == 200) {
-                    $('.btn-save').text('SAVE CHANGES');
-                    var value_to_use = $('[data-editable=1]').val();
-                    var id_of_key = $('#id_of_key').val();
-                    $('#edit_' + id_of_key).text(value_to_use);
-                    $('#defaultModal').modal('hide');
-                    setTimeout(function () {
-                        location.reload();
-                    },1000);
-                }
-            },300);
+            if (data.status == 200) {
+                $('.btn-save').text('SAVE CHANGES');
+                var value_to_use = $('[data-editable=1]').val();
+                var id_of_key = $('#id_of_key').val();
+                $('#edit_' + id_of_key).text(value_to_use);
+                $('#defaultModal').modal('hide');
+                setTimeout(function () {
+                    location.reload();
+                },1000);
+            }
         }
     });
    var form_site_settings = $('form.pro-settings');
@@ -256,8 +259,7 @@ $(function() {
         }
     });
 });
-function Wo_SubmitProForm(self) {
-    $('#save_pro_btn').text('Please wait..');
+function Wo_SubmitProForm() {
     $('.proModalForm').submit();
 }
 function Wo_SubmitLangForm() {
@@ -278,7 +280,7 @@ function Wo_SubmitLangForm() {
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" onclick="Wo_SubmitProForm(this);" class="btn-save btn btn-link waves-effect" id="save_pro_btn">SAVE CHANGES</button>
+                <button type="submit" onclick="Wo_SubmitProForm();" class="btn-save btn btn-link waves-effect">SAVE CHANGES</button>
                 <button type="button" class="btn btn-link" data-dismiss="modal">CLOSE</button>
             </div>
         </div>

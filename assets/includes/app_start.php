@@ -3,6 +3,7 @@
 // ini_set('display_startup_errors', 1);
 error_reporting(0);
 
+
 @ini_set('max_execution_time', 0);
 require_once('config.php');
 
@@ -44,20 +45,7 @@ if (in_array($_SERVER["REMOTE_ADDR"], $baned_ips)) {
 $config              = Wo_GetConfig();
 $db                  = new MysqliDb($sqlConnect);
 
-$all_langs           = Wo_LangsNamesFromDB();
-
-foreach ($all_langs as $key => $value) {
-    $insert = false;
-    if (!in_array($value, array_keys($config))) {
-        $db->insert(T_CONFIG,array('name' => $value, 'value' => 1));
-        $insert = true;
-    }
-}
-if ($insert == true) {
-    $config = Wo_GetConfig();
-}
-
-if( ISSET( $_GET['theme'] ) && in_array($_GET['theme'], ['default', 'sunshine', 'wowonder'])){
+if( ISSET( $_GET['theme'] ) ){
     $_SESSION['theme'] = $_GET['theme'];
 }
 
@@ -174,7 +162,7 @@ $wo['site_pages'] = array(
     'authorize'
 );
 
-$wo['script_version']  = $wo['config']['version'];
+$wo['script_version']  = '2.2';
 $http_header           = 'http://';
 if (!empty($_SERVER['HTTPS'])) {
     $http_header = 'https://';
@@ -291,14 +279,12 @@ if (!empty($_POST['user_id']) && (!empty($_POST['s']))) {
 }
 // Language Function
 if (isset($_GET['lang']) AND !empty($_GET['lang'])) {
-    if (in_array($_GET['lang'], array_keys($wo['config'])) && $wo['config'][$_GET['lang']] == 1) {
-        $lang_name = Wo_Secure(strtolower($_GET['lang']));
-        if (in_array($lang_name, $langs)) {
-            Wo_CleanCache();
-            $_SESSION['lang'] = $lang_name;
-            if ($wo['loggedin'] == true) {
-                mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `language` = '" . $lang_name . "' WHERE `user_id` = " . Wo_Secure($wo['user']['user_id']));
-            }
+    $lang_name = Wo_Secure(strtolower($_GET['lang']));
+    if (in_array($lang_name, $langs)) {
+        Wo_CleanCache();
+        $_SESSION['lang'] = $lang_name;
+        if ($wo['loggedin'] == true) {
+            mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `language` = '" . $lang_name . "' WHERE `user_id` = " . Wo_Secure($wo['user']['user_id']));
         }
     }
 }
@@ -784,24 +770,3 @@ try {
     $wo['blog_categories']   = [];
     $wo['products_categories']   = [];
 }
-
-$wo['config']['currency_array'] = unserialize($wo['config']['currency_array']);
-$wo['config']['currency_symbol_array'] = unserialize($wo['config']['currency_symbol_array']);
-$wo['config']['providers_array'] = unserialize($wo['config']['providers_array']);
-
-$wo['currencies'] = array();
-foreach ($wo['config']['currency_symbol_array'] as $key => $value) {
-    $wo['currencies'][] = array('text' => $key,'symbol' => $value);
-}
-
-if (!empty($_GET['theme'])) {
-    Wo_CleanCache();
-}
-
-$wo['post_colors'] = array();
-if ($wo['config']['colored_posts_system'] == 1) {
-    $wo['post_colors'] = Wo_GetAllColors();
-}
-$wo['stripe_currency'] = array('USD','EUR','AUD','BRL','CAD','CZK','DKK','HKD','HUF','ILS','JPY','MYR','MXN','TWD','NZD','NOK','PHP','PLN','RUB','SGD','SEK','CHF','THB','GBP');
-$wo['paypal_currency'] = array('USD','EUR','AUD','BRL','CAD','CZK','DKK','HKD','HUF','INR','ILS','JPY','MYR','MXN','TWD','NZD','NOK','PHP','PLN','GBP','RUB','SGD','SEK','CHF','THB');
-$wo['2checkout_currency'] = array('USD','EUR','AED','AFN','ALL','ARS','AUD','AZN','BBD','BDT','BGN','BMD','BND','BOB','BRL','BSD','BWP','BYN','BZD','CAD','CHF','CLP','CNY','COP','CRC','CZK','DKK','DOP','DZD','EGP','FJD','GBP','GTQ','HKD','HNL','HRK','HUF','IDR','ILS','INR','JMD','JOD','JPY','KES','KRW','KWD','KZT','LAK','LBP','LKR','LRD','MAD','MDL','MMK','MOP','MRO','MUR','MVR','MXN','MYR','NAD','NGN','NIO','NOK','NPR','NZD','OMR','PEN','PGK','PHP','PKR','PLN','PYG','QAR','RON','RSD','RUB','SAR','SBD','SCR','SEK','SGD','SYP','THB','TND','TOP','TRY','TTD','TWD','UAH','UYU','VND','VUV','WST','XCD','XOF','YER','ZAR');

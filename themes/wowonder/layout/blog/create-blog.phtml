@@ -114,7 +114,6 @@ jQuery(document).ready(function($) {
           thumb_drop_block.removeClass('hover');
           var file = event.dataTransfer.files;
           $("#thumbnail").prop('files', file);
-          $(".prv-img").html("<img src='" + window.URL.createObjectURL(event.dataTransfer.files[0]) + "' alt='Picture'>")
       };
     }
 

@@ -82,11 +82,9 @@ $pages = array(
     'groups-categories',
     'blogs-categories',
     'products-categories',
-    'bank-receipts',
-    'manage-currencies',
-    'manage-colored-posts'
+    'bank-receipts'
 );
-$mod_pages = array('dashboard', 'post-settings', 'manage-stickers', 'manage-gifts', 'manage-users', 'online-users', 'manage-stories', 'manage-pages', 'manage-groups', 'manage-posts', 'manage-articles', 'manage-events', 'manage-forum-threads', 'manage-forum-messages', 'manage-movies', 'manage-games', 'add-new-game', 'manage-user-ads', 'manage-reports', 'manage-third-psites', 'edit-movie','bank-receipts');
+$mod_pages = array('dashboard', 'post-settings', 'manage-stickers', 'manage-gifts', 'manage-users', 'online-users', 'manage-stories', 'manage-pages', 'manage-groups', 'manage-posts', 'manage-articles', 'manage-events', 'manage-forum-threads', 'manage-forum-messages', 'manage-movies', 'manage-games', 'add-new-game', 'manage-user-ads', 'manage-reports', 'manage-third-psites', 'edit-movie');
 
 
 if (!empty($_GET['page'])) {
@@ -192,14 +190,6 @@ if (empty($page_loaded)) {
                 <a href="javascript:void(0);" class="bars"></a>
                 <a class="navbar-brand" href="<?php echo $wo['site_url']; ?>"><img src="<?php echo $wo['config']['theme_url']; ?>/img/logo.png" alt=""></a>
             </div>
-            <div class="navbar-header pull-right">
-                <div class="form-group form-float wo_admin_hdr_srch">
-                    <div class="form-line">
-                        <input type="text" id="search_for" name="search_for" class="form-control" onkeyup="searchInFiles($(this).val())" placeholder="Search Settings">
-                    </div>
-                    <div class="wo_admin_hdr_srch_reslts" id="search_for_bar"></div>
-                </div>
-            </div>
         </div>
     </nav>
     <!-- #Top Bar -->
@@ -227,7 +217,7 @@ if (empty($page_loaded)) {
                         </a>
                     </li>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'general-settings' || $page == 'post-settings' || $page == 'site-settings' || $page == 'email-settings' || $page == 'social-login' || $page == 'site-features' || $page == 'amazon-settings' ||  $page == 'video-settings' || $page == 'payment-settings' || $page == 'manage-currencies' || $page == 'manage-colored-posts') ? 'class="active"' : ''; ?>>
+                    <li <?php echo ($page == 'general-settings' || $page == 'post-settings' || $page == 'site-settings' || $page == 'email-settings' || $page == 'social-login' || $page == 'site-features' || $page == 'amazon-settings' ||  $page == 'video-settings' || $page == 'payment-settings') ? 'class="active"' : ''; ?>>
                         <a href="javascript:void(0);" class="menu-toggle">
                             <i class="material-icons">settings</i>
                             <span>Settings</span>
@@ -254,13 +244,10 @@ if (empty($page_loaded)) {
                             <li <?php echo ($page == 'payment-settings') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('payment-settings'); ?>">Payment System Settings</a>
                             </li>
-                            <li <?php echo ($page == 'manage-currencies') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-currencies'); ?>">Manage Currencies</a>
-                            </li>
                             <li <?php echo ($page == 'amazon-settings') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('amazon-settings'); ?>">Storage Settings</a>
                             </li>
-                            <li <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts') ? 'class="active"' : ''; ?>>
+                            <li <?php echo ($page == 'post-settings') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('post-settings'); ?>">Post Settings</a>
                             </li>
                         </ul>
@@ -356,9 +343,6 @@ if (empty($page_loaded)) {
                             <span>Manage Features</span>
                         </a>
                         <ul class="ml-menu">
-                            <!-- <li <?php echo ($page == 'manage-colored-posts') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>">Manage Colored Posts</a>
-                            </li> -->
                             <li <?php echo ($page == 'manage-apps') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps'); ?>">Apps</a>
                             </li>
@@ -821,51 +805,5 @@ $(document).ready(function(){
         },
         cache: false 
       });
-});
-
-
-
-function searchInFiles(keyword) {
-    if (keyword.length > 2) {
-        $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=search_in_pages', {keyword: keyword}, function(data, textStatus, xhr) {
-            if (data.html != '') {
-                $('#search_for_bar').html(data.html)
-            }
-            else{
-                $('#search_for_bar').html('')
-            }
-        });
-    }
-    else{
-        $('#search_for_bar').html('')
-    }
-}
-$(window).load(function() {
-    jQuery.fn.highlight = function (str, className) {
-        if (str != '') {
-            var aTags = document.getElementsByTagName("h2");
-            var bTags = document.getElementsByTagName("label");
-            var searchText = str.toLowerCase();
-
-            if (aTags.length > 0) {
-                for (var i = 0; i < aTags.length; i++) {
-                    var tag_text = aTags[i].textContent.toLowerCase();
-                    if (tag_text.indexOf(searchText) != -1) {
-                        $(aTags[i]).addClass(className)
-                    }
-                }
-            }
-
-            if (bTags.length > 0) {
-                for (var i = 0; i < bTags.length; i++) {
-                    var tag_text = bTags[i].textContent.toLowerCase();
-                    if (tag_text.indexOf(searchText) != -1) {
-                        $(bTags[i]).addClass(className)
-                    }
-                }
-            }
-        }
-    };
-    jQuery.fn.highlight("<?php echo (!empty($_GET['highlight']) ? $_GET['highlight'] : '') ?>",'highlight_text');
 });
 </script>

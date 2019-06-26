@@ -80,10 +80,6 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                         'message_data' => 'Request successfully accepted'
                     );
                 }
-                else{
-                    $error_code    = 7;
-                    $error_message = 'The Request not found';
-                }
             }
         }
     }
@@ -113,10 +109,6 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                         'api_status' => 200,
                         'message_data' => 'Request successfully deleted'
                     );
-                }
-                else{
-                    $error_code    = 7;
-                    $error_message = 'The Request not found';
                 }
             }
         }

@@ -103,6 +103,8 @@ $(function() {
               $(this).remove();
             });
         });
+        $('#edited_page_link').attr('href', data.link);
+        $('#edited_page_link').attr('data-ajax', data.data_ajax);
       } else {
           var errors = data.errors.join("<br>");
           $('.setting-general-alert').html('<div class="alert alert-danger">' + errors + '</div>');

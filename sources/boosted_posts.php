@@ -11,7 +11,11 @@ if ($wo['user']['is_pro'] == 0) {
 	header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
     exit();
 }
-if ($wo['user']['pro_type'] == 1) {
+// if ($wo['user']['pro_type'] == 1) {
+// 	header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
+//     exit();
+// }
+if (in_array($wo['user']['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['posts_promotion'] < 1) {
 	header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
     exit();
 }

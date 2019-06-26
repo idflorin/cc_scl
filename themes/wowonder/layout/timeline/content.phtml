@@ -152,7 +152,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 										</span>
 									</li>
 								<?php } ?>
-                                <?php if($IsOwnerUser === false && $wo['loggedin'] == true && $wo['config']['poke_system'] == 1) { ?>
+                                <?php if($IsOwnerUser === false && $wo['loggedin'] == true) { ?>
                                     <?php //if( !Wo_IsPoked( $wo['user_profile']['user_id'] , $wo['user']['user_id'] ) ) { ?>
 									<li id="pokebutton" onclick="Wo_RegisterPoke(<?php echo $wo['user_profile']['user_id'];?>,<?php echo $wo['user']['user_id'];?>)">
 										<span class="menu-item">
@@ -572,7 +572,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 						?>
 					</div>
 					<?php
-						$stories = Wo_GetPosts(array('filter_by' => 'all','publisher_id' => $wo['user_profile']['user_id'],'placement' => 'multi_image_post')); 
+						$stories = Wo_GetPosts(array('filter_by' => 'all','publisher_id' => $wo['user_profile']['user_id'])); 
 						if (count($stories) == 0 && count($pinedstory) == 0) {
 							echo Wo_LoadPage('story/profile-no-stories');
 						} else {

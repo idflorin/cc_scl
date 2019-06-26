@@ -699,17 +699,6 @@ body #head_menu_rght .create_head_menu li a svg {
 body #wo_msg_right_prt .msg_write_combo .charsLeft-message {
 	right: auto;left: 115px;
 }
-body .all_colors > svg {
-    right: auto;left: 0;
-}
-body .all_colors > div {
-    margin-right: 0px;margin-left: 20px;
-}
-.view-more-wrapper .order-by .dropdown-menu {
-	left: 0;
-    right: auto;
-}
-body .thumb-image-delete:not(:last-child) {margin: 0 0 0 5px;}
 
 
 

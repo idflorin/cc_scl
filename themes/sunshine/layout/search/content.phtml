@@ -84,32 +84,21 @@ $type_to_find = '<h5 class="search-filter-center-text empty_state"><svg xmlns="h
 								$selected_status_female = '';
 								$gender_text = $wo['lang']['all'];
 								if (!empty($_GET['gender'])) {
-									if ($_GET['gender'] == 'male') {
-										$selected_status_male = 'checked';
+									if (in_array($_GET['gender'], array_keys($wo['genders']))) {
 										$selected_status_all = '';
-										$gender_text = $wo['lang']['male'];
-									} else if ($_GET['gender'] == 'female') {
-										$selected_status_female = 'checked';
-										$selected_status_all = '';
-										$gender_text = $wo['lang']['female'];
+										$gender_text = $wo['genders'][$_GET['gender']];
 									} 
 								}
 							?>
 							<div class="dropdown">
 								<span class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><?php echo $wo['lang']['gender']; ?>: <span class="gender_text"><?php echo $gender_text;?></span> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7,10L12,15L17,10H7Z"></path></svg></span>
 								<ul class="dropdown-menu clearfix gender_menu" role="menu">
-									<label class="radio-inline" for="gender-0">
-										<input type="radio" name="gender" id="gender-0" value="all" <?php echo $selected_status_all_sex;?>>
-										<span><?php echo $wo['lang']['all']; ?></span>
-									</label> 
-									<label class="radio-inline" for="gender-1">
-										<input type="radio" name="gender" id="gender-1" value="male" <?php echo $selected_status_male;?>>
-										<span><?php echo $wo['lang']['male']; ?></span>
-									</label>
-									<label class="radio-inline" for="gender-2">
-										<input type="radio" name="gender" id="gender-2" value="female" <?php echo $selected_status_female;?>>
-										<span><?php echo $wo['lang']['female']; ?></span>
-									</label>
+									<?php foreach ($wo['genders'] as $key => $gender) { ?>
+										<label class="radio-inline" for="gender-<?php echo($key) ?>">
+											<input type="radio" name="gender" id="gender-<?php echo($key) ?>" value="<?php echo($key) ?>" <?php echo (!empty($_GET['gender']) && $key == $_GET['gender']) ? 'checked' : '' ?>>
+											<span><?php echo($gender) ?></span>
+										</label> 
+									<?php } ?>
 								</ul>
 							</div>
 							</div>

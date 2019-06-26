@@ -52,7 +52,6 @@ $fields = Wo_GetWelcomeFileds();
 						?>
 						<div class="sun_input">
 							<select name="gender" id="gender">
-								<option value="0"><?php echo $wo['lang']['gender']?></option>
 								<?php foreach ($wo['genders'] as $key => $gender) { ?>
 									<option value="<?php echo($key) ?>"><?php echo $gender; ?></option>
 								<?php } ?>

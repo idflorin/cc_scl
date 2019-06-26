@@ -95,17 +95,20 @@ if ($type == 'get_users_list') {
             if (!empty($_POST['list_type'])) {
                 $list_type = $_POST['list_type'];
             }
+            $offset = (!empty($_POST['offset']) && is_numeric($_POST['offset']) && $_POST['offset'] > 0 ? Wo_Secure($_POST['offset']) : 0);
+            $limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);
             if ($list_type == 'online' || $list_type == 'offline') {
                 $get = Wo_GetChatUsersAPP($user_id, $list_type, $search_key);
             } else {
                 $fetch_array = array(
                     'user_id' => $user_id, 
                     'searchQuery' => $search_key, 
-                    'limit' => 15, 
+                    'limit' => $limit, 
                     'new' => false, 
                     'after_user_id' => 0,
                     'update' => 0, 
-                    'session_id' => $s
+                    'session_id' => $s,
+                    'offset' => $offset
                 );
                 $get = Wo_GetMessagesUsersAPP($fetch_array);
             }
@@ -125,7 +128,8 @@ if ($type == 'get_users_list') {
                     'lastseen_unix_time' => $user_list['lastseen'],
                     'lastseen_time_text' => Wo_Time_Elapsed_String($user_list['lastseen']),
                     'url' => $user_list['url'],
-                    'chat_color' => Wo_GetChatColor($wo['user']['user_id'], $user_list['user_id'])
+                    'chat_color' => Wo_GetChatColor($wo['user']['user_id'], $user_list['user_id']),
+                    'chat_time'    => $user_list['chat_time']
                 );
                 $json_data['last_message'] = Wo_GetMessagesHeader(array(
                     'user_id' => $user_list['user_id'],
@@ -162,6 +166,9 @@ if ($type == 'get_users_list') {
                     );
                 }
                 array_push($json_success_data, $json_data);
+            }
+            if (!empty($_POST['SetOnline']) && $_POST['SetOnline'] == 1) {
+                Wo_UpdateUserData($user_id, array('lastseen' => time()));
             }
             $check_calles     = Wo_CheckFroInCalls();
             if ($check_calles !== false && is_array($check_calles)) {

@@ -46,7 +46,7 @@
 									<option value="0">
 										<?php echo $wo['lang']['category'];?>
 									</option>
-									<?php foreach ($wo['page_categories'] as $category_id => $category_name):?>
+									<?php foreach ($wo['blog_categories'] as $category_id => $category_name):?>
 										<option value="<?php echo $category_id?>" <?php if($category_id == $wo['article']['category']) echo "selected='selected'" ;?> ><?php echo $category_name;?></option>
 									<?php endforeach;?>
 								</select>
