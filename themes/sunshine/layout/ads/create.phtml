@@ -29,33 +29,30 @@
 								<span><?php echo $wo['lang']['all'];?></span>
 							</div>
 						</label>
-						<?php foreach ($wo['genders'] as $key => $gender) {
-							if ($key == 'male') {
+						<?php 
+						$gender_images = Wo_GetGendersImages();
+						foreach ($wo['genders'] as $key => $gender) {
+							
 						 ?>
-						 <label>
-							<input type="radio" name="gender" id="gender" value="male" >
-							<div class="sr_btn_lab_innr">
-								<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/male.svg')"></div>
-								<span><?php echo $wo['lang']['male'];?></span>
-							</div>
-						</label>
-						<?php } elseif ($key == 'female') { ?>
-							<label>
-								<input type="radio" name="gender" id="gender" value="female" >
-								<div class="sr_btn_lab_innr">
-									<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/female.svg')"></div>
-									<span><?php echo $wo['lang']['female'];?></span>
-								</div>
-							</label>
-						<?php }else{ ?>
 							<label>
 								<input type="radio" name="gender" id="gender" value="<?php echo($key) ?>" >
 								<div class="sr_btn_lab_innr">
-									<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/male.svg')"></div>
-									<span><?php echo($gender) ?></span>
+									<?php if (!empty($gender_images) && !empty($gender_images[$key])) { ?>
+										<div class="sr_btn_img" style="background-image:url('<?php echo (!empty($gender_images) && !empty($gender_images[$key])) ? Wo_GetMedia($gender_images[$key]) : $wo['config']['theme_url'].'/img/cads/male.svg';?>')"></div>
+										<span><?php echo($gender) ?></span>
+									<?php } elseif ($key == 'male') { ?>
+										<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/male.svg')"></div>
+										<span><?php echo($gender) ?></span>
+									<?php } elseif ($key == 'female') { ?>
+										<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/female.svg')"></div>
+										<span><?php echo($gender) ?></span>
+									<?php } else { ?>
+										<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/male.svg')"></div>
+										<span><?php echo($gender) ?></span>
+									<?php } ?>
 								</div>
 							</label>
-						<?php } } ?>
+						<?php } ?>
 					</div>
 				</div>
 				

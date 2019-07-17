@@ -4368,6 +4368,7 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
             }
         }
     }
+    $story['post_is_promoted'] = 0;
     $story['postText_API'] = Wo_MarkupAPI($story['postText'],true,true,true,$story['post_id']);
     $story['postText_API'] = Wo_Emo($story['postText_API']);
     $story['Orginaltext']  = Wo_EditMarkup($story['postText'],true,true,true,$story['post_id']);
@@ -4874,7 +4875,7 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
 
 
 function Wo_DeletePost($post_id = 0,$type = '') {
-    global $wo, $sqlConnect, $cache;
+    global $wo, $sqlConnect, $cache,$db;
     if ($post_id < 1 || empty($post_id) || !is_numeric($post_id)) {
         return false;
     }
@@ -4883,9 +4884,20 @@ function Wo_DeletePost($post_id = 0,$type = '') {
     }
     $user_id = Wo_Secure($wo['user']['user_id']);
     $post_id = Wo_Secure($post_id);
-    $query   = mysqli_query($sqlConnect, "SELECT `id`, `user_id`, `recipient_id`, `page_id`, `postFile`, `postType`, `postText`, `postLinkImage`, `multi_image`, `album_name`,`parent_id` FROM " . T_POSTS . " WHERE `id` = {$post_id} AND (`user_id` = {$user_id} OR `recipient_id` = {$user_id} OR `page_id` IN (SELECT `page_id` FROM " . T_PAGES . " WHERE `user_id` = {$user_id}) OR `group_id` IN (SELECT `id` FROM " . T_GROUPS . " WHERE `user_id` = {$user_id}) OR `page_id` IN (SELECT `page_id` FROM " . T_PAGE_ADMINS . " WHERE `user_id` = {$user_id}))");
+    $query   = mysqli_query($sqlConnect, "SELECT `id`, `user_id`, `recipient_id`, `page_id`, `postFile`, `postType`, `postText`, `postLinkImage`, `multi_image`, `album_name`,`parent_id`,`blog_id` FROM " . T_POSTS . " WHERE `id` = {$post_id} AND (`user_id` = {$user_id} OR `recipient_id` = {$user_id} OR `page_id` IN (SELECT `page_id` FROM " . T_PAGES . " WHERE `user_id` = {$user_id}) OR `group_id` IN (SELECT `id` FROM " . T_GROUPS . " WHERE `user_id` = {$user_id}) OR `page_id` IN (SELECT `page_id` FROM " . T_PAGE_ADMINS . " WHERE `user_id` = {$user_id}))");
     $is_me = mysqli_num_rows($query);
     if ($is_me > 0 || (Wo_IsAdmin() || Wo_IsModerator()) || $type == 'shared') {
+        $post_image = $db->where('post_id',$post_id)->getOne(T_ALBUMS_MEDIA);
+        if (!empty($post_image)) {
+            mysqli_query($sqlConnect, "DELETE FROM " . T_ALBUMS_MEDIA . " WHERE `image` LIKE '%$post_image->image%' ");
+            $explode2 = @end(explode('.', $post_image->image));
+            $explode3 = @explode('.', $post_image->image);
+            $media_2  = $explode3[0] . '_small.' . $explode2;
+            @unlink(trim($media_2));
+            @unlink($post_image->image);
+            $delete_from_s3 = Wo_DeleteFromToS3($media_2);
+            $delete_from_s3 = Wo_DeleteFromToS3($post_image->image);
+        }
         
         // delete shared posts 
         $sql   = "SELECT `id` FROM " . T_POSTS . " WHERE parent_id = ".$post_id;
@@ -4922,6 +4934,9 @@ function Wo_DeletePost($post_id = 0,$type = '') {
                 }
                 $match_i++;
             }
+        }
+        if (!empty($fetched_data['blog_id']) && $fetched_data['blog_id'] > 0) {
+            Wo_DeleteMyBlog($fetched_data['blog_id']);
         }
 
         if (isset($fetched_data['postFile']) && !empty($fetched_data['postFile'])) {

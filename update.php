@@ -54,6 +54,81 @@ if (!empty($_POST['query'])) {
 }
 if (!empty($_POST['update_langs'])) {
     $data  = array();
+    $query = mysqli_query($sqlConnect, "SHOW COLUMNS FROM `Wo_Langs`");
+    while ($fetched_data = mysqli_fetch_assoc($query)) {
+        $data[] = $fetched_data['Field'];
+    }
+    unset($data[0]);
+    unset($data[1]);
+    function Wo_UpdateLangs($lang, $key, $value) {
+        global $sqlConnect;
+        $update_query         = "UPDATE Wo_Langs SET `{lang}` = '{lang_text}' WHERE `lang_key` = '{lang_key}'";
+        $update_replace_array = array(
+            "{lang}",
+            "{lang_text}",
+            "{lang_key}"
+        );
+        return str_replace($update_replace_array, array(
+            $lang,
+            Wo_Secure($value),
+            $key
+        ), $update_query);
+    }
+    $lang_update_queries = array();
+    foreach ($data as $key => $value) {
+        $value = ($value);
+        if ($value == 'arabic') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'منجز');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'درس في');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'لا يمكنك مشاركة منشور على صفحة أو مجموعة غير خاصة بك.');
+        } else if ($value == 'dutch') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Voltooid');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Gestudeerd aan');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'Je kunt een bericht op een pagina of een groep die niet van jezelf is, niet delen.');
+        } else if ($value == 'french') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Terminé');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Étudié à');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'Vous ne pouvez pas partager un message sur une page ou un groupe qui n\'est pas le vôtre.');
+        } else if ($value == 'german') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Abgeschlossen');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'Sie können keinen Beitrag auf einer Seite oder einer Gruppe teilen, die nicht Ihrer eigenen gehört.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Studierte an');
+        } else if ($value == 'italian') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Completato');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Studiato a');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'Non puoi condividere un post su una pagina o un gruppo che non sei proprietario.');
+        } else if ($value == 'portuguese') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Concluído');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Estudou na');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'Você não pode compartilhar uma postagem em uma página ou em um grupo que não é seu.');
+        } else if ($value == 'russian') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Завершенный');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Учился в');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'Вы не можете поделиться постом на странице или в группе, которая не принадлежит вам.');
+        } else if ($value == 'spanish') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Terminado');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Estudió en');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'No puedes compartir una publicación en una página o un grupo que no sea tuyo.');
+        } else if ($value == 'turkish') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Tamamlanan');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Okudu');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'Bir sayfada veya kendi olmayan bir gruptaki bir gönderiyi paylaşamazsınız.');
+        } else if ($value == 'english') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Completed');
+            
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Studied at');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'You can\'t share a post on a page or a group that is your not own.');
+        } else if ($value != 'english') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'completed', 'Completed');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'studied_at', 'Studied at');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'cant_share_own', 'You can\'t share a post on a page or a group that is your not own.');
+        }
+    }
+    if (!empty($lang_update_queries)) {
+        foreach ($lang_update_queries as $key => $query) {
+            $sql = mysqli_query($sqlConnect, $query);
+        }
+    }
     $name = md5(microtime()) . '_updated.php';
     rename('update.php', $name);
 }
@@ -120,11 +195,15 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
                <div class="wo_install_wiz">
                  <?php if ($updated == false) { ?>
                   <div>
-                     <h2 class="light">Update to v2.3.2 </span></h2>
+                     <h2 class="light">Update to v2.3.3 </span></h2>
                      <div class="setting-well">
                         <h4>Changelog</h4>
                         <ul class="wo_update_changelog">
+                            <li> [Added] few new APIs to v2.</li>
                                 <li> [Fixed] 20+ reported bugs.</li>
+                                <li> [Fixed] bugs in API.</li>
+                                <li> [Improved] script stabilitiy for v2.4</li>
+                                <li> [Improved] speed.</li>
                         </ul>
                         <p class="hide_print">Note: The update process might take few minutes.</p>
                         <p class="hide_print">Important: If you got any fail queries, please copy them, open a support ticket and send us the details.</p>
@@ -165,8 +244,14 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
 </html>
 <script>  
 var queries = [
-"INSERT INTO `Wo_Langs` (`id`, `lang_key`, `type`, `english`, `arabic`, `dutch`, `french`, `german`, `italian`, `portuguese`, `russian`, `spanish`, `turkish`) VALUES (NULL, 'less', 'less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less', 'Less');",
-    "UPDATE `Wo_Config` SET `value` = '2.3.2' WHERE `name` = 'version';",
+    "ALTER TABLE `Wo_Users` ADD `school_completed` INT(11) NOT NULL DEFAULT '0' AFTER `zip`;",
+    "CREATE TABLE `Wo_Gender` (`id` int(11) NOT NULL AUTO_INCREMENT,`gender_id` int(11) NOT NULL DEFAULT '0',`image` varchar(300) NOT NULL DEFAULT '',PRIMARY KEY (`id`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;",
+    "ALTER TABLE `Wo_Gender` ADD INDEX(`gender_id`);",
+    "UPDATE `Wo_Config` SET `value` = '2.3.3' WHERE `name` = 'version';",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'completed');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'studied_at');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'cant_share_own');",
+    "ALTER TABLE `Wo_Gender` CHANGE `gender_id` `gender_id` VARCHAR(50) NOT NULL DEFAULT '0';"
 ];
 $('#input_code').bind("paste keyup input propertychange", function(e) {
     if (isPurchaseCode($(this).val())) {

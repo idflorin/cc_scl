@@ -794,7 +794,7 @@ function Wo_LightBoxComment(text, post_id, user_id, event, page_id) {
 }
 
 // load all post comments
-function Wo_loadAllComments(post_id) {
+function Wo_loadAllComments(post_id,self) {
   main_wrapper = $('#post-' + post_id);
   view_more_wrapper = main_wrapper.find('.view-more-wrapper');
   Wo_progressIconLoader(view_more_wrapper);
@@ -806,7 +806,7 @@ function Wo_loadAllComments(post_id) {
   }, function (data) {
     if(data.status == 200) {
       main_wrapper.find('.comments-list').html(data.html);
-      //view_more_wrapper.remove();
+      $(self).remove();
       $('.ball-pulse-'+post_id).fadeOut('100');
     }
   });
@@ -886,6 +886,7 @@ function Wo_OpenPostDeleteBox(post_id) {
 
 // delete post
 function Wo_DeletePost(post_id) {
+  Wo_CloseLightbox();
   var delete_box = $('#post-' + post_id).find('#delete-post');
   var delete_button = delete_box.find('#delete-all-post');
   $('#post-' + post_id).find('#delete-post .ball-pulse').fadeIn(100);
@@ -3203,6 +3204,7 @@ function SearchFor(self,type){
       });
     }
     else{
+      $('#SearchForInputTypeId').val(0);
 
     }
   })

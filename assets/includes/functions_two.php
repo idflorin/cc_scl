@@ -5741,6 +5741,16 @@ function Wo_GetGenders($lang = 'english',$langs)
     }
     return $data;
 }
+function Wo_GetGendersImages()
+{
+    global $wo, $db;
+    $genders = $db->get(T_GENDER);
+    $data = array();
+    foreach ($genders as $key => $value) {
+        $data[$value->gender_id] = $value->image;
+    }
+    return $data;
+}
 function detect_safe_search($path)
 {
     global $wo;

@@ -110,4 +110,5 @@ define('T_PRODUCTS_CATEGORY', 'Wo_Products_Categories');
 define('T_BANK_TRANSFER', 'bank_receipts');
 define('T_COLORS', 'Wo_Colored_Posts');
 define('T_ADMIN', 'Wo_Admin_Pages');
+define('T_GENDER', 'Wo_Gender');
 ?>

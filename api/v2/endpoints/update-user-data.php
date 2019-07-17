@@ -160,6 +160,12 @@ if (empty($error_code)) {
 		}
 	}
 }
+if (!empty($user_data['two_factor']) && $user_data['two_factor'] == 'off') {
+    $user_data['two_factor'] = 0;
+}
+elseif (!empty($user_data['two_factor']) && $user_data['two_factor'] == 'on') {
+    $user_data['two_factor'] = 1;
+}
 
 if (empty($error_code)) {
 	$update = Wo_UpdateUserData($wo['user']['user_id'], $user_data);

@@ -13,9 +13,10 @@ body {direction: rtl}
 .login > .col-md-5 {
     padding-left: 15px;padding-right: 60px;
 }
-.sun_input input, .sun_input textarea, .sun_input select {
+.sun_input input, .sun_input textarea {
     padding: 15px 55px 0px 10px;
 }
+.sun_input select{padding: 15px 50px 0px 10px;}
 .sun_input label {
     left: auto;right: 55px;
 }

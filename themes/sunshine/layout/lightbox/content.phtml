@@ -37,6 +37,7 @@ if (strpos($wo['story']['postFile'],',') !== false) {
 				</span>
 			</span>
 		<?php } ?>
+
 			<span class="lbox_topbar_child right">
 				<?php
 				$fileType = strtolower(substr($image, strrpos($image, '.') + 1));
@@ -51,7 +52,15 @@ if (strpos($wo['story']['postFile'],',') !== false) {
 				<span onclick="zoomout(<?php echo $wo['story']['id'];?>)">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14M7,9H12V10H7V9Z" /></svg>
 				</span>
+				<?php
+				$fileType = strtolower(substr($image, strrpos($image, '.') + 1));
+				if ( $wo['user']['user_id'] == $wo['story']['publisher']['user_id'] && ( $fileType == 'jpg' || $fileType == 'jpeg' || $fileType == 'png') && $wo['story']['multi_image_post']){?>
+				<span class="<?php echo Wo_RightToLeft('pull-right');?> close-lightbox" onclick="Wo_DeletePost(<?php echo $wo['story']['id'];?>);">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+				</span>
+				<?php } ?>
 			</span>
+
 		</div>
 	</div>
 	<div class="comment-section">

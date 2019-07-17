@@ -42,10 +42,10 @@ textarea.postText {
     left: 0px !important;
     right: auto !important;
 }
-.emo-message {
+/*.emo-message {
     left: 92px !important;
     right: auto !important;
-}
+}*/
 .wowonder-well img {
     float: right;
     margin-left: 10px;
@@ -710,7 +710,9 @@ body .all_colors > div {
     right: auto;
 }
 body .thumb-image-delete:not(:last-child) {margin: 0 0 0 5px;}
-
+body .text-sender-container .msg_usr_info_top_list .mobilemsgclose {
+    margin: -1px -15px 0 15px;transform: rotate(180deg);
+}
 
 
 

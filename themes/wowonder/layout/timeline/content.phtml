@@ -691,7 +691,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
             <?php if(!empty($wo['user_profile']['school'])) {  ?>
             <li class="list-group-item">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-                <span><?php echo $wo['lang']['studying_at'];?> <?php echo $wo['user_profile']['school']; ?></span>
+                <span><?php echo ($wo['user_profile']['school_completed'] == 1)   ? $wo['lang']['studied_at'] : $wo['lang']['studying_at'] ;?> <?php echo $wo['user_profile']['school']; ?></span>
             </li>
             <li class="list-group-item" style="padding-top:0; padding-bottom:0;">
                 <hr>
@@ -1226,6 +1226,7 @@ function Wo_AddFamilyMember(){
         return false;
     }
     $('#add_to_family').find('.modal-footer .ball-pulse').fadeIn(100);
+    $('#add_to_family').find('.btn-main').attr('disabled', 'true');
     $.ajax({
         url: Wo_Ajax_Requests_File(),
         type: 'GET',
@@ -1245,11 +1246,14 @@ function Wo_AddFamilyMember(){
                     $(this).remove();
                     $("#add_to_family").modal('hide');
                 })
+                $('#add_to_family').find('btn-main').removeAttr('disabled');
+                location.reload()
             },1500);
             
         }
         else{
             $('.add_to_family_alert').html('<div class="alert alert-success">' + data.message + '</div>');
+            $('#add_to_family').find('.btn-main').removeAttr('disabled');
         }
         $('#add_to_family').find('.modal-footer .ball-pulse').fadeOut(100);
     })

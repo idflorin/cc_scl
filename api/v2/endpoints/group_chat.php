@@ -307,9 +307,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_code    = 7;
             $error_message = 'id must be numeric and greater than 0';
         }
-        if (empty($_FILES['file']) && empty($_POST['text']) && empty($_POST['image_url'])) {
+        if (empty($_FILES['file']) && empty($_POST['text']) && empty($_POST['image_url']) && empty($_POST['gif'])) {
             $error_code    = 12;
-            $error_message = 'text and file and image_url can not be empty';
+            $error_message = 'text and file and image_url and gif can not be empty';
         }
         $group_tab = Wo_GroupTabData($_POST['id']);
         if (empty($group_tab)) {
@@ -551,9 +551,10 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             }
             if (!empty($groups[$key]['parts'])) {
                 foreach ($groups[$key]['parts'] as $key3 => $g_user) {
-
-                    foreach ($non_allowed as $key5 => $value5) {
-                      unset($groups[$key]['parts'][$key3][$value5]);
+                    if (!empty($g_user)) {
+                        foreach ($non_allowed as $key5 => $value5) {
+                          unset($groups[$key]['parts'][$key3][$value5]);
+                        }
                     }
                 }
             }

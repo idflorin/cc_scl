@@ -121,16 +121,18 @@ if ($type == 'get_users_list') {
                     'user_id' => $user_list['user_id'],
                     'username' => $user_list['username'],
                     'name' => $user_list['name'],
-                    'profile_picture' => $user_list['avatar'],
-                    'cover_picture' => $user_list['cover'],
+                    'avatar' => $user_list['avatar'],
+                    'cover' => $user_list['cover'],
                     'verified' => $user_list['verified'],
                     'lastseen' => $lastseen,
                     'lastseen_unix_time' => $user_list['lastseen'],
                     'lastseen_time_text' => Wo_Time_Elapsed_String($user_list['lastseen']),
                     'url' => $user_list['url'],
                     'chat_color' => Wo_GetChatColor($wo['user']['user_id'], $user_list['user_id']),
-                    'chat_time'    => $user_list['chat_time']
+                    'chat_time'    => $user_list['chat_time'],
+                    'about' => $user_list['about']
                 );
+                $json_data['is_following'] = (Wo_IsFollowing($user_list['user_id'],$wo['user']['user_id'] )) ? 1 : 0;
                 $json_data['last_message'] = Wo_GetMessagesHeader(array(
                     'user_id' => $user_list['user_id'],
                     'limit' => 1,

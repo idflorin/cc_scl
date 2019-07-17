@@ -20,7 +20,7 @@ if (!empty($wo['story']['parent_id'])) {
             <li>
                <div class="pointer" onclick="Wo_OpenPostEditBox(<?php echo $wo['story']['id']; ?>);"><?php echo $wo['lang']['edit_post'];?></div>
             </li>
-            <?php } else if (!empty($wo['story']['product_id'])) { 
+            <?php } else if (!empty($wo['story']['product_id']) && empty($wo['story']['parent_id'])) { 
                if ($wo['story']['product']['status'] == 0) { ?>
             <li>
                <div class="pointer mark-as-sold-post" onclick="Wo_MarkAsSold(<?php echo $wo['story']['id']; ?>, <?php echo $wo['story']['product_id']; ?>);"><?php echo $wo['lang']['mark_as_sold']?></div>
@@ -321,7 +321,7 @@ if (!empty($wo['story']['parent_id'])) {
          <?php endif ?>
          <?php  if ($wo['story']['admin'] === true && $wo['story']['group_recipient_exists'] == false && empty($wo['story']['product_id'])) { ?>
          <?php  if (empty($wo['story']['page_id'])) { ?>
-         <span class="dropdown wo_post_privacy_menu" style="color:#9197a3">
+         <div class="dropdown wo_post_privacy_menu" style="color:#9197a3;display: inline-block;">
             <span class="dropdown-toggle pointer" data-toggle="dropdown" role="button" aria-expanded="false">
                <span class="pointer post-privacy" style="color:#9197a3">
                   <?php  if($wo['story']['postPrivacy'] == 0) { ?>
@@ -375,7 +375,7 @@ if (!empty($wo['story']['parent_id'])) {
                </li>
                <?php } else { ?>
                <li>
-                  <div class="pointer" onclick="Wo_UpdatePostPrivacy(<?php echo $wo['story']['id']; ?>,1,event);">
+                  <div class="pointer" onclick="Wo_UpdatePostPrivacy(<?php echo $wo['story']['id']; ?>,2,event);">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"></path>
                      </svg>
@@ -383,7 +383,7 @@ if (!empty($wo['story']['parent_id'])) {
                   </div>
                </li>
                <li>
-                  <div class="pointer" onclick="Wo_UpdatePostPrivacy(<?php echo $wo['story']['id']; ?>,2,event);">
+                  <div class="pointer" onclick="Wo_UpdatePostPrivacy(<?php echo $wo['story']['id']; ?>,1,event);">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"></path>
                      </svg>
@@ -392,9 +392,9 @@ if (!empty($wo['story']['parent_id'])) {
                </li>
                <?php } ?>
             </ul>
-         </span>
+         </div>
          <?php } else { ?>
-         <span class="dropdown wo_post_privacy_menu">
+         <div class="dropdown wo_post_privacy_menu" style="display: inline-block;">
             <span class="dropdown-toggle pointer" data-toggle="dropdown" role="button" aria-expanded="false">
                <span class="pointer post-privacy" style="color:#9197a3">
                   <?php  if($wo['story']['postPrivacy'] == 0) { ?>
@@ -428,7 +428,7 @@ if (!empty($wo['story']['parent_id'])) {
                   </div>
                </li>
             </ul>
-         </span>
+         </div>
          <?php } ?>
          <?php }  ?>
          <?php if(!empty($wo['story']['postMap'])) { ?>
@@ -493,7 +493,7 @@ if (!empty($wo['story']['parent_id'])) {
             <li>
                <div class="pointer" onclick="Wo_OpenPostEditBox(<?php echo $wo['story']['id']; ?>);"><?php echo $wo['lang']['edit_post'];?></div>
             </li>
-            <?php } else if (!empty($wo['story']['product_id'])) { 
+            <?php } else if (!empty($wo['story']['product_id']) && empty($wo['story']['parent_id'])) { 
                if ($wo['story']['product']['status'] == 0) { ?>
             <li>
                <div class="pointer mark-as-sold-post" onclick="Wo_MarkAsSold(<?php echo $wo['story']['id']; ?>, <?php echo $wo['story']['product_id']; ?>);"><?php echo $wo['lang']['mark_as_sold']?></div>
@@ -794,7 +794,7 @@ if (!empty($wo['story']['parent_id'])) {
          <?php endif ?>
          <?php  if ($wo['story']['admin'] === true && $wo['story']['group_recipient_exists'] == false && empty($wo['story']['product_id'])) { ?>
          <?php  if (empty($wo['story']['page_id'])) { ?>
-         <span class="dropdown wo_post_privacy_menu" style="color:#9197a3">
+         <div class="dropdown wo_post_privacy_menu" style="color:#9197a3;display: inline-block;">
             <span class="dropdown-toggle pointer" data-toggle="dropdown" role="button" aria-expanded="false">
                <span class="pointer post-privacy" style="color:#9197a3">
                   <?php  if($wo['story']['postPrivacy'] == 0) { ?>
@@ -848,7 +848,7 @@ if (!empty($wo['story']['parent_id'])) {
                </li>
                <?php } else { ?>
                <li>
-                  <div class="pointer" onclick="Wo_UpdatePostPrivacy(<?php echo $wo['story']['id']; ?>,1,event);">
+                  <div class="pointer" onclick="Wo_UpdatePostPrivacy(<?php echo $wo['story']['id']; ?>,2,event);">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"></path>
                      </svg>
@@ -856,7 +856,7 @@ if (!empty($wo['story']['parent_id'])) {
                   </div>
                </li>
                <li>
-                  <div class="pointer" onclick="Wo_UpdatePostPrivacy(<?php echo $wo['story']['id']; ?>,2,event);">
+                  <div class="pointer" onclick="Wo_UpdatePostPrivacy(<?php echo $wo['story']['id']; ?>,1,event);">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"></path>
                      </svg>
@@ -865,9 +865,9 @@ if (!empty($wo['story']['parent_id'])) {
                </li>
                <?php } ?>
             </ul>
-         </span>
+         </div>
          <?php } else { ?>
-         <span class="dropdown wo_post_privacy_menu">
+         <div class="dropdown wo_post_privacy_menu" style="display: inline-block;">
             <span class="dropdown-toggle pointer" data-toggle="dropdown" role="button" aria-expanded="false">
                <span class="pointer post-privacy" style="color:#9197a3">
                   <?php  if($wo['story']['postPrivacy'] == 0) { ?>
@@ -901,7 +901,7 @@ if (!empty($wo['story']['parent_id'])) {
                   </div>
                </li>
             </ul>
-         </span>
+         </div>
          <?php } ?>
          <?php }  ?>
          <?php if(!empty($wo['story']['postMap'])) { ?>

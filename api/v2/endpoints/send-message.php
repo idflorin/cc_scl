@@ -18,9 +18,9 @@ $required_fields = array(
 );
 
 if (empty($_POST['text'])) {
-	if (empty($_FILES['file']['name']) && empty($_POST['image_url'])) {
+	if (empty($_FILES['file']['name']) && empty($_POST['image_url']) && empty($_POST['gif'])) {
 	    $error_code    = 3;
-	    $error_message = 'file (STREAM FILE) AND text (POST) AND image_url (POST) are missing, at least one is required';
+	    $error_message = 'file (STREAM FILE) AND text (POST) AND image_url AND gif (POST) are missing, at least one is required';
 	}
 }
 

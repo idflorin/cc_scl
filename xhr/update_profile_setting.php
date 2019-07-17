@@ -56,6 +56,10 @@ if ($f == "update_profile_setting") {
                     'school' => $_POST['school'],
                     'relationship_id' => $_POST['relationship']
                 );
+                $Update_data['school_completed'] = 0;
+                if (!empty($_POST['school']) && !empty($_POST['completed']) && $_POST['completed'] == 'on') {
+                    $Update_data['school_completed'] = 1;
+                }
                 if (Wo_UpdateUserData($_POST['user_id'], $Update_data)) {
                     $field_data = array();
                     if (!empty($_POST['custom_fields'])) {

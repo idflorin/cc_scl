@@ -910,7 +910,7 @@ function Wo_GetBlogComments($args = array()) {
     $query_one = '';
     $data      = array();
     if ($offset > 0) {
-        $query_one .= " AND `id` > {$offset} AND `id` <> {$offset} ";
+        $query_one .= " AND `id` < {$offset} AND `id` <> {$offset} ";
     }
     if ($id && $id > 0 && is_numeric($id)) {
         $query_one .= " AND `id` = '$id' ";

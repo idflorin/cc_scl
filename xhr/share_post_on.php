@@ -71,6 +71,10 @@ if ($f == 'share_post_on') {
         }
         $data['status'] = 200;
     }
+    else{
+        $data['status'] = 400;
+        $data['message'] = $wo['lang']['cant_share_own'];
+    }
     header("Content-type: application/json");
     echo json_encode($data);
     exit();

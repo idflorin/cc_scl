@@ -724,12 +724,77 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                     }
                 }
             }
+            $image = '';
+            if (!empty($_FILES['icon'])) {
+                $fileInfo = array(
+                    'file' => $_FILES["icon"]["tmp_name"],
+                    'name' => $_FILES['icon']['name'],
+                    'size' => $_FILES["icon"]["size"],
+                    'type' => $_FILES["icon"]["type"],
+                    'types' => 'jpeg,png,jpg,gif,svg',
+                    'crop' => array(
+                        'width' => 100,
+                        'height' => 100
+                    )
+                );
+                $media    = Wo_ShareFile($fileInfo);
+                if (!empty($media) && !empty($media['filename'])) {
+                    $image = $media['filename'];
+                }
+                if (!empty($image)) {
+                    $gender = $db->where('gender_id',$lang_key)->getOne(T_GENDER);
+                    if (!empty($gender)) {
+                        $link = $gender->image;
+                        if (file_exists($link)) {
+                            @unlink(trim($link));
+                        }
+                        else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                            @Wo_DeleteFromToS3($link);
+                        }
+                        $db->where('gender_id',$lang_key)->update(T_GENDER,array('image' => $image));
+                    }
+                    else{
+                        $db->insert(T_GENDER,array('gender_id' => $lang_key,'image' => $image));
+                    }
+                }
+            }
+            if (!empty($_POST['icon_to_use']) && $_POST['icon_to_use'] == 1) {
+                $gender = $db->where('gender_id',$lang_key)->getOne(T_GENDER);
+                if (!empty($gender)) {
+                    $link = $gender->image;
+                    if (file_exists($link)) {
+                        @unlink(trim($link));
+                    }
+                    else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                        @Wo_DeleteFromToS3($link);
+                    }
+                    $db->where('gender_id',$lang_key)->delete(T_GENDER);
+                }
+            }
         }
         header("Content-type: application/json");
         echo json_encode($data);
         exit();
     }
     if ($s == 'add_new_gender') {
+        $image = '';
+        if (!empty($_FILES['icon'])) {
+            $fileInfo = array(
+                'file' => $_FILES["icon"]["tmp_name"],
+                'name' => $_FILES['icon']['name'],
+                'size' => $_FILES["icon"]["size"],
+                'type' => $_FILES["icon"]["type"],
+                'types' => 'jpeg,png,jpg,gif,svg',
+                'crop' => array(
+                    'width' => 100,
+                    'height' => 100
+                )
+            );
+            $media    = Wo_ShareFile($fileInfo);
+            if (!empty($media) && !empty($media['filename'])) {
+                $image = $media['filename'];
+            }
+        }
         $insert_data = array();
         $insert_data['type'] = 'gender';
         $add = false;
@@ -742,6 +807,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         if ($add == true) {
             $id = $db->insert(T_LANGS,$insert_data);
             $db->where('id',$id)->update(T_LANGS,array('lang_key' => $id));
+            if (!empty($image)) {
+                $db->insert(T_GENDER,array('gender_id' => $id,'image' => $image));
+            }
             $data['status'] = 200;
         }
         else{
@@ -755,6 +823,17 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'delete_gender') {
         if (!empty($_GET['key']) && in_array($_GET['key'], array_keys($wo['genders']))) {
             $db->where('lang_key',Wo_Secure($_GET['key']))->delete(T_LANGS);
+            $gender = $db->where('gender_id',Wo_Secure($_GET['key']))->getOne(T_GENDER);
+            if (!empty($gender)) {
+                $link = $gender->image;
+                if (file_exists($link)) {
+                    @unlink(trim($link));
+                }
+                else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                    @Wo_DeleteFromToS3($link);
+                }
+                $db->where('gender_id',Wo_Secure($_GET['key']))->delete(T_GENDER);
+            }
         }
         $data['status'] = 200;
         header("Content-type: application/json");

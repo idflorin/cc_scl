@@ -29,6 +29,7 @@ if ($followers_alert == 0) {
 
 </ul>
 <ul class="nav navbar-nav navbar-right <?php echo Wo_RightToLeft('pull-right');?>" id="head_menu_rght">
+	<?php if ($wo['config']['user_ads'] == 1 || Wo_CanBlog() == true || $wo['config']['events'] == 1 || $wo['config']['groups'] == 1 || $wo['config']['pages'] == 1) {  ?>
 	<li class="dropdown head_name_links">
 		<a href="#" class="dropdown-toggle sixteen-font-size btn-main" data-toggle="dropdown" role="button" aria-expanded="false">
 			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
@@ -61,6 +62,7 @@ if ($followers_alert == 0) {
 			<?php } ?>
 		</ul>
 	</li>
+<?php } ?>
 	<li class="dropdown requests-container" onclick="Wo_OpenRequestsMenu();">
 		<span class="new-update-alert<?php echo $followers_hidden_class;?>">
 			<?php echo $followers_alert?>

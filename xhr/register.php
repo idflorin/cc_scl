@@ -120,7 +120,13 @@ if ($f == 'register') {
             $re_data['phone_number'] = Wo_Secure($_POST['phone_num']);
         }
         $in_code  = (isset($_POST['invited'])) ? Wo_Secure($_POST['invited']) : false;
-        $register = Wo_RegisterUser($re_data, $in_code);
+        if (empty($_POST['phone_num'])) {
+            $register = Wo_RegisterUser($re_data, $in_code);
+        }
+        else{
+            $register = true;
+        }
+        
         if ($register === true) {
             if ($activate == 1) {
                 $data  = array(
@@ -156,10 +162,12 @@ if ($f == 'register') {
             } else if ($wo['config']['sms_or_email'] == 'sms' && !empty($_POST['phone_num'])) {
                 $random_activation = Wo_Secure(rand(11111, 99999));
                 $message           = "Your confirmation code is: {$random_activation}";
-                $user_id           = Wo_UserIdFromUsername($_POST['username']);
-                $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
-                if ($query) {
+                
+                //if ($query) {
                     if (Wo_SendSMSMessage($_POST['phone_num'], $message) === true) {
+                        $register = Wo_RegisterUser($re_data, $in_code);
+                        $user_id           = Wo_UserIdFromUsername($_POST['username']);
+                        $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
                         $data = array(
                             'status' => 300,
                             'location' => Wo_SeoLink('index.php?link1=confirm-sms?code=' . $code)
@@ -167,7 +175,7 @@ if ($f == 'register') {
                     } else {
                         $errors = $error_icon . $wo['lang']['failed_to_send_code_email'];
                     }
-                }
+                //}
             }
         }
         if (!empty($field_data)) {

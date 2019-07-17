@@ -371,7 +371,7 @@ $(document).on('click', '#share_post_on_btn', function(event) {
         },2000);
       }
       else{
-        $('.share_post_modal_alert').html('<div class="alert alert-danger"><?php echo($wo['lang']['please_check_details']) ?></div>');
+        $('.share_post_modal_alert').html("<div class='alert alert-danger'><?php echo($wo['lang']['cant_share_own']) ?></div>");
         setTimeout(function () {
           $('.share_post_modal_alert').html('');
         },2000);
