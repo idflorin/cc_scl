@@ -18,23 +18,23 @@ require_once('assets/init.php');
 if ($wo['loggedin'] == true) {
     $update_last_seen = Wo_LastSeen($wo['user']['user_id']);
 } else if (!empty($_SERVER['HTTP_HOST'])) {
-    $server_scheme = @$_SERVER["HTTPS"];
-    $pageURL = ($server_scheme == "on") ? "https://" : "http://";
-    $http_url = $pageURL . $_SERVER['HTTP_HOST'];
-    $url = parse_url($wo['config']['site_url']);
-    if (!empty($url)) {
-        if ($url['scheme'] == 'http') {
-            if ($http_url != 'http://' . $url['host']) { 
-               header('Location: ' . $wo['config']['site_url']);
-               exit();
-            }
-        } else {
-            if ($http_url != 'https://' . $url['host']) { 
-               header('Location: ' . $wo['config']['site_url']);
-               exit();
-            }
-        }
-    }
+    // $server_scheme = @$_SERVER["HTTPS"];
+    // $pageURL = ($server_scheme == "on") ? "https://" : "http://";
+    // $http_url = $pageURL . $_SERVER['HTTP_HOST'];
+    // $url = parse_url($wo['config']['site_url']);
+    // if (!empty($url)) {
+    //     if ($url['scheme'] == 'http') {
+    //         if ($http_url != 'http://' . $url['host']) { 
+    //            header('Location: ' . $wo['config']['site_url']);
+    //            exit();
+    //         }
+    //     } else {
+    //         if ($http_url != 'https://' . $url['host']) { 
+    //            header('Location: ' . $wo['config']['site_url']);
+    //            exit();
+    //         }
+    //     }
+    // }
 }
 if (!empty($_GET['ref']) && $wo['loggedin'] == false && !isset($_COOKIE['src'])) {
     $get_ip = get_ip_address();
@@ -407,6 +407,27 @@ switch ($page) {
         break;
     case 'unusual-login':
         include('sources/unusual-login.php');
+        break;
+    case 'jobs':
+        include('sources/jobs.php');
+        break;
+    case 'common_things':
+        include('sources/common_things.php');
+        break;
+    case 'funding':
+        include('sources/funding.php');
+        break;
+    case 'my_funding':
+        include('sources/my_funding.php');
+        break;
+    case 'create_funding':
+        include('sources/create_funding.php');
+        break;
+    case 'edit_fund':
+        include('sources/edit_fund.php');
+        break;
+    case 'show_fund':
+        include('sources/show_fund.php');
         break;
 }
 if (empty($wo['content'])) {

@@ -67,7 +67,7 @@
       </svg>
       <span class="like-btn-mobile"><?php echo $wo['lang']['comment_post_label'] ?></span> 
    </div>
-   <?php if($wo['config']['social_share_twitter'] == 0 && $wo['config']['social_share_google'] == 0 && $wo['config']['social_share_facebook'] == 0 && $wo['config']['social_share_whatsup'] == 0 && $wo['config']['social_share_pinterest'] == 0 && $wo['config']['social_share_linkedin'] == 0 && $wo['config']['social_share_telegram'] == 0) { ?>
+   <?php if($wo['config']['social_share_twitter'] == 0 && $wo['config']['social_share_facebook'] == 0 && $wo['config']['social_share_whatsup'] == 0 && $wo['config']['social_share_pinterest'] == 0 && $wo['config']['social_share_linkedin'] == 0 && $wo['config']['social_share_telegram'] == 0) { ?>
    <?php if (empty($wo['story']['parent_id']) && $wo['story']['post_is_promoted'] != 1) { ?>
    <div class="btn btn-default stat-item" title="<?php echo $wo['lang']['share'];?>" onclick="Wo_SharePostOn(<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['user_id']; ?>,'timeline')">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">

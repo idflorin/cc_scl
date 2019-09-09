@@ -31,7 +31,7 @@ foreach ($nearby as $key => $nearbyuser) {
 	   unset($nearbyuser['user_data'][$value]);
 	   $nearbyuser['user_data']['distance'] = $nearbyuser['distance'];
 	   $nearbyuser['user_data']['user_geoinfo'] = $nearbyuser['user_geoinfo'];
-	   $nearbyuser['user_data']['is_following'] = (Wo_IsFollowing($nearbyuser['user_id'])) ? 'yes' : 'no';
+	   $nearbyuser['user_data']['is_following'] = (Wo_IsFollowing($nearbyuser['user_id'],$wo['user']['user_id'])) ? 'yes' : 'no';
 	}
 	$users[] = $nearbyuser['user_data'];
 }

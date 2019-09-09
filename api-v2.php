@@ -49,8 +49,8 @@ if ($server_key != $wo['config']['widnows_app_api_key']) {
 
 $api               = "api/v2/endpoints/$type.php"; 
 
-$pages_without_access_token = array('get-site-settings','auth', 'regsiter', 'send-reset-password-email', 'create-account', 'social-login','is-active','two-factor');
-$pages_without_loggedin = array('get-site-settings', 'auth', 'regsiter', 'send-reset-password-email', 'create-account', 'social-login','is-active','two-factor');
+$pages_without_access_token = array('get-site-settings','active_account_sms','auth', 'regsiter', 'send-reset-password-email', 'create-account', 'social-login','is-active','two-factor');
+$pages_without_loggedin = array('get-site-settings','active_account_sms', 'auth', 'regsiter', 'send-reset-password-email', 'create-account', 'social-login','is-active','two-factor');
 
 if (!file_exists($api)) {
     $response_data       = array(

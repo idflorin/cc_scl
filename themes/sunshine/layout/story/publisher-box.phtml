@@ -448,22 +448,19 @@ if (!empty($_GET['url'])) {
 <script type="text/javascript">
 function Wo_ChangeColor(color_1,color_2,text_color,image,id) {
 	if (color_1 != '' && color_2 != '' && text_color != '' && id) {
-		$('.wo_pub_txtara_combo').css("cssText", "background-image: linear-gradient(45deg, "+color_1+" 0%, "+color_2+" 100%) !important");
-		$('.postText').css("cssText", "color: "+text_color+" !important");
+		$('.wo_pub_txtara_combo').css("cssText", "background-image: linear-gradient(45deg, "+color_1+" 0%, "+color_2+" 100%) !important;color: "+text_color+" !important");
 		$('#post_color_input').val(id);
 		$('.post.publisher-box').addClass('wo_pub_change_color');
 	}
 	else if(text_color != '' && image != '' && id){
-		$('.wo_pub_txtara_combo').css("cssText", "background-position: center !important;background-repeat: no-repeat !important;background-size: cover !important;background-image:url('"+image+"') !important;");
-		$('.postText').css("cssText", "color: "+text_color+" !important");
+		$('.wo_pub_txtara_combo').css("cssText", "background-position: center !important;background-repeat: no-repeat !important;background-size: cover !important;background-image:url('"+image+"') !important;color: "+text_color+" !important");
 		$('#post_color_input').val(id);
 		$('.post.publisher-box').addClass('wo_pub_change_color');
-	}
+	};
 }
 function Wo_ShowColors() {
 	if ($('.all_colors').is(":visible")) {
 		$('.all_colors').hide();
-		$('.postText').css("cssText", "");
 		$('#post_color_input').val("");
 		$('.post.publisher-box').removeClass('wo_pub_change_color');
 	}
@@ -474,7 +471,6 @@ function Wo_ShowColors() {
 function Wo_CloseColor() {
 	$('.all_colors').hide();
 	$('.wo_pub_txtara_combo').css("cssText", "");
-	$('.postText').css("cssText", "");
 	$('#post_color_input').val("");
 	$('.post.publisher-box').removeClass('wo_pub_change_color');
 	$(".all_colors_display").removeClass('selected');
@@ -506,7 +502,7 @@ $(document).ready(function() {
 	$("textarea.postText").keyup(function(){
 		if($(this).val().length > 180){
 			$('.all_colors').hide();
-			$('.postText').css("cssText", "");
+			$('.wo_pub_txtara_combo').css("cssText", "");
 			$('#post_color_input').val("");
 			$('.post.publisher-box').removeClass('wo_pub_change_color');
 			$(".all_colors_display").removeClass('selected');

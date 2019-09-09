@@ -278,10 +278,13 @@ function Wo_GetMRecordLink() {
   else{$('form.sendMessages').submit()}
 }
 
-function Wo_RegisterTabMessage(id) {
+function Wo_RegisterTabMessage(id,type = '') {
 
   if (!id) {
     return false;
+  }
+  if (type == 'page') {
+    chat_tab = id;
   }
   
   if (recorder && recording_node == "chat" && id == chat_tab) {
@@ -292,17 +295,36 @@ function Wo_RegisterTabMessage(id) {
         var dataForm   = new FormData();
         dataForm.append('audio-filename', file.name);
         dataForm.append('audio-blob', file);
-        Wo_RegisterTabMessageRecord(dataForm,id);
+        Wo_RegisterTabMessageRecord(dataForm,id,type);
       }
-      else{$('form.chat-sending-form-'+id).submit();}
+      else{
+        if (type == 'page') {
+          $('form.page-chat-sending-'+id).submit();
+        }
+        else{
+          $('form.chat-sending-form-'+id).submit();
+        }
+      }
 
     });
   }
-  else{$('form.chat-sending-form-'+id).submit();}
+  else{
+    if (type == 'page') {
+      $('form.page-chat-sending-'+id).submit();
+    }
+    else{
+      $('form.chat-sending-form-'+id).submit();
+    }
+  }
 }
 
-function Wo_RegisterTabMessageRecord(dataForm,id){
+function Wo_RegisterTabMessageRecord(dataForm,id,type = ''){
   if (dataForm && id) {
+    var form_class  = 'chat-sending-form-';
+    if (type == 'page') {
+      form_class  = 'page-chat-sending-';
+    }
+    $('form.'+form_class+id).find('.loading').removeClass('hidden');
     $.ajax({
         url: Wo_Ajax_Requests_File() + "?f=chat&s=register_message_record",
         type:       'POST',
@@ -316,22 +338,21 @@ function Wo_RegisterTabMessageRecord(dataForm,id){
             xhr.upload.addEventListener("progress", function(evt) {
                 if (evt.lengthComputable) {
                     var percentComplete = (evt.loaded / evt.total) * 100;
-                    $('form.chat-sending-form-'+id).find('.loading').removeClass('hidden');
                 }
            }, false);
            return xhr;
         }
     }).done(function(data) {
       if(data.status == 200){
-        $('form.chat-sending-form-'+id).find('input.message-record').val('');   
-        $('form.chat-sending-form-'+id).find('input.media-name').val('');
-        $('form.chat-sending-form-'+id).find('.loading').addClass('hidden');
+        $('form.'+form_class+id).find('input.message-record').val('');   
+        $('form.'+form_class+id).find('input.media-name').val('');
+        $('form.'+form_class+id).find('.loading').addClass('hidden');
         Wo_stopRecording();
         Wo_CleanRecordNodes();
         Wo_StopLocalStream();
-        $('form.chat-sending-form-'+id).find('input.message-record').val(data.url);
-        $('form.chat-sending-form-'+id).find('input.media-name').val(data.name);
-        $('form.chat-sending-form-'+id).submit();
+        $('form.'+form_class+id).find('input.message-record').val(data.url);
+        $('form.'+form_class+id).find('input.media-name').val(data.name);
+        $('form.'+form_class+id).submit();
       }
     });
   }

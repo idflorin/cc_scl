@@ -107,8 +107,14 @@ define('T_PAGES_CATEGORY', 'Wo_Pages_Categories');
 define('T_GROUPS_CATEGORY', 'Wo_Groups_Categories');
 define('T_BLOGS_CATEGORY', 'Wo_Blogs_Categories');
 define('T_PRODUCTS_CATEGORY', 'Wo_Products_Categories');
+define('T_JOB_CATEGORY', 'Wo_Job_Categories');
 define('T_BANK_TRANSFER', 'bank_receipts');
 define('T_COLORS', 'Wo_Colored_Posts');
 define('T_ADMIN', 'Wo_Admin_Pages');
 define('T_GENDER', 'Wo_Gender');
+define('T_JOB', 'Wo_Job');
+define('T_JOB_APPLY', 'Wo_Job_Apply');
+define('T_BLOG_REACTION', 'Wo_Blog_Reaction');
+define('T_FUNDING', 'Wo_Funding');
+define('T_FUNDING_RAISE', 'Wo_Funding_Raise');
 ?>

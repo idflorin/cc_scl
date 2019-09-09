@@ -10,7 +10,10 @@ if (empty($_GET['code'])) {
 $file = 'reset-password';
 $validate = Wo_isValidPasswordResetToken($_GET['code']);
 if ($validate === false) {
-	$file = 'invalid-markup';
+	$validate = Wo_isValidPasswordResetToken2($_GET['code']);
+	if ($validate === false) {
+		$file = 'invalid-markup';
+	}
 }
 $wo['description'] = $wo['config']['siteDesc'];
 $wo['keywords']    = $wo['config']['siteKeywords'];

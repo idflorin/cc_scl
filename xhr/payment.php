@@ -90,8 +90,14 @@ if ($f == 'payment') {
             $create_payment     = Wo_CreatePayment($pro_type);
             if ($mysqli) {
                 //record affiliate with fixed price
-                if (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 0 && $wo['user']['referrer'] == 0) {
-                    $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
+                if ((!empty($_SESSION['ref']) || !empty($wo['user']['ref_user_id'])) && $wo['config']['affiliate_type'] == 0 && $wo['user']['referrer'] == 0) {
+                    if (!empty($_SESSION['ref'])) {
+                        $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
+                    }
+                    elseif (!empty($wo['user']['ref_user_id'])) {
+                        $ref_user_id = Wo_UserIdFromUsername($wo['user']['ref_user_id']);
+                    }
+                    
                     if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
                         $update_user    = Wo_UpdateUserData($wo['user']['user_id'], array(
                             'referrer' => $ref_user_id,
@@ -102,9 +108,14 @@ if ($f == 'payment') {
                     }
                 }
                 //record affiliate with percentage
-                if (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 1 && $wo['user']['referrer'] == 0) {
+                if ((!empty($_SESSION['ref']) || !empty($wo['user']['ref_user_id'])) && $wo['config']['affiliate_type'] == 1 && $wo['user']['referrer'] == 0) {
                     if ($wo['config']['amount_percent_ref'] > 0) {
-                        $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
+                        if (!empty($_SESSION['ref'])) {
+                            $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
+                        }
+                        elseif (!empty($wo['user']['ref_user_id'])) {
+                            $ref_user_id = Wo_UserIdFromUsername($wo['user']['ref_user_id']);
+                        }
                         if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
                             $update_user    = Wo_UpdateUserData($wo['user']['user_id'], array(
                                 'referrer' => $ref_user_id,
@@ -115,7 +126,12 @@ if ($f == 'payment') {
                             unset($_SESSION['ref']);
                         }
                     } else if ($wo['config']['amount_ref'] > 0) {
-                        $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
+                        if (!empty($_SESSION['ref'])) {
+                            $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
+                        }
+                        elseif (!empty($wo['user']['ref_user_id'])) {
+                            $ref_user_id = Wo_UserIdFromUsername($wo['user']['ref_user_id']);
+                        }
                         if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
                             $update_user    = Wo_UpdateUserData($wo['user']['user_id'], array(
                                 'referrer' => $ref_user_id,

@@ -256,6 +256,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
 
             if($receipt){
                 $updated = $db->where('id',$id)->update('bank_receipts',array('approved'=>1,'approved_at'=>time()));
+                $updated = true;
                 if ($updated === true) {
                     if ($receipt->mode == 'wallet') {
                         $amount = $receipt->price;
@@ -272,6 +273,55 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         );
                         Wo_RegisterNotification($notification_data_array);
                     }
+                    elseif ($receipt->mode == 'donate') {
+                        $fund = $db->where('id',$receipt->fund_id)->getOne(T_FUNDING);
+                        if (!empty($fund)) {
+                            $amount = $receipt->price;
+                            $fund_id = $receipt->fund_id;
+
+
+                            $notes = "Doanted to ".mb_substr($fund->title, 0, 100, "UTF-8");
+
+                            $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$receipt->user_id}, 'DONATE', {$amount}, '{$notes}')");
+
+                            $admin_com = 0;
+                            if (!empty($wo['config']['donate_percentage']) && is_numeric($wo['config']['donate_percentage']) && $wo['config']['donate_percentage'] > 0) {
+                                $admin_com = ($wo['config']['donate_percentage'] * $amount) / 100;
+                                $amount = $amount - $admin_com;
+                            }
+                            $user_data = Wo_UserData($fund->user_id);
+                            $db->where('user_id',$fund->user_id)->update(T_USERS,array('balance' => $user_data['balance'] + $amount));
+                            $fund_raise_id = $db->insert(T_FUNDING_RAISE,array('user_id' => $receipt->user_id,
+                                                              'funding_id' => $fund_id,
+                                                              'amount' => $amount,
+                                                              'time' => time()));
+                            $post_data = array(
+                                'user_id' => $receipt->user_id,
+                                'fund_raise_id' => $fund_raise_id,
+                                'time' => time(),
+                                'multi_image_post' => 0
+                            );
+
+                            $id = Wo_RegisterPost($post_data);
+
+                            $notification_data_array = array(
+                                'notifier_id'  => $receipt->user_id,
+                                'recipient_id' => $fund->user_id,
+                                'type' => 'fund_donate',
+                                'url' => 'index.php?link1=show_fund&id=' . $fund->hashed_id
+                            );
+                            Wo_RegisterNotification($notification_data_array);
+
+                            $notification_data_array = array(
+                                'recipient_id' => $receipt->user_id,
+                                'type' => 'admin_notification',
+                                'url' => 'index.php?link1=show_fund&id=' . $fund->hashed_id,
+                                'text' => $wo['lang']['bank_pro'],
+                                'type2' => 'no_name'
+                            );
+                            Wo_RegisterNotification($notification_data_array);
+                        }
+                    }
                     else{
                         $pro_type = $receipt->mode;
                         $update_array = array(
@@ -284,6 +334,36 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                             $update_array['verified'] = 1;
                         }
                         $mysqli       = Wo_UpdateUserData($receipt->user_id, $update_array);
+
+                        $user_data = Wo_UserData($receipt->user_id);
+
+                        if (!empty($user_data['ref_user_id']) && $wo['config']['affiliate_type'] == 1 && $user_data['referrer'] == 0) {
+                            $amount1 = $receipt->price;
+                            $ref_user_id = $user_data['ref_user_id'];
+
+
+                            if ($wo['config']['amount_percent_ref'] > 0) {
+                                if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
+                                    $update_user    = Wo_UpdateUserData($user_data['user_id'], array(
+                                        'referrer' => $ref_user_id,
+                                        'src' => 'Referrer'
+                                    ));
+                                    $ref_amount     = ($wo['config']['amount_percent_ref'] * $amount1) / 100;
+                                    $update_balance = Wo_UpdateBalance($ref_user_id, $ref_amount);
+                                    unset($_SESSION['ref']);
+                                }
+                            } else if ($wo['config']['amount_ref'] > 0) {
+                                if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
+                                    $update_user    = Wo_UpdateUserData($user_data['user_id'], array(
+                                        'referrer' => $ref_user_id,
+                                        'src' => 'Referrer'
+                                    ));
+                                    $update_balance = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
+                                    unset($_SESSION['ref']);
+                                }
+                            }
+                            
+                        }
                         
                         $amount1 = $receipt->price;
                         $notes              = $wo['lang']['upgrade_to_pro'] . " " . $receipt->description . " : Bank";
@@ -364,7 +444,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'add_new_category') {
         $data['status'] = 400;
         $data['message'] = 'Please check your details';
-        $types = array('page' => T_PAGES_CATEGORY,'group' => T_GROUPS_CATEGORY,'blog' => T_BLOGS_CATEGORY,'product' => T_PRODUCTS_CATEGORY);
+        $types = array('page' => T_PAGES_CATEGORY,'group' => T_GROUPS_CATEGORY,'blog' => T_BLOGS_CATEGORY,'product' => T_PRODUCTS_CATEGORY,'job' => T_JOB_CATEGORY);
         if (!empty($_GET['type']) && in_array($_GET['type'], array_keys($types))) {
             $add = false;
             $insert_data = array();
@@ -404,7 +484,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         exit();
     }
     if ($s == 'delete_category' && !empty($_POST['lang_key'])) {
-        $types = array('page' => T_PAGES_CATEGORY,'group' => T_GROUPS_CATEGORY,'blog' => T_BLOGS_CATEGORY,'product' => T_PRODUCTS_CATEGORY);
+        $types = array('page' => T_PAGES_CATEGORY,'group' => T_GROUPS_CATEGORY,'blog' => T_BLOGS_CATEGORY,'product' => T_PRODUCTS_CATEGORY,'job' => T_JOB_CATEGORY);
         if (!empty($_GET['type']) && in_array($_GET['type'], array_keys($types))) {
             if ($_POST['lang_key'] != 'other' && $_POST['lang_key'] != 'all_') {
                 $lang_key = Wo_Secure($_POST['lang_key']);
@@ -1415,7 +1495,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     }
     if ($s == 'auto_delete' && Wo_CheckMainSession($hash_id) === true) {
         if (!empty($_GET['delete'])) {
-            Wo_RunInBackground();
+            Wo_RunInBackground(array('status' => 200));
             $delete_data = Wo_DeleteAllData($_GET['delete']);
         }
         header("Content-type: application/json");
@@ -1678,6 +1758,29 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'delete_job' && isset($_POST['job_id'])) {
+        $job_id = Wo_Secure($_POST['job_id']);
+        $job = $db->where('id',$job_id)->getOne(T_JOB);
+        if (!empty($job)) {
+            if ($job->image_type != 'cover') {
+                @unlink($job->image);
+                Wo_DeleteFromToS3($job->image);
+            }
+            
+        }
+        $db->where('id',$job_id)->delete(T_JOB);
+        $db->where('job_id',$job_id)->delete(T_JOB_APPLY);
+        $post = $db->where('job_id',$job_id)->getOne(T_POSTS);
+        if (!empty($post)) {
+            Wo_DeletePost($post->id);
+        }
+        
+
+        $data['status'] = 200;
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
     if ($s == 'delete_user_page' && isset($_GET['page_id'])) {
         if (Wo_DeletePage($_GET['page_id']) === true) {
             $data['status'] = 200;
@@ -1764,6 +1867,50 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             'status' => 200,
             'html' => $html
         );
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_fund' && Wo_CheckSession($hash_id) === true) {
+        if (!empty($_POST['fund_id'])) {
+            $id = Wo_Secure($_POST['fund_id']);
+            $fund = $db->where('id',$id)->getOne(T_FUNDING);
+            if (!empty($fund)) {
+
+                @Wo_DeleteFromToS3($fund->image);
+
+                if (file_exists($fund->image)) {
+                    try {
+                        unlink($fund->image);   
+                    }
+                    catch (Exception $e) {
+                    }
+                }
+
+                $db->where('id',$id)->delete(T_FUNDING);
+                $raise = $db->where('funding_id',$id)->get(T_FUNDING_RAISE);
+                $db->where('funding_id',$id)->delete(T_FUNDING_RAISE);
+                $posts = $db->where('fund_id',$id)->get(T_POSTS);
+                if (!empty($posts)) {
+                    foreach ($posts as $key => $value) {
+                        $db->where('parent_id',$value->id)->delete(T_POSTS);
+                    }
+                }
+                    
+                $db->where('fund_id',$id)->delete(T_POSTS);
+                foreach ($raise as $key => $value) {
+                    $raise_posts = $db->where('fund_raise_id',$value->id)->get(T_POSTS);
+                    if (!empty($raise_posts)) {
+                        foreach ($posts as $key => $value1) {
+                            $db->where('parent_id',$value1->id)->delete(T_POSTS);
+                        }
+                    }
+                    $db->where('fund_raise_id',$value->id)->delete(T_POSTS);
+                }
+
+                $data['status'] = 200;
+            }
+        }
         header("Content-type: application/json");
         echo json_encode($data);
         exit();

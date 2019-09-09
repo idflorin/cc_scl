@@ -84,9 +84,12 @@ $pages = array(
     'products-categories',
     'bank-receipts',
     'manage-currencies',
-    'manage-colored-posts'
+    'manage-colored-posts',
+    'job-categories',
+    'manage-fund',
+    'manage-jobs'
 );
-$mod_pages = array('dashboard', 'post-settings', 'manage-stickers', 'manage-gifts', 'manage-users', 'online-users', 'manage-stories', 'manage-pages', 'manage-groups', 'manage-posts', 'manage-articles', 'manage-events', 'manage-forum-threads', 'manage-forum-messages', 'manage-movies', 'manage-games', 'add-new-game', 'manage-user-ads', 'manage-reports', 'manage-third-psites', 'edit-movie','bank-receipts');
+$mod_pages = array('dashboard', 'post-settings', 'manage-stickers', 'manage-gifts', 'manage-users', 'online-users', 'manage-stories', 'manage-pages', 'manage-groups', 'manage-posts', 'manage-articles', 'manage-events', 'manage-forum-threads', 'manage-forum-messages', 'manage-movies', 'manage-games', 'add-new-game', 'manage-user-ads', 'manage-reports', 'manage-third-psites', 'edit-movie','bank-receipts','job-categories','manage-jobs');
 
 
 if (!empty($_GET['page'])) {
@@ -350,7 +353,7 @@ if (empty($page_loaded)) {
                         </ul>
                     </li>
                     <?php } ?>
-                     <li <?php echo ($page == 'manage-apps' || $page == 'manage-pages' || $page == 'manage-stickers' || $page == 'add-new-sticker' || $page == 'manage-gifts' || $page == 'add-new-gift' || $page == 'manage-groups' || $page == 'manage-posts' || $page == 'manage-articles' || $page == 'manage-events'||  $page == 'manage-forum-sections' || $page == 'manage-forum-forums' || $page == 'manage-forum-threads' || $page == 'manage-forum-messages' || $page == 'create-new-forum' || $page == 'create-new-section' || $page == 'manage-movies' || $page == 'add-new-movies' || $page == 'manage-games' || $page == 'add-new-game' || $page == 'edit-movie' || $page == 'pages-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories') ? 'class="active"' : ''; ?>>
+                     <li <?php echo ($page == 'manage-apps' || $page == 'manage-pages' || $page == 'manage-stickers' || $page == 'add-new-sticker' || $page == 'manage-gifts' || $page == 'add-new-gift' || $page == 'manage-groups' || $page == 'manage-posts' || $page == 'manage-articles' || $page == 'manage-events'||  $page == 'manage-forum-sections' || $page == 'manage-forum-forums' || $page == 'manage-forum-threads' || $page == 'manage-forum-messages' || $page == 'create-new-forum' || $page == 'create-new-section' || $page == 'manage-movies' || $page == 'add-new-movies' || $page == 'manage-games' || $page == 'add-new-game' || $page == 'edit-movie' || $page == 'pages-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories' || $page == 'manage-fund' || $page == 'manage-jobs') ? 'class="active"' : ''; ?>>
                         <a href="javascript:void(0);" class="menu-toggle">
                             <i class="material-icons">view_agenda</i>
                             <span>Manage Features</span>
@@ -370,6 +373,12 @@ if (empty($page_loaded)) {
                             </li>
                             <li <?php echo ($page == 'manage-posts') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('manage-posts'); ?>">Posts</a>
+                            </li>
+                            <li <?php echo ($page == 'manage-fund') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-fund'); ?>">Fundings</a>
+                            </li>
+                            <li <?php echo ($page == 'manage-jobs') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-jobs'); ?>">Jobs</a>
                             </li>
                             <li <?php echo ($page == 'manage-articles') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('manage-articles'); ?>">Articles (Blog)</a>
@@ -475,6 +484,11 @@ if (empty($page_loaded)) {
                                     <li <?php echo ($page == 'products-categories') ? 'class="active"' : ''; ?>>
                                         <a href="<?php echo Wo_LoadAdminLinkSettings('products-categories'); ?>">
                                             <span>Products Categories</span>
+                                        </a>
+                                    </li> 
+                                    <li <?php echo ($page == 'job-categories') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('job-categories'); ?>">
+                                            <span>Job Categories</span>
                                         </a>
                                     </li>
                                 </ul>

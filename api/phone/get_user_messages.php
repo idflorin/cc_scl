@@ -96,7 +96,7 @@ if ($type == 'get_user_messages') {
             $after_message_id  = 0;
             $before_message_id = 0;
             $message_id = 0;
-            if (!empty($_POST['limit'])) {
+            if (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0) {
                 $limit = $_POST['limit'];
             }
             if (!empty($_POST['after_message_id'])) {
@@ -115,7 +115,7 @@ if ($type == 'get_user_messages') {
                 'after_message_id' => $after_message_id,
                 'message_id' => $message_id
             );
-            $message_info = Wo_GetMessagesAPP($message_info);
+            $message_info = Wo_GetMessagesAPP($message_info,$limit);
             $not_include_status = false;
             $not_include_array = array();
             if (!empty($_POST['not_include'])) {

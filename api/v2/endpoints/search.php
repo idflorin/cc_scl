@@ -34,7 +34,7 @@ foreach ($get_users as $key => $user) {
     foreach ($non_allowed as $key => $value) {
        unset($user[$value]);
     }
-    $user['is_following'] = (Wo_IsFollowing($wo['user']['user_id'], $user['user_id'])) ? 1 : 0;
+    $user['is_following'] = (Wo_IsFollowing($user['user_id'], $wo['user']['user_id'])) ? 1 : 0;
     $users[] = $user;
 }
 

@@ -17,12 +17,72 @@ $current_post = $wo['current_post'] = $wo['story'];
       <!-- header -->
       <?php include 'header.phtml'; ?>
       <!-- header -->
+      
 
       <div class="post-description" id="post-description-<?php echo $wo['story']['id']; ?>">
         <?php if (!empty($wo['story']['parent_id'])) { ?>
         <div><p class="edited_text"><?php echo $wo['story']['postText']; ?></p></div>
         <?php } ?>
 
+        <?php if (!empty($wo['story']['fund_raise_id']) && empty($wo['story']['parent_id'])) { ?>
+			<?php if (!empty($wo['story']['fund']['fund']['image'])): ?>
+				<div class="post-file" id="fullsizeimg">
+					<img src="<?php echo $wo['story']['fund']['fund']['image']; ?>" alt="Picture">
+					<div class="wow_dontd_posts">
+						<div class="wow_dontd_posts_innr">
+							<div class="wow_dontd_posts_left">
+								<h4>
+									<a href="<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['story']['fund']['fund']['hashed_id']; ?>" data-ajax="?link1=show_fund&id=<?php echo($wo['story']['fund']['fund']['hashed_id']) ?>"><?php echo $wo['story']['fund']['fund']['title']; ?></a>
+								</h4>
+								<!--<h5><?php echo $wo['lang']['amount'] ?> : <?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['story']['fund']['amount']; ?></h5>-->
+								<p><?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['story']['fund']['fund']['raised']; ?>  <?php echo $wo['lang']['raised_of']; ?> <?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['story']['fund']['fund']['amount']; ?></p>
+							</div>
+              <?php if ($wo['story']['fund']['fund']['amount'] > $wo['story']['fund']['fund']['raised']) { ?>
+							<div class="wow_dontd_posts_right">
+								<a class="btn" href="<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['story']['fund']['fund']['hashed_id']; ?>" data-ajax="?link1=show_fund&id=<?php echo($wo['story']['fund']['fund']['hashed_id']) ?>"><?php echo $wo['lang']['donate'] ?></a>
+							</div>
+            <?php } ?>
+						</div>
+						<div class="fund_raise_bar">
+							<div class="progress">
+								<div class="progress-bar" role="progressbar" style="width: <?php echo $wo['story']['fund']['fund']['bar']; ?>%" aria-valuenow="<?php echo $wo['story']['fund']['fund']['bar']; ?>" aria-valuemin="0" aria-valuemax="<?php echo($wo['story']['fund']['fund']['amount']) ?>"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			<?php endif; ?>
+		<?php } ?>
+		
+		<?php if (!empty($wo['story']['fund_id']) && empty($wo['story']['parent_id'])) { ?>
+			<?php if (!empty($wo['story']['fund_data']['image'])): ?>
+				<div class="post-file" id="fullsizeimg">
+					<img src="<?php echo $wo['story']['fund_data']['image']; ?>" alt="Picture">
+					<div class="wow_dontd_posts">
+						<div class="wow_dontd_posts_innr">
+							<div class="wow_dontd_posts_left">
+								<h4>
+									<a href="<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['story']['fund_data']['hashed_id']; ?>" data-ajax="?link1=show_fund&id=<?php echo($wo['story']['fund_data']['hashed_id']) ?>"><?php echo $wo['story']['fund_data']['title']; ?></a>
+								</h4>
+								<!--<h5><?php echo $wo['lang']['amount'] ?> : <?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['story']['fund_data']['amount']; ?></h5>-->
+								<p><?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['story']['fund_data']['raised']; ?>  <?php echo $wo['lang']['raised_of']; ?> <?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['story']['fund_data']['amount']; ?></p>
+							</div>
+              <?php if ($wo['story']['fund_data']['amount'] > $wo['story']['fund_data']['raised']) { ?>
+							<div class="wow_dontd_posts_right">
+								<a class="btn" href="<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['story']['fund_data']['hashed_id']; ?>" data-ajax="?link1=show_fund&id=<?php echo($wo['story']['fund_data']['hashed_id']) ?>"><?php echo $wo['lang']['donate'] ?></a>
+							</div>
+            <?php } ?>
+						</div>
+						<div class="fund_raise_bar">
+							<div class="progress">
+								<div class="progress-bar" role="progressbar" style="width: <?php echo $wo['story']['fund_data']['bar']; ?>%" aria-valuenow="<?php echo $wo['story']['fund_data']['bar']; ?>" aria-valuemin="0" aria-valuemax="<?php echo($wo['story']['fund_data']['amount']) ?>"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			<?php endif; ?>
+		<?php } ?>
+
+        
         <!-- shared_post -->
          <?php include 'shared_post.phtml'; ?>
         <!-- shared_post -->

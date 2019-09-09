@@ -5,9 +5,18 @@ if ($f == 'get_follow_requests') {
         'html' => ''
     );
     $requests = Wo_GetFollowRequests();
-    if (count($requests) > 0) {
-        foreach ($requests as $wo['request']) {
-            $data['html'] .= Wo_LoadPage('header/follow-requests');
+    $groups = GetGroupChatRequests();
+    if (count($requests) > 0 || !empty($groups)) {
+        if (!empty($requests)) {
+            foreach ($requests as $wo['request']) {
+                $data['html'] .= Wo_LoadPage('header/follow-requests');
+            }
+        }
+        if (!empty($groups)) {
+            foreach ($groups as $group) {
+                $wo['group_chat'] = Wo_GroupTabData($group->group_id,false);
+                $data['html'] .= Wo_LoadPage('header/group-requests');
+            }
         }
     } else {
         $data['message'] = $wo['lang']['no_new_requests'];

@@ -72,7 +72,7 @@ if (empty($error_code)) {
 			$followers_latest = array();
 			$followers = Wo_GetFollowers($recipient_data['user_id'], 'profile', 50);
 			foreach ($followers as $key => $follower) {
-				$follower['is_following'] = (Wo_IsFollowing($wo['user']['user_id'], $follower['user_id'])) ? 1 : 0;
+				$follower['is_following'] = (Wo_IsFollowing($follower['user_id'], $wo['user']['user_id'])) ? 1 : 0;
 				$followers_latest[] = $follower;
 			}
 			$response_data['followers'] = $followers_latest;
@@ -81,16 +81,22 @@ if (empty($error_code)) {
 			$followings_latest = array();
 			$followings = Wo_GetFollowing($recipient_data['user_id'], 'profile', 50);
 			foreach ($followings as $key => $following) {
-				$following['is_following'] = (Wo_IsFollowing($wo['user']['user_id'], $following['user_id'])) ? 1 : 0;
+				$following['is_following'] = (Wo_IsFollowing($following['user_id'], $wo['user']['user_id'])) ? 1 : 0;
 				$followings_latest[] = $following;
 			}
 			$response_data['following'] = $followings_latest;
 		}
 		if (!empty($data['liked_pages'])) {
 			$response_data['liked_pages'] = Wo_GetLikes($recipient_data['user_id'], 'profile', 50);
+			foreach ($response_data['liked_pages'] as $key => $value) {
+                $response_data['liked_pages'][$key]['is_liked'] = Wo_IsPageLiked($value['page_id'], $wo['user']['id']);
+            }
 		}
 		if (!empty($data['joined_groups'])) {
 			$response_data['joined_groups'] = Wo_GetUsersGroups($recipient_data['user_id'], 50);
+			foreach ($response_data['joined_groups'] as $key => $value) {
+                $response_data['joined_groups'][$key]['is_joined'] = Wo_IsGroupJoined($value['group_id'], $wo['user']['id']);
+            }
 		}
 		if (!empty($data['family'])) {
 			$family = Wo_GetFamaly($recipient_data['user_id'],false,1);

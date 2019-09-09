@@ -115,13 +115,18 @@ function Wo_RegisterReaction(element){
     });
 }
 
-function Wo_RegisterFollow(id, is_confirm) {
+function Wo_RegisterFollow(id, is_confirm,show_modal= false) {
   var _follow_con = $('[id=Follow-' + id + ']');
   is_confirm_f    = 0;
 
   if (is_confirm == 1) {
     is_confirm_f = 1;
   }
+  if (show_modal == true) {
+    $('#un_friend_modal').modal('show');
+    return false;
+  }
+  $('#un_friend_modal').modal('hide');
 
   <?php if ($wo['config']['connectivitySystem'] == 0): ?>
     html_ = '<button type="button" onclick="Wo_RegisterFollow(' + id + ', ' + is_confirm_f + ')" class="btn-active btn btn-default btn-sm wo_following_btn" id="wo_useract_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg><span class="button-text"> <?php echo $wo["lang"]["following_btn"];?></span></button>';
@@ -132,11 +137,11 @@ function Wo_RegisterFollow(id, is_confirm) {
       html_ = '<button type="button" onclick="Wo_RegisterFollow(' + id + ', ' + is_confirm_f + ')" class="btn btn-default btn-sm wo_follow_btn" id="wo_useract_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span class="button-text"> <?php echo $wo["lang"]["follow"];?></span></button>';
     }
   <?php else: ?>
-    if (_follow_con.find('button').hasClass('btn-active')) {
-      if (!confirm("<?php echo $wo['lang']['are_you_sure_unfriend'] ?>")) {
-          return false;
-      }
-    }
+    // if (_follow_con.find('button').hasClass('btn-active')) {
+    //   if (!confirm("<?php echo $wo['lang']['are_you_sure_unfriend'] ?>")) {
+    //       return false;
+    //   }
+    // }
     html_ = '<button type="button" onclick="Wo_RegisterFollow(' + id + ')" class="btn-requested btn btn-default btn-sm wo_request_btn" id="wo_useract_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span class="button-text"> <?php echo $wo["lang"]["requested"];?></span></button>';
     if (_follow_con.find('button').hasClass('btn-requested') || _follow_con.find('button').hasClass('btn-active')) {
       html_ = '<button type="button" onclick="Wo_RegisterFollow(' + id + ')" class="btn btn-default btn-sm wo_follow_btn" id="wo_useract_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span class="button-text"> <?php echo $wo["lang"]["add_friend"];?></span></button>';
@@ -562,5 +567,190 @@ function count_char(self,id) {
   <?php if ($wo['config']['maxCharacters'] != 10000) { ?>
   $(self).limit("<?php echo $wo['config']['maxCharacters']?>", '#charsLeft_'+id);
   <?php } ?>
+}
+
+function ApplyJobNow(job_id) {
+  $.post(Wo_Ajax_Requests_File()+'?f=job&s=get_apply_modal', {job_id: job_id}, function(data, textStatus, xhr) {
+    if (data.status == 200) {
+      $('#apply-job-modal').html(data.html);
+      $('#apply-job-modal').modal('show');
+    }
+  });
+}
+
+$(document).on('change', '#i_currently_work', function(event) {
+  if ($('#i_currently_work').is(":checked")) {
+    $('#experience_end_date').css('display', 'none');
+  }
+  else{
+    $('#experience_end_date').css('display', 'block');
+  }
+});
+
+
+
+function Wo_GetPaymentMethods(self) {
+  var amount = $('#fund_donate_amount').val();
+  var fund_id = $('#fund_donate_id').val();
+  if (!amount || !fund_id) {
+    $('#fund_donate_amount').attr('style', 'border-color: red !important');
+    return false;
+  }
+  $('#fund_donate_amount').attr('style', 'border-color: unset');
+  $(self).attr('disabled', 'true');
+  $.get(Wo_Ajax_Requests_File() + '?f=funding&s=get_payment_donate_method&fund_id=' + fund_id + '&amount=' + amount, function (data) {
+      if (data.status == 200) {
+          $('#donate_for_fund_modal').html(data.html);
+		  $('#dont_modal').modal('hide');
+          $('#fund_payment_donate_modal').modal({
+           show: true
+          });
+      }
+      else{
+        $('#amount_fund_alert').html('<div class="alert alert-danger">' + data['message'] + '</div>');
+        setTimeout(function (argument) {
+          $('#amount_fund_alert').html('');
+        },2000);
+      }
+      $(self).removeAttr('disabled');
+  });
+}
+
+function Wo_GetPayPalDonateLink(fund_id,amount) {
+  if (!amount || !fund_id) {
+    return false;
+  }
+
+  $('.btn-paypal').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
+  $.post(Wo_Ajax_Requests_File() + '?f=funding&s=get_paypal_url', {fund_id:fund_id,amount:amount}, function(data) {
+    if (data.status == 200) {
+      window.location.href = data.url;
+    } else {
+      $('.btn-paypal').attr('disabled', false).html("PayPal App not set yet.");
+    }
+  });
+}
+
+function Wo_StripeDonate(fund_id,amount,type = 'stripe') {
+  if (!amount || !fund_id) {
+    return false;
+  }
+
+  if (type == 'stripe') {
+    $('.btn-cart').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
+  }
+  else{
+    $('.btn-alipay').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
+  }
+
+  
+
+  var handler = StripeCheckout.configure({
+    key: "<?php echo $wo['config']['stripe_id'];?>",
+    locale: 'english',
+    image: '',
+    token: function(token) {
+    $('.modal-body').html('<i class="fa fa-spin fa-spinner"></i> <?php echo $wo['lang']['c_payment'] ?>');
+    $('#pay-go-pro').modal({
+      show: true
+      });
+      $.post(Wo_Ajax_Requests_File() + '?f=funding&s=stripe', {stripeToken:token.id,amount:amount,fund_id:fund_id}, function (data) {
+        if (data.status == 200) {
+          window.location.href = data.location;
+        } else {
+          $('.btn-cart').attr('disabled', false).html('<i class="fa fa-spin fa-spinner"></i> <?php echo $wo['lang']['payment_declined'] ?>');
+        }
+      });
+    }
+  });
+
+  if (type == 'stripe') {
+    handler.open({
+      name: "<?php echo $wo['config']['siteName']?>",
+      description: "<?php echo $wo['lang']['donate']?>",
+      amount: amount*100,
+      currency: '<?php echo $wo['config']['stripe_currency']?>',
+      opened: function () {
+        $('#pay-go-pro').modal('hide');
+        $('.btn-cart').attr('disabled', false).html('<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 58 58" xml:space="preserve"> <g id="XMLID_9_"> <path id="XMLID_114_" style="fill:#8798CC;" d="M54.783,50H3.217C1.44,50,0,48.56,0,46.783V11.217C0,9.44,1.44,8,3.217,8h51.566 C56.56,8,58,9.44,58,11.217v35.566C58,48.56,56.56,50,54.783,50"/> <rect id="XMLID_113_" y="13" style="fill:#556180;" width="58" height="8"/> <path id="XMLID_112_" style="fill:#B0D3F0;" d="M15,26H6c-0.553,0-1,0.448-1,1s0.447,1,1,1h9c0.553,0,1-0.448,1-1S15.553,26,15,26" /> <path id="XMLID_111_" style="fill:#B0D3F0;" d="M29,27c0-0.552-0.447-1-1-1h-9c-0.553,0-1,0.448-1,1s0.447,1,1,1h9 C28.553,28,29,27.552,29,27"/> <path id="XMLID_110_" style="fill:#B0D3F0;" d="M7,31H6c-0.553,0-1,0.448-1,1s0.447,1,1,1h1c0.553,0,1-0.448,1-1S7.553,31,7,31"/> <path id="XMLID_109_" style="fill:#B0D3F0;" d="M13,31h-2c-0.553,0-1,0.448-1,1s0.447,1,1,1h2c0.553,0,1-0.448,1-1S13.553,31,13,31 "/> <path id="XMLID_108_" style="fill:#B0D3F0;" d="M18,31h-1c-0.553,0-1,0.448-1,1s0.447,1,1,1h1c0.553,0,1-0.448,1-1S18.553,31,18,31 "/> <path id="XMLID_107_" style="fill:#B0D3F0;" d="M24,31h-2c-0.553,0-1,0.448-1,1s0.447,1,1,1h2c0.553,0,1-0.448,1-1S24.553,31,24,31 "/> <path id="XMLID_106_" style="fill:#B0D3F0;" d="M27.29,31.29C27.109,31.48,27,31.74,27,32c0,0.26,0.109,0.52,0.29,0.71 C27.478,32.89,27.728,33,28,33c0.26,0,0.519-0.11,0.71-0.29C28.89,32.52,29,32.26,29,32c0-0.26-0.11-0.52-0.29-0.71 C28.34,30.92,27.66,30.92,27.29,31.29"/> <rect id="XMLID_105_" x="36" y="34" style="fill:#91BAE1;" width="16" height="10"/> </g> </svg><?php echo $wo['lang']['credit_card'] ?>');
+      }
+    });
+  }
+  else{
+    handler.open({
+      name: "<?php echo $wo['config']['siteName']?>",
+      description: "<?php echo $wo['lang']['donate']?>",
+      amount: amount*100,
+      alipay: true,
+      currency: '<?php echo $wo['config']['stripe_currency']?>',
+      opened: function () {
+        $('#pay-go-pro').modal('hide');
+        $('.btn-alipay').attr('disabled', false).html('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 48 48" xml:space="preserve"><path d="M42 11v27a4 4 0 0 1-4 4H11a5 5 0 0 1-5-5V11a5 5 0 0 1 5-5h26a5 5 0 0 1 5 5z" fill="#5B9EDD"/><path d="M29.91 27.17C32 23.641 33 19 33 19h-7v-2h9v-2h-9v-3.98L22 11v4h-9v2h9v2h-8v2s13.125 0 14.5-.01c-.281.793-.99 3.189-2.015 5.055C22.602 24.84 19.019 24 16.143 24c-6.898 0-8.428 3.481-8.102 6.664.263 2.54 2.145 6.248 7.893 6.248 5.251 0 9.49-3.023 12.099-6.622C33.008 32.591 38.263 34.909 42 37v-6.038c-3.951-1.361-8.11-2.431-12.09-3.792zm-14.812 7.592c-4.858 0-5.61-2.75-5.694-4.392-.079-1.436.886-4.132 6.371-4.132 2.04 0 5.276 1.046 8.909 2.57-2.053 2.708-5.343 5.954-9.586 5.954z" fill="#FFF"/></svg>Alipay');
+      }
+    });
+  }
+}
+
+function Wo_BankTransferDonate(fund_id,amount) {
+  if (!amount || !fund_id) {
+    return false;
+  }
+
+  $('.bank_payment').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
+
+  $('#configreset').click();
+  $(".prv-img").html('<div class="thumbnail-rendderer"><div><h4 class="bold"><?php echo $wo['lang']['drop_img_here']; ?></h4><div class="error-text-renderer"></div><div><span><?php echo $wo['lang']['or']; ?></span><p><?php echo $wo['lang']['browse_to_upload']; ?></p></div></div> </div>');
+  $("#blog-alert").html('');
+  $('#bank_donate_price').val(amount);
+  $('#bank_donate_fund_id').val(fund_id);
+  $('#pay-go-pro').modal('hide');
+  $('#bank_transfer_donate_modal').modal({
+         show: true
+        });
+}
+
+jQuery(document).ready(function($) {
+  $('#bank_transfer_donate_modal').ajaxForm({
+    url: Wo_Ajax_Requests_File() + '?f=funding&s=bank',
+    beforeSend: function() {
+    $('#bank_transfer_donate_modal').find('.ball-pulse').fadeIn(100);
+  },
+  success: function(data) {
+    if (data['status'] == 200) {
+      $("#blog-alert").html('<div class="alert alert-success">'+ data['message'] +'</div>');
+      setTimeout(function () {
+        window.location = "<?php echo $wo['config']['site_url'];?>";
+        $(".prv-img").html('<div class="thumbnail-rendderer"><div><h4 class="bold"><?php echo $wo['lang']['drop_img_here']; ?></h4><div class="error-text-renderer"></div><div><span><?php echo $wo['lang']['or']; ?></span><p><?php echo $wo['lang']['browse_to_upload']; ?></p></div></div> </div>');
+        $("#blog-alert").html('');
+        $('#configreset').click();
+
+      },3000)
+    } else if (data['message']) {
+      $("#blog-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
+    } 
+    $('#bank_transfer_donate_modal').find('.ball-pulse').fadeOut(100);
+  }});
+});
+
+
+function Wo_CheckOutCardDonate(fund_id,amount) {
+  if (!amount || !fund_id) {
+    return false;
+  }
+
+  $('.btn-check').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
+  $('#donate_check_amount').val(amount)
+  $('#donate_check_fund_id').val(fund_id)
+
+  $("#2checkout_alert_donate_wallet").html('');
+  $('#pay-go-pro').modal('hide');
+  $('#2checkout_wallet_donate_modal').modal({
+        show: true
+  });
+
+}
+function openInNewTab(url, id) {
+   var myWindow = window.open(url, "", "width=600,height=700");
+   return false;
 }
 </script>

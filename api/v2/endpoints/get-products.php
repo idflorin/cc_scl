@@ -22,7 +22,9 @@ foreach ($get_products as $key => $product) {
     foreach ($non_allowed as $key => $value) {
        unset($product['seller'][$value]);
     }
-    $products[] = $product;
+    if (!empty($product['post_id']) && !empty($product['images'])) {
+    	$products[] = $product;
+    }
 }
 
 $response_data = array(

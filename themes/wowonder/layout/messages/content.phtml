@@ -3,7 +3,7 @@ if ($wo['loggedin'] == false) {
     header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
     exit();
 }
-if (!empty($_GET['user'])) {
+if (!empty($_GET['user']) && empty($_GET['page'])) {
     $user_id = Wo_Secure($_GET['user']);
     $user    = Wo_UserData($user_id);
     if (empty($user['user_id'])) {
@@ -37,11 +37,32 @@ if (!empty($_GET['user'])) {
 					<div id="users-message" class="messages-chat-list tab-pane fade in active">
 						<?php
 							$chats = Wo_GetMessagesUsers($wo['user']['user_id']);
+							$array = array();
+					        if (!empty($chats)) {
+					            foreach ($chats as $key => $value) {
+					                $array[] = $value;
+					            }
+					        }
+					        array_multisort( array_column($array, "chat_time"), SORT_DESC, $array );
 							if (count($chats) == 0) {
 								echo '<span class="no-online-users center-text empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>' . $wo['lang']['no_users_found'] . '</span>';
 							}else{
 								foreach($chats as $wo['recipient']) {
-									echo Wo_LoadPage('messages/messages-recipients-list');
+									if (!empty($wo['recipient']['message']['page_id'])) {
+										$message = Wo_GetPageMessages(array(
+	                                                'page_id' => $wo['recipient']['message']['page_id'],
+	                                                'from_id' => $wo['recipient']['message']['user_id'],
+	                                                'to_id'   => $wo['recipient']['message']['conversation_user_id'],
+	                                                'limit' => 1,
+	                                                'limit_type' => 1
+	                                            ));
+				                        $wo['page_message']['message'] = $message[0];
+				                        
+				                        echo Wo_LoadPage('messages/messages-page-list');
+				                    }
+				                    else{
+				                    	echo Wo_LoadPage('messages/messages-recipients-list');
+				                    }
 								}
 							}
 						?> 
@@ -168,6 +189,8 @@ if (!empty($_GET['user'])) {
 						</div>
 						<input type="hidden" id="user-id" name="user_id" value="0" />
 						<input type="hidden" id="messages-group-id" name="group_id" value="0" />
+						<input type="hidden" id="messages-page-id" name="page_id" value="0" />
+						<input type="hidden" id="messages-from-id" name="to_id" value="0" />
 						<input type="hidden" id="message-record-file" name="record-file" value="" />
 						<input type="hidden" id="message-record-name" name="record-name" value="" />
 						<input type="hidden" name="chatSticker" id="chatStickerMessage">
@@ -222,6 +245,21 @@ $(function () {
       Wo_GetUserMessages(<?php echo $user['user_id'] ?>, "<?php echo $user['name']?>", "<?php echo $user['username']?>");
     }, 1000);
   <?php } ?>
+
+  <?php if (!empty($_GET['page']) && !empty($_GET['user'])) {
+  	$page_info = Wo_PageData($_GET['page']);
+
+  	$user_id = $_GET['page'].'_'.$_GET['user'];
+	if ($page_info['user_id'] == $_GET['user']) {
+	    $user_id = $_GET['page'].'_'.$_GET['to'];
+	}
+
+   ?>
+    setTimeout(function () {
+      Wo_GetPageMessages(<?php echo $_GET['page'] ?>, "<?php echo $_GET['user']?>","<?php echo($page_info['page_name']) ?>","<?php echo($user_id) ?>");
+    }, 1000);
+  <?php } ?>
+
   <?php if ($wo['config']['maxCharacters'] != 10000) { ?>
   $('#sendMessage').limit("<?php echo $wo['config']['maxCharacters']?>", '#charsLeft');
   <?php } ?>
@@ -543,9 +581,67 @@ function Wo_GetGroupMessages(group_id, group_name) {
   });
 }
 
+function Wo_GetPageMessages(page_id, page_user_id,page_name,user_id) {
+  view_more_wrapper = $('.view-more-wrapper');
+  
+  $('.text-sender-container').find('.ball-pulse').fadeIn(100);
+  $('.text-sender-container').find('.msg_progress').fadeIn(100);
+  $('#user-name').text(page_name).removeClass('hidden');
+  $('#user-name-right').html('<a target="_blank" href="javascript:void(0);">' + page_name + '</a>');
+  if($('.messages-recipients-list').hasClass('active')) {
+	$('.messages-recipients-list').removeClass('active');
+	$('#messages-recipient-' + user_id).addClass('active');
+  } else { 
+	$('#messages-recipient-' + user_id).addClass('active');
+  }
+  $('#user-avatar-right img').addClass('hidden');
+  $('.msg_usr_lst_sen_main').html('');
+  $('#messages-page-id').attr('value', page_id);
+  $('#messages-from-id').attr('value', page_user_id);
+  $('#user-id').attr('value', 0);
+  $('#sendMessage').val('').attr('disabled', false);
+  $('#sendMessasgeFile').attr('disabled', false);
+  $('#messages-record').attr('disabled',false);
+  $("#messages-group-"+ page_id).find('.group-lastseen').empty();
+  $.get(Wo_Ajax_Requests_File(), {
+    f: 'messages',
+    s: 'get_page_messages',
+    page_user_id: page_user_id,
+    page_id: page_id
+  }, function (data) {
+    if(data.status == 200) {
+    	$('.send-button').css('background-color', '#2e7be5');
+        $('.send-button').css('border-color', '#2e7be5');
+    	$('.wo_msg_user_dtl, .msg_srch_innr, .messages-search-icon').css('display', 'none');
+      <?php if ($wo['config']['maxCharacters'] != 10000) { ?>
+      $('#charsLeft').text("<?php echo $wo['config']['maxCharacters']?>");
+      <?php }?>
+
+      if(data.html.length == 0) {
+        view_more_wrapper.hide();
+        $('.messages-container').html('<div class="no-messages empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg><?php echo $wo["lang"]["no_more_message_to_show"];?> </div>');
+      } 
+      else {
+        $('.messages-container').html(data.html);
+        view_more_wrapper.html('<a href="javascript:void(0);" title="' + data.view_more_text + '"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M13,15L15.5,17.5L16.92,16.08L12,11.16L7.08,16.08L8.5,17.5L11,15V21H13V15M3,3H21V5H3V3M3,7H13V9H3V7Z" /></svg></a>').show();
+        view_more_wrapper.attr('onclick', 'Wo_getOldPageMessages(' + page_id + ','+page_user_id+');').removeClass('hidden');
+        $(".messages-container").animate({
+          scrollTop: $('.messages-container')[0].scrollHeight
+        }, 200);
+      }
+      $('.text-sender-container').find('.ball-pulse').fadeOut(100);
+	  $('.text-sender-container').find('.msg_progress').fadeOut(100);
+    }
+  });
+}
+
+
 function Wo_getNewMessages() {
   user_id = $('#user-id').val();
   group_id = $('#messages-group-id').val();
+  page_id = $('#messages-page-id').val();
+  from_id = $('#messages-from-id').val();
+  to_id = $('#messages-to-id').val();
   message_id = $('.messages-container').find('.messages-wrapper:last').attr('data-message-id');
   if(user_id == 0 && group_id == 0) {
     return false;
@@ -559,6 +655,9 @@ function Wo_getNewMessages() {
       s: 'get_new_messages',
       user_id: user_id,
       group_id: group_id,
+      page_id: page_id,
+      from_id: from_id,
+      to_id: to_id,
       message_id: message_id
     }, function (data) {
       if (data.color) {
@@ -656,6 +755,34 @@ function Wo_getOldGroupMessages(group_id) {
     } else {
       view_more_wrapper.hide();
     }
+	$('.text-sender-container').find('.msg_progress').fadeOut(100);
+  });
+}
+
+function Wo_getOldPageMessages(page_id,from_id,to_id) {
+  view_more_wrapper = $('.view-more-wrapper');
+  before_message_id = $('.messages-text:first').attr('data-message-id');
+  $('.text-sender-container').find('.ball-pulse').fadeIn(100);
+  $('.text-sender-container').find('.msg_progress').fadeIn(100);
+  $.get(Wo_Ajax_Requests_File(), {
+    f: 'messages',
+    s: 'load_previous_messages',
+    page_id: page_id,
+    from_id: from_id,
+    to_id: to_id,
+    before_message_id: before_message_id
+  }, function (data) {
+    if(data.status == 200) {
+      if(data.html.length == 0) {
+        view_more_wrapper.html('<a href="javascript:void(0);" title="<?php echo $wo["lang"]["no_more_message_to_show"];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" /></svg></a>').show();
+        view_more_wrapper.delay(1000).slideUp(200);
+      } else {
+        $('.messages-container').prepend(data.html);
+      }
+    } else {
+      view_more_wrapper.hide();
+    }
+    $('.text-sender-container').find('.ball-pulse').fadeOut(100);
 	$('.text-sender-container').find('.msg_progress').fadeOut(100);
   });
 }

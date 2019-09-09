@@ -357,6 +357,42 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-4 col-md-4">
+            <div class="card">
+                <div class="header">
+                    <h2>Funding System</h2>
+                </div>
+                <div class="body">
+
+                    <div class="alert alert-success funding-settings-alert"></div>
+                    <div class="alert funding-settings-test-alert"></div>
+                    <form class="funding-settings" method="POST">
+                        <label for="funding_system">Raise Money System <span class="black" data-toggle="popover" data-trigger="hover"></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="funding_system" id="funding_system-enabled" value="1" <?php echo ($wo['config']['funding_system'] == 1) ? 'checked': '';?>>
+                            <label for="funding_system-enabled">Enabled</label>
+                            <input type="radio" name="funding_system" id="funding_system-disabled" value="0" <?php echo ($wo['config']['funding_system'] == 0) ? 'checked': '';?>>
+                            <label for="funding_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <label for="funding_request">Who can create funding requests ? <span class="black" data-toggle="popover" data-trigger="hover"></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="funding_request" id="funding_request-enabled" value="all" <?php echo ($wo['config']['funding_request'] == 'all') ? 'checked': '';?>>
+                            <label for="funding_request-enabled">All Users</label>
+                            <input type="radio" name="funding_request" id="funding_request-disabled" value="verified" <?php echo ($wo['config']['funding_request'] == 'verified') ? 'checked': '';?>>
+                            <label for="funding_request-disabled" class="m-l-20">Verified Users</label>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="donate_percentage" name="donate_percentage" class="form-control" value="<?php echo $wo['config']['donate_percentage']?>">
+                                <label class="form-label">Commission (Leave it 0 if you don't want to get any commissions.)</label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="clearfix"></div>
     </div>
     <!-- #END# Vertical Layout -->
@@ -380,6 +416,23 @@ function Wo_TestVisionApi() {
     });
 }
 $(function() {
+    var form_funding_settings = $('form.funding-settings');
+    form_funding_settings.ajaxForm({
+        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
+        beforeSend: function() {
+            form_funding_settings.find('button').text('Please wait..');
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_funding_settings.find('button').text('Save');
+                $('.funding-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                setTimeout(function () {
+                    $('.funding-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+
     var form_adult_settings = $('form.adult-settings');
     form_adult_settings.ajaxForm({
         url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',

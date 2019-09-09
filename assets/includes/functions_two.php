@@ -1689,6 +1689,21 @@ function Wo_GetLikeButton($page_id = 0) {
         return Wo_LoadPage($like_button);
     }
 }
+function Wo_GetPageMessageButton($page_id = 0) {
+    global $wo;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($page_id) || !is_numeric($page_id) or $page_id < 0) {
+        return false;
+    }
+    if (Wo_IsPageOnwer($page_id)) {
+        return false;
+    }
+    $wo['page_id'] = $page_id;
+    $message_button    = 'buttons/page_message';
+    return Wo_LoadPage($message_button);
+}
 function Wo_IsPoked($received_user_id = 0, $send_user_id = 0){
     global $wo, $sqlConnect;
     if ($wo['loggedin'] == false) {
@@ -1741,14 +1756,14 @@ function Wo_RegisterPageLike($page_id = 0, $user_id = 0) {
     if ($query) {
         if (Wo_IsPageInvited($user_id, $page_id) > 0) {
             foreach (Wo_GetPageInviters($user_id, $page_id) as $user) {
-                $notification_data = array(
-                    'recipient_id' => $user['user_id'],
-                    'notifier_id' => $user_id,
-                    'type' => 'accepted_invite',
-                    'page_id' => $page_id,
-                    'url' => 'index.php?link1=timeline&u=' . $page_data['page_name']
-                );
-                Wo_RegisterNotification($notification_data);
+                // $notification_data = array(
+                //     'recipient_id' => $user['user_id'],
+                //     'notifier_id' => $user_id,
+                //     'type' => 'accepted_invite',
+                //     'page_id' => $page_id,
+                //     'url' => 'index.php?link1=timeline&u=' . $page_data['page_name']
+                // );
+                // Wo_RegisterNotification($notification_data);
             }
             $delete_invite = Wo_DeleteInvites($user_id, $page_id);
         }
@@ -1890,7 +1905,7 @@ function Wo_GetUserIdFromPageId($page_id = 0) {
     }
 }
 function Wo_DeletePage($page_id = 0) {
-    global $wo, $sqlConnect, $cache;
+    global $wo, $sqlConnect, $cache,$db;
     if ($wo['loggedin'] == false) {
         return false;
     }
@@ -1943,6 +1958,17 @@ function Wo_DeletePage($page_id = 0) {
     $query_one .= mysqli_query($sqlConnect, "DELETE FROM " . T_VERIFICATION_REQUESTS . " WHERE `page_id` = {$page_id}");
     $query_one .= mysqli_query($sqlConnect, "DELETE FROM " . T_PAGE_ADMINS . " WHERE `page_id` = {$page_id}");
     $query_one .= mysqli_query($sqlConnect, "DELETE FROM " . T_PAGE_RATING . " WHERE `page_id` = {$page_id}");
+    $jobs = $db->where('page_id',$page_id)->get(T_JOB);
+    if (!empty($jobs)) {
+        foreach ($jobs as $key => $job) {
+            if ($job->image_type != 'cover') {
+                @unlink($job->image);
+                Wo_DeleteFromToS3($job->image);
+            }
+        }
+    }
+    $query_one .= mysqli_query($sqlConnect, "DELETE FROM " . T_JOB . " WHERE `page_id` = {$page_id}");
+    $query_one .= mysqli_query($sqlConnect, "DELETE FROM " . T_JOB_APPLY . " WHERE `page_id` = {$page_id}");
     if ($query_one) {
         return true;
     }
@@ -2268,7 +2294,19 @@ function Wo_GetGroupPostPublisherBox($group_id = 0) {
     $group_id = Wo_Secure($group_id);
     $continue = false;
     if (Wo_CanBeOnGroup($group_id) === true) {
-        $continue = true;
+        $group = Wo_GroupData($group_id);
+
+        if ($group['privacy'] == 2) {
+            if (Wo_IsGroupJoined($group_id) === true) {
+                $continue = true;
+            }
+        } else if ($group['privacy'] == 1) {
+            if (Wo_IsGroupJoined($group_id) === true) {
+                $continue = true;
+            }
+        } else {
+            $continue = false;
+        }
     }
     if ($continue == true) {
         return Wo_LoadPage('story/publisher-box');
@@ -4461,8 +4499,8 @@ function Wo_CheckBirthdays($user_id = 0) {
     }
 
     $data  = array();
-    $date  = date('d') . '-' . date('m');
-    $query = mysqli_query($sqlConnect, "SELECT `user_id` FROM " . T_USERS . " WHERE `birthday` LIKE '%{$date}-%' AND `user_id` <> {$user_id} AND `user_id` IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `active` = '1') ORDER BY RAND() LIMIT 5");
+    $date  = '-'.date('m') . '-' . date('d');
+    $query = mysqli_query($sqlConnect, "SELECT `user_id` FROM " . T_USERS . " WHERE `birthday` LIKE '%{$date}%' AND `user_id` <> {$user_id} AND `user_id` IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `active` = '1') ORDER BY RAND() LIMIT 5");
     if ($query) {
         while ($fetched_data = mysqli_fetch_assoc($query)) {
             $user_data = Wo_UserData($fetched_data['user_id']);
@@ -5116,7 +5154,8 @@ function Wo_GetPromotedPost() {
     $logged_user_id = Wo_Secure($wo['user']['user_id']);
     $query_one      = mysqli_query($sqlConnect, "SELECT `id` FROM {$type_table} WHERE `boosted` = '1' AND `user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$logged_user_id}') AND `user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$logged_user_id}') ORDER BY RAND() LIMIT 1");
     $fetched_data   = mysqli_fetch_assoc($query_one);
-    if (count($fetched_data) > 0) {
+
+    if (!empty($fetched_data)) {
         $post = Wo_PostData($fetched_data['id']);
         if (is_array($post)) {
             return $post;

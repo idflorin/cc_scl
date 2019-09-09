@@ -225,6 +225,83 @@ iframe, .post-map img {border-color: #4b4b4b;}
 }
 
 
+.wo_comthing_usr_innr, .wo_jobs_list {box-shadow: 0 1px 0 0 #212121, 0 0 0 1px #212121 !important;}
+.wo_com_lbox_slide_bg {
+    background-color: #2d2d2d;
+}
+.wo_com_lbox_slide_innr .upop_mid .user-name a {
+    color: #f6f6f6;
+}
+.wo_vew_apld_blocks {
+    background-color: #3d3d3d;
+}
+.fundings, .fund_raise, .wo_jobs_list {background: #212121;}
+.fundings_desc h3 a {
+    color: #fdfdfd;
+}
+.fundings_desc_meta .postMeta--author-text a {
+    color: #d5d5d5;
+}
+.fundings_desc_meta .postMeta--author-text, .fundings_desc_meta .postMeta--author-text .middot {
+    color: #d5d5d5;
+}
+.fundings_footer {
+    background: #292929;
+}
+.fundings_footer .progress, .fund_raise_bar .progress {
+    background-color: #444548;
+}
+.fundings_footer .btn {
+    color: white;
+}
+.fund_raise .postMeta--author-text a, .fund_raise .postMeta--author-text .middot, .fund div.list .item .caption .middot {
+    color: #d8d8d8;
+}
+.fundMeta--author-text a, .fund div.list .item .caption a {
+	color: #fff;
+}
+.fund_raise_btns .dropdown .btn {
+	background-color: #4a4a4a;
+}
+.wo_main_jobs {
+    border-color: #333333;
+}
+.wo_job_main_widget .m_widget_head {
+    color: #f2f2f2;
+}
+.wo_job_main_widget .wjob_categories ul li a:before {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+.wo_view_post_jobs .jinfo_inner .middot, .wo_jlist_info_main .middot {
+    color: #dcdcdc;
+}
+.wo_jlist_info_head h2 a {
+    color: white;
+}
+.wo_vew_apld_head .jinfo p {
+    color: #c3c3c3;
+}
+.wo_view_post_jobs .wo_vew_apld_msg .btn {background-color: #ff7166 !important;}
+.wo_create_job_qstn {
+    background-color: #464646;
+    border-color: #4e4e4e;
+    color: #e2e2e2;
+}
+.wo_create_job_qstn_block {
+    background-color: #080808;
+}
+.wo_create_job_qstn_block button.close {
+    color: #e8e8e8;
+background-color: #414141;}
+.load-more .btn {
+    background: #212121;
+}
+.blocksubhead-forum-header {
+    color: #c9c9c9;
+}
+
+
+
 
 
 

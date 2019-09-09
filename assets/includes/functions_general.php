@@ -479,6 +479,10 @@ function Wo_SeoLink($query = '') {
     global $wo, $config;
     if ($wo['config']['seoLink'] == 1) {
         $query = preg_replace(array(
+            '/^index\.php\?link1=edit_fund&id=([A-Za-z0-9_]+)$/i',
+            '/^index\.php\?link1=show_fund&id=([A-Za-z0-9_]+)$/i',
+            '/^index\.php\?link1=timeline&u=([A-Za-z0-9_]+)&type=([A-Za-z0-9_]+)&id=([A-Za-z0-9_]+)$/i',
+            '/^index\.php\?link1=jobs$/i',
             '/^index\.php\?link1=forumaddthred&fid=(\d+)$/i',
             '/^index\.php\?link1=welcome&link2=password_reset&user_id=([A-Za-z0-9_]+)$/i',
             '/^index\.php\?link1=welcome&last_url=(.*)$/i',
@@ -553,6 +557,10 @@ function Wo_SeoLink($query = '') {
             '/^index\.php\?link1=([^\/]+)$/i',
             '/^index\.php\?link1=welcome$/i',
         ), array(
+            $config['site_url'] . '/edit_fund/$1',
+            $config['site_url'] . '/show_fund/$1',
+            $config['site_url'] . '/$1/$2&id=$3',
+            $config['site_url'] . '/jobs',
             $config['site_url'] . '/forums/add/$1/',
             $config['site_url'] . '/password-reset/$1',
             $config['site_url'] . '/welcome/?last_url=$1',
@@ -1298,15 +1306,13 @@ function makeFTPdir($ftp, $dir) {
 }
 function Wo_UploadToS3($filename, $config = array()) {
     global $wo;
-    include_once('assets/libraries/s3/aws-autoloader.php');
-    include_once("assets/libraries/spaces/spaces.php");
-    include_once('assets/libraries/ftp/vendor/autoload.php');
     
     if ($wo['config']['amazone_s3'] == 0 && $wo['config']['ftp_upload'] == 0 && $wo['config']['spaces'] == 0) {
         return false;
     }
 
     if ($wo['config']['ftp_upload'] == 1) {
+        include_once('assets/libraries/ftp/vendor/autoload.php');
         $ftp = new \FtpClient\FtpClient();
         $ftp->connect($wo['config']['ftp_host'], false, $wo['config']['ftp_port']);
         $login = $ftp->login($wo['config']['ftp_username'], $wo['config']['ftp_password']);
@@ -1349,6 +1355,7 @@ function Wo_UploadToS3($filename, $config = array()) {
         if (empty($wo['config']['amazone_s3_key']) || empty($wo['config']['amazone_s3_s_key']) || empty($wo['config']['region']) || empty($wo['config']['bucket_name'])) {
             return false;
         }
+        include_once('assets/libraries/s3/aws-autoloader.php');
         $s3 = new S3Client([
             'version'     => 'latest',
             'region'      => $wo['config']['region'],
@@ -1375,6 +1382,7 @@ function Wo_UploadToS3($filename, $config = array()) {
             return true;
         }
     } else if ($wo['config']['spaces'] == 1) {
+        include_once("assets/libraries/spaces/spaces.php");
         $key = $wo['config']['spaces_key'];
         $secret = $wo['config']['spaces_secret'];
         $space_name = $wo['config']['space_name'];
@@ -1398,13 +1406,14 @@ function Wo_UploadToS3($filename, $config = array()) {
 }
 function Wo_DeleteFromToS3($filename, $config = array()) {
     global $wo;
-    include_once('assets/libraries/s3/aws-autoloader.php');
-    include_once("assets/libraries/spaces/spaces.php");
-    include_once('assets/libraries/ftp/vendor/autoload.php');
+    
+    
+    
     if ($wo['config']['amazone_s3'] == 0 && $wo['config']['ftp_upload'] == 0 && $wo['config']['spaces'] == 0) {
         return false;
     }
     if ($wo['config']['ftp_upload'] == 1) {
+        include_once('assets/libraries/ftp/vendor/autoload.php');
         $ftp = new \FtpClient\FtpClient();
         $ftp->connect($wo['config']['ftp_host'], false, $wo['config']['ftp_port']);
         $login = $ftp->login($wo['config']['ftp_username'], $wo['config']['ftp_password']);
@@ -1429,6 +1438,7 @@ function Wo_DeleteFromToS3($filename, $config = array()) {
             }
         }
     } else if ($wo['config']['amazone_s3'] == 1) {
+        include_once('assets/libraries/s3/aws-autoloader.php');
         if (empty($wo['config']['amazone_s3_key']) || empty($wo['config']['amazone_s3_s_key']) || empty($wo['config']['region']) || empty($wo['config']['bucket_name'])) {
             return false;
         }
@@ -1448,6 +1458,7 @@ function Wo_DeleteFromToS3($filename, $config = array()) {
             return true;
         }
     } else if ($wo['config']['spaces'] == 1) {
+        include_once("assets/libraries/spaces/spaces.php");
         $key = $wo['config']['spaces_key'];
         $secret = $wo['config']['spaces_secret'];
         $space_name = $wo['config']['space_name'];

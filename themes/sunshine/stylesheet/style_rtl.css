@@ -998,6 +998,54 @@ body .all_colors > div {
 body .thumb-image-delete:not(:last-child) {margin: 0 0 0 5px;}
 
 
+body .wo_com_things_head svg {
+    margin-right: 0;margin-left: 15px;
+}
+body .wo_com_usr_lbox > svg {
+    right: auto;left: 10px;
+}
+body .fundings_footer .progress .progress-bar, body .fund_raise_bar .progress .progress-bar {
+    background: linear-gradient(100deg, #5eefcb 0%, #49cfce 100%);
+}
+body .fundMeta--author-avatar {
+    padding-right: 0px;padding-left: 10px;
+}
+body .fund div.list .item .caption {
+    padding-left: 0px;padding-right: 10px;
+}
+body .wo_jlist_info_head .btn {
+    margin: auto;
+    margin-right: auto;
+    margin-left: 0;
+}
+body .wo_select_job_dist #cusrange-reader {
+    text-align: left;
+}
+body .wo_job_main_widget .wjob_categories ul li a {
+    padding-left: 0;padding-right: 25px;
+}
+body .wo_job_main_widget .wjob_categories ul li a:after, body .wo_job_main_widget .wjob_categories ul li a:before {
+    left: auto;right: 0;
+}
+body .wo_view_post_jhead .dropdown {
+    right: auto;left: 10px;
+}
+body .wo_vew_apld_head .avatar {
+    margin-right: 0px;margin-left: 20px;
+}
+body .wow_dontd_posts_left {
+    padding-right: 0;padding-left: 15px;
+}
+body .wow_dontd_posts_right {
+    margin-left: 0;margin-right: auto;
+}
+body .wow_weather_forecast .fivedays {float: right;}
+
+
+
+
+
+
 
 
 

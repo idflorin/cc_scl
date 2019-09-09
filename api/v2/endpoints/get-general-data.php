@@ -266,6 +266,14 @@ if (empty($error_code)) {
                     $wo['notification']['type_text'] = $wo['lang']['poked_you'];
                     $wo['notification']['icon'] .= 'thumbs-up';
                 }
+                if ($wo['notification']['type'] == 'shared_your_post') {
+                    $wo['notification']['type_text'] = $wo['lang']['shared_your_post'];
+                    $wo['notification']['icon'] .= 'share';
+                }
+                if ($wo['notification']['type'] == 'shared_a_post_in_timeline') {
+                    $wo['notification']['type_text'] = $wo['lang']['shared_a_post_in_timeline'];
+                    $wo['notification']['icon'] .= 'share';
+                }
             }
             $wo['notification']['time_text_string'] = Wo_Time_Elapsed_String($wo['notification']['time']);
             $wo['notification']['time_text']        = Wo_Time_Elapsed_String($wo['notification']['time']);
@@ -326,6 +334,25 @@ if (empty($error_code)) {
         $response_data['new_friend_requests_count'] = Wo_CountFollowRequests();
     }
 
+    if (!empty($data['group_chat_requests'])) {
+        $final_group_chat_requests = array();
+        $group_chat_requests = GetGroupChatRequests();
+        if (!empty($group_chat_requests)) {
+            foreach ($group_chat_requests as $key => $group_chat_request) {
+                foreach ($non_allowed as $key => $value) {
+                   unset($group_chat_request->{$value});
+                }
+                $group_chat_request->group_tab = Wo_GroupTabData($group_chat_request->group_id,false);
+                unset($group_chat_request->group_tab['messages']);
+                $group_chat_request->group_tab['avatar'] = Wo_GetMedia($group_chat_request->group_tab['avatar']);
+                $group_chat_request->group_tab['time_text'] = Wo_Time_Elapsed_String($group_chat_request->group_tab['time']);
+                $final_group_chat_requests[] = $group_chat_request;
+            }
+        }
+        $response_data['group_chat_requests'] = $final_group_chat_requests;
+        $response_data['new_group_chat_requests_count'] = Wo_CountGroupChatRequests();
+    }
+
     if (!empty($data['pro_users'])) {
     	$final_pro_users = array();
     	$pro_users = Wo_FeaturedUsers(9);
@@ -338,6 +365,9 @@ if (empty($error_code)) {
             }
         }
         $response_data['pro_users'] = $final_pro_users;
+    }
+    if (!empty($_POST['SetOnline']) && $_POST['SetOnline'] == 1) {
+        Wo_UpdateUserData($wo['user']['user_id'], array('lastseen' => time()));
     }
 
     if (!empty($data['promoted_pages'])) {

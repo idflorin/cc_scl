@@ -777,12 +777,14 @@ try {
     $wo['group_categories']   = Wo_GetCategories(T_GROUPS_CATEGORY);
     $wo['blog_categories']   = Wo_GetCategories(T_BLOGS_CATEGORY);
     $wo['products_categories']   = Wo_GetCategories(T_PRODUCTS_CATEGORY);
+    $wo['job_categories']   = Wo_GetCategories(T_JOB_CATEGORY);
 } catch (Exception $e) {
     $wo['genders']           = [];
     $wo['page_categories']   = [];
     $wo['group_categories']   = [];
     $wo['blog_categories']   = [];
     $wo['products_categories']   = [];
+    $wo['job_categories']   = [];
 }
 
 $wo['config']['currency_array'] = unserialize($wo['config']['currency_array']);

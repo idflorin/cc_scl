@@ -118,7 +118,7 @@ if ($type == 'get_users_friends') {
                     'url' => $user_list['url'],
                     'user_platform' => Wo_GetPlatformFromUser_ID($user_list['user_id'])
                 );
-                $json_data['is_following'] = (Wo_IsFollowing($wo['user']['user_id'], $json_data['user_id'])) ? 1 : 0;
+                $json_data['is_following'] = (Wo_IsFollowing($json_data['user_id'], $wo['user']['user_id'])) ? 1 : 0;
                 array_push($json_success_data_2, $json_data);
             }
             echo json_encode(array(

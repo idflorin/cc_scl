@@ -1,5 +1,15 @@
 <?php 
 if ($f == 'login') {
+    if (!empty($_SESSION['user_id'])) {
+        $_SESSION['user_id'] = '';
+        unset($_SESSION['user_id']);
+    }
+    if (!empty($_COOKIE['user_id'])) {
+        $_COOKIE['user_id'] = '';
+        unset($_COOKIE['user_id']);
+        setcookie('user_id', null, -1);
+        setcookie('user_id', null, -1,'/');
+    }
     $data_ = array();
     $phone = 0;
     if (isset($_POST['username']) && isset($_POST['password'])) {

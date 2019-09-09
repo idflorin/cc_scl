@@ -323,6 +323,27 @@ switch ($page) {
     case 'manage-ads':
         include('sources/ads/admin.php');
         break;
+    case 'jobs':
+        include('sources/jobs.php');
+        break;
+    case 'common_things':
+        include('sources/common_things.php');
+        break;
+    case 'funding':
+        include('sources/funding.php');
+        break;
+    case 'my_funding':
+        include('sources/my_funding.php');
+        break;
+    case 'create_funding':
+        include('sources/create_funding.php');
+        break;
+    case 'edit_fund':
+        include('sources/edit_fund.php');
+        break;
+    case 'show_fund':
+        include('sources/show_fund.php');
+        break;
 }
 
 if (empty($wo['content'])) {

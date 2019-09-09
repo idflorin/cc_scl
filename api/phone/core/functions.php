@@ -84,13 +84,13 @@ function Wo_GetMessagesUsersAPP($fetch_array = array()) {
         $offset_query = " AND `time` < ".$fetch_array['offset'];
     }
     if (isset($searchQuery) AND !empty($searchQuery)) {
-        $query_one = "SELECT `user_id` as `conversation_user_id` FROM " . T_USERS . " WHERE (`user_id` IN (SELECT `from_id` FROM " . T_MESSAGES . " WHERE `to_id` = {$user_id} AND `user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}') AND `active` = '1' ";
+        $query_one = "SELECT `user_id` as `conversation_user_id` FROM " . T_USERS . " WHERE (`user_id` IN (SELECT `from_id` FROM " . T_MESSAGES . " WHERE `to_id` = {$user_id} AND `page_id` = 0 AND `user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}') AND `active` = '1' ";
         if (isset($fetch_array['new']) && $fetch_array['new'] == true) {
             $query_one .= " AND `seen` = 0";
         }
         $query_one .= " ORDER BY `user_id` DESC)";
         if (!isset($fetch_array['new']) or $fetch_array['new'] == false) {
-            $query_one .= " OR `user_id` IN (SELECT `to_id` FROM " . T_MESSAGES . " WHERE `from_id` = {$user_id} ORDER BY `id` DESC)";
+            $query_one .= " OR `user_id` IN (SELECT `to_id` FROM " . T_MESSAGES . " WHERE `from_id` = {$user_id} AND `page_id` = 0 ORDER BY `id` DESC)";
         }
         $query_one .= ") AND ((`username` LIKE '%{$searchQuery}%') OR CONCAT( `first_name`,  ' ', `last_name` ) LIKE  '%{$searchQuery}%')";
         if (!empty($fetch_array['limit'])) {
@@ -98,7 +98,7 @@ function Wo_GetMessagesUsersAPP($fetch_array = array()) {
             $query_one .= "LIMIT {$limit}";
         }
     } else {
-        $query_one = "SELECT * FROM " . T_U_CHATS . " WHERE `user_id` = '$user_id' AND (`conversation_user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `conversation_user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}')) {$offset_query}  ORDER BY `time` DESC";
+        $query_one = "SELECT * FROM " . T_U_CHATS . " WHERE `user_id` = '$user_id' AND `page_id` = 0 AND (`conversation_user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `conversation_user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}')) {$offset_query}  ORDER BY `time` DESC";
     }
     if (!empty($fetch_array['limit'])) {
         $limit = Wo_Secure($fetch_array['limit']);
@@ -108,8 +108,11 @@ function Wo_GetMessagesUsersAPP($fetch_array = array()) {
     if (mysqli_num_rows($sql_query_one) > 0) {
         while ($sql_fetch_one = mysqli_fetch_assoc($sql_query_one)) {
             $new_data = Wo_UserData($sql_fetch_one['conversation_user_id']);
-            $new_data['chat_time'] = $sql_fetch_one['time'];
-            $data[] = $new_data;
+            if (!empty($new_data) && !empty($new_data['username'])) {
+                $new_data['chat_time'] = $sql_fetch_one['time'];
+                $data[] = $new_data;
+            }
+            
         }
     }
     return $data;
@@ -217,16 +220,22 @@ function Wo_GetMessagesAPP($data = array(), $limit = 50) {
         $data['after_message_id'] = Wo_Secure($data['after_message_id']);
         $query_one .= " AND `id` > " . $data['after_message_id'] . " AND `id` <> " . $data['after_message_id'];
     }
+    $query_one .= " AND `page_id` = '0' ";
     $sql_query_one    = mysqli_query($sqlConnect, $query_one);
     $query_limit_from = mysqli_num_rows($sql_query_one) - 50;
     if ($query_limit_from < 1) {
         $query_limit_from = 0;
     }
     if (isset($limit)) {
+        // if (!empty($data['before_message_id']) && is_numeric($data['before_message_id']) && $data['before_message_id'] > 0) {
+        //     $query_one .= " ORDER BY `id` DESC LIMIT {$query_limit_from}, 50";
+        // } else {
+        //     $query_one .= " ORDER BY `id` ASC LIMIT {$query_limit_from}, 50";
+        // }
         if (!empty($data['before_message_id']) && is_numeric($data['before_message_id']) && $data['before_message_id'] > 0) {
-            $query_one .= " ORDER BY `id` DESC LIMIT {$query_limit_from}, 50";
+            $query_one .= " ORDER BY `id` DESC LIMIT {$limit}";
         } else {
-            $query_one .= " ORDER BY `id` ASC LIMIT {$query_limit_from}, 50";
+            $query_one .= " ORDER BY `id` DESC LIMIT {$limit}";
         }
     }
     $query = mysqli_query($sqlConnect, $query_one);
@@ -531,3 +540,4 @@ function Wo_SecureData($config = array(), $data = array()) {
     }
     return $data;
 }
+

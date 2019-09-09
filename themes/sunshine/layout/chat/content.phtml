@@ -556,8 +556,16 @@ function Wo_CloseChat(id, type) {
     tab_type = {f: 'chat',s: 'close_chat',id:id};
   }
   else if(type == 'group'){
-    $('.chat_main_0').toggle(100,function(){$(this).remove();});
+    $('.chat_main_0').fadeOut(200, function () {
+        $(this).remove();
+    });
     tab_type = {f: 'chat',s: 'close_group',id:id};
+  }
+  else if (type == 'page') {
+  	$('.chat_main_0').fadeOut(200, function () {
+        $(this).remove();
+    });
+    tab_type = {f: 'chat',s: 'close_page',id:id};
   }
   $.get(Wo_Ajax_Requests_File(),tab_type);
 }
@@ -587,8 +595,12 @@ function Wo_AddEmoToChat(code, id) {
     inputTag.keyup().focus();
 }
 
-function Wo_AddEmoToGroup(code, id) {
-    inputTag = $('.group-chat-sending-'+ id +' textarea');
+function Wo_AddEmoToGroup(code, id,type = '') {
+	inputTag = $('.group-chat-sending-'+ id +' textarea');
+	if (type == 'page') {
+		inputTag = $('.page-chat-sending-'+ id +' textarea');
+	}
+    
     inputVal = inputTag.val();
     $('.emo-container').hide();
     if (typeof(inputTag.attr('placeholder')) != "undefined") {

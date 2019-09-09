@@ -88,7 +88,7 @@ if ($f == 'pages') {
             if (empty($errors)) {
                 $Update_data = array(
                     'facebook' => $_POST['facebook'],
-                    'google' => $_POST['google'],
+                    'instgram' => $_POST['instgram'],
                     'twitter' => $_POST['twitter'],
                     'linkedin' => $_POST['linkedin'],
                     'vk' => $_POST['vk'],

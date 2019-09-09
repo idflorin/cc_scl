@@ -166,7 +166,7 @@
             <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
             <?php if($wo['story']['publisher']['verified'] == 1) { ?>
             <span class="verified-color">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo $wo['lang']['verified_user'];?>" data-toggle="tooltip">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo ($wo['story']['page_id'] > 0 ? $wo['lang']['verified_page'] : $wo['lang']['verified_user']);?>" data-toggle="tooltip">
                   <path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
                </svg>
             </span>
@@ -204,7 +204,7 @@
             </a>
             <?php if($wo['story']['recipient']['verified'] == 1) { ?> 
             <span class="verified-color">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo $wo['lang']['verified_user'];?>" data-toggle="tooltip">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo ($wo['story']['page_id'] > 0 ? $wo['lang']['verified_page'] : $wo['lang']['verified_user']);?>" data-toggle="tooltip">
                   <path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
                </svg>
             </span>
@@ -213,6 +213,12 @@
          <?php } ?>
          <?php if (!empty($wo['story']['page_event_id'])) {?>
          <small class="small-text"> <?php echo $wo['lang']['created_new_event'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['fund_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['created_donation_request'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['fund_raise_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['donated_to_request'] ?></small>
          <?php } ?>
          <?php if (!empty($wo['story']['event_id']) && $wo['page'] != 'events') {  ?>
          <i class="fa fa-arrow-right"></i> <a href="<?php echo $wo['story']['event']['url']; ?>" data-ajax="?link1=show-event&eid=<?php echo $wo['story']['event']['id']; ?>"><b><?php echo $wo['story']['event']['name']; ?></b></a>
@@ -688,7 +694,7 @@
             <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
             <?php if($wo['story']['publisher']['verified'] == 1) { ?>
             <span class="verified-color">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo $wo['lang']['verified_user'];?>" data-toggle="tooltip">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo ($wo['story']['page_id'] > 0 ? $wo['lang']['verified_page'] : $wo['lang']['verified_user']);?>" data-toggle="tooltip">
                   <path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
                </svg>
             </span>
@@ -714,7 +720,7 @@
             <a href="<?php echo $wo['story']['shared_from']['url']; ?>" class="pointer no_decor" data-ajax="?link1=timeline&u=<?php echo $wo['story']['shared_from']['username']; ?>"><b><?php echo $wo['story']['shared_from']['name']; ?></b></a>
             <?php if($wo['story']['shared_from']['verified'] == 1) { ?>
             <span class="verified-color">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo $wo['lang']['verified_user'];?>" data-toggle="tooltip">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo ($wo['story']['page_id'] > 0 ? $wo['lang']['verified_page'] : $wo['lang']['verified_user']);?>" data-toggle="tooltip">
                   <path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
                </svg>
             </span>
@@ -736,7 +742,7 @@
             </a>
             <?php if($wo['story']['recipient']['verified'] == 1) { ?> 
             <span class="verified-color">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo $wo['lang']['verified_user'];?>" data-toggle="tooltip">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo ($wo['story']['page_id'] > 0 ? $wo['lang']['verified_page'] : $wo['lang']['verified_user']);?>" data-toggle="tooltip">
                   <path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" />
                </svg>
             </span>
@@ -745,6 +751,12 @@
          <?php } ?>
          <?php if (!empty($wo['story']['page_event_id'])) {?>
          <small class="small-text"> <?php echo $wo['lang']['created_new_event'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['fund_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['created_donation_request'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['fund_raise_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['donated_to_request'] ?></small>
          <?php } ?>
          <?php if (!empty($wo['story']['event_id']) && $wo['page'] != 'events') {  ?>
          <i class="fa fa-arrow-right"></i> <a href="<?php echo $wo['story']['event']['url']; ?>" data-ajax="?link1=show-event&eid=<?php echo $wo['story']['event']['id']; ?>"><b><?php echo $wo['story']['event']['name']; ?></b></a>

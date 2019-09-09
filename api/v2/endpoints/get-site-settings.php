@@ -17,9 +17,13 @@ $get_config['page_categories'] = $wo['page_categories'];
 $get_config['group_categories'] = $wo['group_categories'];
 $get_config['blog_categories'] = $wo['blog_categories'];
 $get_config['products_categories'] = $wo['products_categories'];
+$get_config['job_categories'] = $wo['job_categories'];
 $get_config['genders'] = $wo['genders'];
 $get_config['currency_array'] = unserialize($get_config['currency_array']);
 $get_config['currency_symbol_array'] = unserialize($get_config['currency_symbol_array']);
+foreach ($wo['family'] as $key => $value) {
+	$wo['family'][$key] = $wo['lang'][$value];
+}
 $get_config['family'] = $wo['family'];
 if (!empty($wo['post_colors'])) {
 	foreach ($wo['post_colors'] as $key => $color) {

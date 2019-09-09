@@ -1,5 +1,15 @@
 <?php 
 if ($f == 'register') {
+    if (!empty($_SESSION['user_id'])) {
+        $_SESSION['user_id'] = '';
+        unset($_SESSION['user_id']);
+    }
+    if (!empty($_COOKIE['user_id'])) {
+        $_COOKIE['user_id'] = '';
+        unset($_COOKIE['user_id']);
+        setcookie('user_id', null, -1);
+        setcookie('user_id', null, -1,'/');
+    }
     $fields = Wo_GetWelcomeFileds();
     if (empty($_POST['email']) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['confirm_password']) || empty($_POST['gender'])) {
         $errors = $error_icon . $wo['lang']['please_check_details'];
@@ -114,6 +124,12 @@ if ($f == 'register') {
                 $re_data['src']      = Wo_Secure('Referrer');
                 $update_balance      = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
                 unset($_SESSION['ref']);
+            }
+        }
+        elseif (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 1) {
+            $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
+            if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
+                $re_data['ref_user_id']      = Wo_Secure($ref_user_id);
             }
         }
         if (!empty($_POST['phone_num'])) {

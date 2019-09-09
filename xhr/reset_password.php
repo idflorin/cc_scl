@@ -2,7 +2,7 @@
 if ($f == 'reset_password') {
     if (isset($_POST['id'])) {
         $user_id  = explode("_", $_POST['id']);
-        if (Wo_isValidPasswordResetToken($_POST['id']) === false) {
+        if (Wo_isValidPasswordResetToken($_POST['id']) === false && Wo_isValidPasswordResetToken2($_POST['id']) === false) {
             $errors = $error_icon . $wo['lang']['invalid_token'];
         } elseif (empty($_POST['id'])) {
             $errors = $error_icon . $wo['lang']['processing_error'];

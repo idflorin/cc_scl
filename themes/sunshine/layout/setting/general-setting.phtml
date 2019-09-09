@@ -67,6 +67,15 @@
 					<?php } ?>
 				</select>
 			</div>
+
+			<div class="sun_input col-lg-6">
+				<label class="plr15" for="weather_unit"><?php echo $wo['lang']['weather_unit']; ?></label>
+
+				<select id="weather_unit" name="weather_unit" class="form-control">
+					<option value="us" <?php echo ($wo['setting']['weather_unit'] == 'us')   ? 'selected' : '';?> >F</option>
+					<option value="uk" <?php echo ($wo['setting']['weather_unit'] == 'uk')   ? 'selected' : '';?> >C</option>
+				</select>
+			</div>
 		 </div>
 
 		 <div class="setting-panel row">

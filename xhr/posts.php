@@ -271,6 +271,7 @@ if ($f == 'posts') {
                                 $invalid_file = 3;
                                 $upload = false;
                                 @unlink($media['filename']);
+                                Wo_DeleteFromToS3($media['filename']);
                             }
                             $mediaFilename = $media['filename'];
                             $mediaName     = $media['name'];
@@ -467,6 +468,7 @@ if ($f == 'posts') {
                                 $errors[] = $error_icon . $wo['lang']['adult_image_file'];
                                 Wo_DeletePost($id);
                                 @unlink($file['filename']);
+                                Wo_DeleteFromToS3($file['filename']);
                             }
                             if (!empty($file)) {
                                 $media_album = Wo_RegisterAlbumMedia($id, $file['filename']);
@@ -672,6 +674,16 @@ if ($f == 'posts') {
         if (!empty($_POST['post_id']) && !empty($_POST['text'])) {
             $post_id = Wo_Secure($_POST['post_id']);
             $post = $db->where('id',$post_id)->getOne(T_POSTS);
+            if (!empty($post)) {
+                $wo['no_mention'] = array();
+                $mention_regex = '/@\[([0-9]+)\]/i';
+                preg_match_all($mention_regex, $post->postText, $matches);
+                foreach ($matches[1] as $match) {
+                    if (!empty($match)) {
+                        $wo['no_mention'][] = $match;
+                    }
+                }
+            }
             $updatePost = Wo_UpdatePost(array(
                 'post_id' => $_POST['post_id'],
                 'text' => $_POST['text']
@@ -1383,10 +1395,43 @@ if ($f == 'posts') {
             else{
                 $reactedUsers = Wo_GetPostReactionUsers($_GET['post_id'], $react_array[$_GET['type']],20,0,Wo_Secure($_GET['col']));
             }
+
+            $post_info = array();
+
+            if ($_GET['col'] == 'post') {
+                $post_info = $db->where('id',Wo_Secure($_GET['post_id']))->getOne(T_POSTS);
+            }
+            elseif ($_GET['col'] == 'comment') {
+                $comment = $db->where('id',Wo_Secure($_GET['post_id']))->getOne(T_COMMENTS);
+                if (!empty($comment->post_id)) {
+                    $post_info = $db->where('id',$comment->post_id)->getOne(T_POSTS);
+                }
+            }
+            elseif ($_GET['col'] == 'replay') {
+                $comment = $db->where('id',Wo_Secure($_GET['post_id']))->getOne(T_COMMENTS_REPLIES);
+                if (!empty($comment->comment_id)) {
+                    $comment = $db->where('id',$comment->comment_id)->getOne(T_COMMENTS);
+                    if (!empty($comment->post_id)) {
+                        $post_info = $db->where('id',$comment->post_id)->getOne(T_POSTS);
+                    }
+                }
+            }
+            
             
             if (count($reactedUsers) > 0) {
                 foreach ($reactedUsers as $wo['WondredLikedusers']) {
-                    $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
+                    $wo['WondredLikedusers']['page_info'] = array();
+                    if (!empty($post_info) && !empty($post_info->page_id)) {
+                        $wo['WondredLikedusers']['page_info'] = Wo_PageData($post_info->page_id);
+                    }
+                    
+                    if (!empty($wo['WondredLikedusers']['page_info']) && !empty($post_info) && $post_info->page_id > 0 && $wo['WondredLikedusers']['page_info']['user_id'] == $wo['WondredLikedusers']['user_id']) {
+                        $data['html'] .= Wo_LoadPage('story/page-post-likes');
+                    }
+                    else{
+                        $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
+                    }
+                    
                 }
             } else {
                 $data['message'] = $wo['lang']['no_reactions'];
@@ -1430,8 +1475,40 @@ if ($f == 'posts') {
                 $data['title'] = $wo['lang']['users_liked_comment'];
             }
             if (count($likedUsers) > 0) {
+
+                $post_info = array();
+
+                if ($_GET['table'] == 'post') {
+                    $post_info = $db->where('id',Wo_Secure($_GET['post_id']))->getOne(T_POSTS);
+                }
+                elseif ($_GET['table'] == 'comment') {
+                    $comment = $db->where('id',Wo_Secure($_GET['post_id']))->getOne(T_COMMENTS);
+                    if (!empty($comment->post_id)) {
+                        $post_info = $db->where('id',$comment->post_id)->getOne(T_POSTS);
+                    }
+                }
+                elseif ($_GET['table'] == 'reply') {
+                    $comment = $db->where('id',Wo_Secure($_GET['post_id']))->getOne(T_COMMENTS_REPLIES);
+                    if (!empty($comment->comment_id)) {
+                        $comment = $db->where('id',$comment->comment_id)->getOne(T_COMMENTS);
+                        if (!empty($comment->post_id)) {
+                            $post_info = $db->where('id',$comment->post_id)->getOne(T_POSTS);
+                        }
+                    }
+                }
+                
                 foreach ($likedUsers as $wo['WondredLikedusers']) {
-                    $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
+                    $wo['WondredLikedusers']['page_info'] = array();
+                    if (!empty($post_info) && !empty($post_info->page_id)) {
+                        $wo['WondredLikedusers']['page_info'] = Wo_PageData($post_info->page_id);
+                    }
+                    
+                    if (!empty($wo['WondredLikedusers']['page_info']) && !empty($post_info) && $post_info->page_id > 0 && $wo['WondredLikedusers']['page_info']['user_id'] == $wo['WondredLikedusers']['user_id']) {
+                        $data['html'] .= Wo_LoadPage('story/page-post-likes');
+                    }
+                    else{
+                        $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
+                    }
                 }
             } else {
                 $data['message'] = $wo['lang']['no_likes'];
@@ -1501,8 +1578,39 @@ if ($f == 'posts') {
                 $data['title'] = $wo['lang']['users_wondered_comment'];
             }
             if (count($WonderedUsers) > 0) {
+                $post_info = array();
+
+                if ($_GET['table'] == 'post') {
+                    $post_info = $db->where('id',Wo_Secure($_GET['post_id']))->getOne(T_POSTS);
+                }
+                elseif ($_GET['table'] == 'comment') {
+                    $comment = $db->where('id',Wo_Secure($_GET['post_id']))->getOne(T_COMMENTS);
+                    if (!empty($comment->post_id)) {
+                        $post_info = $db->where('id',$comment->post_id)->getOne(T_POSTS);
+                    }
+                }
+                elseif ($_GET['table'] == 'reply') {
+                    $comment = $db->where('id',Wo_Secure($_GET['post_id']))->getOne(T_COMMENTS_REPLIES);
+                    if (!empty($comment->comment_id)) {
+                        $comment = $db->where('id',$comment->comment_id)->getOne(T_COMMENTS);
+                        if (!empty($comment->post_id)) {
+                            $post_info = $db->where('id',$comment->post_id)->getOne(T_POSTS);
+                        }
+                    }
+                }
+
                 foreach ($WonderedUsers as $wo['WondredLikedusers']) {
-                    $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
+                    $wo['WondredLikedusers']['page_info'] = array();
+                    if (!empty($post_info) && !empty($post_info->page_id)) {
+                        $wo['WondredLikedusers']['page_info'] = Wo_PageData($post_info->page_id);
+                    }
+                    
+                    if (!empty($wo['WondredLikedusers']['page_info']) && !empty($post_info) && $post_info->page_id > 0 && $wo['WondredLikedusers']['page_info']['user_id'] == $wo['WondredLikedusers']['user_id']) {
+                        $data['html'] .= Wo_LoadPage('story/page-post-likes');
+                    }
+                    else{
+                        $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
+                    }
                 }
             } else {
                 $data['message'] = ($config['second_post_button'] == 'dislike') ? $wo['lang']['no_dislikes'] : $wo['lang']['no_wonders'];

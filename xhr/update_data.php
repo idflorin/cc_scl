@@ -51,6 +51,7 @@ if ($f == 'update_data') {
             $data['audio_calls_html']     = Wo_LoadPage('modals/in_audio_call');
         }
         $data['followRequests']      = Wo_CountFollowRequests();
+        $data['followRequests']      = $data['followRequests'] + Wo_CountGroupChatRequests();
         $data['notifications_sound'] = $wo['user']['notifications_sound'];
     }
     $data['count_num'] = 0;

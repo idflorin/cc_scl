@@ -7,7 +7,7 @@ if ($f == "load-blog-comments") {
     );
     if (isset($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0 && isset($_GET['b_id']) && is_numeric($_GET['b_id'])) {
         $comments = Wo_GetBlogComments(array(
-            "b_id" => $_GET['b_id'],
+            "blog_id" => $_GET['b_id'],
             "offset" => $_GET['offset']
         ));
         if (count($comments)) {

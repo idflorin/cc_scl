@@ -28,7 +28,8 @@ $allow_array     = array(
     'upload-blog-image',
     'wallet',
     'download_user_info',
-    'movies'
+    'movies',
+    'funding'
 );
 $non_login_array = array(
     'session_status',

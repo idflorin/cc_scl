@@ -128,17 +128,40 @@ if ($f == 'stripe_payment') {
             $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$wo['user']['user_id']}, 'PRO', {$amount2}, '{$notes}')");
                     $create_payment = Wo_CreatePayment($pro_type);
                     if ($mysqli) {
-                        if (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 1 && $wo['user']['referrer'] == 0) {
-                            $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
-                            if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
-                                $update_balance = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
-                                $update_user    = Wo_UpdateUserData($wo['user']['user_id'], array(
-                                    'referrer' => $ref_user_id,
-                                    'src' => 'Referrer'
-                                ));
-                                unset($_SESSION['ref']);
+
+                        if ((!empty($_SESSION['ref']) || !empty($wo['user']['ref_user_id'])) && $wo['config']['affiliate_type'] == 1 && $wo['user']['referrer'] == 0) {
+                            if (!empty($_SESSION['ref'])) {
+                                $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
                             }
+                            elseif (!empty($wo['user']['ref_user_id'])) {
+                                $ref_user_id = Wo_UserIdFromUsername($wo['user']['ref_user_id']);
+                            }
+
+
+                            if ($wo['config']['amount_percent_ref'] > 0) {
+                                if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
+                                    $update_user    = Wo_UpdateUserData($wo['user']['user_id'], array(
+                                        'referrer' => $ref_user_id,
+                                        'src' => 'Referrer'
+                                    ));
+                                    $ref_amount     = ($wo['config']['amount_percent_ref'] * $amount1) / 100;
+                                    $update_balance = Wo_UpdateBalance($ref_user_id, $ref_amount);
+                                    unset($_SESSION['ref']);
+                                }
+                            } else if ($wo['config']['amount_ref'] > 0) {
+                                if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
+                                    $update_user    = Wo_UpdateUserData($wo['user']['user_id'], array(
+                                        'referrer' => $ref_user_id,
+                                        'src' => 'Referrer'
+                                    ));
+                                    $update_balance = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
+                                    unset($_SESSION['ref']);
+                                }
+                            }
+                            
                         }
+                        
+
                         $data = array(
                             'status' => 200,
                             'location' => Wo_SeoLink('index.php?link1=upgraded')

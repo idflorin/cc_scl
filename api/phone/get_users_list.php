@@ -139,7 +139,7 @@ if ($type == 'get_users_list') {
                     'user_data' => 1,
                     'session_id' => $s,
                     'platform' => 'phone'
-                ));
+                ),'user');
 
                 if (!empty($json_data['last_message']['time'])) {
                     $time_today  = time() - 86400;
@@ -172,6 +172,7 @@ if ($type == 'get_users_list') {
             if (!empty($_POST['SetOnline']) && $_POST['SetOnline'] == 1) {
                 Wo_UpdateUserData($user_id, array('lastseen' => time()));
             }
+            
             $check_calles     = Wo_CheckFroInCalls();
             if ($check_calles !== false && is_array($check_calles)) {
                 $video_call = true;

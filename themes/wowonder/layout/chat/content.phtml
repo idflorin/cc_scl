@@ -48,7 +48,7 @@ if (isset($_SESSION['open_chat'])) {
 				</li>
 						
 				<li>
-					<a data-toggle="tab" data-target="#groups-chat" href="#" data-toggle="tooltip" data-placement="bottom" title="<?php echo $wo['lang']['groups'];?>">
+					<a data-toggle="tab" data-target="#groups-chat" href="javascript:void(0)" data-toggle="tooltip" data-placement="bottom" title="<?php echo $wo['lang']['groups'];?>">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
 					</a>
 				</li>				
@@ -530,8 +530,16 @@ function Wo_CloseChat(id, type) {
     tab_type = {f: 'chat',s: 'close_chat',id:id};
   }
   else if(type == 'group'){
-    $('.chat_main_0').toggle(100,function(){$(this).remove();});
+    $('.chat_main_0').fadeOut(200, function () {
+        $(this).remove();
+    });
     tab_type = {f: 'chat',s: 'close_group',id:id};
+  }
+  else if (type == 'page') {
+  	$('.chat_main_0').fadeOut(200, function () {
+        $(this).remove();
+    });
+    tab_type = {f: 'chat',s: 'close_page',id:id};
   }
   $.get(Wo_Ajax_Requests_File(),tab_type);
 }
@@ -561,8 +569,11 @@ function Wo_AddEmoToChat(code, id) {
     inputTag.keyup().focus();
 }
 
-function Wo_AddEmoToGroup(code, id) {
+function Wo_AddEmoToGroup(code, id,type = '') {
     inputTag = $('.group-chat-sending-'+ id +' textarea');
+    if (type == 'page') {
+		inputTag = $('.page-chat-sending-'+ id +' textarea');
+	}
     inputVal = inputTag.val();
     $('.emo-container').hide();
     if (typeof(inputTag.attr('placeholder')) != "undefined") {

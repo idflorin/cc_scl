@@ -199,6 +199,12 @@ if (!empty($wo['story']['parent_id'])) {
          <?php if (!empty($wo['story']['page_event_id'])) {?>
          <small class="small-text"> <?php echo $wo['lang']['created_new_event'] ?></small>
          <?php } ?>
+         <?php if (!empty($wo['story']['fund_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['created_donation_request'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['fund_raise_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['donated_to_request'] ?></small>
+         <?php } ?>
          <?php if (!empty($wo['story']['event_id']) && $wo['page'] != 'events') {  ?>
          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
@@ -671,6 +677,12 @@ if (!empty($wo['story']['parent_id'])) {
          <?php } ?>
          <?php if (!empty($wo['story']['page_event_id'])) {?>
          <small class="small-text"> <?php echo $wo['lang']['created_new_event'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['fund_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['created_donation_request'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['fund_raise_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['donated_to_request'] ?></small>
          <?php } ?>
          <?php if (!empty($wo['story']['event_id']) && $wo['page'] != 'events') {  ?>
          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">

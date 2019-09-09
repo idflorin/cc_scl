@@ -21,7 +21,9 @@ $required_fields =  array(
                         'remove_user',
                         'send',
                         'fetch_messages',
-                        'get_list'
+                        'get_list',
+                        'accept',
+                        'reject'
                     );
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
     if ($_POST['type'] == 'create') {
@@ -572,6 +574,63 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                                 'api_status' => 200,
                                 'data' => $groups
                             );
+    }
+
+    if ($_POST['type'] == 'accept') {
+        if (!empty($_POST['group_id']) && is_numeric($_POST['group_id']) && $_POST['group_id'] > 0) {
+            $group_id = Wo_Secure($_POST['group_id']);
+            $db->where('user_id',$wo['user']['id'])->where('group_id',$group_id)->update(T_GROUP_CHAT_USERS,array('last_seen' => time(),'active' => '1'));
+
+            $group_chat = Wo_GroupTabData($group_id);
+
+            $notification_data = array(
+                'recipient_id' => $group_chat['user_id'],
+                'notifier_id' => $wo['user']['id'],
+                'group_chat_id' => $group_id,
+                'type' => 'accept_group_chat_request',
+                'url' => 'index.php?link1=timeline&u=' . $wo['user']['username']
+            );
+            Wo_RegisterNotification($notification_data);
+
+            $response_data = array(
+                                    'api_status' => 200,
+                                    'message_data' => 'Request successfully accepted'
+                                );
+        }
+        else{
+            $error_code    = 8;
+            $error_message = 'group_id can not be empty';
+        }
+    }
+
+    if ($_POST['type'] == 'reject') {
+        if (!empty($_POST['group_id']) && is_numeric($_POST['group_id']) && $_POST['group_id'] > 0) {
+            $group_id = Wo_Secure($_POST['group_id']);
+
+            $db->where('user_id',$wo['user']['id'])->where('group_id',$group_id)->delete(T_GROUP_CHAT_USERS);
+
+            $group_chat = Wo_GroupTabData($group_id);
+
+            $notification_data = array(
+                'recipient_id' => $group_chat['user_id'],
+                'notifier_id' => $wo['user']['id'],
+                'group_chat_id' => $group_id,
+                'type' => 'declined_group_chat_request',
+                'url' => 'index.php?link1=timeline&u=' . $wo['user']['username']
+            );
+            Wo_RegisterNotification($notification_data);
+
+            $response_data = array(
+                                    'api_status' => 200,
+                                    'message_data' => 'Request successfully rejected'
+                                );
+
+        }
+        else{
+            $error_code    = 8;
+            $error_message = 'group_id can not be empty';
+        }
+
     }
 
 

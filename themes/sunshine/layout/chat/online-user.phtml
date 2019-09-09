@@ -1,5 +1,5 @@
 <?php 
-$message_count = Wo_CountMessages(array('new' => true,'user_id' => $wo['chatList']['user_id']));  
+$message_count = Wo_CountMessages(array('new' => true,'user_id' => $wo['chatList']['user_id']),'user');  
 ?>
 <div class="recipient-chat-user" id="online_<?php echo $wo['chatList']['user_id'];?>">
 	<div class="user-info" onclick="Wo_OpenChatTab(<?php echo $wo['chatList']['user_id'];?>);">

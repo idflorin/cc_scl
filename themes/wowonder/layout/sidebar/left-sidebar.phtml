@@ -129,14 +129,6 @@
 			</a>
 		</li>
 		<?php } ?>
-		<?php if ($wo['config']['find_friends'] == 1) { ?>
-		<li>
-			<a href="<?php echo Wo_SeoLink('index.php?link1=friends-nearby'); ?>">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#b2c17c;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-				<?php echo $wo['lang']['find_friends'];?>
-			</a>
-		</li>
-		<?php } ?>
 		<?php if ($wo['config']['movies'] == 1) { ?>
 		<li>
 			<a href="<?php echo Wo_SeoLink('index.php?link1=movies'); ?>">
@@ -145,9 +137,44 @@
 			</a>
 		</li>
 		<?php } ?>
+		<?php if ($wo['config']['job_system'] == 1) { ?>
+		<li>
+			<a href="<?php echo Wo_SeoLink('index.php?link1=jobs'); ?>" data-ajax="?link1=jobs">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#4caf50;"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> <?php echo $wo['lang']['jobs'];?>
+			</a>
+		</li>
+		<?php } ?>
+		<?php if ($wo['config']['find_friends'] == 1) { ?>
+		<li>
+			<a href="<?php echo Wo_SeoLink('index.php?link1=friends-nearby'); ?>">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#b2c17c;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+				<?php echo $wo['lang']['find_friends'];?>
+			</a>
+		</li>
+		<?php } ?>
+		<?php if ($wo['config']['common_things'] == 1) { ?>
+		<li>
+			<a href="<?php echo Wo_SeoLink('index.php?link1=common_things'); ?>" data-ajax="?link1=common_things">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#ff5991;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> <?php echo $wo['lang']['common_things'];?>
+			</a>
+		</li>
+		<?php } ?>
+		<?php if ($wo['config']['funding_system'] == 1) { ?>
+		<li><hr></li>
+		<li>
+			<a href="<?php echo Wo_SeoLink('index.php?link1=funding'); ?>" data-ajax="?link1=funding">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #673AB7;"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg> <?php echo $wo['lang']['funding'];?>
+			</a>
+		</li>
+		<!--<li>
+			<a href="<?php echo Wo_SeoLink('index.php?link1=my_funding'); ?>" data-ajax="?link1=my_funding">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #FF9800;"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg> <?php echo $wo['lang']['my_funding'];?>
+			</a>
+		</li>-->
+		<?php } ?>
 	</ul>
 	<div class="sidebar">
-	<ul class="list-group trending">
+		<ul class="list-group trending">
             <li class="list-group-item sidebar-title-back" contenteditable="false"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #2196F3;"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> <?php echo $wo['lang']['trending']; ?></li>
             <?php 
                 $hashtags = Wa_GetTrendingHashs('popular');
@@ -157,14 +184,9 @@
             <li class="list-group-item" dir="auto">
                 <a href="<?php echo $wo['hashtag']['url'];?>">#<?php echo $wo['hashtag']['tag'];?></a>
             </li>
-            <?php
-                } 
-                }
-                ?>
-            <li>
-                <div class="clear"></div>
-            </li>
+            <?php } } ?>
+            <li><div class="clear"></div></li>
         </ul>
-		</div>
+	</div>
 </div>
 <?php } ?>

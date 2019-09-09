@@ -126,6 +126,16 @@
 					</select>
 				</div>
 			</div>
+
+			<div class="form-group col-lg-6">
+				<label class="col-md-12" for="weather_unit"><?php echo $wo['lang']['weather_unit']; ?></label>
+				<div class="col-md-12">
+					<select id="weather_unit" name="weather_unit" class="form-control">
+						<option value="us" <?php echo ($wo['setting']['weather_unit'] == 'us')   ? 'selected' : '';?> >F</option>
+						<option value="uk" <?php echo ($wo['setting']['weather_unit'] == 'uk')   ? 'selected' : '';?> >C</option>
+					</select>
+				</div>
+			</div>
 		 </div>
          
 		 <hr>

@@ -10,7 +10,7 @@
 // +------------------------------------------------------------------------+
 /* Script Main Functions (File 3) */
 
-function Wo_RegisterPoint($post_id, $type, $action = '+'){
+function Wo_RegisterPoint($post_id, $type, $action = '+',$user_id = 0){
     global $wo, $sqlConnect,$db;
     if ($wo['config']['point_level_system'] == 0 ){
         return false;
@@ -21,9 +21,15 @@ function Wo_RegisterPoint($post_id, $type, $action = '+'){
     if (empty($type)) {
         return false;
     }
-    $user_id = Wo_Secure( $wo["user"]["id"] );
-    if (empty($user_id) or !is_numeric($user_id) or $user_id < 1) {
-        return false;
+    
+    if (!empty($user_id) && is_numeric($user_id) && $user_id > 0) {
+        $user_id = Wo_Secure($user_id);
+    }
+    else{
+        $user_id = Wo_Secure( $wo["user"]["id"] );
+        if (empty($user_id) || !is_numeric($user_id) || $user_id < 1) {
+            return fasle;
+        }
     }
     if (empty($wo["user"]["point_day_expire"])) {
         $today_end = strtotime(date('M')." ".date('d').", ".date('Y')." 11:59pm");
@@ -1237,6 +1243,7 @@ function Wo_DeleteBlogComment($id, $blog = 0) {
     @mysqli_query($sqlConnect, "DELETE FROM " . T_BLOG_COMM_REPLIES . " WHERE `comm_id` = '$id'");
     @mysqli_query($sqlConnect, "DELETE FROM " . T_BM_LIKES . " WHERE `blog_id` = '$blog_id' AND `blog_comm_id` = '$id'");
     @mysqli_query($sqlConnect, "DELETE FROM " . T_BM_DISLIKES . " WHERE `blog_id` = '$blog_id' AND `blog_comm_id` = '$id'");
+    @mysqli_query($sqlConnect, "DELETE FROM " . T_BLOG_REACTION . " WHERE `comment_id` = '$id'");
     Wo_RegisterPoint($id, "blog_comment", "-");
     return mysqli_query($sqlConnect, "DELETE FROM " . T_BLOG_COMM . " WHERE `id` = '$id'");
 }
@@ -1248,6 +1255,7 @@ function Wo_DeleteBlogCommReply($id, $blog = 0) {
     $blog_id = Wo_Secure($blog);
     @mysqli_query($sqlConnect, "DELETE FROM " . T_BM_LIKES . " WHERE `blog_id` = '$blog_id'    AND `blog_commreply_id` = '$id'");
     @mysqli_query($sqlConnect, "DELETE FROM " . T_BM_DISLIKES . " WHERE `blog_id` = '$blog_id' AND `blog_commreply_id` = '$id'");
+    @mysqli_query($sqlConnect, "DELETE FROM " . T_BLOG_REACTION . " WHERE `reply_id` = '$id'");
     return mysqli_query($sqlConnect, "DELETE FROM " . T_BLOG_COMM_REPLIES . " WHERE `id` = '$id'");
 }
 function Wo_IsBlogOwner($blog_id = 0, $user_id = 0) {
@@ -2263,6 +2271,15 @@ function Wo_NotificationWebPushNotifier() {
                         $notificationText
                     );
                     if (!empty($sql_get_notification_for_push['type'])) {
+                        if ($sql_get_notification_for_push['type'] == "reaction") {
+                            if( $notificationText == "post" ){
+                                $sql_get_notification_for_push['type_text'] .= $wo['lang']['reacted_to_your_post'];
+                            }else if( $notificationText == "comment" ){
+                                $sql_get_notification_for_push['type_text'] .= $wo['lang']['reacted_to_your_comment'];
+                            }else if( $notificationText == "replay" ){
+                                $sql_get_notification_for_push['type_text'] .= $wo['lang']['reacted_to_your_replay'];
+                            }
+                        }
                         if ($sql_get_notification_for_push['type'] == "following") {
                             $sql_get_notification_for_push['type_text'] .= $wo['lang']['followed_you'];
                         }
@@ -3872,11 +3889,13 @@ function Wo_GetMyAds($args = array()) {
     }
     $options   = array(
         "id" => false,
-        "offset" => 0
+        "offset" => 0,
+        'limit' => 30
     );
     $args      = array_merge($options, $args);
     $offset    = Wo_Secure($args['offset']);
     $id        = Wo_Secure($args['id']);
+    $limit        = Wo_Secure($args['limit']);
     $user_id   = $wo['user']['user_id'];
     $query_one = '';
     $data      = array();
@@ -3890,7 +3909,7 @@ function Wo_GetMyAds($args = array()) {
                 " . T_USER_ADS . " 
                     WHERE `user_id` = '$user_id' 
                         {$query_one} ORDER BY `id` 
-                            DESC LIMIT 30";
+                            DESC LIMIT ".$limit;
     $query = mysqli_query($sqlConnect, $sql);
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $ad = Wo_GetUserAdData($fetched_data['id']);
@@ -4020,7 +4039,7 @@ function Wo_GetAllStories($last_id = 0) {
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $story_expire              = $fetched_data['expire'];
         $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['expires']   = date("Y/m/d", strtotime("$story_expire +1 day"));
+        $fetched_data['expires']   = date("Y/m/d", $fetched_data['expire']);
         $data[]                    = $fetched_data;
     }
     return $data;
@@ -4257,9 +4276,9 @@ function Wo_DeleteStatus($id) {
     if (count($data) > 0) {
         foreach ($data as $key => $path) {
             if (file_exists($path)) {
-                //@unlink($path);
-            } else {
-                //@Wo_DeleteFromToS3($path);
+                @unlink($path);
+            } else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                @Wo_DeleteFromToS3($path);
             }
         }
     }
@@ -4814,7 +4833,13 @@ function Wo_CreateGChat($name = false, $parts = array()) {
         $id = mysqli_insert_id($sqlConnect);
         if ($id && is_numeric($id)) {
             foreach ($parts as $part_id) {
-                $sub_sql = "INSERT INTO " . T_GROUP_CHAT_USERS . " (`id`,`user_id`,`group_id`) VALUES (null,'$part_id','$id')";
+                if ($part_id != $user) {
+                    $sub_sql = "INSERT INTO " . T_GROUP_CHAT_USERS . " (`id`,`user_id`,`group_id`,`active`,`last_seen`) VALUES (null,'$part_id','$id','0','0')";
+                }
+                else{
+                    $sub_sql = "INSERT INTO " . T_GROUP_CHAT_USERS . " (`id`,`user_id`,`group_id`) VALUES (null,'$part_id','$id')";
+                }
+                
                 @mysqli_query($sqlConnect, $sub_sql);
             }
         }
@@ -4835,7 +4860,7 @@ function Wo_UpdateGChat($id = false, $update_data = array()) {
     $query     = mysqli_query($sqlConnect, $query_one);
     return $query;
 }
-function Wo_GroupTabData($id = false) {
+function Wo_GroupTabData($id = false,$update_seen = true) {
     global $sqlConnect, $wo;
     if ($wo['loggedin'] == false || !$id || !is_numeric($id)) {
         return false;
@@ -4845,9 +4870,13 @@ function Wo_GroupTabData($id = false) {
     $user  = $wo['user']['id'];
     $sql   = "SELECT * FROM " . T_GROUP_CHAT . " WHERE `group_id` = {$id} ";
     $query = mysqli_query($sqlConnect, $sql);
-    @Wo_UpdateGChatLastSeen($id);
+    if ($update_seen == true) {
+        @Wo_UpdateGChatLastSeen($id);
+    }
+    
     if ($query && mysqli_num_rows($query) > 0) {
         $data             = mysqli_fetch_assoc($query);
+        $data['avatar'] = Wo_GetMedia($data['avatar']);
         $data['messages'] = Wo_GetGroupMessages(array(
             'group_id' => $data['group_id']
         ));
@@ -4906,7 +4935,7 @@ function Wo_GetChatGroups($after_id = false) {
     }
     $sql   = "SELECT * FROM " . T_GROUP_CHAT . " 
                 WHERE (`user_id` = {$user} OR `group_id` IN 
-                   (SELECT `group_id` FROM Wo_GroupChatUsers  WHERE `user_id` = {$user})) {$sub_sql} ORDER BY `time` DESC";
+                   (SELECT `group_id` FROM Wo_GroupChatUsers  WHERE `user_id` = {$user} AND active = 1)) {$sub_sql} ORDER BY `time` DESC";
     $query = mysqli_query($sqlConnect, $sql);
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $fetched_data['user_data']    = Wo_UserData($fetched_data['user_id']);
@@ -4972,7 +5001,7 @@ function Wo_CheckLastGroupUnread() {
     $user   = $wo['user']['id'];
     $groups = array();
     $time   = time();
-    $sql    = "SELECT `last_seen`,`group_id` FROM " . T_GROUP_CHAT_USERS . " WHERE `user_id` = {$user}";
+    $sql    = "SELECT `last_seen`,`group_id` FROM " . T_GROUP_CHAT_USERS . " WHERE `user_id` = {$user} AND `active` = '1' ";
     $query  = mysqli_query($sqlConnect, $sql);
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $last_message = Wo_GetChatGroupLastMessage($fetched_data['group_id']);
@@ -4997,6 +5026,29 @@ function Wo_GetGChatMemebers($id = false) {
         $data[] = Wo_UserData($fetched_data['user_id']);
     }
     return $data;
+}
+function Wo_IsGChatMemebers($group_id) {
+    global $sqlConnect, $wo,$db;
+    if ($wo['loggedin'] == false || empty($group_id)) {
+        return false;
+    }
+    $id    = Wo_Secure($group_id);
+    $user_id = $wo['user']['id'];
+    $count = $db->where('user_id',$user_id)->where('group_id',$id)->where('active',1)->getValue(T_GROUP_CHAT_USERS,'COUNT(*)');
+    if ($count > 0) {
+        return true;
+    }
+    return false;
+}
+function Wo_CountGroupChatRequests()
+{
+    global $sqlConnect, $wo,$db;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    $user_id = $wo['user']['id'];
+    $count = $db->where('user_id',$user_id)->where('active','0')->where('last_seen','0')->getValue(T_GROUP_CHAT_USERS,'COUNT(*)');
+    return $count;
 }
 function Wo_ClearGChat($group_id = false) {
     global $sqlConnect, $wo;
@@ -5052,7 +5104,7 @@ function Wo_AddGChatPart($group_id = false, $user_id = false) {
         @mysqli_query($sqlConnect, "DELETE FROM " . T_GROUP_CHAT_USERS . " WHERE `user_id` = {$user} AND `group_id` = {$group}");
         $code = 0;
     } else {
-        @mysqli_query($sqlConnect, "INSERT INTO " . T_GROUP_CHAT_USERS . " (`id`,`user_id`,`group_id`) VALUES (null,$user,$group)");
+        @mysqli_query($sqlConnect, "INSERT INTO " . T_GROUP_CHAT_USERS . " (`id`,`user_id`,`group_id`,`last_seen`,`active`) VALUES (null,$user,$group,'0','0')");
         $code = 1;
     }
     return $code;
@@ -6092,6 +6144,7 @@ function Wo_SharePostOn($id = false,$type_id,$type) {
         $post_data['boosted']     = 0;
         $post_data['time']        = time();
         $post_data['postText']    = '';
+        $post_data['postType']    = '';
         $post_data['comments_status']    = 1;
         $fields                   = '`' . implode('`, `', array_keys($post_data)) . '`';
         $data                     = '\'' . implode('\', \'', $post_data) . '\'';
@@ -6180,4 +6233,506 @@ function Wo_InsertBankTrnsfer($inserted_data) {
         return mysqli_insert_id($sqlConnect);
     }
     return false;
+}
+
+function Wo_GetPageJobs($page_id)
+{
+    global $wo, $sqlConnect,$db;
+    if ($wo['loggedin'] == false || empty($page_id)) {
+        return false;
+    }
+    $data = array();
+    $page_id = Wo_Secure($page_id);
+    $jobs = $db->where('page_id',$page_id)->orderBy('id','DESC')->get(T_JOB);
+    $page = Wo_PageData($page_id);
+    $data = array();
+    if (!empty($jobs)) {
+        foreach ($jobs as $key => $value) {
+            $data[$key] = (array) $value;
+            if (!empty($data[$key]['question_one_answers'])) {
+                $data[$key]['question_one_answers'] = json_decode($data[$key]['question_one_answers'],true);
+            }
+            if (!empty($data[$key]['question_two_answers'])) {
+                $data[$key]['question_two_answers'] = json_decode($data[$key]['question_two_answers'],true);
+            }
+            if (!empty($data[$key]['question_three_answers'])) {
+                $data[$key]['question_three_answers'] = json_decode($data[$key]['question_three_answers'],true);
+            }
+            $apply = $db->where('user_id',$wo['user']['id'])->where('job_id',$data[$key]['id'])->getValue(T_JOB_APPLY,'COUNT(*)');
+            $data[$key]['apply'] = ($apply > 0) ? true : false;
+            // $post = $db->where('job_id',$data[$key]['id'])->getOne(T_POSTS);
+            // $data[$key]['story'] = array();
+            // if (!empty($post)) {
+            //     $data[$key]['story'] = Wo_PostData($post->id);
+            // }
+            
+            $data[$key]['page'] = $page;
+        }
+    }
+    return $data;
+}
+
+function Wo_GetJobById($job_id)
+{
+    global $wo, $sqlConnect,$db;
+    if ($wo['loggedin'] == false || empty($job_id)) {
+        return false;
+    }
+    $data = array();
+    $job_id = Wo_Secure($job_id);
+    $jobs = $db->where('id',$job_id)->getOne(T_JOB);
+    
+
+    if (!empty($jobs)) {
+        $page = Wo_PageData($jobs->page_id);
+        $jobs = (array) $jobs;
+        if (!empty($jobs['question_one_answers'])) {
+            $jobs['question_one_answers'] = json_decode($jobs['question_one_answers'],true);
+        }
+        if (!empty($jobs['question_two_answers'])) {
+            $jobs['question_two_answers'] = json_decode($jobs['question_two_answers'],true);
+        }
+        if (!empty($jobs['question_three_answers'])) {
+            $jobs['question_three_answers'] = json_decode($jobs['question_three_answers'],true);
+        }
+        $jobs['page'] = $page;
+        $apply = $db->where('user_id',$wo['user']['id'])->where('job_id',$job_id)->getValue(T_JOB_APPLY,'COUNT(*)');
+        $job_apply = $db->where('job_id',$job_id)->getValue(T_JOB_APPLY,'COUNT(*)');
+        $jobs['apply'] = ($apply > 0) ? true : false;
+        $post = $db->where('job_id',$job_id)->getOne(T_POSTS);
+        $jobs['url'] = Wo_SeoLink('index.php?link1=post&id=' . $post->id);
+        $jobs['apply_count'] = $job_apply;
+    }
+    return $jobs;
+}
+
+
+function Wo_GetAllJobs($filter_data = array()) {
+    global $wo, $sqlConnect;
+    $data      = array();
+    $query_one = " SELECT * FROM " . T_JOB . " WHERE status = '1'";
+    if (!empty($filter_data['c_id'])) {
+        $category = $filter_data['c_id'];
+        $query_one .= " AND `category` = '{$category}'";
+    }
+    if (!empty($filter_data['after_id'])) {
+        if (is_numeric($filter_data['after_id'])) {
+            $after_id = Wo_Secure($filter_data['after_id']);
+            $query_one .= " AND `id` < '{$after_id}' AND `id` <> $after_id";
+        }
+    }
+    if (!empty($filter_data['keyword'])) {
+        $keyword = Wo_Secure($filter_data['keyword']);
+        $query_one .= " AND (`title` LIKE '%{$keyword}%' OR `description` LIKE '%{$keyword}%') ";
+    }
+    if (!empty($filter_data['user_id'])) {
+        $user_id = Wo_Secure($filter_data['user_id']);
+        $query_one .= " AND `user_id` = '{$user_id}'";
+    }
+    if (!empty($filter_data['type'])) {
+        $type = Wo_Secure($filter_data['type']);
+        $query_one .= " AND `job_type` = '{$type}'";
+    }
+    // if (!empty($filter_data['order_by']) && $filter_data['order_by'] == 'price_low' && !empty($filter_data['price'])) {
+    //     $price = Wo_Secure($filter_data['price']);
+    //     $query_one .= " AND `price` >= '{$price}'";
+    // }
+    // else if (!empty($filter_data['order_by']) && $filter_data['order_by'] == 'price_high' && !empty($filter_data['price'])) {
+
+    //     $price = Wo_Secure($filter_data['price']);
+    //     $query_one .= " AND `price` <= '{$price}'";
+    // }
+    if (!empty($filter_data['length'])) {
+        $user_lat     = $wo['user']['lat'];
+        $user_lng     = $wo['user']['lng'];
+        $unit   = 6371;
+        $query_one = " AND status = '1'";
+        $distance = Wo_Secure($filter_data['length']);
+        if (!empty($filter_data['c_id'])) {
+            $category = $filter_data['c_id'];
+            $query_one .= " AND `category` = '{$category}'";
+        }
+        if (!empty($filter_data['after_id'])) {
+            if (is_numeric($filter_data['after_id'])) {
+                $after_id = Wo_Secure($filter_data['after_id']);
+                $query_one .= " AND `id` < '{$after_id}' AND `id` <> $after_id";
+            }
+        }
+        if (!empty($filter_data['keyword'])) {
+            $keyword = Wo_Secure($filter_data['keyword']);
+            $query_one .= " AND (`title` LIKE '%{$keyword}%' OR `description` LIKE '%{$keyword}%') ";
+        }
+        if (!empty($filter_data['user_id'])) {
+            $user_id = Wo_Secure($filter_data['user_id']);
+            $query_one .= " AND `user_id` = '{$user_id}'";
+        }
+
+        if (!empty($filter_data['type'])) {
+            $type = Wo_Secure($filter_data['type']);
+            $query_one .= " AND `job_type` = '{$type}'";
+        }
+
+
+        $query_one  = "SELECT `id`, `user_id`, ( {$unit} * acos(cos(radians('$user_lat'))  * 
+        cos(radians(lat)) * cos(radians(lng) - radians('$user_lng')) + 
+        sin(radians('$user_lat')) * sin(radians(lat ))) ) AS distance 
+        FROM " . T_JOB . " WHERE `lat` <> 0 AND `lng` <> 0 $query_one
+        HAVING distance < '$distance'";
+    }
+    // if (!empty($filter_data['order_by']) && $filter_data['order_by'] == 'price_low') {
+    //     $query_one .= " ORDER BY `price` ASC";
+    // }
+    // else if (!empty($filter_data['order_by']) && $filter_data['order_by'] == 'price_high') {
+    //     $query_one .= " ORDER BY `price` DESC";
+    // }
+    // else{
+        $query_one .= " ORDER BY `id` DESC";
+    //}
+    
+    if (!empty($filter_data['limit'])) {
+        if (is_numeric($filter_data['limit'])) {
+            $limit = Wo_Secure($filter_data['limit']);
+            $query_one .= " LIMIT {$limit}";
+        }
+    }
+    
+    $sql = mysqli_query($sqlConnect, $query_one);
+    while ($fetched_data = mysqli_fetch_assoc($sql)) {
+        $job           = Wo_GetJobById($fetched_data['id']);
+        //$products['seller'] = Wo_UserData($fetched_data['user_id']);
+        $data[]             = $job;
+    }
+    return $data;
+}
+
+function Wo_GetApplyJob($info = array())
+{
+    global $wo, $sqlConnect,$db;
+    if ($wo['loggedin'] == false || empty($info)) {
+        return false;
+    }
+    $limit = 20;
+    if (!empty($info['limit']) && is_numeric($info['limit']) && $info['limit'] > 0) {
+        $limit = Wo_Secure($info['limit']);
+    }
+    $data = array();
+    if (!empty($info['job_id']) && is_numeric($info['job_id']) && $info['job_id'] > 0) {
+        $job_id = Wo_Secure($info['job_id']);
+        if (!empty($info['offset']) && is_numeric($info['offset']) && $info['offset'] > 0) {
+            $offset = Wo_Secure($info['offset']);
+            $db->where('id',$offset,'<');
+        }
+
+        $jobs = $db->where('job_id',$job_id)->orderBy("id","DESC")->get(T_JOB_APPLY,$limit);
+    }
+    if (!empty($info['user_id']) && is_numeric($info['user_id']) && $info['user_id'] > 0) {
+        $user_id = Wo_Secure($info['user_id']);
+        if (!empty($info['offset']) && is_numeric($info['offset']) && $info['offset'] > 0) {
+            $offset = Wo_Secure($info['offset']);
+            $db->where('id',$offset,'>');
+        }
+        $jobs = $db->where('user_id',$user_id)->orderBy("id","DESC")->get(T_JOB_APPLY,$limit);
+    }
+
+
+    if (!empty($jobs)) {
+        
+        foreach ($jobs as $key => $value) {
+            $data[$key] = (array) $value;
+            $data[$key]['job_info'] = Wo_GetJobById($value->job_id);
+            $data[$key]['user_data'] = Wo_UserData($value->user_id);
+        }
+        
+        // $jobs['page'] = $page;
+        // $apply = $db->where('user_id',$wo['user']['id'])->where('job_id',$job_id)->getValue(T_JOB_APPLY,'COUNT(*)');
+        // $jobs['apply'] = ($apply > 0) ? true : false;
+        // $post = $db->where('job_id',$job_id)->getOne(T_POSTS);
+        // $jobs['url'] = Wo_SeoLink('index.php?link1=post&id=' . $post->id);
+        // $jobs['apply_count'] = $apply;
+    }
+    return $data;
+}
+
+
+function Wo_GetCommonUsers($args = array()) {
+    global $wo, $sqlConnect;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    $options      = array(
+        "before" => false,
+        "after" => false,
+        "limit" => 20,
+        "order_by" => true
+    );
+    $args         = array_merge($options, $args);
+    $before       = Wo_Secure($args['before']);
+    $after       = Wo_Secure($args['after']);
+    $limit        = Wo_Secure($args['limit']);
+    $user         = $wo['user']['id'];
+    $t_users      = T_USERS;
+    $t_followers  = T_FOLLOWERS;
+    $t_block      = T_BLOCKS;
+    $data         = array();
+    $sub_sql      = "";
+
+    if (!empty($wo['user']['relationship_id'])) {
+        $sub_sql .= " `relationship_id`  = '".$wo['user']['relationship_id']."' ";
+    }
+
+    if (!empty($wo['user']['school'])) {
+        if (!empty($sub_sql)) {
+            $sub_sql .= " OR `school`  = '".$wo['user']['school']."' ";
+        }
+        else{
+            $sub_sql .= " `school`  = '".$wo['user']['school']."' ";
+        }
+    }
+
+    if (!empty($wo['user']['working'])) {
+        if (!empty($sub_sql)) {
+            $sub_sql .= " OR `working`  = '".$wo['user']['working']."' ";
+        }
+        else{
+            $sub_sql .= " `working`  = '".$wo['user']['working']."' ";
+        }
+    }
+
+    if (!empty($wo['user']['birthday']) && $wo['user']['birthday'] != '0000-00-00') {
+        if (!empty($sub_sql)) {
+            $sub_sql .= " OR `birthday`  = '".$wo['user']['birthday']."' ";
+        }
+        else{
+            $sub_sql .= " `birthday`  = '".$wo['user']['birthday']."' ";
+        }
+    }
+
+    if (!empty($wo['user']['country_id'])) {
+        if (!empty($sub_sql)) {
+            $sub_sql .= " OR `country_id`  = '".$wo['user']['country_id']."' ";
+        }
+        else{
+            $sub_sql .= " `country_id`  = '".$wo['user']['country_id']."' ";
+        }
+    }
+
+    if (!empty($wo['user']['city'])) {
+        if (!empty($sub_sql)) {
+            $sub_sql .= " OR `city`  = '".$wo['user']['city']."' ";
+        }
+        else{
+            $sub_sql .= " `city`  = '".$wo['user']['city']."' ";
+        }
+    }
+    $sub_sql2 = "";
+
+    if ($before && is_numeric($before) && $before > 0) {
+        $sub_sql2 = " AND `user_id` > '$before' ";
+    }
+
+    if ($after && is_numeric($after) && $after > 0) {
+        $sub_sql2 = " AND `user_id` < '$after' ";
+    }
+
+    $order_by = "";
+    if ($args['order_by'] == true) {
+        $order_by = " ORDER BY `user_id` DESC ";
+    }
+
+    $sql   = " SELECT `user_id` FROM $t_users WHERE `user_id` <> '$user' AND ({$sub_sql})
+    AND `user_id` NOT IN (SELECT `following_id` FROM $t_followers WHERE `follower_id` = {$user} AND `following_id` <> {$user} AND `active` = '1')
+    AND `user_id` NOT IN (SELECT `blocked` FROM $t_block WHERE `blocker` = {$user} AND `blocked` <> {$user})
+    AND `user_id` NOT IN (SELECT `blocker` FROM $t_block WHERE `blocked` = {$user} AND `blocker` <> {$user}) {$sub_sql2}
+    {$order_by} LIMIT $limit ";
+    //print_r($sql);
+    $query = mysqli_query($sqlConnect, $sql);
+    if ($query) {
+        
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data']        = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['user_data']['age'] = Wo_GetUserCountryName($fetched_data['user_data']);
+            $fetched_data['user_geoinfo']     = $fetched_data['user_data']['lat'] . ',' . $fetched_data['user_data']['lng'];
+            $fetched_data['distance']     = 30;
+            $fetched_data['common_things'] = 0;
+
+            if (!empty($wo['user']['relationship_id']) && !empty($fetched_data['user_data']['relationship_id']) && $wo['user']['relationship_id'] == $fetched_data['user_data']['relationship_id']) {
+                $fetched_data['common_things'] = $fetched_data['common_things'] + 1;
+            }
+            
+            if (!empty($wo['user']['school']) && !empty($fetched_data['user_data']['school']) && $wo['user']['school'] == $fetched_data['user_data']['school']) {
+                $fetched_data['common_things'] = $fetched_data['common_things'] + 1;
+            }
+            
+            if (!empty($wo['user']['working']) && !empty($fetched_data['user_data']['working']) && $wo['user']['working'] == $fetched_data['user_data']['working']) {
+                $fetched_data['common_things'] = $fetched_data['common_things'] + 1;
+            }
+            
+            if (!empty($wo['user']['country_id']) && !empty($fetched_data['user_data']['country_id']) && $wo['user']['country_id'] == $fetched_data['user_data']['country_id']) {
+                $fetched_data['common_things'] = $fetched_data['common_things'] + 1;
+            }
+            
+            if (!empty($wo['user']['city']) && !empty($fetched_data['user_data']['city']) && $wo['user']['city'] == $fetched_data['user_data']['city']) {
+                $fetched_data['common_things'] = $fetched_data['common_things'] + 1;
+            }
+            
+            if (!empty($wo['user']['birthday']) && !empty($fetched_data['user_data']['birthday']) && $wo['user']['birthday'] == $fetched_data['user_data']['birthday'] && $wo['user']['birthday'] != '0000-00-00' && $fetched_data['user_data']['birthday'] != '0000-00-00') {
+                $fetched_data['common_things'] = $fetched_data['common_things'] + 1;
+            }
+
+
+            if ($fetched_data['user_data']['share_my_location'] == 1) {
+                $data[] = $fetched_data;
+            }
+            
+        }
+    }
+    return $data;
+}
+
+function GetFundingByUserId($user_id ,$limit = 6,$offset=0)
+{
+    global $wo, $sqlConnect,$db;
+    if (empty($user_id) || !is_numeric($user_id) || $user_id < 1) {
+        return false;
+    }
+    $user_id = Wo_Secure($user_id);
+    $limit = Wo_Secure($limit);
+    $data = array();
+    if (!empty($offset) && $offset > 0) {
+        $db->where('id',$offset,'<');
+    }
+    $funding = $db->where('user_id',$user_id)->orderBy('id','DESC')->get(T_FUNDING,$limit);
+    if (!empty($funding)) {
+        foreach ($funding as $key => $fund) {
+            $new_data = $fund;
+            $new_data->image = Wo_GetMedia($new_data->image);
+            $new_data->raised = $db->where('funding_id',$new_data->id)->getValue(T_FUNDING_RAISE,"SUM(amount)");
+            $new_data->bar = 0;
+            if (empty($new_data->raised)) {
+                $new_data->raised = 0;
+            }
+            elseif (!empty($new_data->raised) && $new_data->raised >= $new_data->amount) {
+                $new_data->bar = 100;
+            }
+            elseif (!empty($new_data->raised) && $new_data->raised < $new_data->amount && $new_data->raised > 0) {
+                $percent = ($new_data->raised * 100)/$new_data->amount;
+                $new_data->bar = $percent;
+            }
+            $new_data->user_data = Wo_UserData($fund->user_id);
+            $new_data = (Array) $new_data;
+            $data[] = $new_data;
+        }
+    }
+    return $data;
+}
+
+function GetFundingById($id,$type = 'id')
+{
+    global $wo, $sqlConnect,$db;
+    if (empty($id)) {
+        return false;
+    }
+    $id = Wo_Secure($id);
+    $data = array();
+    if ($type == 'hash') {
+        $funding = $db->where('hashed_id',$id)->getOne(T_FUNDING);
+    }
+    else{
+        $funding = $db->where('id',$id)->getOne(T_FUNDING);
+    }
+    
+    if (!empty($funding)) {
+
+        $funding->image = Wo_GetMedia($funding->image);
+        $funding->raised = $db->where('funding_id',$funding->id)->getValue(T_FUNDING_RAISE,"SUM(amount)");
+        $funding->all_donation = $db->where('funding_id',$funding->id)->getValue(T_FUNDING_RAISE,"COUNT(*)");
+        $funding->bar = 0;
+        if (empty($funding->raised)) {
+            $funding->raised = 0;
+        }
+        elseif (!empty($funding->raised) && $funding->raised >= $funding->amount) {
+            $funding->bar = 100;
+        }
+        elseif (!empty($funding->raised) && $funding->raised < $funding->amount && $funding->raised > 0) {
+            $percent = ($funding->raised * 100)/$funding->amount;
+            $funding->bar = $percent;
+        }
+        $funding->user_data = Wo_UserData($funding->user_id);
+        $funding = (Array) $funding;
+        return $funding;
+    }
+    return false;
+}
+
+function GetFunding($limit = 6,$offset=0)
+{
+    global $wo, $sqlConnect,$db;
+    $data = array();
+    if (!empty($offset) && $offset > 0) {
+        $db->where('id',$offset,'<');
+    }
+    $funding = $db->orderBy('id','DESC')->get(T_FUNDING,$limit);
+    if (!empty($funding)) {
+        foreach ($funding as $key => $fund) {
+            $new_data = $fund;
+            $new_data->image = Wo_GetMedia($new_data->image);
+            $new_data->raised = $db->where('funding_id',$new_data->id)->getValue(T_FUNDING_RAISE,"SUM(amount)");
+            $new_data->bar = 0;
+            if (empty($new_data->raised)) {
+                $new_data->raised = 0;
+            }
+            elseif (!empty($new_data->raised) && $new_data->raised >= $new_data->amount) {
+                $new_data->bar = 100;
+            }
+            elseif (!empty($new_data->raised) && $new_data->raised < $new_data->amount && $new_data->raised > 0) {
+                $percent = ($new_data->raised * 100)/$new_data->amount;
+                $new_data->bar = $percent;
+            }
+            $new_data->user_data = Wo_UserData($fund->user_id);
+            $new_data = (Array) $new_data;
+            $data[] = $new_data;
+        }
+    }
+    return $data;
+}
+
+function GetRecentRaise($id,$limit = 6,$offset=0)
+{
+    global $wo, $sqlConnect,$db;
+    if (empty($id)) {
+        return false;
+    }
+    $id = Wo_Secure($id);
+    $data = array();
+    if (!empty($offset) && $offset > 0) {
+        $db->where('id',$offset,'<');
+    }
+    $funding = $db->where('funding_id',$id)->orderBy('id','DESC')->get(T_FUNDING_RAISE,$limit);
+    if (!empty($funding)) {
+        foreach ($funding as $key => $fund) {
+            $new_data = $fund;
+            $new_data->user_data = Wo_UserData($fund->user_id);
+            $new_data = (Array) $new_data;
+            $data[] = $new_data;
+        }
+    }
+    return $data;
+}
+
+function GetFundByRaiseId($id,$user_id)
+{
+    global $wo, $sqlConnect,$db;
+    if (empty($id) || empty($user_id)) {
+        return false;
+    }
+    $id = Wo_Secure($id);
+    $user_id = Wo_Secure($user_id);
+    $funding = $db->where('user_id',$user_id)->where('id',$id)->getOne(T_FUNDING_RAISE);
+    $data = array();
+    if (!empty($funding)) {
+        $funding->user_data = Wo_UserData($funding->user_id);
+        $funding->fund = GetFundingById($funding->funding_id);
+        $data = (Array) $funding;
+    }
+    return $data;
 }

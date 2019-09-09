@@ -157,6 +157,14 @@ if (!empty($wo['notification']['type'])) {
         $wo['notification']['type_text'] = str_replace('{group_name}', $group['name'], $wo['lang']['joined_group']);
         $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users active"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
     }
+    if ($wo['notification']['type'] == 'declined_group_chat_request') {
+        $wo['notification']['type_text'] = $wo['lang']['declined_group_chat_request'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users active"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
+    }
+    if ($wo['notification']['type'] == 'accept_group_chat_request') {
+        $wo['notification']['type_text'] = $wo['lang']['accept_group_chat_request'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users active"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>';
+    }
     if ($wo['notification']['type'] == 'accepted_invite') {
         $page_id = @end(explode('/', $wo['notification']['url']));
         $page = Wo_PageData(Wo_PageIdFromPagename($page_id));
@@ -205,6 +213,14 @@ if (!empty($wo['notification']['type'])) {
     if ($wo['notification']['type'] == 'forum_reply') {
         $wo['notification']['type_text'] = $wo['lang']['replied_to_topic'];
         $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-repeat active"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>';
+    }
+    if ($wo['notification']['type'] == 'apply_job') {
+        $wo['notification']['type_text'] = $wo['lang']['apply_your_job'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus active"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>';
+    }
+    if ($wo['notification']['type'] == 'fund_donate') {
+        $wo['notification']['type_text'] = $wo['lang']['donated_to'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus active"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>';
     }
     if ($wo['notification']['type'] == 'accepted_request') {
         if ($wo['config']['connectivitySystem'] == 1) {

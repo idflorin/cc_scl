@@ -223,6 +223,9 @@ if ($f == "update_general_settings") {
                             'pro_time' => $time,
                             'wallet' => $wallet
                         );
+                        if (!empty($_POST['weather_unit']) && in_array($_POST['weather_unit'], array('uk','us'))) {
+                            $Update_data['weather_unit'] = Wo_Secure($_POST['weather_unit']);
+                        }
                         if (!empty($_POST['verified'])) {
                             if ($_POST['verified'] == 'verified') {
                                 $Verification = 1;

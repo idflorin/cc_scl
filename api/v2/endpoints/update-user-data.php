@@ -168,6 +168,21 @@ elseif (!empty($user_data['two_factor']) && $user_data['two_factor'] == 'on') {
 }
 
 if (empty($error_code)) {
+
+    if (isset($_POST['language']) AND !empty($_POST['language'])) {
+        if (in_array($_POST['language'], array_keys($wo['config'])) && $wo['config'][$_POST['language']] == 1) {
+            $lang_name = Wo_Secure(strtolower($_POST['language']));
+            $langs                    = Wo_LangsNamesFromDB();
+            if (in_array($lang_name, $langs)) {
+                Wo_CleanCache();
+                if ($wo['loggedin'] == true) {
+                    $user_data['language'] = $lang_name;
+                }
+            }
+        }
+    }
+
+
 	$update = Wo_UpdateUserData($wo['user']['user_id'], $user_data);
 	$update_last_seen = Wo_LastSeen($wo['user']['user_id']);
 	if ($update) {

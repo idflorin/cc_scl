@@ -97,7 +97,7 @@ if (empty($error_code)) {
                         'user_id' => $user_id
                     );
                 }
-            } else {
+            } elseif ($wo['config']['sms_or_email'] == 'mail') {
                 $user_id             = Wo_UserIdFromUsername($username);
                 $wo['user']        = $_POST;
                 $wo['code']        = $code;
@@ -123,6 +123,27 @@ if (empty($error_code)) {
                     $error_code    = 11;
                     $error_message = 'Error found while sending the verification email, please try again later.';
                 }
+            }
+            elseif ($wo['config']['sms_or_email'] == 'sms' && !empty($_POST['phone_num'])) {
+                $random_activation = Wo_Secure(rand(11111, 99999));
+                $message           = "Your confirmation code is: {$random_activation}";
+
+                if (Wo_SendSMSMessage($_POST['phone_num'], $message) === true) {
+                    $user_id             = Wo_UserIdFromUsername($username);
+                    $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
+                    $response_data = array(
+                        'api_status' => 220,
+                        'message' => 'Registration successful! We have sent you an sms, Please check your phone to verify your account.',
+                        'user_id' => $user_id
+                    );
+                } else {
+                    $error_code    = 11;
+                    $error_message = 'Error found while sending the verification sms, please try again later.';
+                }
+            }
+            elseif ($wo['config']['sms_or_email'] == 'sms' && empty($_POST['phone_num'])) {
+                $error_code    = 12;
+                $error_message = 'phone_num can not be empty.';
             }
         }
     }

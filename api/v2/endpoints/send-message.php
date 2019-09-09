@@ -55,13 +55,13 @@ if (empty($error_code)) {
         if (!empty($_POST['image_url'])) {
         	$fileend = '_url_image';
         	if (!empty($_POST['sticker_id'])) {
-        		$fileend =  '_' . Wo_Secure($_POST['sticker_id']);
+        		$fileend =  '_sticker_' . Wo_Secure($_POST['sticker_id']);
         	}
             $mediaFilename = Wo_ImportImageFromUrl($_POST['image_url'], $fileend);
         }
         $gif = '';
         if (!empty($_POST['gif'])) {
-            if (strpos($_POST['gif'], '.mp4') !== false) {
+            if (strpos($_POST['gif'], '.gif') !== false) {
                 $gif = Wo_Secure($_POST['gif']);
             }
         }

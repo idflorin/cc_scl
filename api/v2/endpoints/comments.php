@@ -78,7 +78,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     }
                 }
                 if (!empty($text_comment)) {
-                    $comment['text'] = $text_comment;
+                    //$comment['text'] = $text_comment;
                 }
 
                 $response_data = array(
