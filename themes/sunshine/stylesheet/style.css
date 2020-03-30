@@ -437,7 +437,7 @@ from {left: -200px; width: 30%;}50% {width: 30%;}70% {width: 70%;}80% { left: 50
 .profile-cover-changer{position:absolute;display:none;z-index:10;width:45px}
 .profile-cover-changer .btn-file{width:40px;font-size:18px;float:left;background-color:rgba(0,0,0,.4);margin:3px 4px 0;border-radius:3px!important;padding:6px;transition:all .2s ease}
 .profile-cover-changer .btn-file:hover{background-color:rgba(0,0,0,.55);box-shadow:0 1px 2px rgba(0,0,0,.31)}
-.user-avatar-uploading-container{background-color:rgba(0,0,0,.5);height:100%;width:100%;position:absolute;display:none;border-radius:50%}
+.user-avatar-uploading-container{background-color:rgba(0,0,0,.5);height:100%;width:100%;position:absolute;display:none;border-radius:50%;top: 0;bottom: 0;right: 0;left: 0;}
 .user-avatar-uploading-progress{color:#fff;font-size:30px;text-align:center;width:100%;position:absolute;display:none}
 .user-avatar-uploading-progress .ball-pulse{display:block;margin:60px auto;float:none;line-height:0}
 .user-avatar-uploading-progress .ball-pulse>div{background-color:#dcdcdc}
@@ -2836,6 +2836,8 @@ to{opacity:1;margin-top:0}
 .post .post-footer .comments-list .comment .comment-body .reactions-box {left: -50px;}
 .post .post-footer .comments-list .reply .comment-body .reactions-box {	left: -100px;}
 .reaction {overflow: hidden;}
+.wo_page_profile .options-buttons {flex-wrap: wrap;}
+.wo_page_profile .options-buttons .btn {margin-bottom: 8px;}
 }
 
 @media (max-width:420px) {

@@ -10,9 +10,9 @@ use PayPal\Validation\ArgumentValidator;
 
 /**
  * Class Agreement
- * 
+ *
  * A resource representing an agreement.
- * 
+ *
  * @package PayPal\Api
  *
  * @property string id

@@ -1,77 +1,70 @@
 <div class="page-margin">
 	<div class="row">
 		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
-		<div class="col-md-7 singlecol wo-create-forms">
-			<h3 class="wo_create_form_cover blog">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
-				<?php echo $wo['lang']['edit'];?>
-				<span class="<?php echo Wo_RightToLeft('pull-right');?>">
-					<a data-ajax="?link1=my-blogs" href="<?php echo Wo_SeoLink('index.php?link1=my-blogs');?>">
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg><?php echo $wo['lang']['my_articles'];?>
-					</a>
-				</span>
-				<div class="clear"></div>
-			</h3>
+		<div class="col-md-7 singlecol">
+			<div class="page-margin wow_content mt-0">
+				<div class="wo_page_hdng pag_neg_padd pag_alone">
+					<div class="wo_page_hdng_innr">
+						<span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M20,11H4V8H20M20,15H13V13H20M20,19H13V17H20M11,19H4V13H11M20.33,4.67L18.67,3L17,4.67L15.33,3L13.67,4.67L12,3L10.33,4.67L8.67,3L7,4.67L5.33,3L3.67,4.67L2,3V19A2,2 0 0,0 4,21H20A2,2 0 0,0 22,19V3L20.33,4.67Z"></path></svg></span> <?php echo $wo['lang']['edit'];?>
+					</div>
+				</div>
+			</div>
 
-			<div class="wo_settings_page">
+			<div class="page-margin wow_content wow_sett_content">
 				<form class="form form-horizontal create-article-form" method="post" id="update-blog" action="#">
-					<div class="setting-panel row">
-						<div class="form-group col-lg-12">
-							<label class="col-md-12" for="new-blog-title"><?php echo $wo['lang']['title'] ?></label>
-							<div class="col-md-12">
-								<input id="blog_title" name="blog_title" value="<?php echo $wo['article']['title']?>" id="new-blog-title" type="text" class="form-control input-md" placeholder="<?php echo $wo['lang']['title'] ?>"> 
+					<div class="wow_form_fields">
+						<label for="blog_title"><?php echo $wo['lang']['title']; ?></label>
+						<input id="blog_title" name="blog_title" type="text" value="<?php echo $wo['article']['title']?>">
+					</div>
+					<div class="wow_form_fields">
+						<label for="new-blog-desc"><?php echo $wo['lang']['description']; ?></label>
+						<textarea name="blog_description" id="new-blog-desc" rows="3"><?php echo $wo['article']['description']?></textarea>
+					</div>
+					<div class="wow_form_fields">
+						<label for="blog"><?php echo $wo['lang']['content']; ?></label>
+						<textarea name="blog_content" id="blog"><?php echo $wo['article']['content']?></textarea> 
+					</div>
+					<div class="wow_form_fields">
+						<label><?php echo $wo['lang']['thumbnail'];?></label>
+						<div class="wow_fcov_image" data-block="thumdrop-zone">
+							<div id="wow_fcov_img_holder">
+								<img src="<?php echo $wo['article']['thumbnail']; ?>" alt="">
 							</div>
-						</div>
-						<div class="form-group col-lg-12">
-							<label class="col-md-12" for="new-blog-desc"><?php echo $wo['lang']['description'] ?></label>
-							<div class="col-md-12">
-								<input name="blog_description" id="new-blog-desc" value="<?php echo $wo['article']['description']?>" type="text" class="form-control input-md" placeholder="<?php echo $wo['lang']['description'] ?>">
-							</div>
-						</div>
-						<div class="form-group th-alert">
-							<div class="col-md-12">
-								<div class="main prv-img pointer" id="select-img" data-block="thumdrop-zone">
-									<img src="<?php echo $wo['article']['thumbnail']; ?>" alt="">
+							<div class="upload_ad_image" onclick="document.getElementById('thumbnail').click(); return false">
+								<div class="upload_ad_image_content">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"></path></svg> <?php echo $wo['lang']['drop_img_here'] ?> <?php echo $wo['lang']['or']; ?> <?php echo $wo['lang']['browse_to_upload']; ?>
 								</div>
 							</div>
 						</div>
-						<div class="form-group">  
-							<div class="col-md-12">
-								<textarea name="blog_content" id="blog"><?php echo $wo['article']['content']?></textarea> 
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-md-12" for="blog_category"><?php echo $wo['lang']['category'] ?></label>
-							<div class="col-md-12">
-								<select name="blog_category" id="blog_category" class="form-control">
-									<option value="0">
-										<?php echo $wo['lang']['category'];?>
-									</option>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="wow_form_fields">
+								<label for="blog_category"><?php echo $wo['lang']['category'] ?></label>
+								<select name="blog_category" id="blog_category">
+									<option value="0"><?php echo $wo['lang']['category'];?></option>
 									<?php foreach ($wo['blog_categories'] as $category_id => $category_name):?>
 										<option value="<?php echo $category_id?>" <?php if($category_id == $wo['article']['category']) echo "selected='selected'" ;?> ><?php echo $category_name;?></option>
 									<?php endforeach;?>
 								</select>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="col-md-12" for="blog_tags"><?php echo $wo['lang']['tags'] ?></label>
-							<div class="col-md-12">
-								<input data-role="tagsinput" value="<?php echo $wo['article']['tags']?>" id="blog_tags" name="blog_tags" type="text" class="form-control input-md" placeholder="<?php echo $wo['lang']['tags'] ?>"> 
+						<div class="col-md-6">
+							<div class="wow_form_fields">
+								<label for="blog_tags"><?php echo $wo['lang']['tags']; ?></label>
+								<input data-role="tagsinput" value="<?php echo $wo['article']['tags']?>" id="blog_tags" name="blog_tags" type="text" placeholder="<?php echo $wo['lang']['tags'] ?>">
 							</div>
 						</div>
-						<input type="file" class="hidden" id="thumbnail" name="thumbnail" accept="image/*">
-						<input name="image" type="file" id="upload" class="hidden" onchange="">
 					</div>
-					
 					<div class="create-article-alerts" id="blog-alert"></div>
-				
-					<div class="form-group last-sett-btn modal-footer">
-						<div class="ball-pulse"><div></div><div></div><div></div></div>
-						<button type="submit" class="btn btn-main setting-panel-mdbtn">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-							<?php echo $wo['lang']['save']; ?>
-						</button>
+					<div class="text-center">
+						<a class="btn btn-mat" data-ajax="?link1=my-blogs" href="<?php echo Wo_SeoLink('index.php?link1=my-blogs');?>">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"></path></svg> <?php echo $wo['lang']['go_back'];?>
+						</a>
+						<button class="btn btn-main btn-mat btn-mat-raised add_wow_loader" type="submit"><?php echo $wo['lang']['save']; ?></button>
 					</div>
+					<input type="file" class="hidden" id="thumbnail" name="thumbnail" accept="image/*">
+						<input name="image" type="file" id="upload" class="hidden" onchange="">
 					<input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
 				</form>
 			</div>
@@ -105,16 +98,12 @@
           thumb_drop_block.removeClass('hover');
           var file = event.dataTransfer.files;
           $("#thumbnail").prop('files', file);
+		  $("#wow_fcov_img_holder").html("<img src='" + window.URL.createObjectURL(event.dataTransfer.files[0]) + "' alt='Picture'>")
       };
     }
 
-    $("#select-img").click(function(event) {
- 
-      $("#thumbnail").click()
-    });
-
     $("#thumbnail").change(function(event) {
-      $(".prv-img").html("<img src='" + window.URL.createObjectURL(this.files[0]) + "' alt='Picture'>")
+	  $("#wow_fcov_img_holder").html("<img src='" + window.URL.createObjectURL(this.files[0]) + "' alt='Picture'>")
     });
 
     $("#blog_tags").tagsinput({
@@ -125,17 +114,16 @@
     $('#update-blog').ajaxForm({
       url: Wo_Ajax_Requests_File() + '?f=update-blog&blog_id=<?php echo $wo['article']['id'];?>',
       beforeSend: function() {
-        $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+        $('#update-blog').find('.add_wow_loader').addClass('btn-loading');
       },
       success: function(data) {
-        scrollToTop();
         if (data['status'] == 200) {
           $("#blog-alert").html('<div class="alert alert-success">'+ data['message'] +'</div>');
           window.location = data.url;
         } else if (data['message']) {
           $("#blog-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
         } 
-        $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+        $('#update-blog').find('.add_wow_loader').removeClass('btn-loading');
       }
     });
 

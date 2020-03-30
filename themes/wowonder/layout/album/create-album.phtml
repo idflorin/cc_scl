@@ -1,83 +1,63 @@
 <div class="page-margin">
 	<div class="row">
 		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
-		<div class="col-md-7 middlecol wo-create-forms">
-			<h3 class="wo_create_form_cover album">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-image"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-				<?php echo $wo['album']['title'];?>
-				<span class="<?php echo Wo_RightToLeft('pull-right');?>">
-					<a data-ajax="?link1=albums" href="<?php echo Wo_SeoLink('index.php?link1=albums');?>">
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg><?php echo $wo['lang']['my_albums'];?>
-					</a>
-				</span>
-				<div class="clear"></div>
-			</h3>
-            <div class="wo_settings_page">
+		<div class="col-md-7 middlecol">
+			<div class="page-margin wow_content mt-0">
+				<div class="wo_page_hdng pag_neg_padd pag_alone">
+					<div class="wo_page_hdng_innr">
+						<span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M5,3A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H14.09C14.03,20.67 14,20.34 14,20C14,19.32 14.12,18.64 14.35,18H5L8.5,13.5L11,16.5L14.5,12L16.73,14.97C17.7,14.34 18.84,14 20,14C20.34,14 20.67,14.03 21,14.09V5C21,3.89 20.1,3 19,3H5M19,16V19H16V21H19V24H21V21H24V19H21V16H19Z"></path></svg></span> <?php echo $wo['album']['title'];?>
+					</div>
+				</div>
+			</div>
+
+            <div class="page-margin wow_content wow_sett_content">
 				<form class="create-album-form form-horizontal" method="post">
-					<div class="setting-panel row">
-						<!-- Text input-->
-						<div class="form-group col-lg-12">
-							<label class="col-md-12" for="album_name"><?php echo $wo['lang']['album_name'];?> *</label>  
-							<div class="col-md-12">
-								<input id="album_name" name="album_name" type="text" class="form-control input-md" value="<?php echo $wo['album']['album_name'];?>">
+					<div class="wow_form_fields">
+						<label for="album_name"><?php echo $wo['lang']['album_name']; ?></label>
+						<input id="album_name" name="album_name" type="text" value="<?php echo $wo['album']['album_name'];?>">
+						<span class="help-block"><?php echo $wo['lang']['album_name_help'] ?></span>
+					</div>
+					<div class="wow_form_fields">
+						<label><?php echo $wo['lang']['photos'];?></label>
+						<div class="wow_fcov_image">
+							<div id="productimage-holder">
+								<img src="<?php echo $wo['config']['theme_url'];?>/img/ad_pattern.png">
 							</div>
-						</div>
-						<div class="form-group col-lg-12">
-							<label class="col-md-12" for="album_name"><?php echo $wo['lang']['photos'];?> *</label>  
-							<div class="col-md-12">
-								<div class="upload-product-image <?php echo Wo_RightToLeft('pull-left');?>" onclick="document.getElementById('publisher-photos').click(); return false">
-									<div class="upload-image-content">
-										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-									</div>
+							<div class="upload_ad_image" onclick="document.getElementById('publisher-photos').click(); return false">
+								<div class="upload_ad_image_content">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"></path></svg> <?php echo $wo['lang']['choose_image'] ?>
 								</div>
-								<div style="overflow-x: auto;width: calc(100% - 112px);">
-									<div id="productimage-holder"></div>
-								</div>
-								<div class="input-group hidden">
-									<span class="btn btn-default btn-file">
-										<i class="fa fa-camera" ></i><input type="file" id="publisher-photos" accept="image/x-png, image/gif, image/jpeg" name="postPhotos[]" multiple="multiple">
-									</span>
-								</div>
-							</div>
-						</div>
-						<div class="form-group col-lg-12 hidden" id="photo-form">
-							<label class="col-md-3"></label>  
-							<div class="col-md-6">
-								<input type="text" class="form-control input-md" readonly>
-							</div>
-						</div>
-						<div class="publisher-hidden-option">
-							<div id="progress">
-								<span id="percent">0%</span>
-								<div class="progress">
-									<div id="bar" class="progress-bar progress-bar-striped active"></div> 
-								</div>
-								<div class="clear"></div>
 							</div>
 						</div>
 					</div>
-					
+					<div class="publisher-hidden-option">
+						<div id="progress">
+							<span id="percent">0%</span>
+							<div class="progress">
+								<div id="bar" class="progress-bar progress-bar-striped active"></div> 
+							</div>
+							<div class="clear"></div>
+						</div>
+					</div>
+					<div class="hidden">
+						<input type="file" id="publisher-photos" accept="image/x-png, image/gif, image/jpeg" name="postPhotos[]" multiple="multiple">
+					</div>
 					<div class="app-general-alert setting-update-alert"></div>
-					
 					<input type="hidden" name="id" class="form-control input-md" value="<?php echo $wo['album']['id'];?>">
 					<input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-					
-					<div class="form-group last-sett-btn modal-footer">
-						<div class="ball-pulse"><div></div><div></div><div></div></div>
-						<button type="submit" class="btn btn-main setting-panel-mdbtn">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-							<?php echo $wo['lang']['upload'];?>
-						</button>
+					<div class="text-center">
+						<a class="btn btn-mat" data-ajax="?link1=albums" href="<?php echo Wo_SeoLink('index.php?link1=albums');?>">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"></path></svg> <?php echo $wo['lang']['go_back'];?>
+						</a>
+						<button class="btn btn-main btn-mat btn-mat-raised add_wow_loader" type="submit"><?php echo $wo['lang']['publish']; ?></button>
 					</div>
 				</form>
 			</div>
 		</div>
-		<!-- .col-md-8 -->
 		<?php echo Wo_LoadPage('sidebar/content');?>
 	</div>
-	<!-- .row -->
 </div>
-<!-- .page-margin -->
+
 <script type="text/javascript">
 $(document).ready(function() {
 	$("#publisher-photos").on('change', function() {
@@ -110,13 +90,6 @@ $(document).ready(function() {
 });
 
    $(function() {
-
-   	$("#publisher-photos").change(function () {
-        var numFiles = this.files.length;
-        $("#photo-form input").val(numFiles + ' photo(s) selected');
-        $("#photo-form").slideDown(200);
-    });
-
     var bar = $('#bar');
     var percent = $('#percent');
     var status = $('#status');
@@ -128,7 +101,7 @@ $(document).ready(function() {
          var percentVal = '0%';
          bar.width(percentVal);
          percent.html(percentVal);
-         $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+         $('form.create-album-form').find('.add_wow_loader').addClass('btn-loading');
    
        },
        uploadProgress: function (event, position, total, percentComplete) {
@@ -148,7 +121,7 @@ $(document).ready(function() {
              $('.app-general-alert').html('<div class="alert alert-danger">' + errors + '</div>');
              $('.alert-danger').fadeIn(300);
          }
-         $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+         $('form.create-album-form').find('.add_wow_loader').removeClass('btn-loading');
          $('#progress').slideUp(200);
        }
      });

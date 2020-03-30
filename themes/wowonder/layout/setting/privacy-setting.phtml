@@ -1,15 +1,22 @@
-<div class="wo_settings_page">
-	<h3><?php echo $wo['lang']['privacy_setting']; ?></h3>
+<div class="wo_settings_page wow_content">
+	<div class="avatar-holder">
+		<img src="<?php echo $wo['setting']['avatar']?>" alt="<?php echo $wo['setting']['name']?> Profile Picture" class="avatar">
+		<div class="infoz">
+			<h5 title="<?php echo $wo['setting']['name']?>"><a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['setting']['username'] . '');?>" data-ajax="?link1=timeline&u=<?php echo $wo['setting']['username'] ?>"><?php echo $wo['setting']['name']?></a></h5>
+			<p><?php echo $wo['lang']['privacy_setting']; ?></p>
+		</div>
+	</div>
+	<hr>
 
 	<form class="form-horizontal setting-privacy-form" method="post">
          <div class="setting-privacy-alert setting-update-alert"></div>
 		 
-		 <div class="setting-panel row">
+		 <div class="setting-panel wow_sett_privt_labls">
 			<!-- Select Basic -->
 			<?php if ($wo['config']['connectivitySystem'] == 0) { ?>
-			<div class="form-group">
-				<label class="col-md-5" for="follow_privacy"> <?php echo $wo['lang']['follow_privacy_label']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="follow_privacy"> <?php echo $wo['lang']['follow_privacy_label']; ?></label>
+				<div class="col-md-6">
 					<select id="follow_privacy" name="follow_privacy" class="form-control">
 						<?php 
 							$selected_followp_everyone   = ($wo['setting']['follow_privacy'] == 0)   ? ' selected' : '';
@@ -24,9 +31,9 @@
 			</div>
 			<?php } ?>
 			<!-- Select Basic -->
-			<div class="form-group">
-				<label class="col-md-5" for="message_privacy"><?php echo $wo['lang']['message_privacy_label']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="message_privacy"><?php echo $wo['lang']['message_privacy_label']; ?></label>
+				<div class="col-md-6">
 					<select id="message_privacy" name="message_privacy" class="form-control">
 						<?php 
 							$selected_meesageP_everyone   = ($wo['setting']['message_privacy'] == 0)   ? ' selected' : '';
@@ -47,9 +54,9 @@
 					</select>
 				</div>
 			</div>
-			<div class="form-group">
-				<label class="col-md-5" for="friend_privacy"><?php  echo $wo['lang']['friend_privacy']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="friend_privacy"><?php  echo $wo['lang']['friend_privacy']; ?></label>
+				<div class="col-md-6">
 					<select id="friend_privacy" name="friend_privacy" class="form-control">
 						<?php 
 							$selected_friendP_everyone    = ($wo['setting']['friend_privacy'] == 0)   ? ' selected' : '';
@@ -73,9 +80,9 @@
 				</div>
 			</div>
 			<!-- Select Basic -->
-			<div class="form-group">
-				<label class="col-md-5" for="post_privacy"><?php echo $wo['lang']['timeline_post_privacy_label']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="post_privacy"><?php echo $wo['lang']['timeline_post_privacy_label']; ?></label>
+				<div class="col-md-6">
 					<select id="post_privacy" name="post_privacy" class="form-control">
 						<?php 
 							$selected_postp_everyone   = ($wo['setting']['post_privacy'] == "everyone")   ? ' selected' : '';
@@ -96,9 +103,9 @@
 					</select>
 				</div>
 			</div>
-			<div class="form-group">
-				<label class="col-md-5" for="birth_privacy"><?php echo $wo['lang']['timeline_birthday_label']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="birth_privacy"><?php echo $wo['lang']['timeline_birthday_label']; ?></label>
+				<div class="col-md-6">
 					<select id="birth_privacy" name="birth_privacy" class="form-control">
 						<?php 
 							$selected_birth_privacy_everyone   = ($wo['setting']['birth_privacy'] == 0)   ? ' selected' : '';
@@ -120,9 +127,9 @@
 				</div>
 			</div>
 			<?php if($wo['config']['connectivitySystem'] == 0) { ?>
-			<div class="form-group">
-				<label class="col-md-5" for="confirm_followers"> <?php echo $wo['lang']['confirm_request_privacy_label']; ?> </label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="confirm_followers"> <?php echo $wo['lang']['confirm_request_privacy_label']; ?> </label>
+				<div class="col-md-6">
 					<select id="confirm_followers" name="confirm_followers" class="form-control">
 						<?php 
 							$selected_confirm_followers_no   = ($wo['setting']['confirm_followers'] == 0)   ? ' selected' : '';
@@ -150,9 +157,9 @@
 			?>
 			<?php if ($profileVisits == 1) { ?>
 			<?php if($wo['config']['profileVisit'] == 1) { ?>
-			<div class="form-group">
-				<label class="col-md-5" for="visit_privacy"> <?php echo $wo['lang']['profile_visit_notification_p']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="visit_privacy"> <?php echo $wo['lang']['profile_visit_notification_p']; ?></label>
+				<div class="col-md-6">
 					<select id="visit_privacy" name="visit_privacy" class="form-control">
 						<?php 
 							$selected_visit_privacy_yes   = ($wo['setting']['visit_privacy'] == 0)   ? ' selected' : '';
@@ -170,9 +177,9 @@
 			</div>
 			<?php } ?>
 			<?php if($wo['config']['user_lastseen'] == 1 && in_array($wo['setting']['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$wo['setting']['pro_type']]]['last_seen'] == 1) { ?>
-			<div class="form-group">
-				<label class="col-md-5" for="showlastseen"> <?php echo $wo['lang']['lastseen_privacy_label']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="showlastseen"> <?php echo $wo['lang']['lastseen_privacy_label']; ?></label>
+				<div class="col-md-6">
 					<select id="showlastseen" name="showlastseen" class="form-control">
 						<?php 
 							$selected_lastseen_yes   = ($wo['setting']['showlastseen'] == 1)   ? ' selected' : '';
@@ -190,9 +197,9 @@
 			</div>
 			<?php } ?>
 			<?php } ?>
-			<div class="form-group">
-				<label class="col-md-5" for="show_activities_privacy"> <?php echo $wo['lang']['activities_privacy_label']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="show_activities_privacy"> <?php echo $wo['lang']['activities_privacy_label']; ?></label>
+				<div class="col-md-6">
 					<select id="show_activities_privacy" name="show_activities_privacy" class="form-control">
 						<?php 
 							$selected_activities_yes   = ($wo['setting']['show_activities_privacy'] == 1)   ? ' selected' : '';
@@ -207,9 +214,9 @@
 					</select>
 				</div>
 			</div>
-			<div class="form-group">
-				<label class="col-md-5" for="chat_status"> <?php echo $wo['lang']['status']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="chat_status"> <?php echo $wo['lang']['status']; ?></label>
+				<div class="col-md-6">
 					<select id="chat_status" name="status" class="form-control">
 						<?php 
 							$selected_chat_status_yes   = ($wo['setting']['status'] == 1)   ? ' selected' : '';
@@ -224,9 +231,9 @@
 					</select>
 				</div>
 			</div>
-			<div class="form-group">
-				<label class="col-md-5" for="share_my_location"> <?php echo $wo['lang']['share_my_location']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="share_my_location"> <?php echo $wo['lang']['share_my_location']; ?></label>
+				<div class="col-md-6">
 					<select id="share_my_location" name="share_my_location" class="form-control">
 						<?php 
 							$selected_share_my_location_yes   = ($wo['setting']['share_my_location'] == 1)   ? ' selected' : '';
@@ -241,9 +248,9 @@
 					</select>
 				</div>
 			</div>
-			<div class="form-group">
-				<label class="col-md-5" for="share_my_data"> <?php echo $wo['lang']['index_my_page_privacy']; ?></label>
-				<div class="col-md-5">
+			<div class="form-group wow_form_fields">
+				<label class="col-md-6" for="share_my_data"> <?php echo $wo['lang']['index_my_page_privacy']; ?></label>
+				<div class="col-md-6">
 					<select id="share_my_data" name="share_my_data" class="form-control">
 						<?php 
 							$selected_share_my_data_yes   = ($wo['setting']['share_my_data'] == 1)   ? ' selected' : '';
@@ -260,14 +267,10 @@
 			</div>
 		 </div>
 
+		<div class="text-center">
+			<button type="submit" class="btn btn-main btn-mat btn-mat-raised add_wow_loader"><?php echo $wo['lang']['save']; ?></button>
+		</div>
 
-
-         <div class="form-group last-sett-btn modal-footer">
-			<div class="ball-pulse"><div></div><div></div><div></div></div>
-			<button type="submit" class="btn btn-main setting-panel-mdbtn">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> <?php echo $wo['lang']['save']; ?>
-			</button>
-         </div>
          <input type="hidden" name="user_id" value="<?php echo $wo['setting']['user_id'];?>">
          <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
    </form>
@@ -277,7 +280,7 @@ $(function() {
   $('form.setting-privacy-form').ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=update_privacy_settings',
     beforeSend: function() {
-      $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+      $('.wo_settings_page').find('.add_wow_loader').addClass('btn-loading');
     },
     success: function(data) {
       scrollToTop();
@@ -289,7 +292,7 @@ $(function() {
           });
         });
       } 
-      $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+      $('.wo_settings_page').find('.add_wow_loader').removeClass('btn-loading');
     }
   });
 });

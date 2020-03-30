@@ -11,8 +11,8 @@
    ?>
 <div>
    <div class="clear"></div>
-   <div class="bs-callout bs-callout-default">
-      <div class="post-heading" style="padding: 5px 5px;height: 50px">
+   <div class="bs-callout bs-callout-default wow_shared_posts">
+      <div class="post-heading">
          <div class="<?php echo Wo_RightToLeft('pull-left');?> image">
             <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']?>">
             <img src="<?php echo $wo['story']['publisher']['avatar']; ?>" id="updateImage-<?php echo $wo['story']['publisher']['user_id']?>" class="avatar" alt="<?php echo $wo['story']['publisher']['name']; ?> profile picture" style="width: 40px;height: 40px;">
@@ -176,16 +176,16 @@
       </div>
       <div>
         <?php if (empty($wo['story']['color_id']) || (!empty($wo['story']['color_id']) && empty($wo['post_colors'][$wo['story']['color_id']]))) { ?>
-         <p style="margin-top: 15px;"><?php echo $wo['story']['postText']; ?></p>
+         <p class="wow_shared_posts_p"><?php echo $wo['story']['postText']; ?></p>
          <?php } ?>
          <?php if (!empty($wo['story']['color_id']) && !empty($wo['post_colors'][$wo['story']['color_id']])) { ?>
 		<div dir="auto" 
 		<?php if($wo['config']['colored_posts_system'] == 1){ ?>
 			class="wo_actual_colrd_post" style="
 			<?php if (!empty($wo['post_colors'][$wo['story']['color_id']]) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_1) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_2) && !empty($wo['post_colors'][$wo['story']['color_id']]->text_color)) { ?>
-				background-image: linear-gradient(45deg, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_1; ?> 0%, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_2; ?> 100%);margin: 10px -10px -5px;
+				background-image: linear-gradient(45deg, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_1; ?> 0%, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_2; ?> 100%);margin: 10px 0 0;
 			<?php }else{ ?>
-				background-image:url('<?php echo Wo_GetMedia($wo['post_colors'][$wo['story']['color_id']]->image); ?>');margin: 10px -10px -5px; <?php } ?>
+				background-image:url('<?php echo Wo_GetMedia($wo['post_colors'][$wo['story']['color_id']]->image); ?>');margin: 10px 0 0; <?php } ?>
 			<?php if(strlen($wo['story']['postText']) > 330){ ?>font-size: 16px;font-weight: normal;<?php } ?>"
 		<?php } ?>
 	>
@@ -301,37 +301,35 @@
              }
            }
            echo '<br><br>';
-           $symbol =  (!empty($wo['currencies'][$wo['story']['product']['currency']]['symbol'])) ? $wo['currencies'][$wo['story']['product']['currency']]['symbol'] : $wo['config']['classified_currency_s'];
-           $text =  (!empty($wo['currencies'][$wo['story']['product']['currency']]['text'])) ? $wo['currencies'][$wo['story']['product']['currency']]['text'] : $wo['config']['classified_currency'];
-           $status = ($wo['story']['product']['status'] == 0) ? '<span class="product-description">' . $wo['lang']['in_stock'] . '</span>' : '<span class="product-status-sold">' . $wo['lang']['sold'] . '</span><br><br>';
-           $type = ($wo['story']['product']['type'] == 0) ? '<span class="product-description">' . $wo['lang']['new'] . '</span>' : '<span class="product-description">' . $wo['lang']['used'] . '</span><br>';
-           echo '<div class="product-name"><h4 class="product-description">' . $wo['story']['product']['name'] . '</h4></div>';
-           if (!empty($wo['story']['product']['location'])) {
-             echo '<div class="product-name"><span class="product_row_title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span> <span class="product-description"> ' . $wo['story']['product']['location'] . '</span></div><br>';
-           }
-           echo '<div class="product-name"><p class="product-description product-description-'.$wo['story']['product']['id'].'">' . $wo['story']['product']['description'] . '</p></div><br>';
-           echo '<div class="wo_product_row"><div class="product-name"><span class="product_row_title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag" color="#2196F3"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>' . $wo['lang']['type'] . '</span> ' . $type . '</div>';
-           echo '<div class="product-name"><span class="product_row_title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card" color="#349238"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>' . $wo['lang']['price'] . '</span> <span class="product-description" style="max-height: none;">' . $symbol . $wo['story']['product']['price'] . ' (' . $text . ')</span></div>';
-           echo '<div class="product-name"><span class="product_row_title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package" color="#9C27B0"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.1-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"></path><polyline points="2.32 6.16 12 11 21.68 6.16"></polyline><line x1="12" y1="22.76" x2="12" y2="11"></line><line x1="7" y1="3.5" x2="17" y2="8.5"></line></svg>' . $wo['lang']['status'] . '</span> ' . $status . '</div></div>';
+		$symbol =  (!empty($wo['currencies'][$wo['story']['product']['currency']]['symbol'])) ? $wo['currencies'][$wo['story']['product']['currency']]['symbol'] : $wo['config']['classified_currency_s'];
+		$text =  (!empty($wo['currencies'][$wo['story']['product']['currency']]['text'])) ? $wo['currencies'][$wo['story']['product']['currency']]['text'] : $wo['config']['classified_currency'];
+		$status = ($wo['story']['product']['status'] == 0) ? '' . $wo['lang']['in_stock'] . '' : '<span class="product-status-sold">' . $wo['lang']['sold'] . '</span><br><br>';
+		$type = ($wo['story']['product']['type'] == 0) ? '<span class="product-description">' . $wo['lang']['new'] . '</span>' : '<span class="product-description">' . $wo['lang']['used'] . '</span><br>';
+		echo '<div class="wow_post_prod">';
+		echo '<h4 class="wow_post_prod_name">' . $wo['story']['product']['name'] . '</h4>';
+		echo '<div class="wow_post_prod_shead">';
+		if (!empty($wo['story']['product']['location'])) {
+			echo '<span> ' . $wo['story']['product']['location'] . '</span><span class="middot">·</span>';
+		}
+		echo '<span> ' . $status . '</span>';
+		echo '</div>';
+		echo '<div class="wow_post_prod_infos"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>' . $wo['lang']['price'] . ' <span class="product-description" style="max-height: none;">' . $symbol . $wo['story']['product']['price'] . ' (' . $text . ')</span></div>';
+		echo '<div class="wow_post_prod_infos"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16,17H5V7H16L19.55,12M17.63,5.84C17.27,5.33 16.67,5 16,5H5A2,2 0 0,0 3,7V17A2,2 0 0,0 5,19H16C16.67,19 17.27,18.66 17.63,18.15L22,12L17.63,5.84Z" /></svg>' . $wo['lang']['type'] . ' ' . $type . '</div>';
+		echo '<div class="wow_post_prod_infos"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z" /></svg><p class="product-description product-description-'.$wo['story']['product']['id'].'">' . $wo['story']['product']['description'] . '</p></div>';
+		echo '</div>';
          } 
          ?>
-      <p dir="auto">
-         <?php if (!empty($wo['story']['postFeeling']) && $extra_exists == 1) { ?>
-         <span class="feeling-text"> — <i class="twa-lg twa twa-<?php echo $wo['story']['postFeelingIcon'];?>"></i> <?php echo $wo['lang']['feeling'];?> <?php echo $wo['lang'][$wo['story']['postFeeling']];?></span>
-         <?php } ?>
-         <?php if (!empty($wo['story']['postTraveling']) && $extra_exists == 1) { ?>
+      <p class="wow_shared_posts_p" dir="auto"><?php if (!empty($wo['story']['postFeeling']) && $extra_exists == 1) { ?>
+         <span class="feeling-text"> — <i class="twa-lg twa twa-<?php echo $wo['story']['postFeelingIcon'];?>"></i> <?php echo $wo['lang']['feeling'];?> <?php echo $wo['lang'][$wo['story']['postFeeling']];?></span><?php } ?><?php if (!empty($wo['story']['postTraveling']) && $extra_exists == 1) { ?>
          <span class="feeling-text"> — <i class="fa fa-plane"></i> <?php echo $wo['lang']['traveling'];?><?php echo $wo['story']['postTraveling'];?></span>
-         <?php } ?>
-         <?php if (!empty($wo['story']['postWatching']) && $extra_exists == 1) { ?>
+         <?php } ?><?php if (!empty($wo['story']['postWatching']) && $extra_exists == 1) { ?>
          <span class="feeling-text"> — <i class="fa fa-eye"></i> <?php echo $wo['lang']['watching'];?> <?php echo $wo['story']['postWatching'];?></span>
-         <?php } ?>
-         <?php if (!empty($wo['story']['postPlaying']) && $extra_exists == 1) { ?>
+         <?php } ?><?php if (!empty($wo['story']['postPlaying']) && $extra_exists == 1) { ?>
          <span class="feeling-text"> — <i class="fa fa-gamepad"></i> <?php echo $wo['lang']['playing'];?> <?php echo $wo['story']['postPlaying'];?></span>
-         <?php } ?>
-         <?php if (!empty($wo['story']['postListening']) && $extra_exists == 1) { ?>
+         <?php } ?><?php if (!empty($wo['story']['postListening']) && $extra_exists == 1) { ?>
          <span class="feeling-text"> — <i class="fa fa-headphones"></i> <?php echo $wo['lang']['listening'];?> <?php echo $wo['story']['postListening'];?></span>
-         <?php } ?>
-      </p>
+         <?php } ?></p>
+		 
       <?php if(!empty($wo['story']['postYoutube'])) {  ?>
       <div class="post-youtube wo_video_post">
          <iframe id="ytplayer" type="text/html" width="100%" height="340" src="https://www.youtube.com/embed/<?php echo $wo['story']['postYoutube']; ?>?autoplay=0" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen/></iframe>
@@ -397,59 +395,39 @@
       </div>
       <?php } ?>
       <?php if(!empty($wo['story']['page_event_id'])) { ?>
-      <div class="post-fetched-url wo_post_fetch_event">
-         <a href="<?php echo $wo['story']['event']['url'];?>">
-            <?php if (!empty($wo['story']['event']['cover'])) {?>
-            <div class="post-fetched-url-con">
-               <img src="<?php echo $wo['story']['event']['cover'];?>" class="<?php echo Wo_RightToLeft('pull-left');?>"/>
-               <div class="description">
-                  <p>
-                     <?php if (strlen($wo['story']['event']['description']) > 175):?>
-                     <?php echo mb_substr($wo['story']['event']['description'],0,175,"UTF-8") . "..."; ?>
-                     <?php else:?>
-                     <?php echo $wo['story']['event']['description']; ?>
-                     <?php endif;?>
-                  </p>
-               </div>
-            </div>
-            <?php } ?>
-            <div class="fetched-url-text">
-               <h4><?php echo $wo['story']['event']['name'];?></h4>
-               <div class="url">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
-                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                     <line x1="16" y1="2" x2="16" y2="6"></line>
-                     <line x1="8" y1="2" x2="8" y2="6"></line>
-                     <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                  <?php echo $wo['story']['event']['start_date'];?> - <?php echo $wo['story']['event']['end_date'];?>
-               </div>
-            </div>
-            <div class="clear"></div>
-         </a>
-      </div>
+      <div class="post-fetched-url wo_post_fetch_event" id="fullsizeimg">
+		<a href="<?php echo $wo['story']['event']['url'];?>">
+			<?php if (!empty($wo['story']['event']['cover'])) {?>
+				<img src="<?php echo $wo['story']['event']['cover'];?>"/>
+			<?php } ?>
+			<div class="fetched-url-text">
+				<div class="short_start_dt">
+					<b><?php echo date('d',strtotime($wo['story']['event']['start_edit_date'])); ?></b>
+					<span><?php echo date('M',strtotime($wo['story']['event']['start_edit_date'])); ?></span>
+				</div>
+				<h4><?php echo $wo['story']['event']['name'];?></h4>
+				<div class="url"><?php echo $wo['story']['event']['start_date'];?> <?php echo $wo['lang']['to'];?> <?php echo $wo['story']['event']['end_date'];?></div>
+			</div>
+			<div class="clear"></div>
+		</a>
+	</div>
       <?php } ?>
       <?php if(!empty($wo['story']['blog_id'])) { ?>
-      <div class="post-fetched-url wo_post_fetch_blog">
-         <a href="<?php echo $wo['story']['blog']['url'];?>">
-            <div class="fetched-url-text">
-               <h4>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book">
-                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                  </svg>
-                  <?php echo $wo['story']['blog']['title'];?>
-               </h4>
-               <div class="description"><?php echo $wo['story']['blog']['description'];?></div>
-            </div>
-            <?php if (!empty($wo['story']['blog']['thumbnail'])) {?>
-            <div class="post-fetched-url-con">
-               <img src="<?php echo $wo['story']['blog']['thumbnail'];?>" class="<?php echo Wo_RightToLeft('pull-left');?>" alt="<?php echo $wo['story']['blog']['title'];?>"/>
-            </div>
-            <?php } ?>
-            <div class="clear"></div>
-         </a>
-      </div>
+      <div class="post-fetched-url wo_post_fetch_blog" id="fullsizeimg">
+		<a href="<?php echo $wo['story']['blog']['url'];?>">
+			<?php if (!empty($wo['story']['blog']['thumbnail'])) {?>
+				<div class="post-fetched-url-con">
+					<img src="<?php echo $wo['story']['blog']['thumbnail'];?>" alt="<?php echo $wo['story']['blog']['title'];?>"/>
+				</div>
+			<?php } ?>
+			<div class="fetched-url-text">
+				<div class="wow_post_blog_ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#f35d4d" d="M20,11H4V8H20M20,15H13V13H20M20,19H13V17H20M11,19H4V13H11M20.33,4.67L18.67,3L17,4.67L15.33,3L13.67,4.67L12,3L10.33,4.67L8.67,3L7,4.67L5.33,3L3.67,4.67L2,3V19A2,2 0 0,0 4,21H20A2,2 0 0,0 22,19V3L20.33,4.67Z"></path></svg></div>
+				<h4><?php echo $wo['story']['blog']['title'];?></h4>
+				<div class="description"><?php echo $wo['story']['blog']['description'];?></div>
+			</div>
+			<div class="clear"></div>
+		</a>
+	</div>
       <?php } ?>
       <?php if(!empty($wo['story']['postFile'])) { ?>
       <div class="post-file" id="fullsizeimg" style="width: 100%;margin-left:0;">

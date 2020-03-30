@@ -4,33 +4,34 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "396cf3cb949b6f9781e00d16e30acd0e",
+    "content-hash": "35bafe38c1086b31ccf72d363137f3ee",
     "packages": [
         {
             "name": "stripe/stripe-php",
-            "version": "v6.43.0",
+            "version": "v7.13.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "c06eb0da0e73750cab75948dd9ca4a15cf829e68"
+                "reference": "140feae4dfd80c0ca820a2ace8873654c5d3926c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/c06eb0da0e73750cab75948dd9ca4a15cf829e68",
-                "reference": "c06eb0da0e73750cab75948dd9ca4a15cf829e68",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/140feae4dfd80c0ca820a2ace8873654c5d3926c",
+                "reference": "140feae4dfd80c0ca820a2ace8873654c5d3926c",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "php": ">=5.4.0"
+                "php": ">=5.6.0"
             },
             "require-dev": {
-                "php-coveralls/php-coveralls": "1.*",
-                "phpunit/phpunit": "~4.0",
-                "squizlabs/php_codesniffer": "~2.0",
-                "symfony/process": "~2.8"
+                "friendsofphp/php-cs-fixer": "^2.15",
+                "php-coveralls/php-coveralls": "^2.1",
+                "phpunit/phpunit": "^5.7",
+                "squizlabs/php_codesniffer": "^3.3",
+                "symfony/process": "~3.4"
             },
             "type": "library",
             "extra": {
@@ -60,7 +61,7 @@
                 "payment processing",
                 "stripe"
             ],
-            "time": "2019-08-09T20:54:08+00:00"
+            "time": "2019-11-19T23:07:10+00:00"
         }
     ],
     "packages-dev": [],

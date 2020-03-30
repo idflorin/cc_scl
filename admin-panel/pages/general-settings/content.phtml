@@ -170,6 +170,7 @@
                             <input type="radio" name="profile_back" id="profile_back-disabled" value="0" <?php echo ($wo['config']['profile_back'] == 0) ? 'checked': '';?>>
                             <label for="profile_back-disabled" class="m-l-20">Disabled</label>
                         </div>
+                        
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                     </form>

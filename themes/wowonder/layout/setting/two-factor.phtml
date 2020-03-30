@@ -1,43 +1,38 @@
-<div class="wo_settings_page">
-	<h3><?php echo $wo['lang']['two_factor']; ?></h3>
+<div class="wo_settings_page wow_content">
+	<div class="avatar-holder">
+		<img src="<?php echo $wo['setting']['avatar']?>" alt="<?php echo $wo['setting']['name']?> Profile Picture" class="avatar">
+		<div class="infoz">
+			<h5 title="<?php echo $wo['setting']['name']?>"><a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['setting']['username'] . '');?>" data-ajax="?link1=timeline&u=<?php echo $wo['setting']['username'] ?>"><?php echo $wo['setting']['name']?></a></h5>
+			<p><?php echo $wo['lang']['two_factor']; ?></p>
+		</div>
+	</div>
+	<hr>
 
 	<form class="form-horizontal setting-change-password-form" method="post">
 		<div class="setting-password-alert setting-update-alert"></div>
-         
-		 <!-- Form Name -->
-		 
-		 <div class="setting-panel row">
-      <?php if ($wo['config']['two_factor_type'] == 'both' || $wo['config']['two_factor_type'] == 'phone') { ?>
-      <div class="form-group col-lg-12">
-        <label class="col-md-12" for="phone_number"><?php echo $wo['lang']['phone_number']; ?></label>
-        <div class="col-md-12">
-          <input name="phone_number" id="phone_number" type="text" class="form-control input-md" autocomplete="off" placeholder="+15417543010" value="<?php echo $wo['setting']['phone_number']?>">
-        </div>
-      </div>
-      <?php } ?>
-			<div class="form-group col-lg-12">
-				<label class="col-md-12" for="two_factor"><?php echo $wo['lang']['two_factor']; ?></label>
-				<div class="col-md-12">
-					<select id="two_factor_select" name="two_factor" class="form-control">
-						<option value="enable" <?php echo ($wo['setting']['two_factor'] == '1')   ? 'selected' : '';?> ><?php echo $wo['lang']['enable']; ?></option>
-						<option value="disable" <?php echo ($wo['setting']['two_factor'] == '0')   ? 'selected' : '';?> ><?php echo $wo['lang']['disable']; ?></option>
-					</select>
-          <input type="hidden" name="" id="two_factor_value">
-					<br>
-					<small><?php echo $wo['lang']['two_factor_description'] ?></small>
-				</div>
+        
+		<?php if ($wo['config']['two_factor_type'] == 'both' || $wo['config']['two_factor_type'] == 'phone') { ?>
+			<div class="wow_form_fields">
+				<label for="phone_number"><?php echo $wo['lang']['phone_number']; ?></label>  
+				<input name="phone_number" id="phone_number" type="text" class="form-control input-md" autocomplete="off" placeholder="+15417543010" value="<?php echo $wo['setting']['phone_number']?>">
 			</div>
+		<?php } ?>
+		<div class="wow_form_fields">
+			<label for="two_factor"><?php echo $wo['lang']['two_factor']; ?></label>  
+			<select id="two_factor_select" name="two_factor" class="form-control">
+				<option value="enable" <?php echo ($wo['setting']['two_factor'] == '1')   ? 'selected' : '';?> ><?php echo $wo['lang']['enable']; ?></option>
+				<option value="disable" <?php echo ($wo['setting']['two_factor'] == '0')   ? 'selected' : '';?> ><?php echo $wo['lang']['disable']; ?></option>
+			</select>
+			<span class="help-block"><?php echo $wo['lang']['two_factor_description'] ?></small>
+		</div>
+		<input type="hidden" name="" id="two_factor_value">
+		
+		<div class="text-center">
+			<button type="button" class="btn btn-main btn-mat btn-mat-raised add_wow_loader" id="submit_two_factor_btn"><?php echo $wo['lang']['save']; ?></button>
 		</div>
 		
-		<div class="form-group last-sett-btn modal-footer">
-			<div class="ball-pulse"><div></div><div></div><div></div></div>
-			<button type="button" class="btn btn-main setting-panel-mdbtn" id="submit_two_factor_btn">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> 
-			   <?php echo $wo['lang']['save'];?>
-			</button>
-            <input type="hidden" name="user_id" value="<?php echo $wo['setting']['user_id'];?>">
-            <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-         </div>
+         <input type="hidden" name="user_id" value="<?php echo $wo['setting']['user_id'];?>">
+         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
    </form>
 </div>
 <script type="text/javascript">
@@ -48,7 +43,7 @@
     type: 'POST',
     data:$('form.setting-change-password-form').serialize(),
     beforeSend: function() {
-      $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+      $('.wo_settings_page').find('.add_wow_loader').addClass('btn-loading');
     },
     success: function(data) {
       if (data.status == 200) {
@@ -65,7 +60,7 @@
         $('.setting-password-alert').html('<div class="alert alert-danger">' + data.message + '</div>');
         $('.alert-danger').fadeIn(300);
       }
-      $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+      $('.wo_settings_page').find('.add_wow_loader').removeClass('btn-loading');
     }
   });
     

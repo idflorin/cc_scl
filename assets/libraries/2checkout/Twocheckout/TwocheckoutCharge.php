@@ -9,7 +9,7 @@ class Twocheckout_Charge extends Twocheckout
 
         foreach ($params as $key => $value)
         {
-            echo '<input type="hidden" name="'.$key.'" value="'.$value.'"/>';
+            echo '<input type="hidden" name="'.htmlspecialchars($key, ENT_QUOTES, 'UTF-8').'" value="'.htmlspecialchars($value, ENT_QUOTES, 'UTF-8').'"/>';
         }
         if ($type == 'auto') {
             echo '<input type="submit" value="Click here if you are not redirected automatically" /></form>';
@@ -22,7 +22,7 @@ class Twocheckout_Charge extends Twocheckout
 
     public static function direct($params, $type='Checkout')
     {
-        echo '<form id="2checkout" action="'.Twocheckout::$baseUrl.'checkout/purchase" method="post">';
+        echo '<form id="2checkout" action="'.Twocheckout::$baseUrl.'/checkout/purchase" method="post">';
 
         foreach ($params as $key => $value)
         {

@@ -303,7 +303,7 @@ if ($f == 'posts') {
         $url_link         = '';
         $url_content      = '';
         $url_title        = '';
-        if (!empty($_POST['url_link']) && !empty($_POST['url_title'])) {
+        if (!empty($_POST['url_link']) && !empty($_POST['url_title']) && filter_var($_POST['url_link'], FILTER_VALIDATE_URL)) {
             $url_link  = $_POST['url_link'];
             $url_title = $_POST['url_title'];
             if (!empty($_POST['url_content'])) {
@@ -398,6 +398,10 @@ if ($f == 'posts') {
             if (!empty($_POST['answer']) && array_filter($_POST['answer'])) {
                 $is_option = true;
             }
+            $post_active = 1;
+            if ($wo['config']['post_approval'] == 1 && !Wo_IsAdmin()) {
+                $post_active = 0;
+            }
             $post_data = array(
                 'user_id' => Wo_Secure($wo['user']['user_id']),
                 'page_id' => Wo_Secure($page_id),
@@ -424,7 +428,8 @@ if ($f == 'posts') {
                 'postFileThumb' => Wo_Secure($video_thumb),
                 'time' => time(),
                 'blur' => $blur,
-                'multi_image_post' => 0
+                'multi_image_post' => 0,
+                'active' => $post_active
             );
             if (isset($_POST['postSticker']) && Wo_IsUrl($_POST['postSticker']) && empty($_FILES) && empty($_POST['postRecord'])) {
                 $post_data['postSticker'] = $_POST['postSticker'];
@@ -477,20 +482,30 @@ if ($f == 'posts') {
                                 $post_data['album_name'] = '';
                                 $post_data['postFile'] = $file['filename'];
                                 $post_data['postFileName'] = $file['name'];
+                                $post_data['active'] = $post_active;
                                 $new_id = Wo_RegisterPost($post_data);
                                 $media_album = Wo_RegisterAlbumMedia($new_id, $file['filename'],$id);
                             }
                         }
                     }
                 }
-                $wo['story'] = Wo_PostData($id);
-                $html .= Wo_LoadPage('story/content');
-                $data = array(
-                    'status' => 200,
-                    'html' => $html,
-                    'invalid_file' => $invalid_file,
-                    'post_count' => (!empty($wo['story']['publisher']['details']) ? $wo['story']['publisher']['details']['post_count'] : 0)
-                );
+                if ($wo['config']['post_approval'] == 1 && !Wo_IsAdmin()) {
+                    $data = array(
+                        'status' => 200,
+                        'invalid_file' => 4,
+                        'html' => '',
+                    );
+                }
+                else{
+                    $wo['story'] = Wo_PostData($id);
+                    $html .= Wo_LoadPage('story/content');
+                    $data = array(
+                        'status' => 200,
+                        'html' => $html,
+                        'invalid_file' => $invalid_file,
+                        'post_count' => (!empty($wo['story']['publisher']['details']) ? $wo['story']['publisher']['details']['post_count'] : 0)
+                    );
+                } 
             } else {
                 $data = array(
                     'status' => 400,
@@ -586,7 +601,7 @@ if ($f == 'posts') {
     }
     if ($s == 'load_more_posts') {
         $html = '';
-        if ($_GET['filter_by_more'] == 'story' && isset($_GET['story_id']) && isset($_GET['user_id'])) {
+        if (!empty($_GET['filter_by_more']) && $_GET['filter_by_more'] == 'story' && isset($_GET['story_id']) && isset($_GET['user_id'])) {
             $args           = array();
             $args['offset'] = Wo_Secure($_GET['story_id']);
             if ($_GET['user_id'] > 0) {
@@ -595,7 +610,7 @@ if ($f == 'posts') {
             foreach (Wo_GetStroies($args) as $wo['story']) {
                 echo Wo_LoadPage('status/content');
             }
-        } else if ($_GET['filter_by_more'] == 'most_liked') {
+        } else if (!empty($_GET['filter_by_more']) && $_GET['filter_by_more'] == 'most_liked') {
             $most_liked_posts = Wo_GetPosts(array(
                 'filter_by' => 'most_liked',
                 'after_post_id' => Wo_Secure($_GET['after_post_id']),
@@ -682,6 +697,13 @@ if ($f == 'posts') {
                     if (!empty($match)) {
                         $wo['no_mention'][] = $match;
                     }
+                }
+            }
+            if ($wo['config']['maxCharacters'] > 0) {
+                if ((mb_strlen($_POST['text']) - 10) > $wo['config']['maxCharacters']) {
+                    header("Content-type: application/json");
+                    echo json_encode($data);
+                    exit();
                 }
             }
             $updatePost = Wo_UpdatePost(array(
@@ -990,17 +1012,25 @@ if ($f == 'posts') {
         exit();
     }
     if ($s == 'register_reply') {
-        if (!empty($_POST['comment_id']) && !empty($_POST['text']) && Wo_CheckMainSession($hash_id) === true) {
+        if (!empty($_POST['comment_id']) && isset($_POST['text']) && Wo_CheckMainSession($hash_id) === true) {
             $html    = '';
             $page_id = '';
             if (!empty($_POST['page_id'])) {
                 $page_id = $_POST['page_id'];
+            }
+            $comment_image = '';
+            if (!empty($_POST['comment_image'])) {
+                if (isset($_SESSION['file']) && $_SESSION['file'] == $_POST['comment_image']) {
+                    $comment_image = $_POST['comment_image'];
+                    unset($_SESSION['file']);
+                }
             }
             $C_Data      = array(
                 'user_id' => Wo_Secure($wo['user']['user_id']),
                 'page_id' => Wo_Secure($page_id),
                 'comment_id' => Wo_Secure($_POST['comment_id']),
                 'text' => Wo_Secure($_POST['text']),
+                'c_file' => Wo_Secure($comment_image),
                 'time' => time()
             );
             $R_Comment   = Wo_RegisterCommentReply($C_Data);
@@ -1075,6 +1105,32 @@ if ($f == 'posts') {
                     'status' => 200
                 );
             }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'load_more_post_comments') {
+        if (!empty($_GET['post_id'])) {
+            $html        = '';
+            $wo['story'] = Wo_PostData($_GET['post_id']);
+            $offset = 0;
+            if (!empty($_GET['comment_id']) && is_numeric($_GET['comment_id']) && $_GET['comment_id'] > 0) {
+                $offset = Wo_Secure($_GET['comment_id']);
+            }
+            $comments = Wo_GetPostComments($_GET['post_id'], 50,$offset);
+            foreach ($comments as $wo['comment']) {
+                $html .= Wo_LoadPage('comment/content');
+            }
+            $no_more = 0;
+            if (count($comments) < 50) {
+                $no_more = 1;
+            }
+            $data = array(
+                'status' => 200,
+                'html' => $html,
+                'no_more' => $no_more
+            );
         }
         header("Content-type: application/json");
         echo json_encode($data);

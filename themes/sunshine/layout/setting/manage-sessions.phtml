@@ -2,6 +2,8 @@
 	<h3><?php echo $wo['lang']['manage_sessions'] ?></h3>
 	<br>
 	<div class="active_sessions">
+		<a href="javascript:void();" class="btn btn-sm btn-main" id="upgrade-button" onclick="Wo_RemoveAllSessions();"><?php echo $wo['lang']['remove_all_sessions'];?></a>
+		<br>
 		<div class="table-responsive">
 					<?php
 						$get_sessions = Wo_GetAllSessionsFromUserID($wo['setting']['user_id']);
@@ -21,6 +23,14 @@ function logOutSession(id) {
 	}
 	$('#session_' + id).remove();
 	$.post(Wo_Ajax_Requests_File() + '?f=delete_s', {id: id}, function () {
+		Wo_IsLogged();
+	});
+}
+function Wo_RemoveAllSessions() {
+	if (!confirm('Are you sure you want to log out from this device and all devices ?')) {
+		return false;
+	}
+	$.post(Wo_Ajax_Requests_File() + '?f=delete_all_sessions', function () {
 		Wo_IsLogged();
 	});
 }

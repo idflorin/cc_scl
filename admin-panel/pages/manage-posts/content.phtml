@@ -111,6 +111,7 @@ if (($page > $db->totalPages) && !empty($_GET['page-id'])) {
                              <th>Publisher</th>
                              <th>Post Link</th>
                              <th>Posted</th>
+                             <th>Status</th>
                              <th>Action</th>
                             </tr>
                             </thead>
@@ -205,6 +206,16 @@ function Wo_AdminDeletePost(post_id) {
        $(this).remove();
     });
     $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=delete_post', {post_id:post_id, hash_id:hash_id});
+}
+
+function Wo_AdminApprovePost(post_id) {
+    if (confirm("Are you sure you want to approve this post?") == false) {
+      return false;
+    }
+    hash_id = $('#hash_id').val();
+    $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=approve_post', {post_id:post_id, hash_id:hash_id}, function(data, textStatus, xhr) {
+      location.reload();
+    });
 }
 
 </script>

@@ -210,7 +210,7 @@ svg {vertical-align: middle;}
 .wo_sidebar_groups .group-header{margin-bottom: 9px;position: relative;height: 25px;}
 .wo_sidebar_groups .group-bottom {margin-top: 7px;}
 .wo_sidebar_groups .group-header h3 {margin: 0;line-height: 25px;font-size: 13px;text-transform: capitalize;}
-.wo_sidebar_groups .group-header h3 a{max-width: 95px;display: block;overflow: hidden;}
+.wo_sidebar_groups .group-header h3 a{max-width: 100px;display: block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
 .wo_sidebar_groups .group-middle{margin: 0 -10px;}
 .wo_sidebar_groups .group-middle img{width:100%;height: 100px;object-fit: cover;}
 .wo_sidebar_groups .user-follow-btn{position: absolute;right: 0px;box-shadow: -6px 0px 6px white;}

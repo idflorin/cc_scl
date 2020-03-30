@@ -164,7 +164,7 @@ function url_slug($str, $options = array()) {
         'limit' => null,
         'lowercase' => true,
         'replacements' => array(),
-        'transliterate' => false
+        'transliterate' => true
     );
     // Merge options
     $options  = array_merge($defaults, $options);
@@ -546,7 +546,7 @@ function Wo_SeoLink($query = '') {
             '/^index\.php\?link1=movies-genre&genre=([A-Za-z-]+)$/i',
             '/^index\.php\?link1=movies-country&country=([A-Za-z-]+)$/i',
             '/^index\.php\?link1=watch-film&film-id=(\d+)$/i',
-            '/^index\.php\?link1=ads$/i',
+            '/^index\.php\?link1=advertise$/i',
             '/^index\.php\?link1=wallet$/i',
             '/^index\.php\?link1=create-ads$/i',
             '/^index\.php\?link1=edit-ads&id=(\d+)$/i',
@@ -624,7 +624,7 @@ function Wo_SeoLink($query = '') {
             $config['site_url'] . '/movies/genre/$1/',
             $config['site_url'] . '/movies/country/$1/',
             $config['site_url'] . '/movies/watch/$1/',
-            $config['site_url'] . '/ads/',
+            $config['site_url'] . '/advertise/',
             $config['site_url'] . '/wallet/',
             $config['site_url'] . '/ads/create/',
             $config['site_url'] . '/ads/edit/$1/',

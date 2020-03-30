@@ -22,11 +22,12 @@
         //$balance = $wo["user"]["balance"];
     }
 ?>
-<div class="modal fade" id="pay-go-pro" role="dialog" data-keyboard="false">
+<div class="modal fade wow_mat_pops" id="pay-go-pro" role="dialog" data-keyboard="false">
 	<div class="modal-dialog payment_box">
 		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title"><i class="fa fa-money"></i> <?php echo $wo['lang']['choose_a_payment_method'] ?></h4>
+			<div class="wow_pops_head">
+				<svg height="100px" preserveAspectRatio="none" version="1.1" viewBox="0 0 300 100" width="300px" xmlns="http://www.w3.org/2000/svg"><path d="M30.913,43.944c0,0,42.911-34.464,87.51-14.191c77.31,35.14,113.304-1.952,146.638-4.729 c48.654-4.056,69.94,16.218,69.94,16.218v54.396H30.913V43.944z" fill="currentColor" opacity="0.6"></path> <path d="M-35.667,44.628c0,0,42.91-34.463,87.51-14.191c77.31,35.141,113.304-1.952,146.639-4.729 c48.653-4.055,69.939,16.218,69.939,16.218v54.396H-35.667V44.628z" fill="currentColor" opacity="0.6"></path> <path d="M-34.667,62.998c0,0,56-45.667,120.316-27.839C167.484,57.842,197,41.332,232.286,30.428 c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.998z" fill="currentColor"></path></svg>
+				<h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z"></path></svg> <?php echo $wo['lang']['choose_a_payment_method'] ?></h4>
 			</div>
 			<div class="modal-body">
 				<!-- PayPal -->

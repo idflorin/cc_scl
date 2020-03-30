@@ -26,13 +26,28 @@ $fields = Wo_GetWelcomeFileds();
 			<form id="register" class="fadeInUp animated animated_9" method="post">
 				<p class="title"><?php echo $wo['lang']['sign_up']?></p>
 				<div class="errors"></div>
-				<input name="username" type="text" placeholder="<?php echo $wo['lang']['username'];?>" autofocus/>
-				<input name="email" type="email" placeholder="<?php echo $wo['lang']['email_address'];?>" />
+				<div class="wow_form_fields">
+					<label for="username"><?php echo $wo['lang']['username']?></label>
+					<input id="username" name="username" type="text" autocomplete="off" autofocus>
+				</div>
+				<div class="wow_form_fields">
+					<label for="email"><?php echo $wo['lang']['email_address']?></label>
+					<input id="email" name="email" type="email" />
+				</div>
 				<?php if($wo['config']['sms_or_email'] == 'sms') {?>
-					<input name="phone_num" type="text" placeholder="<?php echo $wo['lang']['phone_num_ex'];?>" />
+					<div class="wow_form_fields">
+						<label for="phone_num_ex"><?php echo $wo['lang']['phone_num_ex']?></label>
+						<input id="phone_num_ex" name="phone_num" type="text" />
+					</div>
 				<?php } ?>
-				<input name="password" type="password" placeholder="<?php echo $wo['lang']['password'];?>" />
-				<input name="confirm_password" type="password" placeholder="<?php echo $wo['lang']['confirm_password'];?>" />
+				<div class="wow_form_fields">
+					<label for="password"><?php echo $wo['lang']['password']?></label>
+					<input id="password" name="password" type="password" />
+				</div>
+				<div class="wow_form_fields">
+					<label for="confirm_password"><?php echo $wo['lang']['confirm_password']?></label>
+					<input id="confirm_password" name="confirm_password" type="password" />
+				</div>
 				<?php 
 					if (!empty($fields) && count($fields) > 0) {
 						foreach ($fields as $key => $wo['field']) {
@@ -40,12 +55,15 @@ $fields = Wo_GetWelcomeFileds();
 						}
 					}
 				?>
-				<select name="gender" id="gender">
-					<option value="0"><?php echo $wo['lang']['gender']?></option>
-					<?php foreach ($wo['genders'] as $key => $gender) { ?>
-						<option value="<?php echo($key) ?>"><?php echo $gender; ?></option>
-					<?php } ?>
-				</select>
+				<div class="wow_form_fields">
+					<label for="gender"><?php echo $wo['lang']['gender']?></label>
+					<select name="gender" id="gender">
+						<option value="0"><?php echo $wo['lang']['gender']?></option>
+						<?php foreach ($wo['genders'] as $key => $gender) { ?>
+							<option value="<?php echo($key) ?>"><?php echo $gender; ?></option>
+						<?php } ?>
+					</select>
+				</div>
 				<?php if($wo['config']['reCaptcha'] == 1) {?>
 					<div class="form-group" style="margin-top:10px;">
 						<div class="g-recaptcha" data-sitekey="<?php echo $wo['config']['reCaptchaKey']?>"></div>
@@ -64,12 +82,11 @@ $fields = Wo_GetWelcomeFileds();
 					<div class="clear"></div>
 				</div>
 				<div class="login_signup_combo">
-					<div class="signup__">
-						<a class="dec" href="<?php echo $wo['config']['site_url'];?>"><?php echo $wo['lang']['login']?></a>
-					</div>
 					<div class="login__">
-						<svg class="spinner" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="spinner__path" fill="none" stroke-width="7" stroke-linecap="round" cx="33" cy="33" r="29"></circle></svg>
-						<button type="submit" class="btn btn-main" id="sign_submit" disabled><?php echo $wo['lang']['lets_go']?></button>
+						<button type="submit" class="btn btn-main btn-mat btn-mat-raised add_wow_loader" id="sign_submit" disabled><?php echo $wo['lang']['lets_go']?></button>
+					</div>
+					<div class="signup__">
+						<p><?php echo $wo['lang']['already_have_account']?> <a class="dec" href="<?php echo $wo['config']['site_url'];?>"><?php echo $wo['lang']['login']?></a></p>
 					</div>
 				</div>
 				<?php if (isset($_GET['invite'])): ?>
@@ -91,13 +108,13 @@ $(function() {
     beforeSend: function() {
 		working = true;
 		$this.find('button').attr("disabled", true);
-		$this.find('.spinner').addClass("show");
+		$this.find('.add_wow_loader').addClass('btn-loading');
     },
     success: function(data) {
       if (data.status == 200) {
 		$state.addClass('success');
         $state.html('<?php echo $wo['lang']['welcome_'] ?>');
-		$this.find('.spinner').removeClass("show");
+		$this.find('.add_wow_loader').removeClass('btn-loading');
         setTimeout(function () {
          window.location.href = data.location;
         }, 1000);
@@ -105,7 +122,7 @@ $(function() {
         window.location.href = data.location;
       } else {
         $this.find('button').attr("disabled", false);
-		$this.find('.spinner').removeClass("show");
+		$this.find('.add_wow_loader').removeClass('btn-loading');
         $state.html(data.errors);
       } 
       working = false;

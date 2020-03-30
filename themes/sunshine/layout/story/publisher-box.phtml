@@ -865,6 +865,12 @@ $(function () {
             $("#adult_image_file").modal('hide');
           },3000);
         }
+        else if(data.invalid_file == 4){
+          $("#approve_post").modal('show');
+          Wo_Delay(function(){
+            $("#approve_post").modal('hide');
+          },3000);
+        }
       } 
       else if (data.status == 400) {
         if (data.invalid_file == 1) {

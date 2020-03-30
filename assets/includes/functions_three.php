@@ -924,7 +924,11 @@ function Wo_GetBlogComments($args = array()) {
     if ($blog_id && $blog_id > 0 && is_numeric($blog_id)) {
         $query_one .= " AND `blog_id` = '$blog_id' ";
     }
-    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_BLOG_COMM . " WHERE `id` > 0 {$query_one} ORDER BY `id` DESC LIMIT 10");
+    $limit = 10;
+    if (!empty($args['limit'])) {
+        $limit   = Wo_Secure($args['limit']);
+    }
+    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_BLOG_COMM . " WHERE `id` > 0 {$query_one} ORDER BY `id` DESC LIMIT $limit ");
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $comment = Wo_GetBlogCommentData($fetched_data['id']);
         if ($comment && !empty($comment)) {
@@ -990,6 +994,7 @@ function Wo_GetBlogCommentReplies($args = array()) {
     $args      = array_merge($options, $args);
     $id        = Wo_Secure($args['id']);
     $comm_id   = Wo_Secure($args['comm_id']);
+    $limit = "";
     $query_one = '';
     $data      = array();
     if ($id && $id > 0 && is_numeric($id)) {
@@ -998,7 +1003,15 @@ function Wo_GetBlogCommentReplies($args = array()) {
     if ($comm_id && $comm_id > 0 && is_numeric($comm_id)) {
         $query_one .= " AND `comm_id` = '$comm_id' ";
     }
-    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_BLOG_COMM_REPLIES . " WHERE `id` > 0 {$query_one} ORDER BY `id` ASC");
+    if (!empty($args['limit']) && is_numeric($args['limit']) && $args['limit'] > 0) {
+        $limit = Wo_Secure($args['limit']);
+        $limit = " LIMIT $limit";
+    }
+    if (!empty($args['offset']) && is_numeric($args['offset']) && $args['offset'] > 0) {
+        $offset = Wo_Secure($args['offset']);
+        $query_one .= " AND `id` > $offset ";
+    }
+    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_BLOG_COMM_REPLIES . " WHERE `id` > 0 {$query_one} ORDER BY `id` ASC $limit");
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $comment = Wo_GetBlogCommReplyData($fetched_data['id']);
         if ($comment && !empty($comment)) {
@@ -2964,6 +2977,35 @@ function Wo_GetInterestedEventsUsers($event_id,$offset = 0,$limit = 0) {
     }
     return $data;
 }
+function Wo_GetGoingEventsUsers($event_id,$offset = 0,$limit = 0) {
+    global $sqlConnect, $wo;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($event_id) || !is_numeric($event_id) || $event_id < 1) {
+        return false;
+    }
+    $event_id = Wo_Secure($event_id);
+    $sub_q = "";
+    if ($offset > 0) {
+        $sub_q = " AND `id` < {$offset} AND `id` <> {$offset} ";
+    }
+    $limit_query = '';
+    if (!empty($limit)) {
+        $limit_query = " LIMIT $limit";
+    }
+    $user_id = $wo['user']['id'];
+    $sql     = "SELECT `user_id` FROM " . T_EVENTS_GOING . " WHERE `event_id` = '$event_id' {$sub_q} ORDER BY `id` DESC $limit_query";
+    $query   = mysqli_query($sqlConnect, $sql);
+    $data    = array();
+    while ($fetched_data = mysqli_fetch_assoc($query)) {
+        $event = Wo_UserData($fetched_data['user_id']);
+        if ($event && !empty($event)) {
+            $data[] = $event;
+        }
+    }
+    return $data;
+}
 function Wo_GetPastEvents($offset = 0) {
     global $sqlConnect, $wo;
     if ($wo['loggedin'] == false) {
@@ -3407,7 +3449,12 @@ function Wo_GetMovieComments($args = array()) {
     if ($movie_id && $movie_id > 0 && is_numeric($movie_id)) {
         $query_one .= " AND `movie_id` = '$movie_id' ";
     }
-    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_MOVIE_COMMS . " WHERE `id` > 0 {$query_one} ORDER BY `id` ASC LIMIT 10");
+    $limit = " LIMIT 10 ";
+    if (!empty($args['limit']) && is_numeric($args['limit']) && $args['limit'] > 0) {
+        $limit = Wo_Secure($args['limit']);
+        $limit = " LIMIT $limit ";
+    }
+    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_MOVIE_COMMS . " WHERE `id` > 0 {$query_one} ORDER BY `id` ASC $limit");
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $comment = Wo_GetMovieCommentData($fetched_data['id']);
         if ($comment && !empty($comment)) {
@@ -3428,6 +3475,7 @@ function Wo_GetMovieCommentReplies($args = array()) {
     $movie_id  = Wo_Secure($args['movie_id']);
     $comm_id   = Wo_Secure($args['comm_id']);
     $query_one = '';
+    $limit = "";
     $data      = array();
     if ($id && $id > 0 && is_numeric($id)) {
         $query_one .= " AND `id` = '$id' ";
@@ -3438,7 +3486,15 @@ function Wo_GetMovieCommentReplies($args = array()) {
     if ($comm_id && $comm_id > 0 && is_numeric($comm_id)) {
         $query_one .= " AND `comm_id` = '$comm_id' ";
     }
-    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_MOVIE_COMM_REPLIES . " WHERE `id` > 0 {$query_one} ORDER BY `id` ASC");
+    if (!empty($args['limit']) && is_numeric($args['limit']) && $args['limit'] > 0) {
+        $limit = Wo_Secure($args['limit']);
+        $limit = " LIMIT $limit";
+    }
+    if (!empty($args['offset']) && is_numeric($args['offset']) && $args['offset'] > 0) {
+        $offset = Wo_Secure($args['offset']);
+        $query_one .= " AND `id` > $offset ";
+    }
+    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_MOVIE_COMM_REPLIES . " WHERE `id` > 0 {$query_one} ORDER BY `id` ASC $limit");
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $comment = Wo_GetMovieCommReplyData($fetched_data['id']);
         if ($comment && !empty($comment)) {
@@ -3783,11 +3839,12 @@ function Wo_GetSideBarAds() {
     if ($con_list) {
         $query_one .= " AND `id` NOT IN ({$con_list}) ";
     }
+    $start = date('Y-m-d');
     $sql   = "SELECT * FROM  " . T_USER_ADS . " 
     WHERE `user_id` IN (SELECT `user_id` FROM " . T_USERS . " WHERE `wallet` > 0)
         AND `status` = '1' AND `appears` = 'sidebar' AND
         (`gender` = '$user_gender' OR `gender` = 'all')  AND `audience` LIKE '%$user_country%'
-        {$query_one}
+        {$query_one} AND ((start = '') OR (start <= '{$start}' && end >= '{$start}')) AND ((budget = 0) OR (spent < budget))
         ORDER BY RAND() LIMIT 2";
     $query = mysqli_query($sqlConnect, $sql);
     $data  = array();
@@ -3985,11 +4042,12 @@ function Wo_GetPostAds($last_id = 0) {
     if ($con_list) {
         $query_one .= " AND `id` NOT IN ({$con_list}) ";
     }
+    $start = date('Y-m-d');
     $sql          = "SELECT * FROM  " . T_USER_ADS . " 
     WHERE `user_id` IN (SELECT `user_id` FROM " . T_USERS . " WHERE `wallet` > 0)
         AND `status` = '1' AND `appears` = 'post' AND
         (`gender` = '$user_gender' OR `gender` = 'all')  AND `audience` LIKE '%$user_country%'
-        {$query_one}
+        {$query_one} AND ((start = '') OR (start <= '{$start}' && end >= '{$start}'))  AND ((budget = 0) OR (spent < budget))
         ORDER BY `id` DESC LIMIT 100";
     $query        = mysqli_query($sqlConnect, $sql);
     $fetched_data = mysqli_fetch_assoc($query);
@@ -3999,7 +4057,12 @@ function Wo_GetPostAds($last_id = 0) {
         $fetched_data['is_owner']  = Wo_IsAdsOwner($fetched_data['id']);
         $fetched_data['ad_media']  = Wo_GetMedia($fetched_data['ad_media']);
         $fetched_data['postType']  = 'ad';
+        if (!empty($fetched_data['page_id'])) {
+            $page = Wo_PageData($fetched_data['page_id']);
+            $fetched_data['user_data']['avatar'] = $page['avatar'];
+        }
         $data                      = $fetched_data;
+        
     }
     return $data;
 }
@@ -5284,7 +5347,7 @@ function Wo_GetPageReviews($page_id = false, $after_id = false) {
     if ($after_id && is_numeric($after_id) && $after_id > 0) {
         $sub_sql = " AND `id` < '$after_id' AND `id` <> '$after_id' ";
     }
-    $sql   = " SELECT * FROM " . T_PAGE_RATING . " WHERE `page_id` = {$page_id} {$sub_sql} ORDER BY `id` DESC LIMIT 50";
+    $sql   = " SELECT * FROM " . T_PAGE_RATING . " WHERE `page_id` = {$page_id} {$sub_sql} ORDER BY `id` DESC LIMIT 1";
     $query = mysqli_query($sqlConnect, $sql);
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
@@ -5979,6 +6042,54 @@ function Wo_AutoFollow($user_id = 0) {
     }
 }
 
+function Wo_AutoPageLike($user_id = 0) {
+    global $wo, $db;
+    if (empty($user_id)) {
+        return false;
+    }
+    if (!is_numeric($user_id) || $user_id == 0) {
+        return false;
+    }
+    $wo['loggedin'] = true;
+    $wo['user']['user_id'] = $user_id;
+    $pages_name = explode(',', $wo['config']['auto_page_like']);
+    if (!empty($pages_name)) {
+        foreach ($pages_name as $key => $page_name) {
+            $page_name = trim($page_name);
+            $page_name = Wo_Secure($page_name);
+            $page_id = Wo_PageIdFromPagename($page_name);
+            Wo_RegisterPageLike($page_id, $wo['user']['user_id']);
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function Wo_AutoGroupJoin($user_id = 0) {
+    global $wo, $db;
+    if (empty($user_id)) {
+        return false;
+    }
+    if (!is_numeric($user_id) || $user_id == 0) {
+        return false;
+    }
+    $wo['loggedin'] = true;
+    $wo['user']['user_id'] = $user_id;
+    $groups_name = explode(',', $wo['config']['auto_group_join']);
+    if (!empty($groups_name)) {
+        foreach ($groups_name as $key => $group_name) {
+            $group_name = trim($group_name);
+            $group_name = Wo_Secure($group_name);
+            $group_id = Wo_GroupIdFromGroupname($group_name);
+            Wo_RegisterGroupJoin($group_id, $wo['user']['user_id']);
+        }
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function Wo_MarkAllChatsAsRead($user_id = 0) {
     global $wo, $db;
     if (Wo_IsAdmin() === false) {
@@ -6275,7 +6386,7 @@ function Wo_GetPageJobs($page_id)
 function Wo_GetJobById($job_id)
 {
     global $wo, $sqlConnect,$db;
-    if ($wo['loggedin'] == false || empty($job_id)) {
+    if (empty($job_id)) {
         return false;
     }
     $data = array();
@@ -6296,9 +6407,13 @@ function Wo_GetJobById($job_id)
             $jobs['question_three_answers'] = json_decode($jobs['question_three_answers'],true);
         }
         $jobs['page'] = $page;
-        $apply = $db->where('user_id',$wo['user']['id'])->where('job_id',$job_id)->getValue(T_JOB_APPLY,'COUNT(*)');
+        $jobs['apply'] = false;
+        if ($wo['loggedin']) {
+            $apply = $db->where('user_id',$wo['user']['id'])->where('job_id',$job_id)->getValue(T_JOB_APPLY,'COUNT(*)');
+            $jobs['apply'] = ($apply > 0) ? true : false;
+        }
+        
         $job_apply = $db->where('job_id',$job_id)->getValue(T_JOB_APPLY,'COUNT(*)');
-        $jobs['apply'] = ($apply > 0) ? true : false;
         $post = $db->where('job_id',$job_id)->getOne(T_POSTS);
         $jobs['url'] = Wo_SeoLink('index.php?link1=post&id=' . $post->id);
         $jobs['apply_count'] = $job_apply;

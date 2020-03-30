@@ -135,6 +135,12 @@ if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
                     if (!empty($wo['config']['auto_friend_users'])) {
                         $autoFollow = Wo_AutoFollow($user_id);
                     }
+                    if (!empty($wo['config']['auto_page_like'])) {
+                        Wo_AutoPageLike($user_id);
+                    }
+                    if (!empty($wo['config']['auto_group_join'])) {
+                        Wo_AutoGroupJoin($user_id);
+                    }
                     if (!empty($user_profile->photoURL) && $imported_image != $wo['userDefaultAvatar']) {
                         $explode2  = @end(explode('.', $imported_image));
                         $explode3  = @explode('.', $imported_image);

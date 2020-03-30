@@ -140,7 +140,12 @@ if ($f == 'register') {
             $register = Wo_RegisterUser($re_data, $in_code);
         }
         else{
-            $register = true;
+            if($activate == 1){
+               $register = Wo_RegisterUser($re_data, $in_code);
+            }
+            else{
+                $register = true;
+            }
         }
         
         if ($register === true) {
@@ -157,6 +162,12 @@ if ($f == 'register') {
                 }
                 if (!empty($wo['config']['auto_friend_users'])) {
                     $autoFollow = Wo_AutoFollow(Wo_UserIdFromUsername($_POST['username']));
+                }
+                if (!empty($wo['config']['auto_page_like'])) {
+                    Wo_AutoPageLike(Wo_UserIdFromUsername($_POST['username']));
+                }
+                if (!empty($wo['config']['auto_group_join'])) {
+                    Wo_AutoGroupJoin(Wo_UserIdFromUsername($_POST['username']));
                 }
                 $data['location'] = Wo_SeoLink('index.php?link1=start-up');
             } else if ($wo['config']['sms_or_email'] == 'mail') {

@@ -1,59 +1,99 @@
 <?php if ($wo['config']['credit_card'] == 'yes') { ?>
 <script src="https://checkout.stripe.com/checkout.js"></script>
 <?php } ?>
-<div class="page-margin"> 
-	<div class="row">
-		<div class="col-md-8">
-			<div class="fund_raise">
-				<img src="<?php echo($wo['fund']['image']); ?>" class="fund_main_img">
-				<h2 class="fund_title"><a href="<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" data-ajax="?link1=show_fund&id=<?php echo($wo['fund']['hashed_id']) ?>" style="text-decoration: none;"><?php echo $wo['fund']['title']?></a></h2>
-				<div class="read-blog-info-user">
-					<div class="postMeta--author-avatar">
-						<a href="<?php echo $wo['fund']['user_data']['url']?>">
-							<img src="<?php echo $wo['fund']['user_data']['avatar']?>" alt="User Image">
-						</a>
-					</div>
-					<div class="postMeta--author-text">
-						<a href="<?php echo $wo['fund']['user_data']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['fund']['user_data']['username']; ?>"><?php echo $wo['fund']['user_data']['name']; ?></a>
-						<span class="middot">·</span>
-						<time><?php echo date("d M Y",$wo['fund']['time']); ?></time>
-					</div>
+
+<style>.wow_main_float_head.show-fnds:before {background-image: url(<?php echo($wo['fund']['image']); ?>)}</style>
+
+<div class="page-margin">
+	<div class="wow_main_float_head show-fnds">
+		<div class="container">
+			<h1><?php echo $wo['fund']['title']?></h1>
+			<div class="show-fund-info-user">
+				<div class="postMeta--author-avatar">
+					<a href="<?php echo $wo['fund']['user_data']['url']?>">
+						<img src="<?php echo $wo['fund']['user_data']['avatar']?>" alt="User Image">
+					</a>
 				</div>
-				<hr class="fund_raise_hr">
-				<div class="fund_raise_btns">
-					<?php if ($wo['user']['id'] != $wo['fund']['user_id'] && $wo['fund']['amount'] > $wo['fund']['raised']) { ?>
-						<button type="button" class="btn btn-main" data-toggle="modal" data-target="#dont_modal"><?php echo $wo['lang']['donate']; ?></button>
-					<?php } ?>
-					<div class="dropdown">
-						<button class="btn btn-secondary dropdown-toggle" type="button" id="shr_dropdwn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $wo['lang']['share'];?></button>
-						<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="shr_dropdwn">
-							<li><a class="dropdown-item" href="https://www.facebook.com/sharer.php?u=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank"><?php echo $wo['lang']['facebook'];?></a></li>
-							<li><a class="dropdown-item" href="http://twitter.com/intent/tweet?text=<?php echo $wo['article']['title'] ?>&amp;url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank"><?php echo $wo['lang']['twitter'];?></a></li>
-							<li><a class="dropdown-item" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank"><?php echo $wo['lang']['linkedin'];?></a></li>
-							<li><a class="dropdown-item" href="http://pinterest.com/pin/create/button/?url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank"><?php echo $wo['lang']['pinterest'];?></a></li>
-						</ul>
-					</div>
+				<div class="postMeta--author-text">
+					<a href="<?php echo $wo['fund']['user_data']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['fund']['user_data']['username']; ?>"><?php echo $wo['fund']['user_data']['name']; ?></a>
+					<span class="middot">·</span>
+					<time><?php echo date("d M Y",$wo['fund']['time']); ?></time>
 				</div>
-				<div class="fund_raise_bar">
-					<p><?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['fund']['raised']; ?>  <?php echo $wo['lang']['raised_of']; ?> <?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['fund']['amount']; ?></p>
-					<div class="progress">
-						<div class="progress-bar" role="progressbar" style="width: <?php echo $wo['fund']['bar']; ?>%" aria-valuenow="<?php echo $wo['fund']['bar']; ?>" aria-valuemin="0" aria-valuemax="<?php echo($wo['fund']['amount']) ?>"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-8">
+					<img src="<?php echo($wo['fund']['image']); ?>" class="fund_main_img">
+				</div>
+				<div class="col-md-4">
+					<div class="fund_raise_bar wow_fund_raise_bar">
+						<div class="progress">
+							<div class="progress-bar" role="progressbar" style="width: <?php echo $wo['fund']['bar']; ?>%" aria-valuenow="<?php echo $wo['fund']['bar']; ?>" aria-valuemin="0" aria-valuemax="<?php echo($wo['fund']['amount']) ?>"></div>
+						</div>
+						<p class="show_fnd_stats"><span class="main"><?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['fund']['raised']; ?></span> <?php echo $wo['lang']['raised_of']; ?> <?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$wo['fund']['amount']; ?></p>
+					</div>
+					<p class="show_fnd_stats"><span><?php echo $wo['fund']['all_donation']; ?></span> <?php echo $wo['lang']['total_donations'];?></p>
+					<div class="fund_raise_btns">
+						<?php if ($wo['user']['id'] != $wo['fund']['user_id'] && $wo['fund']['amount'] > $wo['fund']['raised']) { ?>
+							<button type="button" class="btn btn-main btn-mat" data-toggle="modal" data-target="#dont_modal"><?php echo $wo['lang']['donate']; ?></button>
+						<?php } ?>
+						<div class="dropdown">
+							<button class="btn btn-secondary btn-mat dropdown-toggle" type="button" id="shr_dropdwn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $wo['lang']['share'];?></button>
+							<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="shr_dropdwn">
+								<li><a class="dropdown-item" href="https://www.facebook.com/sharer.php?u=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank" title="<?php echo $wo['lang']['facebook'];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12.001,2.002c-5.522,0-9.999,4.477-9.999,9.999c0,4.99,3.656,9.126,8.437,9.879v-6.988h-2.54v-2.891h2.54V9.798	c0-2.508,1.493-3.891,3.776-3.891c1.094,0,2.24,0.195,2.24,0.195v2.459h-1.264c-1.24,0-1.628,0.772-1.628,1.563v1.875h2.771	l-0.443,2.891h-2.328v6.988C18.344,21.129,22,16.992,22,12.001C22,6.479,17.523,2.002,12.001,2.002z"/></svg></a></li>
+								<li><a class="dropdown-item" href="http://twitter.com/intent/tweet?text=<?php echo $wo['article']['title'] ?>&amp;url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank" title="<?php echo $wo['lang']['twitter'];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19.633,7.997c0.013,0.175,0.013,0.349,0.013,0.523c0,5.325-4.053,11.461-11.46,11.461c-2.282,0-4.402-0.661-6.186-1.809	c0.324,0.037,0.636,0.05,0.973,0.05c1.883,0,3.616-0.636,5.001-1.721c-1.771-0.037-3.255-1.197-3.767-2.793	c0.249,0.037,0.499,0.062,0.761,0.062c0.361,0,0.724-0.05,1.061-0.137c-1.847-0.374-3.23-1.995-3.23-3.953v-0.05	c0.537,0.299,1.16,0.486,1.82,0.511C3.534,9.419,2.823,8.184,2.823,6.787c0-0.748,0.199-1.434,0.548-2.032	c1.983,2.443,4.964,4.04,8.306,4.215c-0.062-0.3-0.1-0.611-0.1-0.923c0-2.22,1.796-4.028,4.028-4.028	c1.16,0,2.207,0.486,2.943,1.272c0.91-0.175,1.782-0.512,2.556-0.973c-0.299,0.935-0.936,1.721-1.771,2.22	c0.811-0.088,1.597-0.312,2.319-0.624C21.104,6.712,20.419,7.423,19.633,7.997z"/></svg></a></li>
+								<li><a class="dropdown-item" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank" title="<?php echo $wo['lang']['linkedin'];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20,3H4C3.447,3,3,3.448,3,4v16c0,0.552,0.447,1,1,1h16c0.553,0,1-0.448,1-1V4C21,3.448,20.553,3,20,3z M8.339,18.337H5.667	v-8.59h2.672V18.337z M7.003,8.574c-0.856,0-1.548-0.694-1.548-1.548s0.691-1.548,1.548-1.548c0.854,0,1.548,0.693,1.548,1.548	S7.857,8.574,7.003,8.574z M18.338,18.337h-2.669V14.16c0-0.996-0.018-2.277-1.388-2.277c-1.39,0-1.601,1.086-1.601,2.207v4.248	h-2.667v-8.59h2.56v1.174h0.037c0.355-0.675,1.227-1.387,2.524-1.387c2.704,0,3.203,1.778,3.203,4.092V18.337z"/></svg></a></li>
+								<li><a class="dropdown-item" href="http://pinterest.com/pin/create/button/?url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank" title="<?php echo $wo['lang']['pinterest'];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M9.04,21.54C10,21.83 10.97,22 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2A10,10 0 0,0 2,12C2,16.25 4.67,19.9 8.44,21.34C8.35,20.56 8.26,19.27 8.44,18.38L9.59,13.44C9.59,13.44 9.3,12.86 9.3,11.94C9.3,10.56 10.16,9.53 11.14,9.53C12,9.53 12.4,10.16 12.4,10.97C12.4,11.83 11.83,13.06 11.54,14.24C11.37,15.22 12.06,16.08 13.06,16.08C14.84,16.08 16.22,14.18 16.22,11.5C16.22,9.1 14.5,7.46 12.03,7.46C9.21,7.46 7.55,9.56 7.55,11.77C7.55,12.63 7.83,13.5 8.29,14.07C8.38,14.13 8.38,14.21 8.35,14.36L8.06,15.45C8.06,15.62 7.95,15.68 7.78,15.56C6.5,15 5.76,13.18 5.76,11.71C5.76,8.55 8,5.68 12.32,5.68C15.76,5.68 18.44,8.15 18.44,11.43C18.44,14.87 16.31,17.63 13.26,17.63C12.29,17.63 11.34,17.11 11,16.5L10.33,18.87C10.1,19.73 9.47,20.88 9.04,21.57V21.54Z"/></svg></a></li>
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>
-			<div class="fund_raise">
-				<h4 class="fund_widget_title"><?php echo $wo['lang']['info'];?></h4>
-				<?php echo $wo['fund']['description']; ?>
-			</div>
 		</div>
-		<div class="col-md-4">
-			<?php echo Wo_LoadPage('show_fund/sidebar') ?>
-		</div>
-		<div class="clear"></div>
-		<br>		
-           <?php echo Wo_LoadPage('footer/content'); ?>
 	</div>
-	<!-- .row -->
+	
+	<div class="wow_main_blogs_bg"></div>
+	
+	<div class="wow_content fund_raise">
+		<?php $wo['recent'] = GetRecentRaise($wo['fund']['id'],20); ?>
+		<div class="row">
+			<div class="col-md-<?php if (!empty($wo['recent'])) { ?>8<?php } else {?>12<?php } ?>">
+				<div class="wo_page_hdng pag_neg_padd wow_fnd_hd">
+					<div class="wo_page_hdng_innr">
+						<span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"></path></svg></span> <?php echo $wo['lang']['info'];?>
+					</div>
+				</div>
+				<p class="mb-0"><?php echo $wo['fund']['description']; ?></p>
+			</div>
+			<?php if (!empty($wo['recent'])) { ?>
+				<div class="col-md-4">
+					<div class="wo_page_hdng pag_neg_padd wow_fnd_hd">
+						<div class="wo_page_hdng_innr">
+							<span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z"></path></svg></span> <?php echo $wo['lang']['recent_donations'];?>
+						</div>
+					</div>
+					<div class="fund">
+						<div class="fluid list">
+							<?php if ($wo['recent']) { foreach ($wo['recent'] as $key => $user) { ?>
+								<div class="item fund_item" data-recent="<?php echo($user['id']) ?>">
+									<div class="wrapper">
+										<img class="img-circle" src="<?php echo($user['user_data']['avatar']) ?>" alt="Picture" />
+									</div>
+									<div class="caption">
+										<a href="<?php echo($user['user_data']['url']) ?>" data-ajax="?link1=timeline&u=<?php echo($user['user_data']['username']) ?>"><?php echo $user['user_data']['name']; ?></a>
+										<p>
+											<?php echo $wo['config']['currency_symbol_array'][$wo['config']['currency']].$user['amount']; ?><span class="middot">·</span>
+											<time class="time-ago"><?php echo(Wo_Time_Elapsed_String($user['time'])); ?></time>
+										</p>
+									</div>
+								</div>
+							<?php } } ?>
+						</div>
+					</div>
+				</div>
+			<?php } ?>
+		</div>
+	</div>	
+	<?php echo Wo_LoadPage('footer/content'); ?>
 </div>
 
 <div class="modal fade" id="dont_modal" tabindex="-1" role="dialog">
@@ -118,7 +158,7 @@
 			</div>
 			<div class="modal-footer">
 					<div class="ball-pulse"><div></div><div></div><div></div></div>
-					<button type="submit" class="btn btn-main"><?php echo $wo['lang']['publish']; ?></button>
+					<button type="submit" class="btn btn-main btn-mat"><?php echo $wo['lang']['publish']; ?></button>
 				</div>
 				</form>
 		</div>
@@ -215,17 +255,16 @@
 				<div class="clear"></div>
 				<div class="modal-footer">
 					<div class="ball-pulse"><div></div><div></div><div></div></div>
-					<button type="button" class="btn btn-main" onclick="tokenRequest()" id="2checkout_btn_wallet"><?php echo $wo['lang']['pay']; ?></button>
+					<button type="button" class="btn btn-main btn-mat" onclick="tokenRequest()" id="2checkout_btn_wallet"><?php echo $wo['lang']['pay']; ?></button>
 				</div>
 			</form>
 		</div>
 	</div>
 </div>
 
-
-
-
 <script type="text/javascript">
+$('.wow_main_blogs_bg').css('height', ($('.wow_main_float_head').height()) + 'px');
+
 	$(document).on('change', '#upload', function(event) {
 		let imgPath = $(this)[0].files[0].name;
 	    if (typeof(FileReader) != "undefined") {

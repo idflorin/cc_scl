@@ -21,7 +21,8 @@
 }
 .navbar-default {
     background: <?php echo $wo['config']['header_background'];?>; border: none;
-    height:45px;
+    height: 46px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 .round-check input[type="checkbox"]:checked + label:before {
     background: <?php echo $wo['config']['btn_background_color'];?> !important;
@@ -80,19 +81,12 @@ ul.profile-completion-bar li.completion-bar div.completion-bar-status {
 #search-nearby-users .nearby-users-relationship-collapse li.active .friends_toggle:after{
     background: <?php echo $wo['config']['btn_background_color'];?>;
 }
-.my_pages_header ul li.active a{
-    color: <?php echo $wo['config']['btn_background_color'];?>;
-    border-color: <?php echo $wo['config']['btn_background_color'];?>;
+.wo_page_hdng_menu > ul li.active a {
+    box-shadow: inset 0px -2.5px <?php echo $wo['config']['btn_background_color'];?>;
 }
 .login button, .postCategory h5, .wo_search_page .nav-tabs li.active a {
     background: <?php echo $wo['config']['btn_background_color'];?> !important;
     color: <?php echo $wo['config']['btn_color'];?> !important;
-}
-.main-blog-sidebar .popular-categories li, #category-page .popular-categories li.active{ 
-    background-color: <?php echo $wo['config']['btn_background_color'];?>;
-}
-.main-blog-sidebar .popular-categories li a, #category-page .popular-categories li.active a{
-    color: <?php echo $wo['config']['btn_color'];?>;
 }
 .mejs-controls .mejs-time-rail .mejs-time-current, .mejs-controls .mejs-horizontal-volume-slider .mejs-horizontal-volume-current, .mejs-controls .mejs-volume-button .mejs-volume-slider .mejs-volume-current {
     background-color: <?php echo $wo['config']['btn_background_color'];?> !important;
@@ -126,6 +120,9 @@ a.unread-update {
     color: <?php echo $wo['config']['btn_hover_color'];?>;
     background-color: <?php echo $wo['config']['btn_hover_background_color'];?>;
     border-color: <?php echo $wo['config']['btn_hover_background_color'];?>;
+}
+.btn-main:focus {
+	color: <?php echo $wo['config']['btn_hover_color'];?>;
 }
 .active-wonder {
     color: <?php echo $wo['config']['btn_background_color'];?>;
@@ -182,8 +179,12 @@ a.unread-update {
 .btn-active-color:hover {
     background: <?php echo $wo['config']['btn_hover_background_color'];?>;
 }
-.chat-tab .online-toggle {
-    background: <?php echo $wo['config']['btn_background_color'];?>;
+.chat-tab .online-toggle-hdr, .wow_thread_head {
+    background: <?php echo $wo['config']['header_background'];?>;
+	color: <?php echo $wo['config']['header_color'];?>;
+}
+.chat-tab .online-toggle-hdr a {
+	color: <?php echo $wo['config']['header_color'];?>;
 }
 .profile-style .user-follow-button button.btn-active, .btn-login, .btn-register {
     background: <?php echo $wo['config']['btn_background_color'];?>;
@@ -207,7 +208,7 @@ a.unread-update {
     color: <?php echo $wo['config']['header_color'];?> !important;
     background: <?php echo $wo['config']['header_search_color'];?> !important;
 }
-.chat-messages-wrapper .outgoing {
+.chat-messages-wrapper .outgoing .message-text {
     background: <?php echo $wo['config']['chat_outgoing_background'];?>;
 }
 .normal-container {
@@ -235,9 +236,6 @@ a.unread-update {
 .usr-offline { color: <?php echo $wo['config']['btn_background_color'];?>; }
 .blog-dd-ul li span:hover, .blog-dd-ul li a:hover { background: <?php echo $wo['config']['btn_background_color'];?> !important; }
 .blog_publ {background: <?php echo $wo['config']['btn_background_color'];?> ; border: 1px solid <?php echo $wo['config']['btn_background_color'];?> ; }
-.ads-navbar-wrapper {
-    background-color: <?php echo $wo['config']['btn_background_color'];?> !important;
-}
 .slide-film-desc:hover, .movies-top-breadcrumb li:hover, .movies-top-breadcrumb li a:hover{
     color: <?php echo $wo['config']['btn_background_color'];?> !important;
 }
@@ -250,18 +248,38 @@ a.unread-update {
     color:<?php echo $wo['config']['btn_background_color'];?>;
 }
 .ads-navbar-wrapper ul li a.active {
-     background-color: <?php echo $wo['config']['btn_hover_background_color'];?> !important;
+	border-color: <?php echo $wo['config']['btn_background_color'];?>;
 }
+.ads_mini_wallet, .wo_page_hdng_innr span {
+	background-color: <?php echo $wo['config']['btn_background_color'];?>;
+	color: <?php echo $wo['config']['btn_color'];?>;
+}
+.btn-loading:after {
+	background-color: <?php echo $wo['config']['btn_background_color'];?>;
+}
+.wow_pub_privacy_menu li label input[type="radio"]:checked+span {
+	background-color: <?php echo $wo['config']['btn_background_color'];?>;color: <?php echo $wo['config']['btn_color'];?>;
+}
+.order_by ul li.active a {background: <?php echo $wo['config']['btn_background_color'];?> !important;color: <?php echo $wo['config']['btn_color'];?> !important;}
+
 
 <?php 
 if ($wo['config']['chatSystem'] == 1 && $wo['page'] != 'get_news_feed' && $wo['page'] != 'welcome' && $wo['page'] != 'movies' && $wo['loggedin'] == true && $wo['page'] != 'messages') { ?>
-body, .navbar-default, .wo_about_wrapper_parent{padding-right: 205px;}
-@media (max-width:1140px){.wo_about_wrapper_parent{padding-right: 0px;}}
+body, .navbar-default, .wo_about_wrapper_parent{padding-right: 250px;}
+.wow_main_float_head {right: 250px;}
+@media (max-width:1140px){
+	.wo_about_wrapper_parent{padding-right: 0px;}
+	.wow_main_float_head {right: 0;}
+}
 <?php } ?>
 
 <?php if($wo['language_type'] == 'rtl' && $wo['config']['chatSystem'] == 1 && $wo['page'] != 'get_news_feed' && $wo['page'] != 'welcome' && $wo['page'] != 'movies' && $wo['page'] != 'messages' && $wo['loggedin'] == true) { ?>
-body, .navbar-default, .wo_about_wrapper_parent{padding-left: 205px;padding-right: 0px;}
-@media (max-width:1140px){.wo_about_wrapper_parent{padding-left: 0px;}}
+body, .navbar-default, .wo_about_wrapper_parent{padding-left: 250px;padding-right: 0px;}
+.wow_main_float_head {right: 0;left: 250px;}
+@media (max-width:1140px){
+	.wo_about_wrapper_parent{padding-left: 0px;}
+	.wow_main_float_head {right: 0;left: 0;}
+}
 <?php } ?>
 
 #welcomeheader .mdbtn:hover{background-color: <?php echo $wo['config']['header_color'];?>;color: <?php echo $wo['config']['header_background'];?>;border-color: <?php echo $wo['config']['header_color'];?>;}
@@ -296,7 +314,7 @@ body, .navbar-default, .wo_about_wrapper_parent{padding-left: 205px;padding-righ
 .navbar-default .dropdown-menu.ani-acc-menu >li>a:hover {
     color: <?php echo $wo['config']['btn_color'];?>;background-color: <?php echo $wo['config']['btn_background_color'];?>;
 }
-#wo_nw_msg_page .msg_under_hood .mobilerightpane .messages-search-users-form .wo_msg_tabs li.active a, .text-sender-container .msg_usr_info_top_list .msg_usr_cht_opts_btns > span:hover, .text-sender-container .msg_usr_info_top_list .msg_usr_cht_usr_data a:hover {
+#wo_nw_msg_page .msg_under_hood .mobilerightpane .messages-search-users-form .wo_msg_tabs li.active a, .text-sender-container .msg_usr_info_top_list .msg_usr_cht_opts_btns > span:hover, .text-sender-container .msg_usr_info_top_list .msg_usr_cht_usr_data a:hover, .wo_chat_tabs li.active a {
     color: <?php echo $wo['config']['btn_background_color'];?>;
 }
 .text-sender-container .outgoing .message-model .message {background-color: <?php echo $wo['config']['btn_background_color'];?>;color: <?php echo $wo['config']['btn_color'];?>;}

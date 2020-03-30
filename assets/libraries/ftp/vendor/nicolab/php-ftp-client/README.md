@@ -3,6 +3,8 @@
 A flexible FTP and SSL-FTP client for PHP.
 This lib provides helpers easy to use to manage the remote files.
 
+> This package is aimed to remain simple and light. It's only a wrapper of the FTP native API of PHP, with some useful helpers. If you want to customize some methods, you can do this by inheriting one of the [3 classes of the package](src/FtpClient).
+
 
 ## Install
 
@@ -25,11 +27,11 @@ $ftp->login($login, $password);
 
 OR
 
-Connect to a server FTP via SSL (on port 22 or other port) :
+Connect to a server FTP via SSL (on port 990 or another port) :
 
 ```php
 $ftp = new \FtpClient\FtpClient();
-$ftp->connect($host, true, 22);
+$ftp->connect($host, true, 990);
 $ftp->login($login, $password);
 ```
 
@@ -148,7 +150,7 @@ $ftp->exec($command);
 $ftp->pasv(true);
 
 // Set permissions on a file via FTP
-$ftp->chmod('0777', 'file.php');
+$ftp->chmod(0777, 'file.php');
 
 // Removes a directory
 $ftp->rmdir('path/of/directory/to/remove');

@@ -1,23 +1,24 @@
 [
     {
         "name": "nicolab/php-ftp-client",
-        "version": "v1.4.1",
-        "version_normalized": "1.4.1.0",
+        "version": "v1.5.1",
+        "version_normalized": "1.5.1.0",
         "source": {
             "type": "git",
             "url": "https://github.com/Nicolab/php-ftp-client.git",
-            "reference": "0e0c7666bdc3fb9fc9e63b065c84979588101708"
+            "reference": "8c66e1104da1b638f5d7a9e24624a5525b459a0c"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/Nicolab/php-ftp-client/zipball/0e0c7666bdc3fb9fc9e63b065c84979588101708",
-            "reference": "0e0c7666bdc3fb9fc9e63b065c84979588101708",
+            "url": "https://api.github.com/repos/Nicolab/php-ftp-client/zipball/8c66e1104da1b638f5d7a9e24624a5525b459a0c",
+            "reference": "8c66e1104da1b638f5d7a9e24624a5525b459a0c",
             "shasum": ""
         },
         "require": {
+            "ext-ftp": "*",
             "php": ">=5.4"
         },
-        "time": "2017-01-20T06:44:54+00:00",
+        "time": "2019-04-23T09:22:37+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {

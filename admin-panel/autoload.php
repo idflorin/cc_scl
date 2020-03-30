@@ -87,7 +87,9 @@ $pages = array(
     'manage-colored-posts',
     'job-categories',
     'manage-fund',
-    'manage-jobs'
+    'manage-jobs',
+    'auto-like',
+    'auto-join'
 );
 $mod_pages = array('dashboard', 'post-settings', 'manage-stickers', 'manage-gifts', 'manage-users', 'online-users', 'manage-stories', 'manage-pages', 'manage-groups', 'manage-posts', 'manage-articles', 'manage-events', 'manage-forum-threads', 'manage-forum-messages', 'manage-movies', 'manage-games', 'add-new-game', 'manage-user-ads', 'manage-reports', 'manage-third-psites', 'edit-movie','bank-receipts','job-categories','manage-jobs');
 
@@ -97,7 +99,7 @@ if (!empty($_GET['page'])) {
 }
 if ($page == 'dashboard') {
    Wo_GetOfflineTyping();
-   Wo_DelexpiredEnvents();
+   //Wo_DelexpiredEnvents();
 }
 $wo['decode_android_v']  = $wo['config']['footer_background'];
 $wo['decode_android_value']  = base64_decode('I2FhYQ==');
@@ -579,7 +581,7 @@ if (empty($page_loaded)) {
                     </li>
                     <?php } ?>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'manage-announcements' || $page == 'mailing-list' || $page == 'mass-notifications' || $page == 'ban-users' || $page == 'generate-sitemap' || $page == 'manage-invitation-keys' || $page == 'backups' || $page == 'auto-delete' || $page == 'auto-friend' || $page == 'fake-users') ? 'class="active"' : ''; ?>>
+                    <li <?php echo ($page == 'manage-announcements' || $page == 'mailing-list' || $page == 'mass-notifications' || $page == 'ban-users' || $page == 'generate-sitemap' || $page == 'manage-invitation-keys' || $page == 'backups' || $page == 'auto-delete' || $page == 'auto-friend' || $page == 'fake-users' || $page == 'auto-like' || $page == 'auto-join') ? 'class="active"' : ''; ?>>
                         <a href="javascript:void(0);" class="menu-toggle">
                             <i class="material-icons">build</i>
                             <span>Tools</span>
@@ -593,6 +595,12 @@ if (empty($page_loaded)) {
                             </li>
                             <li <?php echo ($page == 'auto-friend') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('auto-friend'); ?>">Auto Friend</a>
+                            </li>
+                            <li <?php echo ($page == 'auto-like') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('auto-like'); ?>">Auto Page Like</a>
+                            </li>
+                            <li <?php echo ($page == 'auto-join') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('auto-join'); ?>">Auto Group Join</a>
                             </li>
                             <li <?php echo ($page == 'fake-users') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('fake-users'); ?>">Fake User Generator</a>

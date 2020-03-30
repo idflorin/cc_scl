@@ -1,105 +1,74 @@
-<div class="list-group page-margin">
-    <div class="add-photo row">
-       <div class="col-lg-9">
-       	<h2><?php echo $wo['lang']['tell_us'];?></h2>
-        <h4><?php echo $wo['lang']['tell_us_des'];?></h4>
-        <br>
-      <form class="setting-general-form form-horizontal" method="post">
-      <fieldset>
-         <!-- Text input-->
-         <div class="form-group">
-            <label class="col-md-2" for="first_name"><?php echo $wo['lang']['first_name']; ?></label>  
-            <div class="col-md-7">
-               <input id="first_name" name="first_name" type="text" class="form-control input-md" value="<?php echo $wo['user']['first_name']?>" autocomplete="off"> 
-            </div>
-         </div>
-         <div class="form-group">
-            <label class="col-md-2" for="email"><?php echo $wo['lang']['last_name']; ?></label>  
-            <div class="col-md-7">
-               <input name="last_name" id="last_name" type="text" class="form-control input-md" value="<?php echo $wo['user']['last_name']?>" autocomplete="off">
-            </div>
-         </div>
-         
-         <!-- Select Basic -->
-         <div class="form-group">
-            <label class="col-md-2" for="country"><?php echo $wo['lang']['country']; ?></label>
-            <div class="col-md-7">
-               <select id="country" name="country" class="form-control">
-                  <?php 
-                  foreach ($wo['countries_name'] as $country_ids => $country) { 
-                    $country_id = $wo['user']['country_id'];
-                    $selected_contry = ($country_ids == $country_id) ? ' selected' : '' ;
-                  ?>
-                  <option value="<?php echo $country_ids;?>" <?php echo $selected_contry;?> ><?php echo $country;?></option>
-                  <?php } ?>
-               </select>
-            </div>
-         </div>
-         <?php
-         $cutoff   = 1930;
-         $now      = date('Y');
-         $birthday = '';
-         if ($wo['user']['birthday'] != '0000-00-00') {
-             $birthday = explode('-', $wo['user']['birthday']);
-         }
-         ?>
-         <!-- Select Basic -->
-         <!-- <div class="form-group">
-            <label class="col-md-2" for="birthday"><?php echo $wo['lang']['birthday']; ?></label>
-            <div class="col-sm-2">
-               <select id="birthday" name="age_day" class="form-control">
-                  <option value="" disabled selected><?php echo $wo['lang']['day']; ?></option>
-                  <?php
-                  for ($d = 1; $d <= 31; $d++) {
-                      $birthday_d = ($birthday[2] == $d) ? ' selected' : '';
-                      echo '  <option value="' . $d . '" ' . $birthday_d . '>' . $d . '</option>' . PHP_EOL;
-                  }
-                  ?>
-               </select>
-            </div> -->
-            <!-- Select Basic -->
-            <!-- <div class="col-sm-3 no-padding-left">
-               <select id="birthday" name="age_month" class="form-control">
-                  <option value="" disabled selected><?php echo $wo['lang']['month']; ?></option>
-                  <?php
-                  for ($m = 1; $m <= 12; $m++) {
-                      $birthday_m = ($birthday[1] == $m) ? ' selected' : '';
-                     echo '  <option value="' . $m . '" ' . $birthday_m . '>' . $wo['months'][$m] . '</option>' . PHP_EOL;
-                  }
-                  ?>
-               </select>
-            </div> -->
-            <!-- Select Basic -->
-            <!-- <div class="col-sm-2 no-padding-left">
-               <select id="birthday" name="age_year" class="form-control">
-                  <option value="" disabled selected><?php echo $wo['lang']['year']; ?></option>
-                  <?php
-                  for ($y = $now; $y >= $cutoff; $y--) {
-                      $birthday_y = ($birthday[0] == $y) ? ' selected' : '';
-                      echo '  <option value="' . $y . '" ' . $birthday_y . '>' . $y . '</option>' . PHP_EOL;
-                  }
-                  ?>
-               </select>
-            </div>
-         </div> -->
-         <div class="form-group">
-            <label class="col-md-2" for="country"><?php echo $wo['lang']['birthday']; ?></label>
-            <div class="col-md-7">
-              <input id="usr_birthday" name="birthday" type="text" class="form-control input-md" placeholder="<?php echo $wo['lang']['birthday']; ?>" autocomplete="off"> 
-            
-            </div>
-         </div>
-         <input type="hidden" name="user_id" value="<?php echo $wo['user']['user_id'];?>">
-         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-      </fieldset>
-   </form>
-       </div>
-       <div class="col-lg-2 continue-button">
-       	<button class="btn con-button btn-main" onclick="Wo_SubmitInfoForm();"><?php echo $wo['lang']['start_up_continue'];?></button><br> <small class="skip-step" onclick="Wo_SkipStep('start_up_info');"><?php echo $wo['lang']['start_up_skip'];?></small>
-       </div>
-       <div class="clear"></div>
-    </div>
+<div class="row">
+	<div class="col-lg-1"></div>
+	<div class="col-lg-10">
+		<div class="page-margin wow_creads_minstp wow__minstp step-two-active">
+			<div class="line">
+				<div class="line_sec"></div>
+				<div class="dot one"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg></div>
+				<div class="dot two"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg></div>
+				<div class="dot three"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg></div>
+			</div>
+			<div class="steps">
+				<div class="step step-one"><?php echo $wo['lang']['ad_media']; ?></div>
+				<div class="step step-two"><?php echo $wo['lang']['info']; ?></div>
+				<div class="step step-three"><?php echo $wo['lang']['follow']; ?></div>
+			</div>
+		</div>
+		<div class="page-margin wow_content">	
+			<div class="add-photo wow_usr_steps">
+				<h2><?php echo $wo['lang']['tell_us'];?></h2>
+				<h4><?php echo $wo['lang']['tell_us_des'];?></h4>
+				<form class="setting-general-form row form-horizontal" method="post">
+					<div class="col-md-2"></div>
+					<div class="col-md-8">
+						<div class="wow_form_fields">
+							<label for="first_name"><?php echo $wo['lang']['first_name']; ?></label>
+							<input id="first_name" name="first_name" type="text" class="form-control input-md" value="<?php echo $wo['user']['first_name']?>" autocomplete="off"> 
+						</div>
+						<div class="wow_form_fields">
+							<label for="last_name"><?php echo $wo['lang']['last_name']; ?></label>
+							<input id="last_name" name="last_name" type="text" class="form-control input-md" value="<?php echo $wo['user']['last_name']?>" autocomplete="off"> 
+						</div>
+						<div class="wow_form_fields">
+							<label for="country"><?php echo $wo['lang']['country']; ?></label>
+							<select id="country" name="country" class="form-control">
+								<?php 
+									foreach ($wo['countries_name'] as $country_ids => $country) { 
+									$country_id = $wo['user']['country_id'];
+									$selected_contry = ($country_ids == $country_id) ? ' selected' : '' ;
+								?>
+									<option value="<?php echo $country_ids;?>" <?php echo $selected_contry;?> ><?php echo $country;?></option>
+								<?php } ?>
+							</select>
+						</div>
+						<?php
+							$cutoff   = 1930;
+							$now      = date('Y');
+							$birthday = '';
+							if ($wo['user']['birthday'] != '0000-00-00') {
+								$birthday = explode('-', $wo['user']['birthday']);
+							}
+						?>
+						<div class="wow_form_fields">
+							<label for="usr_birthday"><?php echo $wo['lang']['birthday']; ?></label>
+							<input id="usr_birthday" name="birthday" type="text" class="form-control input-md" placeholder="<?php echo $wo['lang']['birthday']; ?>" autocomplete="off"> 
+						</div>
+						<input type="hidden" name="user_id" value="<?php echo $wo['user']['user_id'];?>">
+						<input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+					</div>
+					<div class="col-md-2"></div>
+				</form>
+				<div class="clear"></div>
+			</div>
+			<div class="continue-button wow_usr_steps_cont">
+				<small class="skip-step" onclick="Wo_SkipStep('start_up_info');"><?php echo $wo['lang']['start_up_skip'];?></small>
+				<button class="btn con-button btn-main btn-mat btn-mat-raised" onclick="Wo_SubmitInfoForm();"><?php echo $wo['lang']['start_up_continue'];?></button>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-1"></div>
 </div>
+
 <script type="text/javascript">
   $(function() {
   $("#usr_birthday").datepicker({

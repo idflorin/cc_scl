@@ -591,6 +591,27 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'approve_post') {
+        if (!empty($_POST['post_id'])) {
+            $post = $db->where('id',Wo_Secure($_POST['post_id']))->getOne(T_POSTS);
+            if (!empty($post)) {
+                $db->where('id',Wo_Secure($_POST['post_id']))->update(T_POSTS,array('active' => 1));
+                $notification_data_array = array(
+                    'recipient_id' => $post->user_id,
+                    'type' => 'admin_notification',
+                    'url' => 'index.php?link1=post&id='.$post->id,
+                    'text' => $wo['lang']['approve_post'],
+                    'type2' => 'approve_post'
+                );
+                Wo_RegisterNotification($notification_data_array);
+
+            }
+        }
+        $data['status'] = 200;
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
     // manage packages 
     if ($s == 'test_vision_api') {
         $data['status'] = 400;
@@ -1457,6 +1478,40 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'auto_page_like' && Wo_CheckMainSession($hash_id) === true) {
+        if (!empty($_GET['users'])) {
+            $save = Wo_SaveConfig('auto_page_like', $_GET['users']);
+            if ($save) {
+                $data['status'] = 200;
+            }
+        }
+        else{
+            $save = Wo_SaveConfig('auto_page_like', '');
+            if ($save) {
+                $data['status'] = 200;
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'auto_group_like' && Wo_CheckMainSession($hash_id) === true) {
+        if (!empty($_GET['users'])) {
+            $save = Wo_SaveConfig('auto_group_join', $_GET['users']);
+            if ($save) {
+                $data['status'] = 200;
+            }
+        }
+        else{
+            $save = Wo_SaveConfig('auto_group_join', '');
+            if ($save) {
+                $data['status'] = 200;
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
     if ($s == 'generate_fake_users') {
         require "assets/libraries/fake-users/vendor/autoload.php";
         $faker = Faker\Factory::create();
@@ -1488,6 +1543,16 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 $re_data['avatar'] = Wo_ImportImageFromFile($faker->imageUrl($wo['profile_picture_width_crop'], $wo['profile_picture_height_crop']));
             }
             $add_user = Wo_RegisterUser($re_data);
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_fake_users' && Wo_CheckMainSession($hash_id) === true) {
+        Wo_RunInBackground(array('status' => 200));
+        $query = mysqli_query($sqlConnect, "SELECT user_id FROM " . T_USERS . " WHERE src = 'Fake'");
+        while ($row = mysqli_fetch_assoc($query)) {
+            Wo_DeleteUser($row['user_id']);
         }
         header("Content-type: application/json");
         echo json_encode($data);

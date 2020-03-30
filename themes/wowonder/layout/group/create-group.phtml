@@ -1,68 +1,59 @@
 <div class="page-margin">
 	<div class="row">
 		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
-		<div class="col-md-7 middlecol wo-create-forms">
-			<h3 class="wo_create_form_cover group">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> 
-				<?php echo $wo['lang']['create_new_group'];?>
-				<span class="<?php echo Wo_RightToLeft('pull-right');?>">
-					<a data-ajax="?link1=groups" href="<?php echo Wo_SeoLink('index.php?link1=groups');?>">
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg><?php echo $wo['lang']['my_groups'];?>
-					</a>
-				</span>
-				<div class="clear"></div>
-			</h3>
-			<div class="wo_settings_page">
+		<div class="col-md-7 middlecol">
+			<div class="page-margin wow_content mt-0">
+				<div class="wo_page_hdng pag_neg_padd pag_alone">
+					<div class="wo_page_hdng_innr">
+						<span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M13 3V11H21V3H13M3 21H11V13H3V21M3 3V11H11V3H3M13 16H16V13H18V16H21V18H18V21H16V18H13V16Z"></path></svg></span> <?php echo $wo['lang']['create_new_group'];?>
+					</div>
+				</div>
+			</div>
+			
+			<div class="page-margin wow_content wow_sett_content">
 				<form class="create-group-form form-horizontal" method="post">
-					<div class="setting-panel row">
-						<!-- Text input-->
-						<div class="form-group col-lg-12">
-							<label class="col-md-12" for="group_title"><?php echo $wo['lang']['group_name'];?> *</label>  
-							<div class="col-md-12">
-								<input name="group_title" id="group_title" type="text" class="form-control input-md">
-								<span class="help-block"><?php echo $wo['lang']['your_page_title'];?></span>
-							</div>
+					<div class="wow_form_fields">
+						<label for="group_title"><?php echo $wo['lang']['group_name']; ?></label>
+						<input id="group_title" name="group_title" type="text">
+					</div>
+					<div class="wow_form_fields">
+						<label for="group_name"><?php echo $wo['lang']['group'];?> URL</label>
+						<div class="input-group">
+							<span class="input-group-addon"><?php echo $wo['config']['site_url'];?>/</span>
+							<input id="group_name" name="group_name" type="text">
 						</div>
-						<div class="form-group col-lg-12">
-							<label class="col-md-12" for="group_name"><?php echo $wo['lang']['group'];?> URL *</label>  
-							<div class="col-md-12 input-group">
-								<span class="input-group-addon"><?php echo $wo['config']['site_url'];?>/</span>
-								<input id="group_name" name="group_name" type="text" class="form-control input-md">
-							</div>
-						</div>
-						<div class="form-group col-lg-6">
-							<label class="col-md-12" for="privacy"><?php echo $wo['lang']['group_type'];?> </label>
-							<div class="col-md-12">
-								<select id="privacy" name="privacy" class="form-control">
+					</div>
+					<div class="wow_form_fields">
+						<label for="group_about"><?php echo $wo['lang']['description']; ?></label>
+						<textarea name="about" id="group_about" rows="3"></textarea>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="wow_form_fields">
+								<label for="privacy"><?php echo $wo['lang']['group_type']; ?></label>
+								<select id="privacy" name="privacy">
 									<option value="1" ><?php echo $wo['lang']['public'];?> </option>
 									<option value="2" ><?php echo $wo['lang']['private'];?> </option>
 								</select>
 							</div>
 						</div>
-						<div class="form-group col-lg-6">
-							<label class="col-md-12" for="category"><?php echo $wo['lang']['category'];?> *</label>  
-							<div class="col-md-12">
-								<select name="category" id="category" class="form-control">
+						<div class="col-md-6">
+							<div class="wow_form_fields">
+								<label for="category"><?php echo $wo['lang']['category']; ?></label>
+								<select name="category" id="category">
 									<?php foreach ($wo['group_categories'] as $category_id => $category_name) {?>
 									<option value="<?php echo $category_id?>"><?php echo $category_name; ?></option>
 									<?php } ?>
 								</select>
 							</div>
 						</div>
-						<div class="form-group col-lg-12">
-							<label class="col-md-12" for="about"><?php echo $wo['lang']['about'];?></label>  
-							<div class="col-md-12">
-								<textarea name="about" id="" rows="3" class="form-control input-md"></textarea>
-							</div>
-						</div>
 					</div>
-                     <div class="app-general-alert setting-update-alert"></div>
-					<div class="form-group last-sett-btn modal-footer">
-						<div class="ball-pulse"><div></div><div></div><div></div></div>
-						<button type="submit" class="btn btn-main setting-panel-mdbtn">
-							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> 
-							<?php echo $wo['lang']['create'];?>
-						</button>
+					<div class="app-general-alert setting-update-alert"></div>
+					<div class="text-center">
+						<a class="btn btn-mat" data-ajax="?link1=groups" href="<?php echo Wo_SeoLink('index.php?link1=groups');?>">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"></path></svg> <?php echo $wo['lang']['go_back'];?>
+						</a>
+						<button class="btn btn-main btn-mat btn-mat-raised add_wow_loader" type="submit"><?php echo $wo['lang']['create']; ?></button>
 					</div>
 					<input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
 				</form>
@@ -79,7 +70,7 @@
      $('form.create-group-form').ajaxForm({
        url: Wo_Ajax_Requests_File() + '?f=groups&s=create_group',
        beforeSend: function() {
-         $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+         $('.create-group-form').find('.add_wow_loader').addClass('btn-loading');
        },
        success: function(data) {
          scrollToTop();
@@ -90,7 +81,7 @@
              $('.app-general-alert').html('<div class="alert alert-danger">' + errors + '</div>');
              $('.alert-danger').fadeIn(300);
          }
-         $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+         $('.create-group-form').find('.add_wow_loader').removeClass('btn-loading');
        }
      });
    });

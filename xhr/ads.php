@@ -59,6 +59,27 @@ if ($f == 'ads') {
             }
         }
         if (empty($error)) {
+            $page_id = 0;
+            if (!empty($_POST['page'])) {
+                $page_id = Wo_PageIdFromPagename($_POST['page']);
+                if (empty($page_id)) {
+                    $page_id = 0;
+                }
+            }
+            $start = '';
+            if (!empty($_POST['start'])) {
+                $start = Wo_Secure($_POST['start']);
+            }
+            $end = '';
+            if (!empty($_POST['end'])) {
+                $end = Wo_Secure($_POST['end']);
+            }
+            $budget = 0;
+            if (!empty($_POST['budget']) && is_numeric($_POST['budget']) && $_POST['budget'] > 0) {
+                $budget = Wo_Secure($_POST['budget']);
+            }
+            
+            
             $registration_data             = array(
                 'name' => Wo_Secure($_POST['name']),
                 'url' => Wo_Secure($_POST['website']),
@@ -70,7 +91,11 @@ if ($f == 'ads') {
                 'bidding' => Wo_Secure($_POST['bidding']),
                 'posted' => time(),
                 'appears' => Wo_Secure($_POST['appears']),
-                'user_id' => Wo_Secure($wo['user']['user_id'])
+                'user_id' => Wo_Secure($wo['user']['user_id']),
+                'page_id' => $page_id,
+                'start'   => $start,
+                'end'   => $end,
+                'budget'   => $budget
             );
             $fileInfo                      = array(
                 'file' => $_FILES["media"]["tmp_name"],
@@ -86,7 +111,7 @@ if ($f == 'ads') {
             $data                          = array(
                 'message' => $success_icon . $wo['lang']['ad_added'],
                 'status' => 200,
-                'url' => Wo_SeoLink('index.php?link1=ads')
+                'url' => Wo_SeoLink('index.php?link1=advertise')
             );
         } else {
             $data = array(
@@ -183,7 +208,7 @@ if ($f == 'ads') {
             $data = array(
                 'message' => $success_icon . $wo['lang']['ad_saved'],
                 'status' => 200,
-                'url' => Wo_SeoLink('index.php?link1=ads')
+                'url' => Wo_SeoLink('index.php?link1=advertise')
             );
             if (isset($_GET['a']) && $_GET['a'] == 1) {
                 $data['url'] = Wo_SeoLink('index.php?link1=admincp&page=user_ads');

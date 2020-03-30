@@ -1197,7 +1197,16 @@ function Wo_UploadImage($file, $name, $type, $type_file, $user_id = 0, $placemen
     } else if ($type == 'avatar') {
         $filename             = $dir . '/' . Wo_GenerateKey() . '_' . date('d') . '_' . md5(time()) . '_avatar.' . $ext;
         $image_data['avatar'] = $filename;
-        $user_data            = Wo_UserData($image_data['user_id']);
+        if ($placement == 'page') {
+            $user_data            = Wo_PageData($image_data['page_id']);
+        }
+        elseif ($placement == 'group') {
+            $user_data            = Wo_GroupData($image_data['id']);
+        }
+        else{
+            $user_data            = Wo_UserData($image_data['user_id']);
+        }
+        
         $image_data_d         = array();
         @$image_data_d['avatar'] = $user_data['avatar'];
         if (move_uploaded_file($file, $filename)) {
@@ -1218,7 +1227,7 @@ function Wo_UploadImage($file, $name, $type, $type_file, $user_id = 0, $placemen
                 return true;
             } else {
 
-                $image_file = Wo_GetMedia($image_data['cover']);
+                $image_file = Wo_GetMedia($image_data['avatar']);
                 $blur = 0;
                 $upload_p = true;
 
@@ -2604,7 +2613,7 @@ function Wo_GetSearchFilter($result, $limit = 30, $offset = 0) {
         if( substr( $key, 0, 4 ) == 'fid_' && !empty( $val ) ){
             $profile_search[ $key ] = Wo_Secure( $val );
             $custom_type = $db->where('name',substr( $key, 4))->getOne(T_FIELDS);
-            if ($custom_type->type == 'textbox' || $custom_type->type == 'textarea') {
+            if (!empty($custom_type) && ($custom_type->type == 'textbox' || $custom_type->type == 'textarea') ) {
                 $profile_search_sql .= "`" . Wo_Secure( $key ) . "` LIKE '%" . Wo_Secure( $val ) . "%' AND";
             }
             else{
@@ -3141,7 +3150,7 @@ function Wo_RegisterMessage($ms_data = array()) {
         return false;
     }
     if (!isset($ms_data['stickers'])) {
-        if (empty($ms_data['text']) || !isset($ms_data['text']) || strlen($ms_data['text']) < 0) {
+        if ((empty($ms_data['text']) && $ms_data['text'] != 0) || !isset($ms_data['text']) || strlen($ms_data['text']) < 0) {
             if (empty($ms_data['media']) || !isset($ms_data['media']) || strlen($ms_data['media']) < 0) {
                 return false;
             }
@@ -4169,9 +4178,9 @@ function Wo_DisplaySharedFile($media, $placement = '', $cache = false) {
                     $usr_country = $wo['user']['country_id'];
                     $db->where(" `audience` LIKE '%$usr_country%' ");
                 }
-
-
-                $video_ad = $db->orderBy('RAND()')->getOne(T_USER_ADS);
+                   
+                $start = date('Y-m-d');
+                $video_ad = $db->where("((start = '') OR (start <= '{$start}' && end >= '{$start}'))")->where("((budget = 0) OR (spent < budget))")->orderBy('RAND()')->getOne(T_USER_ADS);
                 if (!empty($video_ad)) {
                     $wo['is_video_ad'] = ",'ads'";
                     $wo['wo_ad_url']   = $video_ad->url;
@@ -4597,13 +4606,16 @@ function Wo_GetHashtag($tag = '', $type = true) {
     }
 }
 function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 0) {
-    global $wo, $sqlConnect, $cache;
+    global $wo, $sqlConnect, $cache,$db;
     if (empty($post_id) || !is_numeric($post_id) || $post_id < 0) {
         return false;
     }
     $data           = array();
     $post_id        = Wo_Secure($post_id);
     $query_one      = "SELECT * FROM " . T_POSTS . " WHERE `id` = {$post_id}";
+    if ($wo['config']['post_approval'] == 1 && !Wo_IsAdmin()) {
+        $query_one .= " AND `active` = '1' ";
+    }
     $hashed_post_Id = md5($post_id);
     if ($wo['config']['cacheSystem'] == 1) {
         $fetched_data = $cache->read($hashed_post_Id . '_P_Data.tmp');
@@ -4641,9 +4653,13 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
         }
     }
     $story['limit_comments']   = 3;
-    $story['limited_comments'] = true;
+    $story['limited_comments'] = false;
     if ($limited == 'not_limited') {
         $story['limit_comments']   = 10000;
+        $story['limited_comments'] = false;
+    }
+    if (!empty($limited) && is_numeric($limited) && $limited > 0) {
+        $story['limit_comments']   = Wo_Secure($limited);
         $story['limited_comments'] = false;
     }
     $story['is_group_post']          = false;
@@ -4812,11 +4828,18 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
         $story['event'] = Wo_EventData($story['event_id']);
     }
     $story['options'] = array();
+    $story['voted_id'] = 0;
     if ($story['poll_id'] == 1) {
         $options = Ju_GetPercentageOfOptionPost($story['id']);
         if (!empty($options)) {
             $story['options'] = $options;
         }
+        if ($wo['loggedin']) {
+            $option = $db->where('post_id',$post_id)->where('user_id',$wo['user']['id'])->getOne(T_VOTES,'option_id');
+            $story['voted_id'] = $option->option_id;
+        }
+        
+
     }
     if ($wo['loggedin'] == true) {
         $story['post_share']       = Wo_CountPostShare($story['id']);
@@ -4849,9 +4872,19 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
     if ($wo['config']['second_post_button'] == 'reaction') {
         $story['reaction'] = Wo_GetPostReactionsTypes($story['id']);
     }
-
+    $story['job'] = array();
     if (!empty($story['job_id'])) {
         $story['job'] = Wo_GetJobById($story['job_id']); 
+    }
+    $story['fund'] = array();
+    if (!empty($story['fund_raise_id'])) {
+        $story['fund'] = GetFundByRaiseId($story['fund_raise_id'],$story['user_id']);
+        unset($story['fund']['user_data']);
+    }
+    $story['fund_data'] = array();
+    if (!empty($story['fund_id'])) {
+        $story['fund_data'] = GetFundingById($story['fund_id']);
+        unset($story['fund_data']['user_data']);
     }
     return $story;
 }
@@ -4997,12 +5030,13 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND (`postSoundCloud` <> '' OR `postFile` LIKE '%_soundFile%')";
                 break;
             case 'video':
-                $query_text .= " AND (`postYoutube` <> '' OR `postVine` <> '' OR `postFacebook` <> '' OR `postDailymotion` <> '' OR `postVimeo` <> '' OR `postFile` LIKE '%_video%')";
+                $query_text .= " AND (`postYoutube` <> '' OR `postVine` <> '' OR `postFacebook` <> '' OR `postDailymotion` <> '' OR `postVimeo` <> '' OR `postPlaytube` <> '' OR `postFile` LIKE '%_video%')";
                 break;
             case 'maps':
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
+        $query_text .= " AND `postPrivacy` <> '3'";
     } else if (isset($Wo_page_publisher['page_id'])) {
         $page_id = Wo_Secure($Wo_page_publisher['page_id']);
         $query_text .= " AND (`page_id` = {$page_id}) AND `id` NOT IN (SELECT `post_id` from " . T_PINNED_POSTS . " WHERE `page_id` = {$page_id})";
@@ -5023,7 +5057,7 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND (`postSoundCloud` <> '' OR `postFile` LIKE '%_soundFile%')";
                 break;
             case 'video':
-                $query_text .= " AND (`postYoutube` <> '' OR `postVine` <> '' OR `postFacebook` <> '' OR `postDailymotion` <> '' OR `postVimeo` <> '' OR `postFile` LIKE '%_video%')";
+                $query_text .= " AND (`postYoutube` <> '' OR `postVine` <> '' OR `postFacebook` <> '' OR `postDailymotion` <> '' OR `postVimeo` <> '' OR `postPlaytube` <> '' OR `postFile` LIKE '%_video%')";
                 break;
             case 'maps':
                 $query_text .= " AND `postMap` <> ''";
@@ -5034,6 +5068,7 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 }
                 break;
         }
+        $query_text .= " AND `postPrivacy` <> '3'";
 
     } else if (isset($Wo_group_publisher['id'])) {
         $group_id = Wo_Secure($Wo_group_publisher['id']);
@@ -5052,12 +5087,13 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND (`postSoundCloud` <> '' OR `postFile` LIKE '%_soundFile%')";
                 break;
             case 'video':
-                $query_text .= " AND (`postYoutube` <> '' OR `postVine` <> '' OR `postFacebook` <> '' OR `postDailymotion` <> '' OR `postVimeo` <> '' OR `postFile` LIKE '%_video%')";
+                $query_text .= " AND (`postYoutube` <> '' OR `postVine` <> '' OR `postFacebook` <> '' OR `postDailymotion` <> '' OR `postVimeo` <> '' OR `postPlaytube` <> '' OR `postFile` LIKE '%_video%')";
                 break;
             case 'maps':
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
+        $query_text .= " AND `postPrivacy` <> '3'";
     } else if (isset($Wo_event_publisher['id'])) {
         $event_id = Wo_Secure($Wo_event_publisher['id']);
         $query_text .= " AND (`event_id` = {$event_id}) AND `id` NOT IN (SELECT `post_id` from " . T_PINNED_POSTS . " WHERE `event_id` = {$event_id})";
@@ -5075,12 +5111,13 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND (`postSoundCloud` <> '' OR `postFile` LIKE '%_soundFile%')";
                 break;
             case 'video':
-                $query_text .= " AND (`postYoutube` <> '' OR `postVine` <> '' OR `postFacebook` <> '' OR `postDailymotion` <> '' OR `postVimeo` <> '' OR `postFile` LIKE '%_video%')";
+                $query_text .= " AND (`postYoutube` <> '' OR `postVine` <> '' OR `postFacebook` <> '' OR `postDailymotion` <> '' OR `postVimeo` <> '' OR `postPlaytube` <> '' OR `postFile` LIKE '%_video%')";
                 break;
             case 'maps':
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
+        $query_text .= " AND `postPrivacy` <> '3'";
     } else {
         $logged_user_id    = Wo_Secure($wo['user']['user_id']);
         $groups_not_joined = array();
@@ -5154,6 +5191,9 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
     $query_text .= " AND `id` NOT IN (SELECT `post_id` FROM " . T_HIDDEN_POSTS . " WHERE `user_id` = {$user})";
     if ($wo['config']['job_system'] != 1) {
         $query_text .= " AND `job_id` = '0' ";
+    }
+    if ($wo['config']['post_approval'] == 1) {
+        $query_text .= " AND `active` = '1' ";
     }
     if (empty($data['limit']) or !is_numeric($data['limit']) or $data['limit'] < 1) {
         $data['limit'] = 5;
@@ -7136,7 +7176,7 @@ function Wo_GetPostCommentsLimited($post_id = 0, $comment_id = 0) {
     return $data;
 }
 
-function Wo_GetPostComments($post_id = 0, $limit = 5) {
+function Wo_GetPostComments($post_id = 0, $limit = 5, $offset = 0) {
     global $sqlConnect, $wo;
     if (empty($post_id) || !is_numeric($post_id) || $post_id < 0) {
         return false;
@@ -7144,12 +7184,17 @@ function Wo_GetPostComments($post_id = 0, $limit = 5) {
     if ($wo['loggedin'] == false) {
         return false;
     }
+    $offset_query = "";
+    if (!empty($offset)) {
+        $offset_query = " AND `id` > ".$offset;
+    }
     $logged_user_id = Wo_Secure($wo['user']['user_id']);
     $post_id        = Wo_Secure($post_id);
     $data           = array();
-    $query          = "SELECT `id` FROM " . T_COMMENTS . " WHERE `post_id` = {$post_id} AND `user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$logged_user_id}') AND `user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$logged_user_id}') ORDER BY `id` ASC";
+    $query          = "SELECT `id` FROM " . T_COMMENTS . " WHERE `post_id` = {$post_id} AND `user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$logged_user_id}') AND `user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$logged_user_id}') {$offset_query} ORDER BY `id` ASC";
     if (($comments_num = Wo_CountPostComment($post_id)) > $limit) {
-        $query .= " LIMIT " . ($comments_num - $limit) . ", {$limit} ";
+        //$query .= " LIMIT " . ($comments_num - $limit) . ", {$limit} ";
+        $query .= " LIMIT {$limit} ";
     }
     $query_one = mysqli_query($sqlConnect, $query);
     while ($fetched_data = mysqli_fetch_assoc($query_one)) {
@@ -7310,8 +7355,12 @@ function Wo_DeletePostReplyComment($comment_id = '') {
         return false;
     }
     $logged_user_id = Wo_Secure($wo['user']['user_id']);
-    $query_one      = mysqli_query($sqlConnect, "SELECT `id`, `user_id` FROM " . T_COMMENTS_REPLIES . " WHERE `id` = {$comment_id} AND `user_id` = {$logged_user_id}");
+    $query_one      = mysqli_query($sqlConnect, "SELECT `id`, `user_id`,`c_file` FROM " . T_COMMENTS_REPLIES . " WHERE `id` = {$comment_id} AND `user_id` = {$logged_user_id}");
     if (mysqli_num_rows($query_one) > 0 || Wo_IsAdmin()) {
+        $query_img = mysqli_fetch_assoc($query_one);
+        if (!empty($query_img['c_file'])) {
+            @unlink($query_img['c_file']);
+        }
         $query_delete = mysqli_query($sqlConnect, "DELETE FROM " . T_COMMENTS_REPLIES . " WHERE `id` = {$comment_id}");
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_REACTIONS . " WHERE `replay_id` = '{$comment_id}'");
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_COMMENT_REPLIES_WONDERS . " WHERE `reply_id` = {$comment_id}");

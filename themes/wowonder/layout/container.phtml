@@ -147,6 +147,11 @@
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
       <?php endif; ?>
+	  
+	  <?php if ($wo['page'] == 'friends_nearby'): ?>
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/leaflet.css">
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/leaflet.js"></script>
+      <?php endif; ?>
 
       <?php if ($wo['page'] == 'forum') { ?>
         <script src="<?php echo $wo['config']['theme_url'];?>/javascript/forum/script.master.js"></script>
@@ -246,7 +251,7 @@
                         $('#load-more-posts').hide();
                         json_data = JSON.parse($('#json-data').val());
                         if (json_data.page == 'home') {
-                            document.getElementById('posts').innerHTML = '<div class="posts_load"><div class="wo_loading_post"><div class="wo_loading_post_child"></div></div></div>';
+                            document.getElementById('posts').innerHTML = '<div class="posts_load"><div class="wo_loading_post"><div class="lightui1-shimmer"> <div class="_2iwr"></div> <div class="_2iws"></div> <div class="_2iwt"></div> <div class="_2iwu"></div> <div class="_2iwv"></div> <div class="_2iww"></div> <div class="_2iwx"></div> <div class="_2iwy"></div> <div class="_2iwz"></div> <div class="_2iw-"></div> <div class="_2iw_"></div> <div class="_2ix0"></div> </div></div><div class="wo_loading_post"><div class="lightui1-shimmer"> <div class="_2iwr"></div> <div class="_2iws"></div> <div class="_2iwt"></div> <div class="_2iwu"></div> <div class="_2iwv"></div> <div class="_2iww"></div> <div class="_2iwx"></div> <div class="_2iwy"></div> <div class="_2iwz"></div> <div class="_2iw-"></div> <div class="_2iw_"></div> <div class="_2ix0"></div> </div></div></div>';
                             loadposts();
                             window.history.pushState({state:'new'},'', websiteUrl);
                             $("html, body").animate({ scrollTop: 0 }, 100);
@@ -422,14 +427,9 @@
       </div>
       <!-- Load modal alerts -->
     <?php echo Wo_LoadPage('modals/site-alerts'); ?>
-    <?php echo Wo_LoadPage('modals/language'); ?>
     
     <?php if (($wo['page'] == 'home' || $wo['page'] == 'timeline' || $wo['page'] == 'products') && $wo['config']['classified'] == 1) { ?>
     <?php echo Wo_LoadPage('products/create'); ?>
-    <?php } ?>
-    
-    <?php if (($wo['page'] == 'ads')) { ?>
-    <?php echo Wo_LoadPage('ads/send_money'); ?>
     <?php } ?>
     
     <?php if ($wo['loggedin'] == true) {?>

@@ -107,6 +107,13 @@
                             <input type="radio" name="colored_posts_system" id="colored_posts_system-disabled" value="0" <?php echo ($wo['config']['colored_posts_system'] == 0) ? 'checked': '';?>>
                             <label for="colored_posts_system-disabled" class="m-l-20">Disabled</label>
                         </div>
+                        <label for="post_approval">Post Approval System</label>
+                        <div class="form-group">
+                            <input type="radio" name="post_approval" id="post_approval-enabled" value="1" <?php echo ($wo['config']['post_approval'] == 1) ? 'checked': '';?>>
+                            <label for="post_approval-enabled">Enabled</label>
+                            <input type="radio" name="post_approval" id="post_approval-disabled" value="0" <?php echo ($wo['config']['post_approval'] == 0) ? 'checked': '';?>>
+                            <label for="post_approval-disabled" class="m-l-20">Disabled</label>
+                        </div>
                         <br>
 
                         <label for="maxCharacters">Max Allowed Characters Length</label>
@@ -134,6 +141,7 @@
                                 <label class="form-label">Post Limit For Per User p/hour</label>
                             </div>
                         </div>
+
 
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>

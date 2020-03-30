@@ -268,7 +268,7 @@ function Wo_OpenNotificationsMenu() {
   }, function (data) {
     if(data.status == 200) {
       if(data.html.length == 0) {
-        notification_list.html('<span class="center-text padding-10"><svg style="width: 100%;color: #03A9F4;margin: 15px 0px 15px 0px;" xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.56 2.9A7 7 0 0 1 19 9v4m-2 4H2a3 3 0 0 0 3-3V9a7 7 0 0 1 .78-3.22M13.73 21a2 2 0 0 1-3.46 0"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>' + data.message + '</span>');
+        notification_list.html('<div class="empty_state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M18.586 20H4a.5.5 0 0 1-.4-.8l.4-.533V10c0-1.33.324-2.584.899-3.687L1.393 2.808l1.415-1.415 19.799 19.8-1.415 1.414L18.586 20zM6.408 7.822A5.985 5.985 0 0 0 6 10v8h10.586L6.408 7.822zM20 15.786l-2-2V10a6 6 0 0 0-8.99-5.203L7.56 3.345A8 8 0 0 1 20 10v5.786zM9.5 21h5a2.5 2.5 0 1 1-5 0z" fill="currentColor"/></svg>' + data.message + '</div>');
       } else {
         document.getElementById('notification-list').innerHTML = data.html;
         Wo_intervalUpdates();
@@ -286,7 +286,7 @@ function Wo_OpenMessagesMenu() {
   }, function (data) {
     if(data.status == 200) {
       if(data.html.length == 0) {
-        messages_list.html('<span class="center-text padding-10"><svg style="width: 100%;color: #4caf50;margin: 15px 0px 15px 0px;" xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>' + data.message + '</span>');
+        messages_list.html('<div class="empty_state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M6.455 19L2 22.5V4a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.455zM4 18.385L5.763 17H20V5H4v13.385zM13.414 11l2.475 2.475-1.414 1.414L12 12.414 9.525 14.89l-1.414-1.414L10.586 11 8.11 8.525l1.414-1.414L12 9.586l2.475-2.475 1.414 1.414L13.414 11z" fill="currentColor"/></svg>' + data.message + '</div>');
       } else {
         //messages_list.html(data.html);
         document.getElementById('messages-list').innerHTML = data.html;
@@ -307,7 +307,7 @@ function Wo_OpenRequestsMenu() {
   }, function (data) {
     if(data.status == 200) {
       if(data.html.length == 0) {
-        requests_List.html('<span class="center-text"><svg style="width: 100%;color: #3f51b5;margin: 15px 0px 15px 0px;" xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="18" y1="8" x2="23" y2="13"></line><line x1="23" y1="8" x2="18" y2="13"></line></svg>' + data.message + '</span>');
+        requests_List.html('<div class="empty_state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M14 14.252v2.09A6 6 0 0 0 6 22l-2-.001a8 8 0 0 1 10-7.748zM12 13c-3.315 0-6-2.685-6-6s2.685-6 6-6 6 2.685 6 6-2.685 6-6 6zm0-2c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm7 6.586l2.121-2.122 1.415 1.415L20.414 19l2.122 2.121-1.415 1.415L19 20.414l-2.121 2.122-1.415-1.415L17.586 19l-2.122-2.121 1.415-1.415L19 17.586z" fill="currentColor"/></svg>' + data.message + '</div>');
       } else {
         requests_List.html(data.html);
         Wo_intervalUpdates();
@@ -1666,7 +1666,7 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
   } else if ($('.chat-wrapper').length == 2) {
     placement = 3;
   }
-  var loading_icon = '<div class="ball-pulse" style="display: block;"><div></div><div></div><div></div></div>';
+  var loading_icon = '<svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="11" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg>';
   $('#online_' + recipient_id).find('.new-message-alert').hide();
   if (group_id) {
     var loading_div = $('.chat-container').find('#group_tab_' + group_id).find('.chat-loading-icon');
@@ -1728,7 +1728,7 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
           if (data.messages.length > 0) {
              $('.chat-tab').find('.chat_' + recipient_id).find('.chat-messages').html(data.messages);
           } else {
-            $('.chat_' + recipient_id).find('.chat-user-desc').fadeIn(150);
+            $('.chat_' + recipient_id).find('.chat-user-desc').addClass('chat-user-desc-show');
           }
           setTimeout(function () {
             $('.chat-messages-wrapper').scrollTop($('.chat-messages-wrapper')[0].scrollHeight);
@@ -2409,7 +2409,7 @@ function Wo_VoteUp(id) {
      return false;
   }
   if ($is_voted == 'false') {
-     $vote_con.find('.vote-icon').html('<i class="fa fa-check-circle"></i>');
+     $vote_con.find('.poll-option span').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="opacity: 1;"><path fill="#2196f3" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z" /></svg>');
   }
   $('#post-' + $post_id).find('.options').attr('data-vote', true);
   $.get(Wo_Ajax_Requests_File(), {f:'vote_up', id:id}, function (data) {

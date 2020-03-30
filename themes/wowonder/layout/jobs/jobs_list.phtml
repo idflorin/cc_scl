@@ -3,15 +3,14 @@
 		<a href="<?php echo $wo['job']['url']?>"><img src="<?php echo Wo_GetMedia($wo['job']['image']);?>"></a>
 	</div>
 	<div class="wo_jlist_info">
-		<div class="wo_jlist_info_head " style="display: block;">
-			<h2 style="display: inline-block;"><a href="<?php echo $wo['job']['url']?>" title="<?php echo $wo['job']['title']?>"><?php echo $wo['job']['title']?></a></h2>
-			<div style="float: right;">
+		<div class="wo_jlist_info_head">
+			<h2><a href="<?php echo $wo['job']['url']?>" title="<?php echo $wo['job']['title']?>"><?php echo $wo['job']['title']?></a></h2>
+			<div>
 				<?php if (Wo_IsModerator() || Wo_IsAdmin()) { ?>
 					<a class="btn btn-main" href="javascript:void(0)" onclick="Wo_OpenJobDeleteBox(<?php echo  $wo['job']['id']; ?>);"><?php echo $wo['lang']['delete'] ?></a>
 				<?php } ?>
 			    <a class="btn btn-main" href="<?php echo $wo['job']['url']?>"><?php echo $wo['lang']['apply_now'] ?></a>
 			</div>
-			
 		</div>
 		<div class="wo_jlist_info_main">
 			<span><?php echo (!empty($wo['currencies'][$wo['config']['currency']]['symbol'])) ? $wo['currencies'][$wo['config']['currency']]['symbol'] : $wo['config']['classified_currency_s'];?><?php echo $wo['job']['minimum']?> - <?php echo (!empty($wo['currencies'][$wo['config']['currency']]['symbol'])) ? $wo['currencies'][$wo['config']['currency']]['symbol'] : $wo['config']['classified_currency_s'];?><?php echo $wo['job']['maximum']?></span>
