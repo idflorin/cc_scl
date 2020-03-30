@@ -485,11 +485,10 @@ if ($f == 'chat') {
                 if (!empty($user_data) && $user_data['message_privacy'] == 1 && Wo_IsFollowing($wo['user']['user_id'], $_POST['user_id']) === false) {
                     exit();
                 }
-                if (!empty($_POST['chatSticker'])) {
+                if (!empty($_POST['chatSticker']) && !strpos($_POST['chatSticker'], '.gif')) {
                     $fileend =  '_sticker_' . rand(111111,999999);
                     $mediaFilename = Wo_ImportImageFromUrl($_POST['chatSticker'], $fileend);
                 }
-                
                 
                 $messages = Wo_RegisterMessage(array(
                     'from_id' => Wo_Secure($wo['user']['user_id']),

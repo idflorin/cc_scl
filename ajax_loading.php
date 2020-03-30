@@ -59,6 +59,12 @@ switch ($page) {
     case 'suggested-pages':
         include('sources/suggested_pages.php');
         break;
+    case 'liked-pages':
+        include('sources/liked_pages.php');
+        break;
+    case 'joined_groups':
+        include('sources/joined_groups.php');
+        break;
     case 'poke':
         include('sources/poke.php');
         break;
@@ -302,7 +308,7 @@ switch ($page) {
     case 'my-events':
         include('sources/events/my_events.php');
         break;
-    case 'ads':
+    case 'advertise':
         include('sources/ads/ads.php');
         break;
     case 'wallet':

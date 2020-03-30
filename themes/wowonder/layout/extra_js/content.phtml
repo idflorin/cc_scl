@@ -709,28 +709,21 @@ function Wo_BankTransferDonate(fund_id,amount) {
         });
 }
 
-jQuery(document).ready(function($) {
-  $('#bank_transfer_donate_modal').ajaxForm({
-    url: Wo_Ajax_Requests_File() + '?f=funding&s=bank',
-    beforeSend: function() {
-    $('#bank_transfer_donate_modal').find('.ball-pulse').fadeIn(100);
-  },
-  success: function(data) {
-    if (data['status'] == 200) {
-      $("#blog-alert").html('<div class="alert alert-success">'+ data['message'] +'</div>');
-      setTimeout(function () {
-        window.location = "<?php echo $wo['config']['site_url'];?>";
-        $(".prv-img").html('<div class="thumbnail-rendderer"><div><h4 class="bold"><?php echo $wo['lang']['drop_img_here']; ?></h4><div class="error-text-renderer"></div><div><span><?php echo $wo['lang']['or']; ?></span><p><?php echo $wo['lang']['browse_to_upload']; ?></p></div></div> </div>');
-        $("#blog-alert").html('');
-        $('#configreset').click();
+function Wo_BitcoinDonate(fund_id,amount) {
+  if (!amount || !fund_id) {
+    return false;
+  }
 
-      },3000)
-    } else if (data['message']) {
-      $("#blog-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
-    } 
-    $('#bank_transfer_donate_modal').find('.ball-pulse').fadeOut(100);
-  }});
-});
+  $('.btn-bitcoin').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
+  $('#pay-go-pro').modal('hide');
+  $.get(Wo_Ajax_Requests_File() + '?f=donate_with_bitcoin&amount=' + amount+"&fund_id="+fund_id, function (data) {
+    if (data.status == 200) {
+      $(data.html).appendTo('body').submit();
+    }
+  });
+}
+
+
 
 
 function Wo_CheckOutCardDonate(fund_id,amount) {

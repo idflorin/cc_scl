@@ -109,6 +109,33 @@
       <meta name="googlebot" content="noindex">
       <?php } ?>
       <?php } ?>
+      <?php if (!empty($wo['story']['fund'])) {  ?>
+      <meta property="og:title" content="<?php echo $wo['story']['fund']['fund']['title'];?>" />
+      <meta property="og:type" content="funding" />
+      <meta property="og:image" content="<?php echo $wo['story']['fund']['fund']['image'];?>" />
+      <meta property="og:description" content="<?php echo $wo['story']['fund']['fund']['description'];?>" />    
+      <meta name="twitter:title" content="<?php echo $wo['story']['fund']['fund']['title'];?>" />
+      <meta name="twitter:description" content="<?php echo $wo['story']['fund']['fund']['description'];?>" />
+      <meta name="twitter:image" content="<?php echo $wo['story']['fund']['fund']['image'];?>" />
+      <?php } ?>
+      <?php if (!empty($wo['story']['fund_data'])) {  ?>
+      <meta property="og:title" content="<?php echo $wo['story']['fund_data']['title'];?>" />
+      <meta property="og:type" content="funding" />
+      <meta property="og:image" content="<?php echo $wo['story']['fund_data']['image'];?>" />
+      <meta property="og:description" content="<?php echo $wo['story']['fund_data']['description'];?>" />    
+      <meta name="twitter:title" content="<?php echo $wo['story']['fund_data']['title'];?>" />
+      <meta name="twitter:description" content="<?php echo $wo['story']['fund_data']['description'];?>" />
+      <meta name="twitter:image" content="<?php echo $wo['story']['fund_data']['image'];?>" />
+      <?php } ?>
+      <?php if (!empty($wo['story']['job'])) {  ?>
+      <meta property="og:title" content="<?php echo $wo['story']['job']['title'];?>" />
+      <meta property="og:type" content="job" />
+      <meta property="og:image" content="<?php echo Wo_GetMedia($wo['story']['job']['image']);?>" />
+      <meta property="og:description" content="<?php echo $wo['story']['job']['description'];?>" />    
+      <meta name="twitter:title" content="<?php echo $wo['story']['job']['title'];?>" />
+      <meta name="twitter:description" content="<?php echo $wo['story']['job']['description'];?>" />
+      <meta name="twitter:image" content="<?php echo Wo_GetMedia($wo['story']['job']['image']);?>" />
+      <?php } ?>
       <?php if ($wo['page'] == 'read-blog') { ?>
       <meta property="og:type" content="article" />
       <meta property="og:image" content="<?php echo $wo['article']['thumbnail']?>" />
@@ -429,7 +456,7 @@
          <div class="extra">
             <?php 
                if ($wo['loggedin'] == true && $wo['page'] != 'maintenance') {
-                 if ($wo['config']['chatSystem'] == 1 && $wo['page'] != 'get_news_feed' && $wo['page'] != 'sharer' && $wo['page'] != 'movies' && $wo['page'] != 'video-api' && $wo['page'] != 'messages' && $wo['page'] != '404' && $wo['page'] != 'start_up') {
+                 if ($wo['config']['chatSystem'] == 1 && $wo['page'] != 'get_news_feed' && $wo['page'] != 'sharer' && $wo['page'] != 'video-api' && $wo['page'] != 'messages' && $wo['page'] != '404' && $wo['page'] != 'start_up') {
                    echo Wo_LoadPage('chat/content');
                  }
                  echo Wo_LoadPage('modals/logged-out');
@@ -447,7 +474,7 @@
     <?php //} ?>
     
     <?php if (($wo['page'] == 'ads')) { ?>
-    <?php echo Wo_LoadPage('ads/send_money'); ?>
+    <?php //echo Wo_LoadPage('ads/send_money'); ?>
     <?php } ?>
     
     <?php if ($wo['loggedin'] == true) {?>
@@ -457,10 +484,11 @@
     <?php } ?>
     
       <!-- JS FILES -->
-      <?php if ($wo['loggedin'] == false) { ?>
       <?php if ($wo['config']['reCaptcha'] == 1) { ?>
       <script type="text/javascript" src='https://www.google.com/recaptcha/api.js'></script>
       <?php } ?>
+      <?php if ($wo['loggedin'] == false) { ?>
+      
       <script type="text/javascript" src="<?php echo $wo['config']['theme_url'];?>/javascript/welcome.js<?php echo $wo['update_cache']; ?>"></script>
       <?php } ?>
       <script type="text/javascript" src="<?php echo $wo['config']['theme_url'];?>/javascript/script.js<?php echo $wo['update_cache']; ?>"></script>

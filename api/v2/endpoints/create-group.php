@@ -44,6 +44,12 @@ if (empty($error_code)) {
         $error_code    = 6;
         $error_message = 'Invalid group name characters';
     }
+    $privacy = 1;
+    if (!empty($_POST['privacy'])) {
+        if ($_POST['privacy'] == 2) {
+            $privacy = 2;
+        }
+    }
     
     if (empty($error_code)) {
     	$group_data  = array(
@@ -52,6 +58,7 @@ if (empty($error_code)) {
             'group_title' => $group_title,
             'about' => $about,
             'category' => $category,
+            'privacy' => Wo_Secure($privacy),
             'active' => 1
         );
         $register_group    = Wo_RegisterGroup($group_data);

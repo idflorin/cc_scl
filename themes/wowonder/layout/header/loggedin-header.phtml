@@ -191,13 +191,65 @@ if ($followers_alert == 0) {
 
 			<?php if ($wo['config']['user_ads'] == 1) { ?>
 				<li>
-					<a href="<?php echo Wo_SeoLink('index.php?link1=ads'); ?>" data-ajax="?link1=ads"><?php echo $wo['lang']['ads']; ?></a>
+					<a href="<?php echo Wo_SeoLink('index.php?link1=advertise'); ?>" data-ajax="?link1=advertise"><?php echo $wo['lang']['ads']; ?></a>
 				</li>
 			<?php } ?>
 
 			<li class="dropdown-search-link">
 					<a href="<?php echo Wo_SeoLink('index.php?link1=albums'); ?>" data-ajax="?link1=albums"><?php echo $wo['lang']['albums']; ?></a>
 			</li>
+
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=saved-posts');?>" data-ajax="?link1=saved-posts"><?php echo $wo['lang']['saved_posts'];?>
+				</a>
+			</li>
+			<?php if ($wo['config']['poke_system'] == 1) { ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=poke');?>"  data-ajax="?link1=poke"><span><?php echo $wo['lang']['pokes'];?></span>
+				</a>
+			</li>
+			<?php } ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=search?query=');?>"><?php echo $wo['lang']['explore'];?>
+				</a>
+			</li>
+			<?php if ($wo['config']['popular_posts'] == 1) { ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo $wo['config']['site_url']; ?>/most_liked" data-ajax="?link1=most_liked"><?php echo $wo['lang']['popular_posts'];?>
+				</a>
+			</li>
+			<?php } ?>
+			<?php if ($wo['config']['games'] == 1) { ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=new-game'); ?>" data-ajax="?link1=new-game"><?php echo $wo['lang']['games'];?>
+				</a>
+			</li>
+			<?php } ?>
+			<?php if ($wo['config']['find_friends'] == 1) { ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=friends-nearby'); ?>"><?php echo $wo['lang']['find_friends'];?>
+				</a>
+			</li>
+			<?php } ?>
+			<?php if ($wo['config']['job_system'] == 1) { ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=jobs'); ?>" data-ajax="?link1=jobs"><?php echo $wo['lang']['jobs'];?>
+				</a>
+			</li>
+			<?php } ?>
+			<?php if ($wo['config']['common_things'] == 1) { ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=common_things'); ?>" data-ajax="?link1=common_things"><?php echo $wo['lang']['common_things'];?>
+				</a>
+			</li>
+			<?php } ?>
+			<?php if ($wo['config']['funding_system'] == 1) { ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=funding'); ?>" data-ajax="?link1=funding"><?php echo $wo['lang']['funding'];?>
+				</a>
+			</li>
+			<?php } ?>
+
 			
 			<?php if ($wo['config']['groups'] == 1 || $wo['config']['pages'] == 1) { ?><li><hr></li><?php } ?>
 			<li class="dropdown-hidden-link">

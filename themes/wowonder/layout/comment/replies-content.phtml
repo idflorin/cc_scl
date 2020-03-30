@@ -32,6 +32,13 @@
          <?php echo $wo['reply']['text']?>
                
          </div>
+         <div class="comment-image">
+            <?php if (!empty($wo['reply']['c_file'])): ?>
+               <span data-href="<?php echo Wo_GetMedia($wo['reply']['c_file']);?>" onclick="Wo_OpenLighteBox(this,event);" class="pointer">
+               <img src="<?php echo Wo_GetMedia($wo['reply']['c_file']);?>" alt="Comment image">
+               </span>
+            <?php endif ?>
+         </div>
          
          
          <div class="clear"></div>   

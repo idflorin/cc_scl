@@ -171,7 +171,8 @@ $wo['site_pages'] = array(
     'sharer',
     'app_api',
     'api_request',
-    'authorize'
+    'authorize',
+    'advertise'
 );
 
 $wo['script_version']  = $wo['config']['version'];
@@ -245,7 +246,7 @@ if (!empty($_GET['c_id']) && !empty($_GET['user_id'])) {
         $wo['loggedin'] = true;
     }
 }
-if (!empty($_POST['user_id']) && (!empty($_POST['s']))) {
+if (!empty($_POST['user_id']) && (!empty($_POST['s']) || !empty($_POST['access_token']))) {
     $application = 'windows';
     $access_token = (!empty($_POST['s'])) ? $_POST['s'] : $_POST['access_token'];
     if (!empty($_GET['application'])) {
@@ -254,7 +255,7 @@ if (!empty($_POST['user_id']) && (!empty($_POST['s']))) {
         }
     }
     if ($application == 'windows') {
-        $access_token = md5($access_token);
+        $access_token = $access_token;
     }
     $s                = Wo_Secure($access_token);
     $user_id          = Wo_Secure($_POST['user_id']);
@@ -590,7 +591,8 @@ $wo['footer_pages']                  = array(
     'movies',
     'ads',
     'setting',
-    'contact-us'
+    'contact-us',
+    'advertise'
 );
 
 $wo['update_cache']                  = '';
@@ -742,7 +744,7 @@ if (!empty($_GET['mode'])) {
     }
 }
 
-include_once('assets/includes/onesignal_config.php');
+//include_once('assets/includes/onesignal_config.php');
 
 
 if (!empty($_GET['access']) || empty($_COOKIE['access'])) {
@@ -807,3 +809,5 @@ if ($wo['config']['colored_posts_system'] == 1) {
 $wo['stripe_currency'] = array('USD','EUR','AUD','BRL','CAD','CZK','DKK','HKD','HUF','ILS','JPY','MYR','MXN','TWD','NZD','NOK','PHP','PLN','RUB','SGD','SEK','CHF','THB','GBP');
 $wo['paypal_currency'] = array('USD','EUR','AUD','BRL','CAD','CZK','DKK','HKD','HUF','INR','ILS','JPY','MYR','MXN','TWD','NZD','NOK','PHP','PLN','GBP','RUB','SGD','SEK','CHF','THB');
 $wo['2checkout_currency'] = array('USD','EUR','AED','AFN','ALL','ARS','AUD','AZN','BBD','BDT','BGN','BMD','BND','BOB','BRL','BSD','BWP','BYN','BZD','CAD','CHF','CLP','CNY','COP','CRC','CZK','DKK','DOP','DZD','EGP','FJD','GBP','GTQ','HKD','HNL','HRK','HUF','IDR','ILS','INR','JMD','JOD','JPY','KES','KRW','KWD','KZT','LAK','LBP','LKR','LRD','MAD','MDL','MMK','MOP','MRO','MUR','MVR','MXN','MYR','NAD','NGN','NIO','NOK','NPR','NZD','OMR','PEN','PGK','PHP','PKR','PLN','PYG','QAR','RON','RSD','RUB','SAR','SBD','SCR','SEK','SGD','SYP','THB','TND','TOP','TRY','TTD','TWD','UAH','UYU','VND','VUV','WST','XCD','XOF','YER','ZAR');
+
+$wo['regx_attr'] = '/(onclick=["](.*?)["]|onclick=[\'](.*?)[\']|onafterprint=["](.*?)["]|onafterprint=[\'](.*?)[\']|onbeforeprint=["](.*?)["]|onbeforeprint=[\'](.*?)[\']|onbeforeunload=["](.*?)["]|onbeforeunload=[\'](.*?)[\']|onerror=["](.*?)["]|onerror=[\'](.*?)[\']|onhashchange=["](.*?)["]|onhashchange=[\'](.*?)[\']|onload=["](.*?)["]|onload=[\'](.*?)[\']|onmessage=["](.*?)["]|onmessage=[\'](.*?)[\']|onoffline=["](.*?)["]|onoffline=[\'](.*?)[\']|ononline=["](.*?)["]|ononline=[\'](.*?)[\']|onpagehide=["](.*?)["]|onpagehide=[\'](.*?)[\']|onpageshow=["](.*?)["]|onpageshow=[\'](.*?)[\']|onpopstate=["](.*?)["]|onpopstate=[\'](.*?)[\']|onresize=["](.*?)["]|onresize=[\'](.*?)[\']|onstorage=["](.*?)["]|onstorage=[\'](.*?)[\']|onunload=["](.*?)["]|onunload=[\'](.*?)[\']|onblur=["](.*?)["]|onblur=[\'](.*?)[\']|onchange=["](.*?)["]|onchange=[\'](.*?)[\']|oncontextmenu=["](.*?)["]|oncontextmenu=[\'](.*?)[\']|onfocus=["](.*?)["]|onfocus=[\'](.*?)[\']|oninput=["](.*?)["]|oninput=[\'](.*?)[\']|oninvalid=["](.*?)["]|oninvalid=[\'](.*?)[\']|onreset=["](.*?)["]|onreset=[\'](.*?)[\']|onsearch=["](.*?)["]|onsearch=[\'](.*?)[\']|onselect=["](.*?)["]|onselect=[\'](.*?)[\']|onsubmit=["](.*?)["]|onsubmit=[\'](.*?)[\']|onkeydown=["](.*?)["]|onkeydown=[\'](.*?)[\']|onkeypress=["](.*?)["]|onkeypress=[\'](.*?)[\']|onkeyup=["](.*?)["]|onkeyup=[\'](.*?)[\']|ondblclick=["](.*?)["]|ondblclick=[\'](.*?)[\']|onmousedown=["](.*?)["]|onmousedown=[\'](.*?)[\']|onmousemove=["](.*?)["]|onmousemove=[\'](.*?)[\']|onmouseout=["](.*?)["]|onmouseout=[\'](.*?)[\']|onmouseover=["](.*?)["]|onmouseover=[\'](.*?)[\']|onmouseup=["](.*?)["]|onmouseup=[\'](.*?)[\']|onmousewheel=["](.*?)["]|onmousewheel=[\'](.*?)[\']|onwheel=["](.*?)["]|onwheel=[\'](.*?)[\']|ondrag=["](.*?)["]|ondrag=[\'](.*?)[\']|ondragend=["](.*?)["]|ondragend=[\'](.*?)[\']|ondragenter=["](.*?)["]|ondragenter=[\'](.*?)[\']|ondragleave=["](.*?)["]|ondragleave=[\'](.*?)[\']|ondragover=["](.*?)["]|ondragover=[\'](.*?)[\']|ondragstart=["](.*?)["]|ondragstart=[\'](.*?)[\']|ondrop=["](.*?)["]|ondrop=[\'](.*?)[\']|onscroll=["](.*?)["]|onscroll=[\'](.*?)[\']|oncopy=["](.*?)["]|oncopy=[\'](.*?)[\']|oncut=["](.*?)["]|oncut=[\'](.*?)[\']|onpaste=["](.*?)["]|onpaste=[\'](.*?)[\']|onabort=["](.*?)["]|onabort=[\'](.*?)[\']|oncanplay=["](.*?)["]|oncanplay=[\'](.*?)[\']|oncanplaythrough=["](.*?)["]|oncanplaythrough=[\'](.*?)[\']|oncuechange=["](.*?)["]|oncuechange=[\'](.*?)[\']|ondurationchange=["](.*?)["]|ondurationchange=[\'](.*?)[\']|onemptied=["](.*?)["]|onemptied=[\'](.*?)[\']|onended=["](.*?)["]|onended=[\'](.*?)[\']|onerror=["](.*?)["]|onerror=[\'](.*?)[\']|onloadeddata=["](.*?)["]|onloadeddata=[\'](.*?)[\']|onloadedmetadata=["](.*?)["]|onloadedmetadata=[\'](.*?)[\']|onloadstart=["](.*?)["]|onloadstart=[\'](.*?)[\']|onpause=["](.*?)["]|onpause=[\'](.*?)[\']|onplay=["](.*?)["]|onplay=[\'](.*?)[\']|onplaying=["](.*?)["]|onplaying=[\'](.*?)[\']|onprogress=["](.*?)["]|onprogress=[\'](.*?)[\']|onratechange=["](.*?)["]|onratechange=[\'](.*?)[\']|onseeked=["](.*?)["]|onseeked=[\'](.*?)[\']|onseeking=["](.*?)["]|onseeking=[\'](.*?)[\']|onstalled=["](.*?)["]|onstalled=[\'](.*?)[\']|onsuspend=["](.*?)["]|onsuspend=[\'](.*?)[\']|ontimeupdate=["](.*?)["]|ontimeupdate=[\'](.*?)[\']|onvolumechange=["](.*?)["]|onvolumechange=[\'](.*?)[\']|onwaiting=["](.*?)["]|onwaiting=[\'](.*?)[\']|ontoggle=["](.*?)["]|ontoggle=[\'](.*?)[\'])/m';

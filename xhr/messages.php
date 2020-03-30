@@ -74,6 +74,10 @@ if ($f == 'messages') {
         $messages = Wo_GetGroupMessages(array(
             'group_id' => $group_id
         ));
+        $onclick = "Wo_ExitGroupChat";
+        if (Wo_IsGChatOwner($group_id)) {
+            $onclick = "Wo_DeleteGroupChat";
+        }
         @Wo_UpdateGChatLastSeen($group_id);
         foreach ($messages as $wo['message']) {
             $html .= Wo_LoadPage('messages/group-text-list');
@@ -81,7 +85,8 @@ if ($f == 'messages') {
         $data = array(
             'status' => 200,
             'html' => $html,
-            'view_more_text' => $wo['lang']['view_more_messages']
+            'view_more_text' => $wo['lang']['view_more_messages'],
+            'onclick' => $onclick
         );
         header("Content-type: application/json");
         echo json_encode($data);

@@ -32,6 +32,8 @@ if (!empty($wo['post_colors'])) {
 		}
 	}
 }
+$get_config['fields'] = Wo_GetUserCustomFields();
+$get_config['movie_category'] = $wo['film-genres'];
 $get_config['post_colors'] = $wo['post_colors'];
 $get_config['post_reactions_types'] = array('Like','Love','HaHa','Wow','Sad','Angry');
 $response_data      = array(

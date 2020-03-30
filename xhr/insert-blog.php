@@ -22,6 +22,8 @@ if ($f == "insert-blog") {
             }
         }
         if (empty($error)) {
+            $_POST['blog_content'] = preg_replace($wo['regx_attr'], '', $_POST['blog_content']);
+
             $registration_data = array(
                 'user' => $wo['user']['id'],
                 'title' => Wo_Secure($_POST['blog_title']),
@@ -41,8 +43,8 @@ if ($f == "insert-blog") {
                         'type' => $_FILES["thumbnail"]["type"],
                         'types' => 'jpeg,jpg,png,bmp,gif',
                         'crop' => array(
-                            'width' => 600,
-                            'height' => 380
+                            'width' => 1200,
+                            'height' => 600
                         )
                     );
                     $media         = Wo_ShareFile($fileInfo);

@@ -13,6 +13,7 @@ if ($wo['chat']['page']['is_page_onwer'] == 1) {
 <div class="chat-wrapper chat_page_<?php echo $wo['chat']['page']['page_id'];?>" id="chat_page_<?php echo $wo['chat']['page']['page_id'];?>">
 	<div style="background:<?php echo $wo['chat']['color']; ?>" class="online-toggle">
 		<div class="cht_tg_left_prt" onclick="javascript:$('.chat-tab-container-<?php echo $wo['chat']['user']['user_id'];?>').slideToggle(100);">
+			<?php if ($wo['chat']['page']['is_page_onwer'] == 1) { ?>
 			<a style="color:#fff;" href="<?php echo $wo['chat']['user']['url'];?>" data-ajax="?link1=timeline&u=<?php echo $wo['chat']['user']['username'];?>"> 
 				<?php if ($wo['chat']['page']['is_page_onwer'] == 1) { ?>
 					<span class="chat-tab-status <?php echo (Wo_IsOnline($wo['chat']['user']['user_id']) === true) ? 'active' : ''; ?>">
@@ -21,6 +22,11 @@ if ($wo['chat']['page']['is_page_onwer'] == 1) {
 				<?php } ?>
 				<?php echo mb_substr($name, 0, 13, "UTF-8");?>
 			</a>
+			<?php }else{ ?>
+			<a style="color:#fff;" href="<?php echo $wo['chat']['page']['url'];?>" data-ajax="?link1=timeline&u=<?php echo $wo['chat']['page']['page_name'];?>">
+				<?php echo mb_substr($name, 0, 13, "UTF-8");?>
+			</a>
+			<?php } ?>
 		</div>
 		
 		<img class="cht_hd_avtr" src="<?php echo $avatar;?>" alt="<?php echo $name;?>" />

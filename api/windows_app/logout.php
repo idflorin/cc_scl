@@ -26,7 +26,7 @@ if (empty($_GET['type']) || !isset($_GET['type'])) {
 }
 $type = Wo_Secure($_GET['type'], 0);
 if ($type == 'logout') {
-    if (empty($_POST['s'])) {
+    if (empty($_POST['access_token'])) {
         $json_error_data = array(
             'api_status' => '400',
             'api_text' => 'failed',
@@ -48,7 +48,7 @@ if ($type == 'logout') {
         );
     }
     if (empty($json_error_data)) {
-        $s       = Wo_Secure(md5($_POST['s']));
+        $s       = Wo_Secure($_POST['access_token']);
         $user_id = Wo_Secure($_POST['user_id']);
         if (Wo_CheckUserSessionID($user_id, $s, 'windows')) {
             $remove_session = mysqli_query($sqlConnect, "DELETE FROM " . T_APP_SESSIONS . " WHERE `user_id` = '$user_id' AND `session_id` = '$s'");

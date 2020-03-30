@@ -113,9 +113,11 @@ iframe, .post-map img {border:1px solid #ededed;border-radius:3px;}
 .post .post-image .image{width:100%;height:auto}
 .post .post-actions .stat-item{margin-top:15px!important;font-size:11px!important;color:#999!important}
 .comment-reply{display:none}
-.comment-reply .wo_commreply_combo{margin-top:10px;display:flex}
-.comment-reply .wo_commreply_combo .avatar{width:30px!important;height:30px!important}
-.comment-reply .wo_commreply_combo .textarea{margin-top:0;border-radius:15px!important;padding-right:13px;margin-left:5px}
+.comment-reply .wo_commreply_combo {margin-top:10px;display:flex;position: relative;}
+.comment-reply .wo_commreply_combo .avatar {width:30px!important;height:30px!important}
+.comment-reply .wo_commreply_combo .textarea {margin-top:0;border-radius:15px!important;padding-right:60px;margin-left:5px}
+.comment-reply .wo_commreply_combo .image-comment {right: 10px;}
+.comment-reply .wo_commreply_combo .image-comment .btn-file {padding: 2px 0 !important;font-size: 0;margin: 7px 0px;}
 .comment-edit{display:none;margin-bottom:15px}
 .options-buttons{position:absolute;margin-left:20px;margin-top:-40px;z-index:1}
 .no-posts{margin-top:20px;margin-bottom:20px}
@@ -1763,7 +1765,7 @@ svg.feather{vertical-align:middle;margin-top:-4px;width: 19px;height:19px;}
 #create-product-modal .upload-product-image svg.feather{width:24px;height:24px;color:#848484dd}
 #create-product-modal .sun_scroll {overflow-x: auto;width: calc(100% - 125px);}
 #productimage-holder{width:100%;padding:0 8px;margin:0;white-space:nowrap}
-#productimage-holder .thumb-image{width:100px;height:100px;margin:0 5px 0 0;display:inline-block;object-fit:cover;user-select:none;pointer-events:none;border-radius:4px}
+#productimage-holder .thumb-image{width:100px;height:100px;margin:0 5px 0 0;display:inline-block;object-fit:cover;user-select:none;border-radius:4px}
 #create-product-modal #productimage-holder {padding:0 6px;}
 #create-product-modal #productimage-holder .thumb-image {border-radius: 5px;width: 90px;height: 90px;}
 .wo-create-forms .wo_settings_page{box-shadow:0 1px 0 0 #e3e4e8,0 0 0 1px #f1f1f1;padding:10px 15px;position:relative;border-radius:0 0 2px 2px}

@@ -15,6 +15,7 @@
 		</div>
 	</div>
 	<div class="continue-button">
+		<small class="skip-step" onclick="Wo_SkipStep('startup_follow');"><?php echo $wo['lang']['skip'];?></small>
        	<button class="con-button btn btn-main" onclick="Wo_SubmitFollow();">
 			<?php
 				$string = str_replace('{number}', count($wo['users']), $wo['lang']['follow_num']);

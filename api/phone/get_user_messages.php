@@ -143,6 +143,9 @@ if ($type == 'get_user_messages') {
                 
                 $message['position']  = $message_po;
                 $message['type']      = Wo_GetFilePosition($message['media']);
+                if (!empty($message['stickers']) && strpos($message['stickers'], '.gif') !== false) {
+                    $message['type'] = 'gif';
+                }
                 if ($message['type_two'] == 'contact') {
                     $message['type']   = 'contact';
                 }

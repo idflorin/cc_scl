@@ -6,7 +6,7 @@
 		<div class="col-md-8">
 			<div class="fund_raise">
 				<img src="<?php echo($wo['fund']['image']); ?>" class="fund_main_img">
-				<h2 class="fund_title"><a href="<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" data-ajax="?link1=show_fund&id=<?php echo($wo['fund']['hashed_id']) ?>" style="text-decoration: none;"><?php echo $wo['fund']['title']?></a></h2>
+				<h2 class="fund_title"><a href="<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" data-ajax="?link1=show_fund&id=<?php echo($wo['fund']['hashed_id']) ?>" style="text-decoration: none;"><?php echo stripslashes($wo['fund']['title']); ?></a></h2>
 				<div class="read-blog-info-user">
 					<div class="postMeta--author-avatar">
 						<a href="<?php echo $wo['fund']['user_data']['url']?>">
@@ -28,7 +28,7 @@
 						<button class="btn btn-secondary dropdown-toggle" type="button" id="shr_dropdwn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><?php echo $wo['lang']['share'];?></button>
 						<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="shr_dropdwn">
 							<li><a class="dropdown-item" href="https://www.facebook.com/sharer.php?u=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank"><?php echo $wo['lang']['facebook'];?></a></li>
-							<li><a class="dropdown-item" href="http://twitter.com/intent/tweet?text=<?php echo $wo['article']['title'] ?>&amp;url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank"><?php echo $wo['lang']['twitter'];?></a></li>
+							<li><a class="dropdown-item" href="http://twitter.com/intent/tweet?text=<?php echo $wo['fund']['title'] ?>&amp;url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank"><?php echo $wo['lang']['twitter'];?></a></li>
 							<li><a class="dropdown-item" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank"><?php echo $wo['lang']['linkedin'];?></a></li>
 							<li><a class="dropdown-item" href="http://pinterest.com/pin/create/button/?url=<?php echo $wo['config']['site_url'].'/show_fund/'. $wo['fund']['hashed_id']; ?>" target="_blank"><?php echo $wo['lang']['pinterest'];?></a></li>
 						</ul>
@@ -43,7 +43,7 @@
 			</div>
 			<div class="fund_raise">
 				<h4 class="fund_widget_title"><?php echo $wo['lang']['info'];?></h4>
-				<?php echo $wo['fund']['description']; ?>
+				<?php echo stripslashes($wo['fund']['description']); ?>
 			</div>
 			
 		</div>
@@ -89,7 +89,7 @@
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
 				<h4 class="modal-title"><i class="fa fa-money"></i> <?php echo $wo['lang']['bank_transfer'] ?></h4>
 			</div>
-			<form class="form form-horizontal" method="post" id="bank_transfer_form_donate" action="#">
+			<form class="form form-horizontal" method="post" id="bank_transfer_form_donate">
 			<div class="modal-body dt_bank_trans_modal">
 				<div id="blog-alert"></div>
 				<p><?php echo $wo['config']['bank_description'];?></p>
@@ -249,6 +249,30 @@
 	    }
 		$('#bank_transfer_donate_modal').addClass('up_rec_img_ready');
 	});
+
+	
+jQuery(document).ready(function($) {
+  $('#bank_transfer_donate_modal').ajaxForm({
+    url: Wo_Ajax_Requests_File() + '?f=funding&s=bank',
+    beforeSend: function() {
+    $('#bank_transfer_donate_modal').find('.ball-pulse').fadeIn(100);
+  },
+  success: function(data) {
+    if (data['status'] == 200) {
+      $("#blog-alert").html('<div class="alert alert-success">'+ data['message'] +'</div>');
+      setTimeout(function () {
+        window.location = "<?php echo $wo['config']['site_url'];?>";
+        $(".prv-img").html('<div class="thumbnail-rendderer"><div><h4 class="bold"><?php echo $wo['lang']['drop_img_here']; ?></h4><div class="error-text-renderer"></div><div><span><?php echo $wo['lang']['or']; ?></span><p><?php echo $wo['lang']['browse_to_upload']; ?></p></div></div> </div>');
+        $("#blog-alert").html('');
+        $('#configreset').click();
+
+      },3000)
+    } else if (data['message']) {
+      $("#blog-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
+    } 
+    $('#bank_transfer_donate_modal').find('.ball-pulse').fadeOut(100);
+  }});
+});
 
 
 

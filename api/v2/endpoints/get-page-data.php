@@ -36,6 +36,10 @@ if (empty($error_code)) {
         if (!empty($page_data['call_action_type'])) {
             $page_data['call_action_type_text'] = $wo['call_action'][$page_data['call_action_type']];
         }
+        $page_data['is_rated'] = false;
+        if (Wo_IsPageRatingExists($page_id, $wo['user']['id'])) {
+            $page_data['is_rated'] = true;
+        }
 
         $response_data['page_data'] = $page_data;
     }

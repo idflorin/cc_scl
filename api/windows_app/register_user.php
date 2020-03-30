@@ -92,12 +92,7 @@ if ($type == 'user_registration') {
             'error_id' => '14',
             'error_text' => 'Password not match.'
         );
-    } else if (empty($_POST['s'])) {
-        $json_error_data['errors'] = array(
-            'error_id' => '14',
-            'error_text' => 'Error found, please try again later.'
-        );
-    } 
+    }
     if (empty($json_error_data['errors'])) {
         $username        = Wo_Secure($_POST['username'], 0);
         $password        = $_POST['password'];
@@ -120,7 +115,6 @@ if ($type == 'user_registration') {
             'email_code' => $username,
             'src' => 'Phone',
             'timezone' => 'UTC',
-            'device_id' => $device_id,
             'gender' => Wo_Secure($gender),
             'lastseen' => time(),
             'active' => Wo_Secure($activate)
@@ -134,17 +128,17 @@ if ($type == 'user_registration') {
                     'api_version' => $api_version,
                     'message' => 'Successfully joined, Please wait..',
                     'success_type' => 'registered',
-                    'session_id' => 0,
+                    'access_token' => 0,
                     'cookie' => Wo_CreateLoginSession(Wo_UserIdForLogin($username)),
                     'user_id' => 0
                 );
-                $s = $_POST['s'];
-                $s_md5 = Wo_Secure($_POST['s']);
-                $time = time();
                 $user_id = Wo_UserIdFromUsername($username);
-                $add_session = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `time`) VALUES ('{$user_id}', '{$s_md5}', 'phone', '{$time}')");
+                $time           = time();
+                $cookie         = '';
+                $access_token   = sha1(rand(111111111, 999999999)) . md5(microtime()) . rand(11111111, 99999999) . md5(rand(5555, 9999));
+                $add_session = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `time`) VALUES ('{$user_id}', '{$access_token}', 'windows', '{$time}')");
                 if ($add_session) {
-            	    $json_success_data['session_id'] = $s_md5;
+            	    $json_success_data['access_token'] = $access_token;
             	    $json_success_data['user_id'] = $user_id;
                 }
             } else {
@@ -167,7 +161,7 @@ if ($type == 'user_registration') {
                     'api_version' => $api_version,
                     'message' => 'Registration successful! We have sent you an email, Please check your inbox/spam to verify your email.',
                     'success_type' => 'verification',
-                    'session_id' => 0,
+                    'access_token' => 0,
                     'user_id' => 0
                 );
             }

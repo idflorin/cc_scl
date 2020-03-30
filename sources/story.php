@@ -18,7 +18,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
         $wo['story'] = Wo_PostData($id, $placement, 'not_limited',Wo_Secure($_GET['ref']));
     }
     else{
-        $wo['story'] = Wo_PostData($id, $placement, 'not_limited');
+        $wo['story'] = Wo_PostData($id, $placement, 50);
     }
     
     if (empty($wo['story'])) {

@@ -35,6 +35,8 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
         $groups = Wo_GroupSug($limit);
         foreach ($groups as $key => $group) {
             $groups[$key]['members'] = Wo_CountGroupMembers($group['id']);
+            $groups[$key]['is_joined'] = Wo_IsGroupJoined($group['id']);
+            $groups[$key]['is_owner'] = Wo_IsGroupOnwer($group['id']);
         }
         $response_data = array(
                                 'api_status' => 200,
@@ -45,6 +47,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
         $pages = Wo_PageSug($limit);
         foreach ($pages as $key => $page) {
             $pages[$key]['likes'] = Wo_CountPageLikes($page['page_id']);
+            $pages[$key]['is_liked'] = Wo_IsPageLiked($page['page_id'], $wo['user']['id']);
         }
         $response_data = array(
                                 'api_status' => 200,

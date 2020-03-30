@@ -24,24 +24,24 @@
 
           <?php if ($wo['chat']['group']['user_id'] == $wo['user']['id']): ?>
 
-            <li><a class="white" href="javascript:void(0)" target="_blank" onclick="Wo_DeleteGroupChat(<?php echo $wo['chat']['group']['group_id'];?>)"><?php echo $wo['lang']['delete_group'];?></a></li>
+            <li><a class="white" href="javascript:void(0)" onclick="Wo_DeleteGroupChat(<?php echo $wo['chat']['group']['group_id'];?>)"><?php echo $wo['lang']['delete_group'];?></a></li>
 
-            <li><a class="white" href="javascript:void(0)" target="_blank" onclick="Wo_EditGChat(event,<?php echo $wo['chat']['group']['group_id'];?>)"><?php echo $wo['lang']['edit_group'];?></a></li>
+            <li><a class="white" href="javascript:void(0)" onclick="Wo_EditGChat(event,<?php echo $wo['chat']['group']['group_id'];?>)"><?php echo $wo['lang']['edit_group'];?></a></li>
 
-            <li><a class="white" href="javascript:void(0)" target="_blank" onclick="Wo_ClearGroupHistory(<?php echo $wo['chat']['group']['group_id'];?>)"><?php echo $wo['lang']['clear_history'];?></a></li>
+            <li><a class="white" href="javascript:void(0)" onclick="Wo_ClearGroupHistory(<?php echo $wo['chat']['group']['group_id'];?>)"><?php echo $wo['lang']['clear_history'];?></a></li>
 
           <?php endif ?>
 
 
           <?php if ($wo['chat']['group']['user_id'] != $wo['user']['id']): ?>
 
-            <li><a class="white" href="javascript:void(0)" target="_blank" onclick="Wo_ExitGroupChat('<?php echo $wo['chat']['group']['group_id'];?>');"><?php echo $wo['lang']['exit_group'];?></a></li>
+            <li><a class="white" href="javascript:void(0)" onclick="Wo_ExitGroupChat('<?php echo $wo['chat']['group']['group_id'];?>');"><?php echo $wo['lang']['exit_group'];?></a></li>
 
 
         
           <?php endif; ?>
 
-          <li><a class="white" href="javascript:void(0)" target="_blank" onclick="Wo_ManageGChat();"><?php echo $wo['lang']['members'];?></a></li>
+          <li><a class="white" href="javascript:void(0)" onclick="Wo_ManageGChat();"><?php echo $wo['lang']['members'];?></a></li>
 
 
         </ul>

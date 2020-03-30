@@ -797,6 +797,30 @@ function Wo_LightBoxComment(text, post_id, user_id, event, page_id) {
   }
 }
 
+function Wo_loadPostMoreComments(post_id,self) {
+  main_wrapper = $('#post-' + post_id);
+  view_more_wrapper = main_wrapper.find('.view-more-wrapper');
+  Wo_progressIconLoader(view_more_wrapper);
+  $('#post-' + post_id).find('.view-more-wrapper .ball-pulse').fadeIn(100);
+  comment_id = main_wrapper.find('.comment').last().attr('data-comment-id');
+  $.get(Wo_Ajax_Requests_File(), {
+    f: 'posts',
+    s: 'load_more_post_comments',
+    post_id: post_id,
+    comment_id: comment_id
+  }, function (data) {
+    if(data.status == 200) {
+      main_wrapper.find('.comments-list').append(data.html);
+      //view_more_wrapper.remove();
+      if (data.no_more == 1) {
+        $(self).remove();
+      }
+      
+      $('.ball-pulse-'+post_id).fadeOut('100');
+    }
+  });
+}
+
 // load all post comments
 function Wo_loadAllComments(post_id,self) {
   main_wrapper = $('#post-' + post_id);
@@ -1647,7 +1671,13 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
      length = $('body').attr('chat-off').length;
     }
     if(current_width < 720 || length > 0) {
-       document.location = data.url;
+      if (page_id > 0) {
+        document.location = websiteUrl+"/messages/"+page_user_id+"&page="+page_id;
+      }
+      else{
+        document.location = data.url;
+      }
+       
        return false;
     }
     if(data.chat != 1 && group_id === 0) {
@@ -2042,17 +2072,27 @@ function Wo_RegisterReply(text, comment_id, user_id, event, page_id, type) {
     reply_textarea = comment_wrapper.find('.comment-replies');
     textarea_wrapper = reply_textarea.find('.textarea');
     reply_list = comment_wrapper.find('.comment-replies-text');
-    if(text == '') {
+    var comment_src_image = $('#comment_src_image_'+comment_id);
+    var comment_image = '';
+    if (comment_src_image.length > 0) {
+      comment_image = comment_src_image.val();
+    }      
+    if(text == '' && comment_image == '') {
       return false;
     }
     $.post(Wo_Ajax_Requests_File() + '?f=posts&s=register_reply', {
       comment_id: comment_id,
       text: text,
       user_id: user_id,
-      page_id: page_id
+      page_id: page_id,
+      comment_image: comment_image
     }, function (data) {
       textarea_wrapper.val('');
       if(data.status == 200) {
+        $('.comment-image-con').empty();
+        $('#comment_src_image_'+comment_id).val('');
+        $('#comment_src_image_'+comment_id).val('');
+        $('#comment_reply_image_' + comment_id).val('');
         Wo_OpenReplyBox(comment_id);
         comment_wrapper.find('.reply-container:last-child').after(data.html);
         comment_wrapper.find('[id=comment-replies]').html(data.replies_num);
@@ -2946,6 +2986,66 @@ function load_ajax_emojii(id, path){
 		$('.emo-comment-container-' + id ).append("<span class=\"emoji_holder\" onclick=\"Wo_AddEmoToCommentInput("+ id +",'"+ value +"');\"><span>"+ value + "</span>");
 	});
 }
+function load_ajax_reply_emojii(id, path){
+    var emojjii = "😀*😁*😂*🤣*😃*😄*😅*😆*😉*😊*😋*😎*😍*😘*😗*😙*😚*🙂*🤗*🤩*🤔*🤨*😐*😑*😶*🙄*😏*😣*😥*😮*🤐*😯*😪*😫*😴*😌*😛*😜*😝*🤤*😒*😓*😔*😕*🙃*🤑*😲*☹️*🙁*😖*😞*😟*😤*😢*😭*😦*😧*😨*😩*🤯*😬*😰*😱*😳*🤪*😵*😡*😠*🤬*😷*🤒*🤕*🤢*🤮*🤧*😇*🤠*🤡*🤥*🤫*🤭*🧐*🤓*😈*👿*👹*👺*💀*👻*👽*🤖*💩*😺*😸*😹*😻*😼*😽*🙀*😿*😾*👶*👧*🧒*👦*👩*🧑*👨*👵*🧓*👴*👲*💅*🤳*💃*🕺*🕴*👫*👭*👬*💑*🤲*👐*🙌*👏*🤝*👍*👎*👊*✊*🤛*🤜*🤞*✌️*🤟*🤘*👌*👈*👉*👆*👇*☝️*✋*🤚*🖐*🖖*👋*🤙*💪*🖕*✍️*🙏*💍*💄*💋*👄*👅*👂*👃*👣*👁*👀*🧠*🗣*👤*👥";
+    
+  $('.emo-comment-container-' + id ).html("");
+  $.each(emojjii.split('*'), function(key, value) {
+    $('.emo-comment-container-' + id ).append("<span class=\"emoji_holder\" onclick=\"Wo_AddEmoTo_replyCommentInput("+ id +",'"+ value +"');\"><span>"+ value + "</span>");
+  });
+}
+function Wo_AddEmoTo_replyCommentInput(post_id, code, type) {
+    inputTag = $('[id=post-' + post_id + ']').find('.comment-reply-textarea');
+    if (type == 'lightbox-post-footer') {
+       inputTag = $('.lightbox-post-footer').find('.comment-reply-textarea');
+    }
+    inputVal = inputTag.val();
+    if (typeof(inputTag.attr('placeholder')) != "undefined") {
+        inputPlaceholder = inputTag.attr('placeholder');
+        if (inputPlaceholder == inputVal) {
+            inputTag.val('');
+            inputVal = inputTag.val();
+        }
+    }
+    if (inputVal.length == 0) {
+        inputTag.val(code + ' ');
+    } else {
+        inputTag.val(inputVal + ' ' + code);
+    }
+    inputTag.keyup().focus();
+}
+
+function Wo_UploadReplyCommentImage(id) {
+  var image_container = $('#post-' + id);
+  var fetched_image = $('.comment-reply-image-'+id);
+  var data = new FormData();
+  data.append('image', $('#comment_reply_image_' + id).prop('files')[0]);
+  image_container.find('#wo_comment_combo .ball-pulse').fadeIn(100);
+  $.ajax({
+        type: "POST",
+        url: Wo_Ajax_Requests_File() + '?f=upload_image&id=' + id,
+        data: data,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+          if (data.status == 200) {
+            fetched_image.html('<img src="' + data.image + '"><div class="remove-icon" onclick="Wo_EmptyReplyCommentImage(' + id + ')"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></div>');
+            $('#comment_src_image_' + id).val(data.image_src);
+            fetched_image.removeClass('hidden');
+            image_container.find('.comment-reply-textarea').focus();
+          }
+          image_container.find('#wo_comment_combo .ball-pulse').fadeOut(100);
+        }
+    });
+}
+function Wo_EmptyReplyCommentImage(id) {
+  var image_container = $('#post-' + id);
+  var fetched_image = $('.comment-reply-image-'+id);
+  $('.comment-image-con').empty();
+  $('#comment_src_image_'+id).val('');
+  $('#comment_src_image_'+id).val('');
+  $('#comment_reply_image_' + id).val('');
+}
 
 function _getCookie(cname) {
   var name = cname + "=";
@@ -3267,7 +3367,7 @@ function Wo_SharePostOn(post_id, owner_id,type){
     })
     .done(function(data) {
       if (data.status == 200) {
-        $('body').append(data.html);
+        $('body').prepend(data.html);
         $('#SearchForInputPostId').val(post_id);
         $('#SearchForInputTypeId').val(owner_id);
         $('#share_post_modal').modal('show');

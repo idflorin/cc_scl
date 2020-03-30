@@ -2301,9 +2301,9 @@ function Wo_GetGroupPostPublisherBox($group_id = 0) {
                 $continue = true;
             }
         } else if ($group['privacy'] == 1) {
-            if (Wo_IsGroupJoined($group_id) === true) {
+            //if (Wo_IsGroupJoined($group_id) === true) {
                 $continue = true;
-            }
+            //}
         } else {
             $continue = false;
         }
@@ -2730,17 +2730,29 @@ function Wo_GetUsersGroupsAPI($user_id,$limit = 0,$offset = 0) {
     }
     return $data;
 }
-function Wo_GetGroupSettingMembers($group_id = 0) {
+function Wo_GetGroupSettingMembers($group_id = 0,$limit = 0,$offset = 0) {
     global $wo, $sqlConnect;
     $data = array();
     if (empty($group_id) or !is_numeric($group_id) or $group_id < 1) {
         return false;
     }
+    $limit_query = '';
+    if (!empty($limit)) {
+        $limit    = Wo_Secure($limit);
+        $limit_query = " LIMIT $limit";
+    }
+    $offset_query = '';
+    if (!empty($offset)) {
+        $offset    = Wo_Secure($offset);
+        $offset_query = " AND `id` > $offset ";
+    }
     $group_id  = Wo_Secure($group_id);
-    $query     = " SELECT `user_id` FROM " . T_GROUP_MEMBERS . " WHERE `group_id` = {$group_id} AND `active` = '1'";
+    $query     = " SELECT `user_id`,`id` FROM " . T_GROUP_MEMBERS . " WHERE `group_id` = {$group_id} AND `active` = '1' $offset_query $limit_query";
     $sql_query = mysqli_query($sqlConnect, $query);
     while ($fetched_data = mysqli_fetch_assoc($sql_query)) {
-        $data[] = Wo_UserData($fetched_data['user_id']);
+        $user_data = Wo_UserData($fetched_data['user_id']);
+        $user_data['member_id'] = $fetched_data['id'];
+        $data[] = $user_data;
     }
     return $data;
 }
@@ -3097,18 +3109,29 @@ function Wo_CountGamePlayers($id) {
     $fetched_data = mysqli_fetch_assoc($query);
     return $fetched_data['count'];
 }
-function Wo_GetMyGames() {
+function Wo_GetMyGames($limit = 0,$offset = 0) {
     global $sqlConnect, $wo;
     if ($wo['loggedin'] == false) {
         return false;
     }
     $data       = array();
     $user_id    = Wo_Secure($wo['user']['user_id']);
-    $query_text = "SELECT `game_id` FROM " . T_GAMES_PLAYERS . " WHERE `user_id` = {$user_id} ORDER BY `last_play` DESC";
+    $offset_ = "";
+    if (!empty($offset) && is_numeric($offset) && $offset > 0) {
+        $offset_ .= " AND `id` < " . Wo_Secure($offset);
+    }
+    $limit_ = "";
+    if (!empty($limit)) {
+        $limit = Wo_Secure($limit);
+        $limit_ = " LIMIT {$limit}";
+    }
+    $query_text = "SELECT `game_id`,`id` FROM " . T_GAMES_PLAYERS . " WHERE `user_id` = {$user_id} $offset_ ORDER BY `last_play` DESC $limit_";
     $query_one  = mysqli_query($sqlConnect, $query_text);
     while ($fetched_data = mysqli_fetch_assoc($query_one)) {
         if (is_array($fetched_data)) {
-            $data[] = Wo_GameData($fetched_data['game_id']);
+            $game_data = Wo_GameData($fetched_data['game_id']);
+            $game_data['offset_id'] = $fetched_data['id'];
+            $data[] = $game_data;
         }
     }
     return $data;
@@ -3537,7 +3560,7 @@ function Wo_RegisterCommentReply($data = array()) {
     if (empty($data['comment_id']) || !is_numeric($data['comment_id']) || $data['comment_id'] < 0) {
         return false;
     }
-    if (empty($data['text'])) {
+    if (empty($data['text']) && empty($data['c_file'])) {
         return false;
     }
     if (empty($data['user_id']) || !is_numeric($data['user_id']) || $data['user_id'] < 0) {
@@ -3756,7 +3779,7 @@ function Wo_ClearRecent() {
         }
     }
 }
-function Wo_GetSearchAdv($search_qeury, $type, $offset = 0) {
+function Wo_GetSearchAdv($search_qeury, $type, $offset = 0, $limit = 0) {
     global $sqlConnect;
     $search_qeury = Wo_Secure($search_qeury);
     $data         = array();
@@ -3778,7 +3801,14 @@ function Wo_GetSearchAdv($search_qeury, $type, $offset = 0) {
             $data[] = Wo_PageData($fetched_data['page_id']);
         }
     } elseif ($type == 'games') {
-        $query = mysqli_query($sqlConnect, " SELECT `id` FROM " . T_GAMES . " WHERE `game_name` LIKE '%$search_qeury%' AND `active` = '1' ORDER BY `id` DESC LIMIT 10");
+        $limit_ = 10;
+        if (!empty($limit)) {
+            $limit_ = Wo_Secure($limit);
+        }
+        if ($offset > 0) {
+            $offset_to .= " AND `id` < {$offset} AND `id` <> {$offset} ";
+        }
+        $query = mysqli_query($sqlConnect, " SELECT `id` FROM " . T_GAMES . " WHERE `game_name` LIKE '%$search_qeury%' AND `active` = '1' {$offset_to} ORDER BY `id` DESC LIMIT $limit_");
         while ($fetched_data = mysqli_fetch_assoc($query)) {
             $data[] = Wo_GameData($fetched_data['id']);
         }

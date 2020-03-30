@@ -110,7 +110,8 @@
    <?php if($wo['story']['post_comments'] > 3 && $wo['story']['comments_status'] == 1) { ?>
    <div class="row view-more-wrapper load-more-comments page-margin">
       <?php if ($wo['story']['limited_comments'] === true) { ?>
-      <span onclick="Wo_loadAllComments(<?php echo $wo['story']['id']; ?>,this);"><?php echo $wo['lang']['view_more_comments'];?></span>
+      <span onclick="Wo_loadPostMoreComments(<?php echo $wo['story']['id']; ?>,this);"><?php echo $wo['lang']['view_more_comments'];?></span>
+
       <?php } ?>
       <div class="order-by <?php echo Wo_RightToLeft('pull-right');?>"> 
          <div class="dropdown">
@@ -139,6 +140,14 @@
          }
          ?>
    </div>
+   <?php if (count($wo['story']['get_post_comments']) <  $wo['story']['post_comments']) { ?>
+      <div>
+         <span onclick="Wo_loadPostMoreComments(<?php echo $wo['story']['id']; ?>,this);" class="pointer"><?php echo $wo['lang']['view_more_comments'];?></span>
+      </div>
+      
+      <br>
+      <div class="clear"></div>
+   <?php } ?>
    <?php if ($wo['story']['comments_status'] == 1) { ?> 
    <div class="post-commet-textarea">
       <div class="loading_cont">

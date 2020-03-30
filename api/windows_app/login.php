@@ -46,16 +46,6 @@ if ($type == 'user_login') {
                 'error_text' => 'Please write your password.'
             )
         );
-    } else if (empty($_POST['s'])) {
-        $json_error_data = array(
-            'api_status' => '400',
-            'api_text' => 'failed',
-            'api_version' => $api_version,
-            'errors' => array(
-                'error_id' => '5',
-                'error_text' => 'No session sent.'
-            )
-        );
     }
     if (empty($json_error_data)) {
         $username        = $_POST['username'];
@@ -64,7 +54,6 @@ if ($type == 'user_login') {
         if (empty($user_id)) {
             $user_id     = Wo_UserIdFromEmail($username);
         }
-        $s      = Wo_Secure(md5($_POST['s']));
         $user_login_data = Wo_UserData($user_id);
         if (empty($user_login_data)) {
             $json_error_data = array(
@@ -95,8 +84,10 @@ if ($type == 'user_login') {
                 echo json_encode($json_error_data, JSON_PRETTY_PRINT);
                 exit();
             } else {
-                $time = time();
-                $add_session = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `time`) VALUES ('{$user_id}', '{$s}', 'windows', '{$time}')");
+                $time           = time();
+                $cookie         = '';
+                $access_token   = sha1(rand(111111111, 999999999)) . md5(microtime()) . rand(11111111, 99999999) . md5(rand(5555, 9999));
+                $add_session = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `time`) VALUES ('{$user_id}', '{$access_token}', 'windows', '{$time}')");
                 if ($add_session) {
                     if (!empty($_POST['timezone'])) {
                         $timezone = Wo_Secure($_POST['timezone']);
@@ -109,9 +100,9 @@ if ($type == 'user_login') {
                         'api_text' => 'success',
                         'api_version' => $api_version,
                         'user_id' => Wo_UserIdFromUsername($username),
-                        'messages' => array(
-                            'respond_message_1' => 'Successfully logged in, Please wait..'
-                        ),
+                        'messages' => 'Successfully logged in, Please wait..',
+                        'access_token' => $access_token,
+                        'user_id' => $user_id,
                         'timezone' => $timezone
                     );
                     header("Content-type: application/json");

@@ -58,7 +58,7 @@ if (empty($error_code)) {
             'jpeg'
         );
         for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
-            $new_string = pathinfo($_FILES['images']['name']);
+            $new_string = pathinfo($_FILES['images']['name'][$i]);
             if (!in_array(strtolower($new_string['extension']), $allowed)) {
                 $error_code    = 6;
                 $error_message = 'Image format is not supported, (jpg, png, gif, jpeg) are supported';
@@ -67,6 +67,12 @@ if (empty($error_code)) {
     }
     
     if (empty($error_code)) {
+        $currency = 0;
+        if (isset($_POST['currency'])) {
+            if (in_array($_POST['currency'], array_keys($wo['currencies']))) {
+                $currency = Wo_Secure($_POST['currency']);
+            }
+        }
         $product_data_array = array(
             'name' => $product_title,
             'category' => $product_category,
@@ -74,25 +80,70 @@ if (empty($error_code)) {
             'price' => $product_price,
             'location' => $product_location,
             'type' => $product_type,
+            'currency' => $currency,
             'lat' => $lat,
             'lng' => $lng
         );
         $product_data       = Wo_UpdateProductData($_POST['product_id'], $product_data_array);
         $product_id         = $_POST['product_id'];
         $id = Wo_GetPostIDFromProdcutID($product_id);
-        if (count($_FILES['postPhotos']) > 0 && !empty($id) && $id > 0) {
-            $fileInfo = array(
-                'file' => $_FILES["postPhotos"]["tmp_name"],
-                'name' => $_FILES['postPhotos']['name'],
-                'size' => $_FILES["postPhotos"]["size"],
-                'type' => $_FILES["postPhotos"]["type"],
-                'types' => 'jpg,png,jpeg,gif'
-            );
-            $file     = Wo_ShareFile($fileInfo, 1);
-            if (!empty($file)) {
-                $media_album = Wo_RegisterProductMedia($product_id, $file['filename']);
+        // if (count($_FILES['postPhotos']) > 0 && !empty($id) && $id > 0) {
+        //     $fileInfo = array(
+        //         'file' => $_FILES["postPhotos"]["tmp_name"],
+        //         'name' => $_FILES['postPhotos']['name'],
+        //         'size' => $_FILES["postPhotos"]["size"],
+        //         'type' => $_FILES["postPhotos"]["type"],
+        //         'types' => 'jpg,png,jpeg,gif'
+        //     );
+        //     $file     = Wo_ShareFile($fileInfo, 1);
+        //     if (!empty($file)) {
+        //         $media_album = Wo_RegisterProductMedia($product_id, $file['filename']);
+        //     }
+        // }
+        if (isset($_FILES['images']['name'])) {
+                if (count($_FILES['images']['name']) > 0 && !empty($id) && $id > 0) {
+                    for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
+                        $fileInfo = array(
+                            'file' => $_FILES["images"]["tmp_name"][$i],
+                            'name' => $_FILES['images']['name'][$i],
+                            'size' => $_FILES["images"]["size"][$i],
+                            'type' => $_FILES["images"]["type"][$i],
+                            'types' => 'jpg,png,jpeg,gif'
+                        );
+                        $file     = Wo_ShareFile($fileInfo, 1);
+                        if (!empty($file)) {
+                            $media_album = Wo_RegisterProductMedia($product_id, $file['filename']);
+                        }
+                    }
+                }
             }
-        }
+            if (!empty($_POST['deleted_images_ids'])) {
+                $images_array = explode(',', $_POST['deleted_images_ids']);
+                if (!empty($images_array)) {
+                    $product_data = Wo_GetProduct($product_id);
+                    foreach ($images_array as $key => $value) {
+                        $image = Wo_ProductImageData(array('id' => $value));
+                        if (!empty($image)) {
+                            $explode2    = @end(explode('.', $image['image']));
+                            $explode3    = @explode('.', $image['image']);
+                            $small_image = $explode3[0] . '_small.' . $explode2;
+
+                            $product = Wo_GetProduct($image['product_id']);
+                            if (!empty($product) && $wo['user']['id'] == $product['user_id']) {
+                                $deleted = Wo_DeleteProductImage($value);
+                                if ($deleted) {
+                                    if (($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1)) {
+                                        Wo_DeleteFromToS3($image['image']);
+                                        Wo_DeleteFromToS3($small_image);
+                                    }
+                                    @unlink($image['image']);
+                                    @unlink($small_image);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
 
 

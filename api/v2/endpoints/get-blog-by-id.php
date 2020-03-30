@@ -24,6 +24,7 @@ else{
 		foreach ($non_allowed as $key4 => $value4) {
           unset($article['author'][$value4]);
         }
+        $sql_query = mysqli_query($sqlConnect, "UPDATE `Wo_Blog` SET `view` = `view` + 1 WHERE `id` = '".Wo_Secure($_POST['blog_id'])."'");
 		
 		$response_data = array(
                                 'api_status' => 200,

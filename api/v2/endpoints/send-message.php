@@ -17,11 +17,13 @@ $required_fields = array(
     'message_hash_id'
 );
 
-if (empty($_POST['text'])) {
-	if (empty($_FILES['file']['name']) && empty($_POST['image_url']) && empty($_POST['gif'])) {
-	    $error_code    = 3;
-	    $error_message = 'file (STREAM FILE) AND text (POST) AND image_url AND gif (POST) are missing, at least one is required';
-	}
+if (empty($_POST['product_id'])) {
+    if (empty($_POST['text']) && $_POST['text'] != 0) {
+    	if (empty($_FILES['file']['name']) && empty($_POST['image_url']) && empty($_POST['gif'])) {
+    	    $error_code    = 3;
+    	    $error_message = 'file (STREAM FILE) AND text (POST) AND image_url AND gif (POST) are missing, at least one is required';
+    	}
+    }
 }
 
 foreach ($required_fields as $key => $value) {
@@ -39,46 +41,58 @@ if (empty($error_code)) {
         $error_code    = 6;
         $error_message = 'Recipient user not found';
     } else {
-	    $mediaFilename = '';
-        $mediaName     = '';
-        if (isset($_FILES['file']['name'])) {
-            $fileInfo      = array(
-                'file' => $_FILES["file"]["tmp_name"],
-                'name' => $_FILES['file']['name'],
-                'size' => $_FILES["file"]["size"],
-                'type' => $_FILES["file"]["type"]
-            );
-            $media         = Wo_ShareFile($fileInfo);
-            $mediaFilename = $media['filename'];
-            $mediaName     = $media['name'];
-        }
-        if (!empty($_POST['image_url'])) {
-        	$fileend = '_url_image';
-        	if (!empty($_POST['sticker_id'])) {
-        		$fileend =  '_sticker_' . Wo_Secure($_POST['sticker_id']);
-        	}
-            $mediaFilename = Wo_ImportImageFromUrl($_POST['image_url'], $fileend);
-        }
-        $gif = '';
-        if (!empty($_POST['gif'])) {
-            if (strpos($_POST['gif'], '.gif') !== false) {
-                $gif = Wo_Secure($_POST['gif']);
+        if (empty($_POST['product_id'])) {
+
+    	    $mediaFilename = '';
+            $mediaName     = '';
+            if (isset($_FILES['file']['name'])) {
+                $fileInfo      = array(
+                    'file' => $_FILES["file"]["tmp_name"],
+                    'name' => $_FILES['file']['name'],
+                    'size' => $_FILES["file"]["size"],
+                    'type' => $_FILES["file"]["type"]
+                );
+                $media         = Wo_ShareFile($fileInfo);
+                $mediaFilename = $media['filename'];
+                $mediaName     = $media['name'];
             }
+            if (!empty($_POST['image_url'])) {
+            	$fileend = '_url_image';
+            	if (!empty($_POST['sticker_id'])) {
+            		$fileend =  '_sticker_' . Wo_Secure($_POST['sticker_id']);
+            	}
+                $mediaFilename = Wo_ImportImageFromUrl($_POST['image_url'], $fileend);
+            }
+            $gif = '';
+            if (!empty($_POST['gif'])) {
+                if (strpos($_POST['gif'], '.gif') !== false) {
+                    $gif = Wo_Secure($_POST['gif']);
+                }
+            }
+        	$message_data = array(
+                'from_id' => Wo_Secure($wo['user']['user_id']),
+                'to_id' => Wo_Secure($recipient_id),
+                'media' => Wo_Secure($mediaFilename),
+                'mediaFileName' => Wo_Secure($mediaName),
+                'time' => time(),
+                'type_two' => (!empty($_POST['contact'])) ? 'contact' : '',
+                'text' => '',
+                'stickers' => $gif,
+            );
+    		if (!empty($_POST['text']) || $_POST['text'] == 0) {
+    		 	$message_data['text'] = Wo_Secure($_POST['text']);
+    		}
+            $last_id      = Wo_RegisterMessage($message_data);
         }
-    	$message_data = array(
-            'from_id' => Wo_Secure($wo['user']['user_id']),
-            'to_id' => Wo_Secure($recipient_id),
-            'media' => Wo_Secure($mediaFilename),
-            'mediaFileName' => Wo_Secure($mediaName),
-            'time' => time(),
-            'type_two' => (!empty($_POST['contact'])) ? 'contact' : '',
-            'text' => '',
-            'stickers' => $gif,
-        );
-		if (!empty($_POST['text'])) {
-		 	$message_data['text'] = Wo_Secure($_POST['text']);
-		}
-        $last_id      = Wo_RegisterMessage($message_data);
+        else{
+            $last_id = Wo_RegisterMessage(array(
+                            'from_id' => Wo_Secure($wo['user']['user_id']),
+                            'to_id' => $recipient_id,
+                            'time' => time(),
+                            'stickers' => '',
+                            'product_id' => Wo_Secure($_POST['product_id'])
+                        ));
+        }
         if (!empty($last_id)) {
         	$message_info = array(
                 'user_id' => $recipient_id,
@@ -101,6 +115,9 @@ if (empty($error_code)) {
                 }
                 $message['position'] = $message_po;
                 $message['type']     = Wo_GetFilePosition($message['media']);
+                if (!empty($message['stickers']) && strpos($message['stickers'], '.gif') !== false) {
+                    $message['type'] = 'gif';
+                }
                 if ($message['type_two'] == 'contact') {
                     $message['type']   = 'contact';
                 }

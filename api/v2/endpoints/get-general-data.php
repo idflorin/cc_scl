@@ -274,6 +274,68 @@ if (empty($error_code)) {
                     $wo['notification']['type_text'] = $wo['lang']['shared_a_post_in_timeline'];
                     $wo['notification']['icon'] .= 'share';
                 }
+                // ************************ 
+                if ($wo['notification']['type'] == "gift") {
+                    $wo['notification']['type_text'] .= $wo['lang']['send_gift_to_you'];
+                    $wo['notification']['icon'] .= 'gift';
+                }
+                if ($wo['notification']['type'] == 'declined_group_chat_request') {
+                    $wo['notification']['type_text'] = $wo['lang']['declined_group_chat_request'];
+                    $wo['notification']['icon'] .= 'declined_group_chat_request';
+                }
+                if ($wo['notification']['type'] == 'accept_group_chat_request') {
+                    $wo['notification']['type_text'] = $wo['lang']['accept_group_chat_request'];
+                    $wo['notification']['icon'] .= 'accept_group_chat_request';
+                }
+                if ($wo['notification']['type'] == 'apply_job') {
+                    $wo['notification']['type_text'] = $wo['lang']['apply_your_job'];
+                    $wo['notification']['icon'] .= 'apply_job';
+                }
+                if ($wo['notification']['type'] == 'fund_donate') {
+                    $wo['notification']['type_text'] = $wo['lang']['donated_to'];
+                    $wo['notification']['icon'] .= 'fund_donate';
+                }
+                if ($wo['notification']['type'] == 'page_admin') {
+                    $wo['notification']['type_text'] = $wo['lang']['added_page_admin'];
+                    $wo['notification']['icon']     .= 'page_admin';
+                }
+                if ($wo['notification']['type'] == 'group_admin') {
+                    $wo['notification']['type_text'] = $wo['lang']['added_group_admin'];
+                    $wo['notification']['icon']     .= 'group_admin';
+                }
+                if ($wo['notification']['type'] == 'added_u_as') {
+                    $wo['notification']['type_text'] = $wo['notification']['text'];
+                    $wo['notification']['icon']     .= 'added_u_as';
+                }
+                if ($wo['notification']['type'] == 'accept_u_as') {
+                    $wo['notification']['type_text'] = $wo['notification']['text'];
+                    $wo['notification']['icon']     .= 'accept_u_as';
+                }
+                if ($wo['notification']['type'] == 'rejected_u_as') {
+                    $wo['notification']['type_text'] = $wo['notification']['text'];
+                    $wo['notification']['icon']     .= 'rejected_u_as';
+                }
+                if ($wo['notification']['type'] == 'sent_u_money') {
+                    $wo['notification']['type_text'] = $wo['notification']['text'];
+                    $wo['notification']['icon']     .= 'sent_u_money';
+                }
+                if ($wo['notification']['type'] == 'blog_commented') {
+                    $wo['notification']['type_text'] = $wo['lang']['commented_on_blog'];
+                    $wo['notification']['icon'] .= 'blog_commented';
+                }
+                if ($wo['notification']['type'] == 'bank_pro') {
+                    $wo['notification']['type_text'] = $wo['lang']['bank_pro'];
+                    $wo['notification']['icon'] .= 'bank_pro';
+                }
+                if ($wo['notification']['type'] == 'bank_wallet') {
+                    $wo['notification']['type_text'] = $wo['lang']['bank_pro'];
+                    $wo['notification']['icon'] .= 'bank_wallet';
+                }
+                if ($wo['notification']['type'] == 'bank_decline') {
+                    $wo['notification']['type_text'] = $wo['lang']['bank_decline'];
+                    $wo['notification']['icon'] .= 'bank_decline';
+                }
+                // ************************ 
             }
             $wo['notification']['time_text_string'] = Wo_Time_Elapsed_String($wo['notification']['time']);
             $wo['notification']['time_text']        = Wo_Time_Elapsed_String($wo['notification']['time']);
@@ -344,7 +406,7 @@ if (empty($error_code)) {
                 }
                 $group_chat_request->group_tab = Wo_GroupTabData($group_chat_request->group_id,false);
                 unset($group_chat_request->group_tab['messages']);
-                $group_chat_request->group_tab['avatar'] = Wo_GetMedia($group_chat_request->group_tab['avatar']);
+                $group_chat_request->group_tab['avatar'] = $group_chat_request->group_tab['avatar'];
                 $group_chat_request->group_tab['time_text'] = Wo_Time_Elapsed_String($group_chat_request->group_tab['time']);
                 $final_group_chat_requests[] = $group_chat_request;
             }

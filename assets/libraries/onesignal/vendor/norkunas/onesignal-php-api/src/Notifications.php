@@ -302,6 +302,8 @@ class Notifications
             })
             ->setDefined('android_led_color')
             ->setAllowedTypes('android_led_color', 'string')
+            ->setDefined('android_channel_id') 
+            ->setAllowedTypes('android_channel_id', 'string')
             ->setDefined('android_accent_color')
             ->setAllowedTypes('android_accent_color', 'string')
             ->setDefined('android_visibility')

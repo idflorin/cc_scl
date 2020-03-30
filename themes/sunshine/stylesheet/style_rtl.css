@@ -1041,6 +1041,13 @@ body .wow_dontd_posts_right {
 }
 body .wow_weather_forecast .fivedays {float: right;}
 
+body .comment-reply .wo_commreply_combo .textarea {
+	padding-left: 60px;
+    padding-right: 10px;
+}
+body .comment-reply .wo_commreply_combo .image-comment {
+	    left: 13px;
+}
 
 
 

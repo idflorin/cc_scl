@@ -38,20 +38,9 @@ if ($type == 'search_public_users') {
                 'error_text' => 'No user id sent.'
             )
         );
-    } else if (empty($_POST['s'])) {
-        $json_error_data = array(
-            'api_status' => '400',
-            'api_text' => 'failed',
-            'api_version' => $api_version,
-            'errors' => array(
-                'error_id' => '5',
-                'error_text' => 'No session sent.'
-            )
-        );
     }
     if (empty($json_error_data)) {
         $user_id         = $_POST['user_id'];
-        $s      = Wo_Secure($_POST['s']);
         $user_login_data = Wo_UserData($user_id);
         
         if (empty($user_login_data)) {

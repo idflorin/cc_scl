@@ -71,14 +71,14 @@
 						<div class="col-md-6">
 							<div class="wow_form_fields">
 								<label for="start_date"><?php echo $wo['lang']['start_date']; ?></label>
-								<input id="start_date" name="" type="text">
+								<input id="start_date" name="start" type="text">
 								<span class="help-block"><?php echo $wo['lang']['ad_start_date_help'] ?></span>
 							</div>
 						</div>
 						<div class="col-md-6">
 							<div class="wow_form_fields">
 								<label for="end_date"><?php echo $wo['lang']['end_date']; ?></label>
-								<input id="end_date" name="" type="text">
+								<input id="end_date" name="end" type="text">
 								<span class="help-block"><?php echo $wo['lang']['ad_end_date_help'] ?></span>
 							</div>
 						</div>
@@ -158,7 +158,7 @@
 					</div>
 					<div class="wow_form_fields">
 						<label for="camp_budget"><?php echo $wo['lang']['camp_budget']; ?></label>
-						<input id="camp_budget" name="" type="text">
+						<input id="camp_budget" name="budget" type="text">
 						<span class="help-block"><?php echo $wo['lang']['camp_budget_help'] ?></span>
 					</div>
 					<div class="wow_form_fields">
@@ -208,17 +208,47 @@ $secondbackButton.on("click", function(e){
 });
 
 $firstButton.on("click", function(e){
-	$ad_media_step.slideUp();
-	$ad_detail_step.slideDown();
-	$('.wow_creads_minstp').addClass('step-two-active');
-	e.preventDefault();
+	if (!$('#company').val()) {
+		$('#company').addClass('border_class');
+	}
+	else{
+		$('#company').removeClass('border_class');
+		$ad_media_step.slideUp();
+		$ad_detail_step.slideDown();
+		$('.wow_creads_minstp').addClass('step-two-active');
+		e.preventDefault();
+	}
 });
 $secondButton.on("click", function(e){
-	$ad_media_step.slideUp();
-	$ad_detail_step.slideUp();
-	$ad_submit_step.slideDown();
-	$('.wow_creads_minstp').addClass('step-three-active');
-	e.preventDefault();
+	if (!$('#title').val() || !$('#description').val() || !$('#start_date').val() || !$('#end_date').val() || !$('#url').val()) {
+		if (!$('#title').val()) {
+			$('#title').addClass('border_class');
+		}
+		if (!$('#description').val()) {
+			$('#description').addClass('border_class');
+		}
+		if (!$('#start_date').val()) {
+			$('#start_date').addClass('border_class');
+		}
+		if (!$('#end_date').val()) {
+			$('#end_date').addClass('border_class');
+		}
+		if (!$('#url').val()) {
+			$('#url').addClass('border_class');
+		}
+	}
+	else{
+		$('#title').removeClass('border_class');
+		$('#description').removeClass('border_class');
+		$('#start_date').removeClass('border_class');
+		$('#end_date').removeClass('border_class');
+		$('#url').removeClass('border_class');
+		$ad_media_step.slideUp();
+		$ad_detail_step.slideUp();
+		$ad_submit_step.slideDown();
+		$('.wow_creads_minstp').addClass('step-three-active');
+		e.preventDefault();
+	}
 });
 
 
@@ -284,7 +314,7 @@ $secondButton.on("click", function(e){
 	    $("#select-page").change(function(event) {
 		  	var self     = $(this);
 		  	if (self.val() != '') {
-		  		var page_url = document.location.origin +'/'+ self.val();
+		  		var page_url = websiteUrl +'/'+ self.val();
 		  		$('#create-ads').find("input[name=website]").val(page_url);
 		  	}
 
@@ -316,3 +346,6 @@ $secondButton.on("click", function(e){
 
 	});
 </script>
+<style type="text/css">
+	div .ads_col_8 .border_class{border: 1px solid red !important;}
+</style>

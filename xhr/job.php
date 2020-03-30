@@ -131,6 +131,7 @@ if ($f == 'job' && $wo['config']['job_system'] == 1) {
 				    	                                 'postText' => $insert_array['title'],
 				    	                                 'job_id' => $job_id,
                                                          'postType' => 'job',
+                                                         'postPrivacy' => 0,
                                                          'time' => time()));
 		    		$db->where('id',$post_id)->update(T_POSTS,array('post_id' => $post_id));
 

@@ -32,6 +32,7 @@
 				<div class="clear"></div>
 			</div>
 			<div class="continue-button wow_usr_steps_cont">
+				<small class="skip-step" onclick="Wo_SkipStep('startup_follow');"><?php echo $wo['lang']['start_up_skip'];?></small>
 				<button class="con-button btn btn-main btn-mat btn-mat-raised" onclick="Wo_SubmitFollow();"><?php $string = str_replace('{number}', count($wo['users']), $wo['lang']['follow_num']); echo $string;?></button>
 			</div>
 		</div>

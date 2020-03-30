@@ -87,10 +87,17 @@ if (empty($error_code)) {
 			$error_code    = 7;
             $error_message = 'text (POST) is empty';
 		} else {
-			$updatePost = Wo_UpdatePost(array(
+			$update_data = array(
                 'post_id' => $_POST['post_id'],
                 'text' => $_POST['text']
-            ));
+            );
+            if (in_array($_POST['privacy_type'],array('0','1','2','3'))) {
+            	Wo_UpdatePostPrivacy(array(
+	                'post_id' => Wo_Secure($_POST['post_id']),
+	                'privacy_type' => Wo_Secure($_POST['privacy_type'])
+	            ));
+            }
+			$updatePost = Wo_UpdatePost($update_data);
             if (!empty($updatePost)) {
             	$action = 'edited';
             }

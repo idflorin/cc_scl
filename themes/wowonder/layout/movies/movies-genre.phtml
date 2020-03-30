@@ -42,7 +42,7 @@
 			<?php endif; ?>
 		</div>
 		<div class="posts_load">
-			<?php if (count($wo['movies']) > 26): ?>
+			<?php if (count($wo['movies']) >= 26): ?>
 				<div class="load-more">
 					<button class="btn btn-default text-center pointer load-more-movies" data-genre="<?php echo strtolower($wo['genre']); ?>" data-movies-type="genre"><i class="fa fa-arrow-down progress-icon" data-icon="arrow-down"></i> <?php echo $wo['lang']['load_more'] ?></button>
 				</div>

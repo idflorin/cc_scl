@@ -37,6 +37,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 $received_user_id = $wo['user']['id'];
                 $send_user_id = Wo_Secure($_POST['user_id']);
                 mysqli_query($sqlConnect, "DELETE FROM " . T_POKES . " WHERE `received_user_id` = '{$received_user_id}' AND `send_user_id` = {$send_user_id}");
+                mysqli_query($sqlConnect, "DELETE FROM " . T_POKES . " WHERE `received_user_id` = '{$send_user_id}' AND `send_user_id` = {$received_user_id}");
             }
             $received_user_id = Wo_Secure($_POST['user_id']);
             $send_user_id     = $wo['user']['id'];
@@ -104,6 +105,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     unset($fetched_data['user_data'][$value]);
                 }
                 if (!empty($fetched_data['user_data'])) {
+                    $fetched_data['user_data']['is_following'] = (Wo_IsFollowing($fetched_data['user_data']['user_id'], $wo['user']['user_id'])) ? 1 : 0;
                     $pokes[] = $fetched_data;
                 }
             }

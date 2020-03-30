@@ -34,6 +34,7 @@ require_once('assets/libraries/social-login/config.php');
 require_once('assets/libraries/social-login/autoload.php');
 
 
+
 if ($application == 'windows_app') {
     switch ($type) {
         case 'user_login':
@@ -121,6 +122,9 @@ if ($application == 'windows_app') {
         case 'check_hash':
             include "api/$application/check-hash.php";
             break;
+        case 'user_registration':
+            include "api/$application/register_user.php";
+            break;   
     }
 } else if ($application == 'phone') {
     

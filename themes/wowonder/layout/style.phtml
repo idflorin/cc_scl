@@ -264,7 +264,7 @@ a.unread-update {
 
 
 <?php 
-if ($wo['config']['chatSystem'] == 1 && $wo['page'] != 'get_news_feed' && $wo['page'] != 'welcome' && $wo['page'] != 'movies' && $wo['loggedin'] == true && $wo['page'] != 'messages') { ?>
+if ($wo['config']['chatSystem'] == 1 && $wo['page'] != 'get_news_feed' && $wo['page'] != 'welcome' && $wo['loggedin'] == true && $wo['page'] != 'messages') { ?>
 body, .navbar-default, .wo_about_wrapper_parent{padding-right: 250px;}
 .wow_main_float_head {right: 250px;}
 @media (max-width:1140px){
@@ -273,7 +273,7 @@ body, .navbar-default, .wo_about_wrapper_parent{padding-right: 250px;}
 }
 <?php } ?>
 
-<?php if($wo['language_type'] == 'rtl' && $wo['config']['chatSystem'] == 1 && $wo['page'] != 'get_news_feed' && $wo['page'] != 'welcome' && $wo['page'] != 'movies' && $wo['page'] != 'messages' && $wo['loggedin'] == true) { ?>
+<?php if($wo['language_type'] == 'rtl' && $wo['config']['chatSystem'] == 1 && $wo['page'] != 'get_news_feed' && $wo['page'] != 'welcome' && $wo['page'] != 'messages' && $wo['loggedin'] == true) { ?>
 body, .navbar-default, .wo_about_wrapper_parent{padding-left: 250px;padding-right: 0px;}
 .wow_main_float_head {right: 0;left: 250px;}
 @media (max-width:1140px){

@@ -1024,6 +1024,14 @@ body .earn_points .ep_illus .ep_how_many svg {
 	border-left: 0 !important;
 }
 
+body .comment-reply .wo_commreply_combo .textarea {
+	padding-left: 60px;
+    padding-right: 10px;
+}
+body .comment-reply .wo_commreply_combo .image-comment {
+	    left: 13px;
+}
+
 
 
 

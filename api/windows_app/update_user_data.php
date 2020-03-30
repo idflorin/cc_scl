@@ -12,7 +12,6 @@ $json_error_data   = array();
 $json_success_data = array();
 $type              = Wo_Secure($_GET['type'], 0);
 if ($type == 'update_user_data' || $type == 'u_user_data') {
-    print_r($_POST);
     if (empty($_POST['user_id'])) {
         $json_error_data = array(
             'api_status' => '400',
@@ -23,20 +22,10 @@ if ($type == 'update_user_data' || $type == 'u_user_data') {
                 'error_text' => 'No user id sent.'
             )
         );
-    } else if (empty($_POST['s'])) {
-        $json_error_data = array(
-            'api_status' => '400',
-            'api_text' => 'failed',
-            'api_version' => $api_version,
-            'errors' => array(
-                'error_id' => '5',
-                'error_text' => 'No session sent.'
-            )
-        );
     }
     if (empty($json_error_data)) {
         $user_id         = $_POST['user_id'];
-        $s               = Wo_Secure($_POST['s']);
+        $s               = Wo_Secure($_POST['access_token']);
         $user_login_data = Wo_UserData($user_id);
         $wo['lang'] = Wo_LangsFromDB($user_login_data['language']);
         if (empty($user_login_data)) {

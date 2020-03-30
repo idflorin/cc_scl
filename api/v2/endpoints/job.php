@@ -17,7 +17,8 @@ $required_fields =  array(
                         'edit',
                         'apply',
                         'search',
-                        'get_apply'
+                        'get_apply',
+                        'get'
                     );
 
 $job_type = array('full_time','part_time','internship','volunteer','contract');
@@ -377,6 +378,13 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $array['after_id'] = $offset;
         }
         $result = Wo_GetAllJobs($array);
+        foreach ($result as $key => $value) {
+        	$result[$key]['image'] = Wo_GetMedia($value['image']);
+        	$post = $db->where('job_id',$value['id'])->getOne(T_POSTS,array('id'));
+        	if (!empty($post)) {
+        		$result[$key]['post_id'] = $post->id;
+        	}
+        }
         $response_data = array(
                                     'api_status' => 200,
                                     'data' => $result
@@ -405,6 +413,35 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
     	else{
 	    	$error_code    = 8;
 		    $error_message = 'job_id can not be empty';
+	    }
+    }
+
+    if ($_POST['type'] == 'get') {
+    	if (!empty($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0) {
+    		$page_id = Wo_Secure($_POST['page_id']);
+
+
+    		
+
+    		$offset = (!empty($_POST['offset']) && is_numeric($_POST['offset']) && $_POST['offset'] > 0 ? Wo_Secure($_POST['offset']) : 0);
+	        $limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);
+
+	        $page_jobs = Wo_GetPosts(array('filter_by' => 'job', 'page_id' => $page_id,'limit' => $limit ,'after_post_id' => $offset));
+	        
+	        foreach ($page_jobs as $key => $value) {
+	        	foreach ($non_allowed as $key4 => $value4) {
+                  unset($page_jobs[$key]['user_data'][$value4]);
+                }
+	        }
+
+	        $response_data = array(
+                                    'api_status' => 200,
+                                    'data' => $page_jobs
+                                );
+    	}
+    	else{
+	    	$error_code    = 9;
+		    $error_message = 'page_id can not be empty';
 	    }
     }
 

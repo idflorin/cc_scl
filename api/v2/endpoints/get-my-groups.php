@@ -15,7 +15,8 @@ $offset = (!empty($_POST['offset']) && is_numeric($_POST['offset']) && $_POST['o
 $limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);
 $required_fields =  array(
                         'my_groups',
-                        'joined_groups'
+                        'joined_groups',
+                        'category'
                     );
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 	if ($_POST['type'] == 'my_groups') {
@@ -50,6 +51,32 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 		else{
 			$error_code    = 4;
 		    $error_message = 'user_id (POST) is missing';
+		}
+	}
+	elseif ($_POST['type'] == 'category') {
+		if (!empty($_POST['category'])) {
+			$groups = array();
+			$category_id = Wo_Secure($_POST['category']);
+			if ($offset > 0) {
+	            $offset_to .= " AND `id` < {$offset} AND `id` <> {$offset} ";
+	        }
+
+	        $query = mysqli_query($sqlConnect, " SELECT `id` FROM " . T_GROUPS . " WHERE `category` = {$category_id} AND `active` = '1' {$offset_to} ORDER BY `id` DESC LIMIT {$limit}");
+	        while ($fetched_data = mysqli_fetch_assoc($query)) {
+	        	$group_data = Wo_GroupData($fetched_data['id']);
+	        	$group_data['members'] = Wo_CountGroupMembers($fetched_data['id']);
+	        	$group_data['is_joined'] = Wo_IsGroupJoined($group_data['group_id']);
+		        $group_data['is_owner'] = Wo_IsGroupOnwer($group_data['group_id']);
+	            $groups[] = $group_data;
+	        }
+	        $response_data = array(
+		                        'api_status' => 200,
+		                        'data' => $groups
+		                    );
+		}
+		else{
+			$error_code    = 6;
+		    $error_message = 'category (POST) is missing';
 		}
 	}
 }

@@ -33,16 +33,6 @@ if ($type == 'insert_new_message' || $type == 'new_message') {
                 'error_text' => 'No recipient id sent.'
             )
         );
-    } else if (empty($_POST['s'])) {
-        $json_error_data = array(
-            'api_status' => '400',
-            'api_text' => 'failed',
-            'api_version' => $api_version,
-            'errors' => array(
-                'error_id' => '5',
-                'error_text' => 'No session sent.'
-            )
-        );
     } else if (empty($_POST['send_time'])) {
         $json_error_data = array(
             'api_status' => '400',
@@ -56,7 +46,7 @@ if ($type == 'insert_new_message' || $type == 'new_message') {
     }
     if (empty($json_error_data)) {
         $user_id         = $_POST['user_id'];
-        $s               = Wo_Secure(md5($_POST['s']));
+        $s               = Wo_Secure($_POST['access_token']);
         $user_login_data = Wo_UserData($user_id);
         $wo['lang'] = Wo_LangsFromDB($user_login_data['language']);
         if (empty($user_login_data)) {

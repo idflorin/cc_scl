@@ -13,7 +13,7 @@
 			</div>
 		</div>
 		<div class="wo_jlist_info_main">
-			<span><?php echo (!empty($wo['currencies'][$wo['config']['currency']]['symbol'])) ? $wo['currencies'][$wo['config']['currency']]['symbol'] : $wo['config']['classified_currency_s'];?><?php echo $wo['job']['minimum']?> - <?php echo (!empty($wo['currencies'][$wo['config']['currency']]['symbol'])) ? $wo['currencies'][$wo['config']['currency']]['symbol'] : $wo['config']['classified_currency_s'];?><?php echo $wo['job']['maximum']?></span>
+			<span><?php echo (!empty($wo['currencies'][$wo['job']['currency']]['symbol'])) ? $wo['currencies'][$wo['job']['currency']]['symbol'] : '$';?><?php echo $wo['job']['minimum']?> - <?php echo (!empty($wo['currencies'][$wo['job']['currency']]['symbol'])) ? $wo['currencies'][$wo['job']['currency']]['symbol'] : '$';?><?php echo $wo['job']['maximum']?></span>
 			<span class="middot">·</span>
 			<?php
 				$product_by_ = $wo['job']['category'];
@@ -21,7 +21,7 @@
 			?>
 			<span><a href="<?php echo Wo_SeoLink('index.php?link1=jobs');?>?c_id=<?php echo($wo['job']['category']) ?>"><?php echo $wo['job_categories'][$wo['job']['category']];?></a></span>
 		</div>
-		<p><?php echo mb_substr($wo['job']['description'], 0, 150, "UTF-8") . '...';?></p>
+		<p><?php echo stripslashes(mb_substr($wo['job']['description'], 0, 150, "UTF-8")) . '...';?></p>
 	</div>
 	<div class="clear"></div>
 </div>

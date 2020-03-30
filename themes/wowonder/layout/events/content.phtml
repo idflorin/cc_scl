@@ -81,7 +81,30 @@
 				</div>
 				<div class="clear"></div>
 			</div>
-		<?php }else{ ?>
+		<?php }elseif (!empty($_GET['type']) && $_GET['type'] == 'going') { ?>
+			<div class="page-margin wow_content mt-0">
+				<div class="wo_page_hdng pag_neg_padd pag_alone">
+					<div class="wo_page_hdng_innr">
+						<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="feather" viewBox="0 0 24 24"><path fill="#E91E63" d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z" /></svg></span> <?php echo $wo['lang']['going_people']; ?>
+					</div>
+				</div>
+			</div>
+			<div class="profile-lists sun_side_widget wow_content negg_padd">
+				<div id="following-list" class="row" style="margin: 0;">
+					<?php
+					    $interested = Wo_GetGoingEventsUsers($wo['event']['id']);
+						if (empty($interested)) {
+							echo '<div class="empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather"><path fill="currentColor" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" /></svg>' . $wo['lang']['no_going_people'] . '</div>';
+						} else {
+							foreach ($interested as $wo['UsersList']) {
+								echo Wo_LoadPage('events/includes/users-list');
+							}
+						}
+					?>
+				</div>
+				<div class="clear"></div>
+			</div>
+		<?php } else{ ?>
 		
 		<?php echo Wo_LoadPage('story/publisher-box'); ?>
 
@@ -153,7 +176,9 @@
 				</div>
 			</div>
 			<li>
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"></path></svg> <?php echo $wo['event']['going']; ?> <?php echo $wo['lang']['going_people']; ?>
+				<a href="<?php echo $wo['event']['url']; ?>?type=going">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"></path></svg> <?php echo $wo['event']['going']; ?> <?php echo $wo['lang']['going_people']; ?>
+				</a>
 			</li>
 			<li>
 				<a href="<?php echo $wo['event']['url']; ?>?type=interested">

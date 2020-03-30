@@ -59,7 +59,7 @@ if (empty($error_code)) {
             'jpeg'
         );
         for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
-            $new_string = pathinfo($_FILES['images']['name']);
+            $new_string = pathinfo($_FILES['images']['name'][$i]);
             if (!in_array(strtolower($new_string['extension']), $allowed)) {
                 $error_code    = 6;
                 $error_message = 'Image format is not supported, (jpg, png, gif, jpeg) are supported';
@@ -68,6 +68,12 @@ if (empty($error_code)) {
     }
     
     if (empty($error_code)) {
+        $currency = 0;
+        if (isset($_POST['currency'])) {
+            if (in_array($_POST['currency'], array_keys($wo['currencies']))) {
+                $currency = Wo_Secure($_POST['currency']);
+            }
+        }
         $product_data = array(
             'user_id' => $wo['user']['user_id'],
             'name' => $product_title,
@@ -78,6 +84,7 @@ if (empty($error_code)) {
             'type' => $product_type,
             'location' => $product_location,
             'active' => 1,
+            'currency' => $currency,
             'lat' => $lat ,
             'lng' => $lng
         );
@@ -91,17 +98,31 @@ if (empty($error_code)) {
             );
             $post_id   = Wo_RegisterPost($post_data);
             if (count($_FILES['images']) > 0 && !empty($post_id) && $post_id > 0) {
-                $fileInfo = array(
-                    'file' => $_FILES["images"]["tmp_name"],
-                    'name' => $_FILES['images']['name'],
-                    'size' => $_FILES["images"]["size"],
-                    'type' => $_FILES["images"]["type"],
-                    'types' => 'jpg,png,jpeg,gif'
-                );
-                $file     = Wo_ShareFile($fileInfo, 1);
-                if (!empty($file)) {
-                    $media_album = Wo_RegisterProductMedia($last_id, $file['filename']);
+
+                for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
+                    $fileInfo = array(
+                        'file' => $_FILES["images"]["tmp_name"][$i],
+                        'name' => $_FILES['images']['name'][$i],
+                        'size' => $_FILES["images"]["size"][$i],
+                        'type' => $_FILES["images"]["type"][$i],
+                        'types' => 'jpg,png,jpeg,gif'
+                    );
+                    $file     = Wo_ShareFile($fileInfo, 1);
+                    if (!empty($file)) {
+                        $media_album = Wo_RegisterProductMedia($last_id, $file['filename']);
+                    }
                 }
+                // $fileInfo = array(
+                //     'file' => $_FILES["images"]["tmp_name"],
+                //     'name' => $_FILES['images']['name'],
+                //     'size' => $_FILES["images"]["size"],
+                //     'type' => $_FILES["images"]["type"],
+                //     'types' => 'jpg,png,jpeg,gif'
+                // );
+                // $file     = Wo_ShareFile($fileInfo, 1);
+                // if (!empty($file)) {
+                //     $media_album = Wo_RegisterProductMedia($last_id, $file['filename']);
+                // }
             }
             $response_data = array(
                 'api_status' => 200,

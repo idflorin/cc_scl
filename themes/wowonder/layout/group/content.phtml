@@ -19,7 +19,7 @@
 				<?php if(Wo_IsGroupOnwer($wo['group_profile']['id']) === true) { ?>
 					<form action="#" method="post" class="profile-cover-changer">
 						<div class="input-group">
-							<span class="input-group-btn">
+							<span class="input-group-btn profile_cover">
 								<span class="btn btn-upload-image btn-file">
 									<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
 									<input type="file" name="cover" accept="image/x-png, image/jpeg" onchange="Wo_UpdateProfileCover();">
@@ -48,7 +48,7 @@
 						<img id="group-avatar-image" alt="<?php echo $wo['group_profile']['name']?> Profile Picture" src="<?php echo $wo['group_profile']['avatar']?>"/>
 						<?php if(Wo_IsGroupOnwer($wo['group_profile']['id']) === true) { ?>
 							<form action="#" method="post" class="profile-avatar-changer">
-								<div class="input-group">
+								<div class="input-group profile_avatar">
 									<span class="input-group-btn">
 										<span class="btn btn-upload-image btn-file">
 											<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
@@ -149,7 +149,7 @@
 				?>
 			</div>
 			<?php
-				$stories = Wo_GetPosts(array('filter_by' => 'all', 'group_id' => $wo['group_profile']['id'])); 
+				$stories = Wo_GetPosts(array('filter_by' => 'all', 'group_id' => $wo['group_profile']['id'],'placement' => 'multi_image_post')); 
 				if (count($stories) == 0 && count($pinedstory) == 0) {
 				echo Wo_LoadPage('story/group-no-stories');
 				} else {
@@ -323,9 +323,12 @@ $(function () {
     url: Wo_Ajax_Requests_File() + '?f=update_group_avatar_picture',
 
     beforeSend: function () {
+
+    	$('.profile_avatar').fadeOut(100);
       $('.user-avatar-uploading-container,.user-avatar-uploading-progress').fadeIn(200);
     },
     success: function (data) {
+    	$('.profile_avatar').fadeIn(100);
       if(data.status == 200) {
         $('[id^=group-avatar-image]').attr("src", data.img);
       }
@@ -337,9 +340,11 @@ $(function () {
     url: Wo_Ajax_Requests_File() + '?f=update_group_cover_picture',
 
     beforeSend: function () {
+    	$('.profile_cover').fadeOut(100);
       $('.user-cover-uploading-container,.user-cover-uploading-progress').fadeIn(200);
     },
     success: function (data) {
+    	$('.profile_cover').fadeIn(100);
       if(data.status == 200) {
         $('[id^=cover-image]').attr("src", data.img);
       }

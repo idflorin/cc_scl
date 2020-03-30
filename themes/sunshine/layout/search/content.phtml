@@ -296,6 +296,9 @@ $type_to_find = '<h5 class="search-filter-center-text empty_state"><svg xmlns="h
 									$search_query = Wo_GetSearchFilter($_GET, 30);
 									if (count($search_query) != 0) {
 										foreach ($search_query as $wo['result']) {
+											if (!empty($wo['result']['avatar_full'])) {
+												$wo['result']['avatar'] = Wo_GetMedia($wo['result']['avatar_full']);
+											}
 											echo Wo_LoadPage('search/user-result');
 										}
 									} else {

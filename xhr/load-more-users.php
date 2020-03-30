@@ -1,7 +1,7 @@
 <?php 
 if ($f == 'load-more-users') {
     $offset = (isset($_GET['offset']) && is_numeric($_GET['offset'])) ? $_GET['offset'] : false;
-    $query  = $_GET['query'];
+    $query  = (isset($_GET['query'])) ? $_GET['query'] : '';
     $html   = "";
     $data   = array(
         "status" => 404,
@@ -18,7 +18,7 @@ if ($f == 'load-more-users') {
                     $html .= Wo_LoadPage('search/user-result');
                 }
                 else{
-                    $html .= Wo_LoadPage('search/result');
+                    $html .= Wo_LoadPage('search/user-result');
                 }
             }
             $data['status'] = 200;

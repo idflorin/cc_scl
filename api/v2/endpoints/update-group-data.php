@@ -71,6 +71,22 @@ if (empty($error_code)) {
 			if ($group_data['group_id']) {
 				unset($group_data['group_id']);
 			}
+			$privacy      = 1;
+            $join_privacy = 1;
+            $array        = array(
+                1,
+                2
+            );
+            if (!empty($_POST['privacy'])) {
+                if (in_array($_POST['privacy'], $array)) {
+                    $group_data['privacy'] = $_POST['privacy'];
+                }
+            }
+            if (!empty($_POST['join_privacy'])) {
+                if (in_array($_POST['join_privacy'], $array)) {
+                    $group_data['join_privacy'] = $_POST['join_privacy'];
+                }
+            }
 			$update = Wo_UpdateGroupData($group['id'], $group_data);
 			if ($update) {
 				$response_data['api_status'] = 200;

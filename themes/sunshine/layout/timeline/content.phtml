@@ -12,7 +12,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 		<div class="cardheader user-cover">
 			<?php if($IsOwner === true) { ?>
 				<form action="#" method="post" class="profile-cover-changer">
-					<div class="input-group when-notedit">
+					<div class="input-group when-notedit profile_cover">
 						<span class="input-group-btn">
 							<span class="btn btn-upload-image btn-file">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
@@ -20,7 +20,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 							</span>
 						</span>
 					</div>
-                    <div class="input-group">
+                    <div class="input-group profile_cover">
 						<span class="input-group-btn when-notedit">
 							<span class="btn btn-upload-image btn-file" onclick="Wo_StartRepositioner();">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-crop"><path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"></path><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"></path></svg>
@@ -84,7 +84,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 						<?php if($IsOwner === true) { ?>
 						<form action="#" method="post" class="profile-avatar-changer">
 							<div class="input-group">
-								<span class="input-group-btn">
+								<span class="input-group-btn profile_avatar">
 									<span class="btn btn-upload-image btn-file">
 										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-camera"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
 										<input type="file" name="avatar" accept="image/x-png, image/jpeg" onchange="Wo_UpdateProfileAvatar();">
@@ -1315,9 +1315,12 @@ $(function () {
     url: Wo_Ajax_Requests_File() + '?f=update_user_avatar_picture',
 
     beforeSend: function () {
+      $('.profile_avatar').fadeOut(100);
       $('.user-avatar-uploading-container, .user-avatar-uploading-progress').fadeIn(200);
+
     },
     success: function (data) {
+      $('.profile_avatar').fadeIn(100);
       if(data.status == 200) {
         Wo_GetNewPosts();
         $('[id^=updateImage-<?php echo $wo['user_profile']['id']; ?>]').attr('data-target', '#ProfileImageModal-Stopped'); 
@@ -1378,9 +1381,11 @@ $(function () {
     url: Wo_Ajax_Requests_File() + '?f=update_user_cover_picture',
 
     beforeSend: function () {
+      $('.profile_cover').fadeOut(100);
       $('.user-cover-uploading-container,.user-cover-uploading-progress').fadeIn(200);
     },
     success: function (data) {
+      $('.profile_cover').fadeIn(100);
       if(data.status == 200) {
         Wo_GetNewPosts();
         $('[id^=cover-image]').attr('data-target', '#ProfileCoverImageModal-Stopped');      

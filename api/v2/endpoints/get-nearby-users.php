@@ -14,6 +14,7 @@ $options['gender'] = (!empty($_POST['gender'])) ? $_POST['gender'] : false;
 $options['name'] = (!empty($_POST['keyword'])) ? $_POST['keyword'] : false;
 $options['status'] = (!empty($_POST['status'])) ? $_POST['status'] : false;
 $options['distance'] = (!empty($_POST['distance'])) ? $_POST['distance'] : false;
+$options['relship'] = (!empty($_POST['relship'])) ? $_POST['relship'] : false;
 
 $update_lat = (!empty($_POST['lat'])) ? $_POST['lat'] : false;
 $update_lng = (!empty($_POST['lng'])) ? $_POST['lng'] : false;

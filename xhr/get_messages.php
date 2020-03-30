@@ -5,6 +5,7 @@ if ($f == 'get_messages') {
             'status' => 200,
             'html' => ''
         );
+        $data['message'] = $wo['lang']['no_more_message_to_show'];
 
         $messages = Wo_GetMessagesUsers($wo['user']['user_id'], '', 5);
         //$page_messages = Wo_GetPageChatList($wo['user']['user_id'], 5);

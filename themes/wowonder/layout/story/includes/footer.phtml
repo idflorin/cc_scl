@@ -153,6 +153,14 @@
          }
          ?>
    </div>
+   <?php if (count($wo['story']['get_post_comments']) <  $wo['story']['post_comments']) { ?>
+      <div>
+         <span onclick="Wo_loadPostMoreComments(<?php echo $wo['story']['id']; ?>,this);" class="pointer"><?php echo $wo['lang']['view_more_comments'];?></span>
+      </div>
+      
+      <br>
+      <div class="clear"></div>
+   <?php } ?>
    <?php if ($wo['story']['comments_status'] == 1) { ?> 
    <div class="post-commet-textarea dropdown">
       <div id="wo_comment_combo" class="remove_combo_on_click wo_comment_combo_<?php echo $wo['story']['id']; ?>" onclick="Wo_ShowCommentCombo(<?php echo $wo['story']['id']; ?>);">

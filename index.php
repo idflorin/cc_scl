@@ -77,6 +77,7 @@ if ($wo['config']['maintenance_mode'] == 1) {
 if (!empty($_GET['m'])) {
     $page = 'welcome';
 }
+
 switch ($page) {
     case 'maintenance':
         include('sources/maintenance.php');
@@ -128,6 +129,12 @@ switch ($page) {
         break;
     case 'suggested-pages':
         include('sources/suggested_pages.php');
+        break;
+    case 'liked-pages':
+        include('sources/liked_pages.php');
+        break;
+    case 'joined_groups':
+        include('sources/joined_groups.php');
         break;
     case 'go-pro':
         include('sources/go_pro.php');
@@ -375,7 +382,7 @@ switch ($page) {
     case 'watch-film':
         include('sources/movies/watch_film.php');
         break;
-    case 'ads':
+    case 'advertise':
         include('sources/ads/ads.php');
         break;
     case 'wallet':

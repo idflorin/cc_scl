@@ -53,11 +53,9 @@ if (empty($error_code)) {
     if (empty($error_code)) {
         $activate  = ($wo['config']['emailValidation'] == '1') ? 0 : 1;
         //$device_id = (!empty($_POST['device_id'])) ? $_POST['device_id'] : '';
-        $gender    = 'male';
-        if (!empty($_POST['gender'])) {
-            if ($_POST['gender'] == 'female') {
-                $gender = 'female';
-            }
+        $gender = 'male';
+        if (in_array($_POST['gender'], array_keys($wo['genders']))) {
+            $gender = $_POST['gender'];
         }
         $code = md5(rand(1111, 9999) . time());
         $account_data = array(

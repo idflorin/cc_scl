@@ -40,8 +40,16 @@ if ($f == 'groups') {
             if ($privacy == 2) {
                 $re_group_data['join_privacy'] = 2;
             }
+
             $register_group = Wo_RegisterGroup($re_group_data);
+
             if ($register_group) {
+                if ($privacy == 2) {
+                    $group_id            = Wo_GroupIdFromGroupname(Wo_Secure($_POST['group_name']));
+                    $user_id = $wo['user']['id'];
+                    $active = 1;
+                    $query = mysqli_query($sqlConnect, " INSERT INTO " . T_GROUP_MEMBERS . " (`user_id`,`group_id`,`active`,`time`) VALUES ({$user_id},{$group_id},'{$active}'," . time() . ")");
+                }
                 $data = array(
                     'status' => 200,
                     'location' => Wo_SeoLink('index.php?link1=timeline&u=' . Wo_Secure($_POST['group_name']))

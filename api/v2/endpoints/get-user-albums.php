@@ -21,9 +21,13 @@ if (empty($error_code)) {
     if (empty($recipient_data)) {
         $error_code    = 6;
         $error_message = 'Recipient user not found';
-    } else {
+    }
+    elseif (empty($_POST['type']) || !in_array($_POST['type'], array('photos','video','music','files','maps','text'))) {
+         $error_code    = 7;
+         $error_message = 'type can not be empty';
+     } else {
 		$data = array(
-            'filter_by' => 'photos',
+            'filter_by' => Wo_Secure($_POST['type']),
             'limit' => (!empty($_POST['limit'])) ? (int) $_POST['limit'] : 35,
             'publisher_id' => $recipient_id,
             'after_post_id' => (!empty($_POST['offset'])) ? (int) $_POST['offset'] : 0,
@@ -47,7 +51,7 @@ if (empty($error_code)) {
         }
         $response_data = array(
 		    'api_status' => 200,
-		    'albums' => $albums
+		    'data' => $albums
 		);
     }
 }

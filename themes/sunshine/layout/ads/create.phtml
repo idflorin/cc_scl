@@ -290,7 +290,7 @@ $(document).ready(function() {
 	    $("#select-page").change(function(event) {
 		  	var self     = $(this);
 		  	if (self.val() != '') {
-		  		var page_url = document.location.origin +'/'+ self.val();
+		  		var page_url = websiteUrl +'/'+ self.val();
 		  		$('#create-ads').find("input[name=website]").val(page_url);
 		  	}
 
@@ -304,6 +304,36 @@ $(document).ready(function() {
 			type:"POST",
 			beforeSend: function() {
 				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+				if (!$("[name='headline']").val()) {
+					$('.fcov_title').addClass('border_class');
+				}
+				else{
+					$('.fcov_title').removeClass('border_class');
+				}
+				if (!$("[name='description']").val()) {
+					$('.fads_headline').addClass('border_class');
+				}
+				else{
+					$('.fads_headline').removeClass('border_class');
+				}
+				if (!$("[name='location']").val()) {
+					$('.location').addClass('border_class');
+				}
+				else{
+					$('.location').removeClass('border_class');
+				}
+				if (!$("[name='name']").val()) {
+					$('.company').addClass('border_class');
+				}
+				else{
+					$('.company').removeClass('border_class');
+				}
+				if (!$("[name='website']").val()) {
+					$('#website').addClass('border_class');
+				}
+				else{
+					$('#website').removeClass('border_class');
+				}
 			},
 			success: function(data) {
 				scrollToTop();
@@ -322,3 +352,6 @@ $(document).ready(function() {
 
 	});
 </script>
+<style type="text/css">
+	div .create-ads-cont .border_class{border: 1px solid red !important;}
+</style>

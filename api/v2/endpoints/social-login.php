@@ -40,24 +40,19 @@ if (empty($error_code)) {
     		}
     	}
     } else if ($provider == 'google') {
-    	if (empty($_POST['google_key'])) {
-    		$error_code    = 5;
-    		$error_message = 'google_key (POST) is missing';
-    	} else {
-    		$app_key = $_POST['google_key'];
-    		$get_user_details = fetchDataFromURL("https://www.googleapis.com/plus/v1/people/me?access_token={$access_token}&key={$app_key}");
-    		$json_data = json_decode($get_user_details);
-    		if (!empty($json_data->error)) {
-	    		$error_code    = 4;
-	    		$error_message = $json_data->error;
-	    	} else if (!empty($json_data->id)) {
-	    		$social_id = $json_data->id;
-	    		$social_email = $json_data->emails[0]->value;
-	    		$social_name = $json_data->displayName;
-	    		if (empty($social_email)) {
-	    			$social_email = 'go_' . $social_id . '@google.com';
-	    		}
-	    	}
+        
+		$get_user_details = fetchDataFromURL("https://www.googleapis.com/plus/v1/people/me?access_token={$access_token}");
+		$json_data = json_decode($get_user_details);
+		if (!empty($json_data->error)) {
+    		$error_code    = 4;
+    		$error_message = $json_data->error;
+    	} else if (!empty($json_data->id)) {
+    		$social_id = $json_data->id;
+    		$social_email = $json_data->emails[0]->value;
+    		$social_name = $json_data->displayName;
+    		if (empty($social_email)) {
+    			$social_email = 'go_' . $social_id . '@google.com';
+    		}
     	}
     }
     if (!empty($social_id)) {
