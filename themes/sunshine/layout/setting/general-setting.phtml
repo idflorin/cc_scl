@@ -67,6 +67,7 @@
 					<?php } ?>
 				</select>
 			</div>
+			<?php if ($wo['config']['weather_widget'] == 1 && !empty($wo['config']['weather_key'])) { ?>
 
 			<div class="sun_input col-lg-6">
 				<label class="plr15" for="weather_unit"><?php echo $wo['lang']['weather_unit']; ?></label>
@@ -76,6 +77,7 @@
 					<option value="uk" <?php echo ($wo['setting']['weather_unit'] == 'uk')   ? 'selected' : '';?> >C</option>
 				</select>
 			</div>
+		    <?php } ?>
 		 </div>
 
 		 <div class="setting-panel row">
@@ -181,9 +183,13 @@
 					<div class="col-md-12">
 						<?php $pro_type = Wo_GetUserProType($wo['setting']['pro_type']);?>
 						<label style="color:<?php echo $pro_type['color_name'];?>">
-						<?php if (!empty(in_array($wo['setting']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['setting']['pro_type']]]['image']))) { ?>
+						<?php if (!empty(in_array($wo['setting']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['setting']['pro_type']]]['image'])) && $_COOKIE['mode'] == 'day') { ?>
 				          <img src="<?php echo($wo['pro_packages'][$wo['pro_packages_types'][$wo['setting']['pro_type']]]['image']) ?>" class="pro_packages_icon_inline">
-				        <?php }else{ ?>
+				        <?php }
+				        elseif (!empty(in_array($wo['setting']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['setting']['pro_type']]]['night_image'])) && $_COOKIE['mode'] == 'night') { ?>
+				        	<img src="<?php echo($wo['pro_packages'][$wo['pro_packages_types'][$wo['setting']['pro_type']]]['night_image']) ?>" class="pro_packages_icon_inline">
+				        <?php }
+				        else{ ?>
 				          
 							<i class="fa fa-fw fa-<?php echo $pro_type['icon'];?>"></i> 
 						

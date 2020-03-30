@@ -25,7 +25,7 @@
 	
 	<?php
 	if (!empty($wo['setting']['notification_settings'])) {
-		$wo['setting']['notification_settings'] = unserialize(html_entity_decode($wo['setting']['notification_settings']));
+		$wo['setting']['notification_settings'] = (Array) json_decode(html_entity_decode($wo['setting']['notification_settings']));
 	}
 	?>
 	<form class="setting-general-form form-horizontal" method="post">

@@ -33,6 +33,31 @@ require_once('./api/' . $application . '/core/functions.php');
 require_once('assets/libraries/social-login/config.php');
 require_once('assets/libraries/social-login/autoload.php');
 
+if ($application == 'windows_app') {
+    $server_key        = (!empty($_POST['server_key'])) ? Wo_Secure($_POST['server_key'], 0) : false;
+    if (empty($server_key)) {
+        $response_data       = array(
+            'api_status'     => '404',
+            'errors'         => array(
+                'error_id'   => '1',
+                'error_text' => 'Error: 404 POST (server_key) not specified, Admin Panel > API Settings > Manage API Server Key'
+            )
+        );
+        echo json_encode($response_data, JSON_PRETTY_PRINT);
+        exit();
+    }
+    if ($server_key != $wo['config']['widnows_app_api_key']) {
+        $response_data       = array(
+            'api_status'     => '404',
+            'errors'         => array(
+                'error_id'   => '1',
+                'error_text' => 'Error: invalid server key'
+            )
+        );
+        echo json_encode($response_data, JSON_PRETTY_PRINT);
+        exit();
+    }
+}
 
 
 if ($application == 'windows_app') {
@@ -124,6 +149,12 @@ if ($application == 'windows_app') {
             break;
         case 'user_registration':
             include "api/$application/register_user.php";
+            break;  
+        case 'two-factor':
+            include "api/$application/two-factor.php";
+            break;  
+        case 'active_account_sms':
+            include "api/$application/active_account_sms.php";
             break;   
     }
 } else if ($application == 'phone') {

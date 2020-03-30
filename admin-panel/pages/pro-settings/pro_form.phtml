@@ -79,7 +79,15 @@
     <br>
     <small>The icon size (width = 32px and height: 32px and .png)</small>
 </div>
-<?php if (!empty($wo['pro']['image'])) { ?>
+<div class="form-group form-float">
+    <div class="form-line focused">
+        <input type="file" name="night_icon" class="form-control">
+        <label class="form-label">Night Icon</label>
+    </div>
+    <br>
+    <small>The icon size (width = 32px and height: 32px and .png)</small>
+</div>
+<?php if (!empty($wo['pro']['image']) || !empty($wo['pro']['night_image'])) { ?>
 <label for="icon_to_use">Icon to use</label>
 <div class="form-group">
     <input type="radio" name="icon_to_use" id="icon_to_use-enabled" value="1">

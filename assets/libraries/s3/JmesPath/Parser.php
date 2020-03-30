@@ -1,9 +1,4 @@
 <?php
-
-/*
-This is the parser, don't oveerload
-*/
-
 namespace JmesPath;
 
 use JmesPath\Lexer as T;

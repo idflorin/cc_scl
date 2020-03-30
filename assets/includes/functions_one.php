@@ -27,7 +27,7 @@ function Wo_GetUserFromSessionID($session_id, $platform = 'web') {
     $query      = mysqli_query($sqlConnect, "SELECT * FROM " . T_APP_SESSIONS . " WHERE `session_id` = '{$session_id}' LIMIT 1");
     $fetched_data = mysqli_fetch_assoc($query);
     if (empty($fetched_data['platform_details']) && $fetched_data['platform'] == 'web') {
-        $ua = serialize(getBrowser());
+        $ua = json_encode(getBrowser());
         if (isset($fetched_data['platform_details'])) {
             $update_session = $db->where('id', $fetched_data['id'])->update(T_APP_SESSIONS, array('platform_details' => $ua));
         }
@@ -78,7 +78,7 @@ function Wo_GetAllSessionsFromUserID($user_id = 0) {
             $row['browser'] = 'Desktop Application';
         }
         if (!empty($row['platform_details'])) {
-            $uns = unserialize($row['platform_details']);
+            $uns = (Array) json_decode($row['platform_details']);
             $row['browser'] = $uns['name'];
             $row['platform'] = ucfirst($uns['platform']);
             $row['ip_address'] = $uns['ip_address'];
@@ -220,7 +220,7 @@ function Wo_CreateLoginSession($user_id = 0) {
     $hash      = sha1(rand(111111111, 999999999)) . md5(microtime()) . rand(11111111, 99999999) . md5(rand(5555, 9999));
     $query_two = mysqli_query($sqlConnect, "DELETE FROM " . T_APP_SESSIONS . " WHERE `session_id` = '{$hash}'");
     if ($query_two) {
-        $ua = serialize(getBrowser());
+        $ua = json_encode(getBrowser());
         $delete_same_session = $db->where('user_id', $user_id)->where('platform_details', $ua)->delete(T_APP_SESSIONS);
         $query_three = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `platform_details`, `time`) VALUES('{$user_id}', '{$hash}', 'web', '$ua'," . time() . ")");
         if ($query_three) {
@@ -517,7 +517,7 @@ function Wo_UserData($user_id, $password = true) {
         $fetched_data['name'] = $fetched_data['username'];
     }
     if (!empty($fetched_data['details'])) {
-        $fetched_data['details'] = unserialize($fetched_data['details']);
+        $fetched_data['details'] = (Array) json_decode($fetched_data['details']);
     }
     $fetched_data['following_data'] = '';
     $fetched_data['followers_data'] = '';
@@ -526,7 +526,7 @@ function Wo_UserData($user_id, $password = true) {
     $fetched_data['groups_data'] = '';
     $fetched_data['album_data'] = '';
     if (!empty($fetched_data['sidebar_data'])) {
-        $sidebar_data = unserialize($fetched_data['sidebar_data']);
+        $sidebar_data = (Array) json_decode($fetched_data['sidebar_data']);
         if (!empty($sidebar_data['following_data'])) {
             $fetched_data['following_data'] = $sidebar_data['following_data'];
         }
@@ -634,7 +634,7 @@ function Wo_RegisterUser($registration_data, $invited = false) {
         $getIpInfo = fetchDataFromURL("http://ip-api.com/json/$get_ip");
         $getIpInfo = json_decode($getIpInfo, true);
         if ($getIpInfo['status'] == 'success' && !empty($getIpInfo['regionName']) && !empty($getIpInfo['countryCode']) && !empty($getIpInfo['timezone']) && !empty($getIpInfo['city'])) {
-            $registration_data['last_login_data'] = serialize($getIpInfo);
+            $registration_data['last_login_data'] = json_encode($getIpInfo);
         }
     }
     $registration_data['registered'] = date('n') . '/' . date("Y");
@@ -1982,7 +1982,9 @@ function Wo_GetFollowing($user_id, $type = '', $limit = '', $after_user_id = '',
     $sql_query = mysqli_query($sqlConnect, $query);
     while ($fetched_data = mysqli_fetch_assoc($sql_query)) {
         $user_data                  = Wo_UserData($fetched_data['user_id'], false);
-        $user_data['family_member'] = Wo_GetFamalyMember($fetched_data['user_id'], $wo['user']['id']);
+        if ($wo['loggedin']) {
+            $user_data['family_member'] = Wo_GetFamalyMember($fetched_data['user_id'], $wo['user']['id']);
+        }
         $data[]                     = $user_data;
     }
     return $data;
@@ -2215,7 +2217,16 @@ function Wo_RegisterNotification($data = array()) {
     $send_notification = true;
     
     if (!empty($recipient['notification_settings'])) {
-        $recipient['notification_settings'] = unserialize(html_entity_decode($recipient['notification_settings']));
+        //$old = unserialize(html_entity_decode($recipient['notification_settings']));
+        $recipient['notification_settings'] = (Array) json_decode(html_entity_decode($recipient['notification_settings']));
+        // if (empty($recipient['notification_settings']) && !empty($old)) {
+        //     $impload   = json_encode($old);
+        //     $query_one = " UPDATE " . T_USERS . " SET `notification_settings` = '{$impload}' WHERE `user_id` = '".$recipient['user_id']."' ";
+        //     //$query1    = mysqli_query($sqlConnect, $query_one);
+        //     // Wo_UpdateUserData($recipient['user_id'], array(
+        //     //     'notification_settings' => json_encode(value)
+        //     // ));
+        // }
     } else {
         $recipient['notification_settings'] = array();
     }
@@ -5036,7 +5047,9 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
-        $query_text .= " AND `postPrivacy` <> '3'";
+        if ($Wo_publisher['user_id'] != $wo['user']['id']) {
+            $query_text .= " AND `postPrivacy` <> '3'";
+        }
     } else if (isset($Wo_page_publisher['page_id'])) {
         $page_id = Wo_Secure($Wo_page_publisher['page_id']);
         $query_text .= " AND (`page_id` = {$page_id}) AND `id` NOT IN (SELECT `post_id` from " . T_PINNED_POSTS . " WHERE `page_id` = {$page_id})";
@@ -5068,7 +5081,9 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 }
                 break;
         }
-        $query_text .= " AND `postPrivacy` <> '3'";
+        if ($Wo_page_publisher['user_id'] != $wo['user']['id']) {
+            $query_text .= " AND `postPrivacy` <> '3'";
+        }
 
     } else if (isset($Wo_group_publisher['id'])) {
         $group_id = Wo_Secure($Wo_group_publisher['id']);
@@ -5093,7 +5108,9 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
-        $query_text .= " AND `postPrivacy` <> '3'";
+        if ($Wo_group_publisher['user_id'] != $wo['user']['id']) {
+            $query_text .= " AND `postPrivacy` <> '3'";
+        }
     } else if (isset($Wo_event_publisher['id'])) {
         $event_id = Wo_Secure($Wo_event_publisher['id']);
         $query_text .= " AND (`event_id` = {$event_id}) AND `id` NOT IN (SELECT `post_id` from " . T_PINNED_POSTS . " WHERE `event_id` = {$event_id})";
@@ -5117,7 +5134,9 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
-        $query_text .= " AND `postPrivacy` <> '3'";
+        if ($Wo_event_publisher['user_id'] != $wo['user']['id']) {
+            $query_text .= " AND `postPrivacy` <> '3'";
+        }
     } else {
         $logged_user_id    = Wo_Secure($wo['user']['user_id']);
         $groups_not_joined = array();
@@ -5151,7 +5170,7 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                   )
             )";
         }
-        $query_text .= " AND `postPrivacy` <> '3'";
+        $query_text .= " AND (`postPrivacy` <> '3' OR (`user_id` = {$logged_user_id} AND `postPrivacy` >= '0'))";
         $query_text .= " AND `postShare` NOT IN (1)";
         if (!empty($groups_not_joined)) {
             $implode_groups = implode($groups_not_joined, ',');

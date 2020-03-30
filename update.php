@@ -4,6 +4,7 @@ if (file_exists('assets/init.php')) {
 } else {
     die('Please put this file in the home directory !');
 }
+ini_set('max_execution_time', 0);
 function check_($check) {
     $siteurl           = urlencode(getBaseUrl());
     $arrContextOptions = array(
@@ -53,102 +54,59 @@ if (!empty($_POST['query'])) {
     exit();
 }
 if (!empty($_POST['update_langs'])) {
-    $data  = array();
-    $query = mysqli_query($sqlConnect, "SHOW COLUMNS FROM `Wo_Langs`");
+    $config = array();
+    $query  = mysqli_query($sqlConnect, "SELECT * FROM " . T_CONFIG);
     while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = $fetched_data['Field'];
+        $config[$fetched_data['name']] = $fetched_data['value'];
     }
-    unset($data[0]);
-    unset($data[1]);
-    unset($data[2]);
-    function Wo_UpdateLangs($lang, $key, $value) {
-        global $sqlConnect;
-        $update_query         = "UPDATE Wo_Langs SET `{lang}` = '{lang_text}' WHERE `lang_key` = '{lang_key}'";
-        $update_replace_array = array(
-            "{lang}",
-            "{lang_text}",
-            "{lang_key}"
-        );
-        return str_replace($update_replace_array, array(
-            $lang,
-            Wo_Secure($value),
-            $key
-        ), $update_query);
-    }
-    $lang_update_queries = array();
-    foreach ($data as $key => $value) {
-        $value = ($value);
-        if ($value == 'arabic') {
-            $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'لا يوجد مستخدمون ذاهبون.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'صفحات أعجبتني');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'انضم إلى المجموعات');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'كسب٪ d نقاط عن طريق إنشاء مدونة جديدة');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'عرض المرشحين المهتمين');
-        } else if ($value == 'dutch') {
-           $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'Er zijn geen vertrekkende gebruikers.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Liked Pages');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Aangesloten groepen');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Verdien %d punten door een nieuw blog te maken');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'Bekijk geïnteresseerde kandidaten');
-        } else if ($value == 'french') {
-            $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'Il n&#39;y a aucun utilisateur actif.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Pages aimées');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Groupes joints');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Gagnez %d points en créant un nouveau blog');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'Voir les candidats intéressés');
-        } else if ($value == 'german') {
-            $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'Es gibt keine gehenden Benutzer.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Gefallene Seiten');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Verbundene Gruppen');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Verdiene %d Punkte, indem du ein neues Blog erstellst');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'Interessierte Kandidaten anzeigen');
-        } else if ($value == 'italian') {
-           $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'Non ci sono utenti attivi.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Pagine piaciute');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Gruppi uniti');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Guadagna %d punti creando un nuovo blog');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'Visualizza i candidati interessati');
-        } else if ($value == 'portuguese') {
-            $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'Não há usuários ativos.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Páginas curtidas');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Grupos Associados');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Ganhe %d pontos criando um novo blog');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'Exibir candidatos interessados');
-        } else if ($value == 'russian') {
-            $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'Там нет идущих пользователей.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Понравившиеся страницы');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Объединенные группы');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Заработайте %d баллов, создав новый блог');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'Посмотреть заинтересованных кандидатов');
-        } else if ($value == 'spanish') {
-           $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'No hay usuarios que vayan.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Páginas Me gusta');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Grupos unidos');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Gane %d puntos creando un nuevo blog');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'Ver candidatos interesados');
-        } else if ($value == 'turkish') {
-            $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'Giden kullanıcı yok.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Beğenilen Sayfalar');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Katılan Gruplar');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Yeni bir blog oluşturarak %d puan kazanın');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'İlgilenen Adayları Göster');
-        } else if ($value == 'english') {
-            $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'There are no going users.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Liked Pages');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Joined Groups');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Earn %d points by creating a new blog');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'View Interested Candidates');
-        } else if ($value != 'english') {
-            $lang_update_queries[] = Wo_UpdateLangs($value, 'no_going_people', 'There are no going users.');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'liked_pages', 'Liked Pages');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'joined_groups', 'Joined Groups');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'earn_text_create_blog', 'Earn %d points by creating a new blog');
-    $lang_update_queries[] = Wo_UpdateLangs($value, 'view_interested_Candidates', 'View Interested Candidates');
+    $config = (Object) $config;
+    if (!empty($config->currency_array)) {
+        $currency_array = @unserialize($config->currency_array);
+        if ($currency_array !== false) {
+            $value       = json_encode($currency_array);
+            $update_name = 'currency_array';
+            $query_one   = " UPDATE " . T_CONFIG . " SET `value` = '{$value}' WHERE `name` = '{$update_name}'";
+            $query       = mysqli_query($sqlConnect, $query_one);
         }
     }
-    if (!empty($lang_update_queries)) {
-        foreach ($lang_update_queries as $key => $query) {
-            $sql = mysqli_query($sqlConnect, $query);
+    if (!empty($config->currency_symbol_array)) {
+        $currency_symbol_array = @unserialize($config->currency_symbol_array);
+        if ($currency_symbol_array !== false) {
+            $value       = json_encode($currency_symbol_array);
+            $update_name = 'currency_symbol_array';
+            $query_one   = " UPDATE " . T_CONFIG . " SET `value` = '{$value}' WHERE `name` = '{$update_name}'";
+            $query       = mysqli_query($sqlConnect, $query_one);
+        }
+    }
+    if (!empty($config->providers_array)) {
+        $providers_array = @unserialize($config->providers_array);
+        if ($providers_array !== false) {
+            $value       = json_encode($providers_array);
+            $update_name = 'providers_array';
+            $query_one   = " UPDATE " . T_CONFIG . " SET `value` = '{$value}' WHERE `name` = '{$update_name}'";
+            $query       = mysqli_query($sqlConnect, $query_one);
+        }
+    }
+    $users = $db->get(T_USERS);
+    if (!empty($users)) {
+        foreach ($users as $key => $user) {
+            $update_array = array();
+            if (!empty($user->details)) {
+                $details = @unserialize($user->details);
+                if ($details !== false) {
+                    $update_array['details'] = json_encode($details);
+                } else {
+                }
+            }
+            if (!empty($user->notification_settings)) {
+                $notification_settings = @unserialize(html_entity_decode($user->notification_settings));
+                if ($notification_settings !== false) {
+                    $update_array['notification_settings'] = json_encode($notification_settings);
+                }
+            }
+            if (!empty($update_array)) {
+                $db->where('user_id', $user->user_id)->update(T_USERS, $update_array);
+            }
         }
     }
     $name = md5(microtime()) . '_updated.php';
@@ -217,14 +175,14 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
                <div class="wo_install_wiz">
                  <?php if ($updated == false) { ?>
                   <div>
-                     <h2 class="light">Update to v2.5.1 [Important] </span></h2>
+                     <h2 class="light">Update to v2.5.2 [Important] </span></h2>
                      <div class="setting-well">
                         <h4>Changelog</h4>
                         <ul class="wo_update_changelog">
-                                <li> [Added] view joined groups and liked pages from one page.</li>
-                                <li> [Added] the ability to attache photos in commment replies.</li>
-                                <li> [Added] missing files from v2.5</li>
+                                <li> [Added] click button to comment and reply.</li>
+                                <li> [Fixed] bugs.</li>
                                 <li> [Fixed] bugs in API.</li>
+                                <li> [Fixed] Important security issues.</li>
                         </ul>
                         <p class="hide_print">Note: The update process might take few minutes.</p>
                         <p class="hide_print">Important: If you got any fail queries, please copy them, open a support ticket and send us the details.</p>
@@ -265,13 +223,10 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
 </html>
 <script>  
 var queries = [
-    "UPDATE `Wo_Config` SET `value` = '2.5.1' WHERE `name` = 'version';",
-    "ALTER TABLE `Wo_Comment_Replies` ADD `c_file` VARCHAR(300) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `text`;",
-    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'no_going_people');",
-    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'liked_pages');",
-    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'joined_groups');",
-    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'earn_text_create_blog');",
-    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'view_interested_Candidates');",
+    "UPDATE `Wo_Config` SET `value` = '2.5.2' WHERE `name` = 'version';",
+    "ALTER TABLE `Wo_Manage_Pro` ADD `night_image` VARCHAR(300) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `image`;",
+    "ALTER TABLE `Wo_Users` CHANGE `notification_settings` `notification_settings` VARCHAR(400) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '{\"e_liked\":1,\"e_shared\":1,\"e_wondered\":0,\"e_commented\":1,\"e_followed\":1,\"e_accepted\":1,\"e_mentioned\":1,\"e_joined_group\":1,\"e_liked_page\":1,\"e_visited\":1,\"e_profile_wall_post\":1}';",
+    "ALTER TABLE `Wo_Users` CHANGE `details` `details` VARCHAR(300) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '{\"post_count\":0,\"album_count\":0,\"following_count\":0,\"followers_count\":0,\"groups_count\":0,\"likes_count\":0}';"
 ];
 $('#input_code').bind("paste keyup input propertychange", function(e) {
     if (isPurchaseCode($(this).val())) {

@@ -186,9 +186,17 @@
 			<div class="wo_commreply_combo" id="post-<?php echo $wo["comment"]["id"];?>">
 				<img class="avatar" src="<?php echo $wo['user']['avatar'];?>"/>
 				<textarea onkeyup="textAreaAdjust(this, 26)" class="reply-box form-control textarea comment-reply-textarea" onkeydown="Wo_RegisterReply(this.value,<?php echo $wo['comment']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, event, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" placeholder="<?php echo $wo['lang']['reply_to_comment'];?>" dir="auto"></textarea>
+        
 			
 
          <div class="image-comment">
+          <div class="pull-right">
+            &nbsp;<button type="button" onclick="Wo_RegisterReply2(<?php echo $wo['comment']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" class="btn btn-file" title="<?php echo $wo['lang']['post']; ?>">
+				<svg fill="#009da0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="feather feather-user-plus">
+                  <path d="M3.741 1.408l18.462 10.154a.5.5 0 0 1 0 .876L3.741 22.592A.5.5 0 0 1 3 22.154V1.846a.5.5 0 0 1 .741-.438zM5 13v6.617L18.85 12 5 4.383V11h5v2H5z"/>
+               </svg>
+			</button>
+         </div>
           <span data-toggle="dropdown" role="button" aria-expanded="false" style="text-decoration: none;cursor: pointer;" onclick="load_ajax_reply_emojii('<?php echo $wo["comment"]["id"];?>','<?php echo $wo['config']['theme_url'];?>/emoji/');" class="emo-comment2" >
             <span class="btn btn-file">
                <svg fill="#009da0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="feather feather-user-plus">

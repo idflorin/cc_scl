@@ -5,7 +5,6 @@ use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\FulfilledPromise;
 
-
 //-----------------------------------------------------------------------------
 // Functional functions
 //-----------------------------------------------------------------------------
@@ -142,8 +141,18 @@ function or_chain()
  */
 function load_compiled_json($path)
 {
-    if ($compiled = @include("$path.php")) {
-        return $compiled;
+    static $compiledList = [];
+
+    $compiledFilepath = "{$path}.php";
+
+    if (!isset($compiledList[$compiledFilepath])) {
+        if (is_readable($compiledFilepath)) {
+            $compiledList[$compiledFilepath] = include($compiledFilepath);
+        }
+    }
+
+    if (isset($compiledList[$compiledFilepath])) {
+        return $compiledList[$compiledFilepath];
     }
 
     if (!file_exists($path)) {
@@ -162,7 +171,6 @@ function clear_compiled_json()
 {
     // pass
 }
-
 
 //-----------------------------------------------------------------------------
 // Directory iterator functions.
@@ -258,14 +266,6 @@ function describe_type($input)
 }
 
 /**
- * Debug function used to describe the provided value type and class.
- *
- * @param mixed $input
- *
- * @return string Returns a string containing the type of the variable and
- *                if a class is provided, the class name.
- */
-/**
  * Creates a default HTTP handler based on the available clients.
  *
  * @return callable
@@ -275,11 +275,32 @@ function default_http_handler()
     $version = (string) ClientInterface::VERSION;
     if ($version[0] === '5') {
         return new \Aws\Handler\GuzzleV5\GuzzleHandler();
-    } elseif ($version[0] === '6') {
-        return new \Aws\Handler\GuzzleV6\GuzzleHandler();
-    } else {
-        throw new \RuntimeException('Unknown Guzzle version: ' . $version);
     }
+
+    if ($version[0] === '6') {
+        return new \Aws\Handler\GuzzleV6\GuzzleHandler();
+    }
+
+    throw new \RuntimeException('Unknown Guzzle version: ' . $version);
+}
+
+/**
+ * Gets the default user agent string depending on the Guzzle version
+ *
+ * @return string
+ */
+function default_user_agent()
+{
+    $version = (string) ClientInterface::VERSION;
+    if ($version[0] === '5') {
+        return \GuzzleHttp\Client::getDefaultUserAgent();
+    }
+
+    if ($version[0] === '6') {
+        return \GuzzleHttp\default_user_agent();
+    }
+
+    throw new \RuntimeException('Unknown Guzzle version: ' . $version);
 }
 
 /**
@@ -351,11 +372,88 @@ function manifest($service = null)
     $service = strtolower($service);
     if (isset($manifest[$service])) {
         return $manifest[$service] + ['endpoint' => $service];
-    } elseif (isset($aliases[$service])) {
-        return manifest($aliases[$service]);
-    } else {
-        throw new \InvalidArgumentException(
-            "The service \"{$service}\" is not provided by the AWS SDK for PHP."
-        );
     }
+
+    if (isset($aliases[$service])) {
+        return manifest($aliases[$service]);
+    }
+
+    throw new \InvalidArgumentException(
+        "The service \"{$service}\" is not provided by the AWS SDK for PHP."
+    );
+}
+
+/**
+ * Checks if supplied parameter is a valid hostname
+ *
+ * @param string $hostname
+ * @return bool
+ */
+function is_valid_hostname($hostname)
+{
+    return (
+        preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*\.?$/i", $hostname)
+        && preg_match("/^.{1,253}$/", $hostname)
+        && preg_match("/^[^\.]{1,63}(\.[^\.]{0,63})*$/", $hostname)
+    );
+}
+
+/**
+ * Ignores '#' full line comments, which parse_ini_file no longer does
+ * in PHP 7+.
+ *
+ * @param $filename
+ * @param bool $process_sections
+ * @param int $scanner_mode
+ * @return array|bool
+ */
+function parse_ini_file(
+    $filename,
+    $process_sections = false,
+    $scanner_mode = INI_SCANNER_NORMAL)
+{
+    return parse_ini_string(
+        preg_replace('/^#.*\\n/m', "", file_get_contents($filename)),
+        $process_sections,
+        $scanner_mode
+    );
+}
+
+/**
+ * Outputs boolean value of input for a select range of possible values,
+ * null otherwise
+ *
+ * @param $input
+ * @return bool|null
+ */
+function boolean_value($input)
+{
+    if (is_bool($input)) {
+        return $input;
+    }
+
+    if ($input === 0) {
+        return false;
+    }
+
+    if ($input === 1) {
+        return true;
+    }
+
+    if (is_string($input)) {
+        switch (strtolower($input)) {
+            case "true":
+            case "on":
+            case "1":
+                return true;
+                break;
+
+            case "false":
+            case "off":
+            case "0":
+                return false;
+                break;
+        }
+    }
+    return null;
 }

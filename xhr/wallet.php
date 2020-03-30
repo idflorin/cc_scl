@@ -101,9 +101,9 @@ if ($f == 'wallet') {
         }
         global $sqlConnect;
         $user    = Wo_UserData($wo['user']['user_id']);
-        $notes   = $wo['lang']['replenish_my_balance'] . " " . $wo['config']['currency'] . sprintf('%.2f', $_GET['amount']) . " @PayPal";
-        $amount1 = $_GET['amount'];
-        $result  = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `wallet` = `wallet` + " . $_GET['amount'] . " WHERE `user_id` = '" . $wo['user']['user_id'] . "'");
+        $amount1 = Wo_Secure($_GET['amount']);
+        $notes   = $wo['lang']['replenish_my_balance'] . " " . $wo['config']['currency'] . sprintf('%.2f', $amount1) . " @PayPal";
+        $result  = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `wallet` = `wallet` + " . $amount1 . " WHERE `user_id` = '" . $wo['user']['user_id'] . "'");
         if ($result) {
             $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$wo['user']['user_id']}, 'WALLET', {$amount1}, '{$notes}')");
             header("Location: " . Wo_SeoLink('index.php?link1=wallet'));

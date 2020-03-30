@@ -1,16 +1,27 @@
 <?php
 namespace Aws\Exception;
 
+use Aws\CommandInterface;
+use Aws\HasDataTrait;
+use Aws\HasMonitoringEventsTrait;
+use Aws\MonitoringEventsInterface;
+use Aws\ResponseContainerInterface;
+use Aws\ResultInterface;
+use JmesPath\Env as JmesPath;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\RequestInterface;
-use Aws\CommandInterface;
-use Aws\ResultInterface;
 
 /**
  * Represents an AWS exception that is thrown when a command fails.
  */
-class AwsException extends \RuntimeException
+class AwsException extends \RuntimeException implements
+    MonitoringEventsInterface,
+    ResponseContainerInterface,
+    \ArrayAccess
 {
+    use HasDataTrait;
+    use HasMonitoringEventsTrait;
+
     /** @var ResponseInterface */
     private $response;
     private $request;
@@ -21,6 +32,9 @@ class AwsException extends \RuntimeException
     private $errorCode;
     private $connectionError;
     private $transferInfo;
+    private $errorMessage;
+    private $maxRetriesExceeded;
+
 
     /**
      * @param string           $message Exception message
@@ -34,6 +48,7 @@ class AwsException extends \RuntimeException
         array $context = [],
         \Exception $previous = null
     ) {
+        $this->data = isset($context['body']) ? $context['body'] : [];
         $this->command = $command;
         $this->response = isset($context['response']) ? $context['response'] : null;
         $this->request = isset($context['request']) ? $context['request'] : null;
@@ -47,6 +62,11 @@ class AwsException extends \RuntimeException
         $this->transferInfo = isset($context['transfer_stats'])
             ? $context['transfer_stats']
             : [];
+        $this->errorMessage = isset($context['message'])
+            ? $context['message']
+            : null;
+        $this->monitoringEvents = [];
+        $this->maxRetriesExceeded = false;
         parent::__construct($message, 0, $previous);
     }
 
@@ -78,6 +98,16 @@ class AwsException extends \RuntimeException
     public function getCommand()
     {
         return $this->command;
+    }
+
+    /**
+     * Get the concise error message if any.
+     *
+     * @return string|null
+     */
+    public function getAwsErrorMessage()
+    {
+        return $this->errorMessage;
     }
 
     /**
@@ -190,5 +220,38 @@ class AwsException extends \RuntimeException
     public function setTransferInfo(array $info)
     {
         $this->transferInfo = $info;
+    }
+
+    /**
+     * Returns whether the max number of retries is exceeded.
+     *
+     * @return bool
+     */
+    public function isMaxRetriesExceeded()
+    {
+        return $this->maxRetriesExceeded;
+    }
+
+    /**
+     * Sets the flag for max number of retries exceeded.
+     */
+    public function setMaxRetriesExceeded()
+    {
+        $this->maxRetriesExceeded = true;
+    }
+
+    public function hasKey($name)
+    {
+        return isset($this->data[$name]);
+    }
+
+    public function get($key)
+    {
+        return $this[$key];
+    }
+
+    public function search($expression)
+    {
+        return JmesPath::search($expression, $this->toArray());
     }
 }

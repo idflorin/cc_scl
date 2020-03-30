@@ -66,7 +66,8 @@ $non_login_array = array(
     'get_next_image',
     'get_previous_image',
     'load-blogs',
-    'load-recent-blogs'
+    'load-recent-blogs',
+    'get_no_posts_name'
 );
 if (!in_array($f, $allow_array)) {
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {

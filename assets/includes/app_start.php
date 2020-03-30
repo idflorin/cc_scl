@@ -322,23 +322,24 @@ $rtl_langs           = array(
     'arabic'
 );
 if (!isset($_COOKIE['ad-con'])) {
-    setcookie('ad-con', htmlentities(serialize(array(
+    setcookie('ad-con', htmlentities(json_encode(array(
         'date' => date('Y-m-d'),
         'ads' => array()
     ))), time() + (10 * 365 * 24 * 60 * 60));
 }
 $wo['ad-con'] = array();
 if (!empty($_COOKIE['ad-con'])) {
-    $wo['ad-con'] = unserialize(html_entity_decode($_COOKIE['ad-con']));
+    $wo['ad-con'] = json_decode(html_entity_decode($_COOKIE['ad-con']));
+    $wo['ad-con'] = ToArray($wo['ad-con']);
 }
 if (!is_array($wo['ad-con']) || !isset($wo['ad-con']['date']) || !isset($wo['ad-con']['ads'])) {
-    setcookie('ad-con', htmlentities(serialize(array(
+    setcookie('ad-con', htmlentities(json_encode(array(
         'date' => date('Y-m-d'),
         'ads' => array()
     ))), time() + (10 * 365 * 24 * 60 * 60));
 }
 if (is_array($wo['ad-con']) && isset($wo['ad-con']['date']) && strtotime($wo['ad-con']['date']) < strtotime(date('Y-m-d'))) {
-    setcookie('ad-con', htmlentities(serialize(array(
+    setcookie('ad-con', htmlentities(json_encode(array(
         'date' => date('Y-m-d'),
         'ads' => array()
     ))), time() + (10 * 365 * 24 * 60 * 60));
@@ -592,7 +593,8 @@ $wo['footer_pages']                  = array(
     'ads',
     'setting',
     'contact-us',
-    'advertise'
+    'advertise',
+    'jobs'
 );
 
 $wo['update_cache']                  = '';
@@ -789,9 +791,9 @@ try {
     $wo['job_categories']   = [];
 }
 
-$wo['config']['currency_array'] = unserialize($wo['config']['currency_array']);
-$wo['config']['currency_symbol_array'] = unserialize($wo['config']['currency_symbol_array']);
-$wo['config']['providers_array'] = unserialize($wo['config']['providers_array']);
+$wo['config']['currency_array'] = (Array) json_decode($wo['config']['currency_array']);
+$wo['config']['currency_symbol_array'] = (Array) json_decode($wo['config']['currency_symbol_array']);
+$wo['config']['providers_array'] = (Array) json_decode($wo['config']['providers_array']);
 
 $wo['currencies'] = array();
 foreach ($wo['config']['currency_symbol_array'] as $key => $value) {

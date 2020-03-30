@@ -120,6 +120,15 @@
       <meta name="twitter:description" content="<?php echo $wo['story']['fund_data']['description'];?>" />
       <meta name="twitter:image" content="<?php echo $wo['story']['fund_data']['image'];?>" />
       <?php } ?>
+      <?php if (!empty($wo['fund'])) {  ?>
+      <meta property="og:title" content="<?php echo $wo['fund']['title'];?>" />
+      <meta property="og:type" content="funding" />
+      <meta property="og:image" content="<?php echo $wo['fund']['image'];?>" />
+      <meta property="og:description" content="<?php echo $wo['fund']['description'];?>" />    
+      <meta name="twitter:title" content="<?php echo $wo['fund']['title'];?>" />
+      <meta name="twitter:description" content="<?php echo $wo['fund']['description'];?>" />
+      <meta name="twitter:image" content="<?php echo $wo['fund']['image'];?>" />
+      <?php } ?>
       <?php if (!empty($wo['story']['job'])) {  ?>
       <meta property="og:title" content="<?php echo $wo['story']['job']['title'];?>" />
       <meta property="og:type" content="job" />
@@ -141,52 +150,57 @@
       <meta name="twitter:description" content="<?php echo $wo['article']['description'];?>" />
       <meta name="twitter:image" content="<?php echo $wo['article']['thumbnail']; ?>" />
       <?php } ?>
+      <?php if (!empty($_SERVER) && !empty($_SERVER['REQUEST_URI'])) {
+        $link_text = substr($wo['config']['site_url'], 0,strpos($wo['config']['site_url'], '://') + 2).parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+         ?>
+         <link rel="canonical" href="<?php echo($link_text) ?>" />
+      <?php } ?>
       <link rel="shortcut icon" type="image/png" href="<?php echo $wo['config']['theme_url'];?>/img/icon.png"/>
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/general-style-plugins.css<?php echo $wo['update_cache']; ?>">
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/general-style-plugins.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
       <?php if($wo['language_type'] == 'rtl' && $wo['page'] != 'welcome') { ?>
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/bootsrap-rtl.min.css<?php echo $wo['update_cache']; ?>">
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/style_rtl.css<?php echo $wo['update_cache']; ?>">
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/bootsrap-rtl.min.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/style_rtl.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
       <?php } ?>
       <?php if ($wo['page'] == 'create_blog' || $wo['page'] == 'edit-blog') { ?>
-      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/tinymce/js/tinymce/tinymce.min.js"></script>
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/tinymce/js/tinymce/tinymce.min.js?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php } ?>
     
       <?php if ($wo['page'] == 'welcome') { ?>
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/welcome.css<?php echo $wo['update_cache']; ?>">
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/welcome.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
       <?php } else { ?>
-      <script src="//media.twiliocdn.com/sdk/js/video/v1/twilio-video.min.js"></script>
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/style.css<?php echo $wo['update_cache']; ?>">
+      <script src="//media.twiliocdn.com/sdk/js/video/v1/twilio-video.min.js?version=<?php echo $wo['config']['version']; ?>"></script>
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/style.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
       <?php } ?>
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/font-awesome-4.7.0/css/font-awesome.min.css<?php echo $wo['update_cache']; ?>">
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/font-awesome-4.7.0/css/font-awesome.min.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
 	  
 	  <?php if ($wo['page'] == 'messages') { ?>
 	  <link href="https://fonts.googleapis.com/css?family=Krub" rel="stylesheet">
 	  <?php } ?>
     
      <?php if ($wo['page'] == 'welcome' && $wo['language_type'] == 'rtl') { ?>
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/welcome_rtl.css<?php echo $wo['update_cache']; ?>">
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/welcome_rtl.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
       <?php } ?>
 
-      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/jquery-3.1.1.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/jquery-ui-touch-punch@0.2.3/jquery.ui.touch-punch.min.js"></script>
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/jquery-3.1.1.min.js?version=<?php echo $wo['config']['version']; ?>"></script>
+      <script src="https://cdn.jsdelivr.net/npm/jquery-ui-touch-punch@0.2.3/jquery.ui.touch-punch.min.js?version=<?php echo $wo['config']['version']; ?>"></script>
 
-      <?php if ($wo['page'] == 'ads'): ?>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
-      <?php endif; ?>
+      <?php //if ($wo['page'] == 'ads'): ?>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css?version=<?php echo $wo['config']['version']; ?>">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js?version=<?php echo $wo['config']['version']; ?>"></script>
+      <?php //endif; ?>
 	  
 	  <?php if ($wo['page'] == 'friends_nearby'): ?>
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/leaflet.css">
-      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/leaflet.js"></script>
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/leaflet.css?version=<?php echo $wo['config']['version']; ?>">
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/leaflet.js?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php endif; ?>
 
       <?php if ($wo['page'] == 'forum') { ?>
-        <script src="<?php echo $wo['config']['theme_url'];?>/javascript/forum/script.master.js"></script>
-        <script src="<?php echo $wo['config']['theme_url'];?>/javascript/forum/forum.ajax.js"></script>
+        <script src="<?php echo $wo['config']['theme_url'];?>/javascript/forum/script.master.js?version=<?php echo $wo['config']['version']; ?>"></script>
+        <script src="<?php echo $wo['config']['theme_url'];?>/javascript/forum/forum.ajax.js?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php } ?>
 
       <?php if ($wo['page'] == 'movies' || $wo['page'] == 'watch_movie') { ?>
-        <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/movies/style.movies.css<?php echo $wo['update_cache']; ?>" />
+        <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/movies/style.movies.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>" />
       <?php } ?>
       
       <?php if (isset($wo['bbcodeditor']) && $wo['bbcodeditor']):?>
@@ -194,10 +208,10 @@
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/javascript/bbcode/jquery.bbcode.css" media="all"> -->
       <?php endif ?>
       <?php if ($wo['config']['checkout_payment'] == 'yes') { ?>
-        <script type="text/javascript" src="https://www.2checkout.com/checkout/api/2co.min.js"></script>
+        <script type="text/javascript" src="https://www.2checkout.com/checkout/api/2co.min.js?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php } ?>
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/player/fluidplayer.min.css" type="text/css"/>
-      <script src="<?php echo $wo['config']['theme_url'];?>/player/fluidplayer.min.js"></script>
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/player/fluidplayer.min.css?version=<?php echo $wo['config']['version']; ?>" type="text/css"/>
+      <script src="<?php echo $wo['config']['theme_url'];?>/player/fluidplayer.min.js?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php if ($wo['loggedin'] == true && $wo['page'] == 'home' && $wo['config']['web_push'] == 1) { ?>
       <link rel="manifest" href="<?php echo $wo['config']['theme_url'];?>/javascript/OneSignalSDKFiles/manifest.json">
       <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async='async'></script>
@@ -385,7 +399,7 @@
       <?php }?>
 
     <?php if ($_COOKIE['mode'] == 'night') { ?>
-      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/dark.css<?php echo $wo['update_cache']; ?>" id="night-mode-css">
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/dark.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>" id="night-mode-css">
     <?php } ?>
    </head>
    
@@ -427,14 +441,14 @@
             ?>
          <footer>
             <?php 
-              if ($wo['page'] != 'welcome' && $wo['page'] != 'register' && $wo['page'] != 'get_news_feed' && $wo['page'] != 'forum' && $wo['page'] != 'messages') {
+              if ($wo['page'] != 'welcome' && $wo['page'] != 'register' && $wo['page'] != 'get_news_feed' && $wo['page'] != 'forum' && $wo['page'] != 'messages' && $wo['page'] != 'jobs') {
                 echo Wo_LoadPage('footer/content');
               }
              ?>
          </footer>
          <div class="second-footer">
             <?php
-               if (in_array($wo['page'], $wo['footer_pages']) && $wo['page'] != 'messages') {
+               if (in_array($wo['page'], $wo['footer_pages']) && $wo['page'] != 'messages' && $wo['page'] != 'jobs') {
                   echo Wo_LoadPage('footer/content');
                }
             ?>
@@ -475,15 +489,15 @@
       <?php } ?>
       <?php if ($wo['loggedin'] == false) { ?>
       
-      <script type="text/javascript" src="<?php echo $wo['config']['theme_url'];?>/javascript/welcome.js<?php echo $wo['update_cache']; ?>"></script>
+      <script type="text/javascript" src="<?php echo $wo['config']['theme_url'];?>/javascript/welcome.js<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php } ?>
-      <script type="text/javascript" src="<?php echo $wo['config']['theme_url'];?>/javascript/script.js<?php echo $wo['update_cache']; ?>"></script>
+      <script type="text/javascript" src="<?php echo $wo['config']['theme_url'];?>/javascript/script.js<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php if ($wo['loggedin'] == true) {?>
       <?php if ($wo['config']['google_map'] == 1) { ?>
       <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $wo['config']['google_map_api'];?>&libraries=places"></script>
       <?php } ?>
-      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/audioRecord/recorder.js"></script>
-      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/audioRecord/record.js"></script>
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/audioRecord/recorder.js?version=<?php echo $wo['config']['version']; ?>"></script>
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/audioRecord/record.js?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php } ?>
       <?php if ($wo['page'] == 'timeline' && $wo['loggedin'] == true && $wo['config']['css_upload'] == 1) { ?>
       <?php if (!empty($wo['user_profile']['css_file']) && file_exists($wo['user_profile']['css_file'])) {?>

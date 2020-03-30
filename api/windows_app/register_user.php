@@ -141,7 +141,9 @@ if ($type == 'user_registration') {
             	    $json_success_data['access_token'] = $access_token;
             	    $json_success_data['user_id'] = $user_id;
                 }
-            } else {
+            }
+
+            elseif ($wo['config']['sms_or_email'] == 'mail') {
                 $wo['user']        = $_POST;
                 $body              = Wo_LoadPage('emails/activate');
                 $send_message_data = array(
@@ -155,16 +157,63 @@ if ($type == 'user_registration') {
                     'is_html' => true
                 );
                 $send              = Wo_SendMessage($send_message_data);
-                $json_success_data  = array(
-                	'api_status' => '200',
-                    'api_text' => 'success',
-                    'api_version' => $api_version,
-                    'message' => 'Registration successful! We have sent you an email, Please check your inbox/spam to verify your email.',
-                    'success_type' => 'verification',
-                    'access_token' => 0,
-                    'user_id' => 0
-                );
+                
+                if ($send) {
+                    $json_success_data  = array(
+                        'api_status' => '200',
+                        'api_text' => 'success',
+                        'api_version' => $api_version,
+                        'message' => 'Registration successful! We have sent you an email, Please check your inbox/spam to verify your email.',
+                        'success_type' => 'verification',
+                        'access_token' => 0,
+                        'user_id' => 0
+                    );
+                } else {
+                    $json_error_data['errors'] = array(
+                        'error_id' => '15',
+                        'error_text' => 'Error found while sending the verification email, please try again later.'
+                    );
+                    header("Content-type: application/json");
+                    echo json_encode($json_error_data, JSON_PRETTY_PRINT);
+                    exit();
+                }
             }
+            elseif ($wo['config']['sms_or_email'] == 'sms' && !empty($_POST['phone_num'])) {
+                $random_activation = Wo_Secure(rand(11111, 99999));
+                $message           = "Your confirmation code is: {$random_activation}";
+
+                if (Wo_SendSMSMessage($_POST['phone_num'], $message) === true) {
+                    $user_id             = Wo_UserIdFromUsername($username);
+                    $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
+                    $json_success_data  = array(
+                        'api_status' => '200',
+                        'api_text' => 'success',
+                        'api_version' => $api_version,
+                        'message' => 'Registration successful! We have sent you an sms, Please check your phone to verify your account.',
+                        'success_type' => 'verification',
+                        'access_token' => 0,
+                        'user_id' => $user_id
+                    );
+                } else {
+                    $json_error_data['errors'] = array(
+                        'error_id' => '16',
+                        'error_text' => 'Error found while sending the verification sms, please try again later.'
+                    );
+                    header("Content-type: application/json");
+                    echo json_encode($json_error_data, JSON_PRETTY_PRINT);
+                    exit();
+                }
+            }
+            elseif ($wo['config']['sms_or_email'] == 'sms' && empty($_POST['phone_num'])) {
+                $json_error_data['errors'] = array(
+                    'error_id' => '17',
+                    'error_text' => 'phone_num can not be empty.'
+                );
+                header("Content-type: application/json");
+                echo json_encode($json_error_data, JSON_PRETTY_PRINT);
+                exit();
+            }
+
         }
     } else {
         header("Content-type: application/json");

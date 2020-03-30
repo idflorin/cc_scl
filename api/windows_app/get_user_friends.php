@@ -81,6 +81,29 @@ if ($type == 'get_users_friends') {
                 foreach ($non_allowed as $key => $value) {
                     unset($json_data[$value]);
                 }
+                $json_data['is_following'] = 0;
+                $json_data['can_follow'] = 0;
+                if (Wo_IsFollowing($recipient_id, $logged_user_id)) {
+                    $json_data['is_following'] = 1;
+                    $json_data['can_follow'] = 1;
+                } else {
+                    if (Wo_IsFollowRequested($recipient_id, $logged_user_id)) {
+                        $json_data['is_following'] = 2;
+                        $json_data['can_follow'] = 1;
+                    } else {
+                        if ($json_data['follow_privacy'] == 1) {
+                            if (Wo_IsFollowing($logged_user_id, $recipient_id)) {
+                                $json_data['is_following'] = 0;
+                                $json_data['can_follow'] = 1;
+                            }
+                        } else if ($json_data['follow_privacy'] == 0) {
+                            $json_data['can_follow'] = 1;
+                        }
+                    }
+                }
+                $json_data['is_following_me'] = (Wo_IsFollowing( $wo['user']['user_id'], $json_data['user_id'])) ? 1 : 0;
+                $json_data['lastseen_time_text'] = Wo_Time_Elapsed_String($json_data['lastseen']);
+                $json_data['is_blocked']         = Wo_IsBlocked($json_data['user_id']);
                // array_push($json_success_data['users'], $json_data);
                 $users[] = $json_data;
             }
@@ -93,6 +116,29 @@ if ($type == 'get_users_friends') {
                 foreach ($non_allowed as $key => $value) {
                     unset($json_data[$value]);
                 }
+                $json_data['is_following'] = 0;
+                $json_data['can_follow'] = 0;
+                if (Wo_IsFollowing($recipient_id, $logged_user_id)) {
+                    $json_data['is_following'] = 1;
+                    $json_data['can_follow'] = 1;
+                } else {
+                    if (Wo_IsFollowRequested($recipient_id, $logged_user_id)) {
+                        $json_data['is_following'] = 2;
+                        $json_data['can_follow'] = 1;
+                    } else {
+                        if ($json_data['follow_privacy'] == 1) {
+                            if (Wo_IsFollowing($logged_user_id, $recipient_id)) {
+                                $json_data['is_following'] = 0;
+                                $json_data['can_follow'] = 1;
+                            }
+                        } else if ($json_data['follow_privacy'] == 0) {
+                            $json_data['can_follow'] = 1;
+                        }
+                    }
+                }
+                $json_data['is_following_me'] = (Wo_IsFollowing( $wo['user']['user_id'], $json_data['user_id'])) ? 1 : 0;
+                $json_data['lastseen_time_text'] = Wo_Time_Elapsed_String($json_data['lastseen']);
+                $json_data['is_blocked']         = Wo_IsBlocked($json_data['user_id']);
                 //array_push($json_success_data_2, $json_data);
                 $online[] = $json_data;
             }

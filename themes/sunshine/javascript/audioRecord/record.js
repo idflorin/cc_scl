@@ -447,6 +447,51 @@ function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
   }
 }
 
+function Wo_RegisterComment2(post_id, user_id, page_id, type) {
+  text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
+  if(recording_node == "comm") {
+    Wo_stopRecording(); 
+    if (recorder) { 
+      recorder.exportWAV(function(blob){
+        var comment_src_image = $('#post-' + post_id).find('#comment_src_image');
+        var comment_image = '';
+        if (comment_src_image.length > 0) {
+          comment_image = comment_src_image.val();
+        }       
+        var dataForm = new FormData();                    
+        dataForm.append('post_id',            post_id);
+        dataForm.append('text',                  text);
+        dataForm.append('user_id',            user_id);
+        dataForm.append('page_id',            page_id);
+        dataForm.append('comment_image',comment_image);
+        if (blob.size > 50) {
+          var fileName   = (new Date).toISOString().replace(/:|\./g, '-');
+          var file       = new File([blob], 'wo-' + fileName + '.wav', {type: 'audio/wav'});
+          dataForm.append('audio-filename', file.name);
+          dataForm.append('audio-blob', file);
+        }
+        Wo_InsertComment(dataForm,post_id);
+      });
+    }
+
+    else{
+        var comment_src_image = $('#post-' + post_id).find('#comment_src_image');
+        var comment_image = '';
+        if (comment_src_image.length > 0) {
+          comment_image = comment_src_image.val();
+        }       
+        var dataForm = new FormData();                    
+        dataForm.append('post_id',            post_id);
+        dataForm.append('text',                  text);
+        dataForm.append('user_id',            user_id);
+        dataForm.append('page_id',            page_id);
+        dataForm.append('comment_image',comment_image); 
+        $('#charsLeft_'+post_id).text($('#charsLeft_'+post_id).attr('data_num'));
+        Wo_InsertComment(dataForm,post_id);
+    }
+  }
+}
+
 function Wo_InsertComment(dataForm,post_id){
     if (!dataForm) { return false;}
     post_wrapper = $('[id=post-' + post_id + ']');

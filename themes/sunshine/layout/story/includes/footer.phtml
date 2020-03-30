@@ -140,7 +140,7 @@
          }
          ?>
    </div>
-   <?php if (count($wo['story']['get_post_comments']) <  $wo['story']['post_comments']) { ?>
+   <?php if (count($wo['story']['get_post_comments']) <  $wo['story']['post_comments'] && $wo['story']['comments_status'] == 1) { ?>
       <div>
          <span onclick="Wo_loadPostMoreComments(<?php echo $wo['story']['id']; ?>,this);" class="pointer"><?php echo $wo['lang']['view_more_comments'];?></span>
       </div>
@@ -200,6 +200,9 @@
                   </li>
                </ul>
             </nav>
+			&nbsp;<button type="button" onclick="Wo_RegisterComment2(<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" class="btn btn-add-comm-postt" title="<?php echo $wo['lang']['post']; ?>">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" /></svg>
+			</button>
          </div>
       </div>
    </div>

@@ -250,7 +250,29 @@ $secondButton.on("click", function(e){
 		e.preventDefault();
 	}
 });
+$(document).ready(function() {
+	$('#create-ads').ajaxForm({
+		url: Wo_Ajax_Requests_File() + '?f=ads&s=new',
+		type:"POST",
+		beforeSend: function() {
+			$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+		},
+		success: function(data) {
+			scrollToTop();
+			if (data['status'] == 200) {
+				$("#create-ads-alert").html('<div class="alert alert-success">'+ data['message'] +'</div>');
+				window.location = data.url;
+			} 
 
+			else if (data['message']) {
+				$("#create-ads-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
+			} 
+
+			$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+		}
+	});
+	$('.selectpicker').selectpicker();
+});
 
 	jQuery(document).ready(function($) {
 		
@@ -298,7 +320,7 @@ $secondButton.on("click", function(e){
 			});
 		}
 
-	  	$('.selectpicker').selectpicker();
+	  	
 
 	  	<?php if ($wo['config']['google_map']) { ?>
 	    $("#ads-location").keyup(function(event) {
@@ -323,26 +345,7 @@ $secondButton.on("click", function(e){
 		  	}
 	  	});
 
-		$('#create-ads').ajaxForm({
-			url: Wo_Ajax_Requests_File() + '?f=ads&s=new',
-			type:"POST",
-			beforeSend: function() {
-				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
-			},
-			success: function(data) {
-				scrollToTop();
-				if (data['status'] == 200) {
-					$("#create-ads-alert").html('<div class="alert alert-success">'+ data['message'] +'</div>');
-					window.location = data.url;
-				} 
-
-				else if (data['message']) {
-					$("#create-ads-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
-				} 
-
-				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
-			}
-		});
+		
 
 	});
 </script>

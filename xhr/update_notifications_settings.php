@@ -84,7 +84,7 @@ if ($f == "update_notifications_settings") {
             'e_visited' => $e_visited,
             'e_profile_wall_post' => $e_profile_wall_post
         );
-        $Update_data = serialize($Update_data);
+        $Update_data = json_encode($Update_data);
         if (Wo_UpdateUserData($_POST['user_id'], array(
             'notification_settings' => $Update_data
         ))) {

@@ -15,12 +15,12 @@ if ($f == 'confirm_user_unusal_login') {
         if (empty($errors) && $confirm_code > 0) {
             unset($_SESSION['code_id']);
             if (!empty($_SESSION['last_login_data'])) {
-                $update_user = $db->where('user_id', $user_id)->update(T_USERS, array('last_login_data' => serialize($_SESSION['last_login_data'])));
+                $update_user = $db->where('user_id', $user_id)->update(T_USERS, array('last_login_data' => json_encode($_SESSION['last_login_data'])));
             } else if (!empty(get_ip_address())) {
                 $getIpInfo = fetchDataFromURL("http://ip-api.com/json/" .  get_ip_address());
                 $getIpInfo = json_decode($getIpInfo, true);
                 if ($getIpInfo['status'] == 'success' && !empty($getIpInfo['regionName']) && !empty($getIpInfo['countryCode']) && !empty($getIpInfo['timezone']) && !empty($getIpInfo['city'])) {
-                    $update_user = $db->where('user_id', $user_id)->update(T_USERS, array('last_login_data' => serialize($getIpInfo)));
+                    $update_user = $db->where('user_id', $user_id)->update(T_USERS, array('last_login_data' => json_encode($getIpInfo)));
                 }
             }
             $session             = Wo_CreateLoginSession($user_id);

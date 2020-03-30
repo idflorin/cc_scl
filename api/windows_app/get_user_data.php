@@ -101,6 +101,30 @@ if ($type == 'get_user_data') {
             foreach ($non_allowed as $key => $value) {
             	unset($user_profile_data[$value]);
             }
+            $user_profile_data['is_following'] = 0;
+            $user_profile_data['can_follow'] = 0;
+            if (Wo_IsFollowing($recipient_id, $logged_user_id)) {
+                $user_profile_data['is_following'] = 1;
+                $user_profile_data['can_follow'] = 1;
+            } else {
+                if (Wo_IsFollowRequested($recipient_id, $logged_user_id)) {
+                    $user_profile_data['is_following'] = 2;
+                    $user_profile_data['can_follow'] = 1;
+                } else {
+                    if ($user_profile_data['follow_privacy'] == 1) {
+                        if (Wo_IsFollowing($logged_user_id, $recipient_id)) {
+                            $user_profile_data['is_following'] = 0;
+                            $user_profile_data['can_follow'] = 1;
+                        }
+                    } else if ($user_profile_data['follow_privacy'] == 0) {
+                        $user_profile_data['can_follow'] = 1;
+                    }
+                }
+            }
+            $user_profile_data['is_following_me'] = (Wo_IsFollowing( $wo['user']['user_id'], $user_profile_data['user_id'])) ? 1 : 0;
+            $user_profile_data['lastseen_time_text'] = Wo_Time_Elapsed_String($user_profile_data['lastseen']);
+            $user_profile_data['is_blocked']         = Wo_IsBlocked($user_profile_data['user_id']);
+
             $user_profile_data['gender'] = ($user_profile_data['gender'] == 'male') ? $wo['lang']['male']: $wo['lang']['female'];
             $json_success_data = array(
                 'api_status' => '200',

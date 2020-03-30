@@ -140,7 +140,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         unset($wo['config']['providers_array'][$key]);
                     }
                 }
-                $saveSetting = Wo_SaveConfig('providers_array', serialize($wo['config']['providers_array']));
+                $saveSetting = Wo_SaveConfig('providers_array', json_encode($wo['config']['providers_array']));
             }
         }
         $data = array(
@@ -153,7 +153,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'add_new_provider') {
         if (!empty($_POST['provider'])) {
             $wo['config']['providers_array'][] = Wo_Secure($_POST['provider']);
-            $saveSetting = Wo_SaveConfig('providers_array', serialize($wo['config']['providers_array']));
+            $saveSetting = Wo_SaveConfig('providers_array', json_encode($wo['config']['providers_array']));
         }
         $data = array(
                     'status' => 200
@@ -197,8 +197,8 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         if (!empty($_POST['currency']) && !empty($_POST['currency_symbol'])) {
             $wo['config']['currency_array'][] = Wo_Secure($_POST['currency']);
             $wo['config']['currency_symbol_array'][Wo_Secure($_POST['currency'])] = Wo_Secure($_POST['currency_symbol']);
-            $saveSetting = Wo_SaveConfig('currency_array', serialize($wo['config']['currency_array']));
-            $saveSetting = Wo_SaveConfig('currency_symbol_array', serialize($wo['config']['currency_symbol_array']));
+            $saveSetting = Wo_SaveConfig('currency_array', json_encode($wo['config']['currency_array']));
+            $saveSetting = Wo_SaveConfig('currency_symbol_array', json_encode($wo['config']['currency_symbol_array']));
         }
         $data = array(
                     'status' => 200
@@ -211,8 +211,8 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         if (!empty($_POST['currency']) && !empty($_POST['currency_symbol']) && in_array($_POST['currency_id'], array_keys($wo['config']['currency_array']))) {
             $wo['config']['currency_array'][$_POST['currency_id']] = Wo_Secure($_POST['currency']);
             $wo['config']['currency_symbol_array'][Wo_Secure($_POST['currency'])] = Wo_Secure($_POST['currency_symbol']);
-            $saveSetting = Wo_SaveConfig('currency_array', serialize($wo['config']['currency_array']));
-            $saveSetting = Wo_SaveConfig('currency_symbol_array', serialize($wo['config']['currency_symbol_array']));
+            $saveSetting = Wo_SaveConfig('currency_array', json_encode($wo['config']['currency_array']));
+            $saveSetting = Wo_SaveConfig('currency_symbol_array', json_encode($wo['config']['currency_symbol_array']));
         }
         $data = array(
                     'status' => 200
@@ -238,8 +238,8 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         $saveSetting = Wo_SaveConfig('ads_currency', reset($wo['config']['currency_array']));
                     }
                 }
-                $saveSetting = Wo_SaveConfig('currency_array', serialize($wo['config']['currency_array']));
-                $saveSetting = Wo_SaveConfig('currency_symbol_array', serialize($wo['config']['currency_symbol_array']));
+                $saveSetting = Wo_SaveConfig('currency_array', json_encode($wo['config']['currency_array']));
+                $saveSetting = Wo_SaveConfig('currency_symbol_array', json_encode($wo['config']['currency_symbol_array']));
             }
         }
         $data = array(
@@ -546,6 +546,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         $_POST['image'] = $media['filename'];
                     }
                 }
+                if (!empty($_FILES['night_icon'])) {
+                    $fileInfo = array(
+                        'file' => $_FILES["night_icon"]["tmp_name"],
+                        'name' => $_FILES['night_icon']['name'],
+                        'size' => $_FILES["night_icon"]["size"],
+                        'type' => $_FILES["night_icon"]["type"],
+                        'types' => 'jpeg,png,jpg,gif,svg',
+                        'crop' => array(
+                            'width' => 32,
+                            'height' => 32
+                        )
+                    );
+                    $media    = Wo_ShareFile($fileInfo);
+                    if (!empty($media) && !empty($media['filename'])) {
+                        $_POST['night_image'] = $media['filename'];
+                    }
+                }
                 if (!empty($_POST['icon_to_use']) && $_POST['icon_to_use'] == 1) {
                     $link = substr($wo['pro_packages'][$_POST['type']]['image'], strpos($wo['pro_packages'][$_POST['type']]['image'],'upload/'));
                     if (file_exists($link)) {
@@ -555,6 +572,14 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         @Wo_DeleteFromToS3($link);
                     }
                     $_POST['image'] = '';
+                    $link = substr($wo['pro_packages'][$_POST['type']]['night_image'], strpos($wo['pro_packages'][$_POST['type']]['night_image'],'upload/'));
+                    if (file_exists($link)) {
+                        @unlink(trim($link));
+                    }
+                    else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                        @Wo_DeleteFromToS3($link);
+                    }
+                    $_POST['night_image'] = '';
                 }
                 Wo_updateProInfo($_POST);
                 if (!empty($_POST['name']) && $_POST['name'] != $wo['lang'][$_POST['type']]) {

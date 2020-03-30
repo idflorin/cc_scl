@@ -254,8 +254,10 @@ function Wo_RegisterLike(post_id) {
   $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_like', post_id: post_id}, function (data) {
     if(data.status == 200) {
       post.find("[id^=likes]").text(data.likes);
+      post.find("[id^=wonders]").text(data.wonders);
     } else {
       post.find("[id^=likes]").text(data.likes);
+      post.find("[id^=wonders]").text(data.wonders);
     }
     if (data.can_send == 1) {
       Wo_SendMessages();
@@ -283,8 +285,10 @@ function Wo_RegisterWonder(post_id) {
   $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_wonder', post_id: post_id}, function (data) {
     if(data.status == 200) {
       post.find("[id^=wonders]").text(data.wonders);
+      post.find("[id^=likes]").text(data.likes);
     } else {
       post.find("[id^=wonders]").text(data.wonders);
+      post.find("[id^=likes]").text(data.likes);
     }
     if (data.can_send == 1) {
       Wo_SendMessages();

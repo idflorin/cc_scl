@@ -144,6 +144,19 @@
 								</select>
 								<label for="ads-audience"><?php echo $wo['lang']['audience']?></label>
 							</div>
+							<div class="sun_input">
+								<input id="start_date" name="start" type="text">
+								<label for="start_date"><?php echo $wo['lang']['start_date']?></label>
+							</div>
+							<div class="sun_input">
+								<input id="end_date" name="start" type="text">
+								<label for="end_date"><?php echo $wo['lang']['end_date']?></label>
+							</div>
+							<div class="sun_input">
+								<input id="camp_budget" name="start" type="text">
+								<label for="camp_budget"><?php echo $wo['lang']['camp_budget']?></label>
+							</div>
+
 							<?php if ($wo['config']['google_map']) { ?>
 								<div id="review-ads-location">
 									<div id="place"></div>
@@ -206,9 +219,12 @@
 		</div>
 	</div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/jquery-ui-timepicker-addon@1.6.3/dist/jquery-ui-timepicker-addon.min.js"></script>
 <script>
 $(document).ready(function() {
+	$("#start_date").datepicker({ dateFormat: 'yy-mm-dd', minDate: 'today'});
+	$("#end_date").datepicker({ dateFormat: 'yy-mm-dd', minDate: '+1day'});
+	
 	$("#ad-media-file").on('change', function() {
 	//Get count of selected files
 	var product_countFiles = $(this)[0].files.length;
@@ -236,6 +252,57 @@ $(document).ready(function() {
             }
          }
 	});
+
+	$('#create-ads').ajaxForm({
+			url: Wo_Ajax_Requests_File() + '?f=ads&s=new',
+			type:"POST",
+			beforeSend: function() {
+				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+				if (!$("[name='headline']").val()) {
+					$('.fcov_title').addClass('border_class');
+				}
+				else{
+					$('.fcov_title').removeClass('border_class');
+				}
+				if (!$("[name='description']").val()) {
+					$('.fads_headline').addClass('border_class');
+				}
+				else{
+					$('.fads_headline').removeClass('border_class');
+				}
+				if (!$("[name='location']").val()) {
+					$('.location').addClass('border_class');
+				}
+				else{
+					$('.location').removeClass('border_class');
+				}
+				if (!$("[name='name']").val()) {
+					$('.company').addClass('border_class');
+				}
+				else{
+					$('.company').removeClass('border_class');
+				}
+				if (!$("[name='website']").val()) {
+					$('#website').addClass('border_class');
+				}
+				else{
+					$('#website').removeClass('border_class');
+				}
+			},
+			success: function(data) {
+				scrollToTop();
+				if (data['status'] == 200) {
+					$("#create-ads-alert").html('<div class="alert alert-success">'+ data['message'] +'</div>');
+					window.location = data.url;
+				} 
+
+				else if (data['message']) {
+					$("#create-ads-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
+				} 
+
+				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+			}
+		});
 });
 
 	jQuery(document).ready(function($) {
@@ -299,56 +366,7 @@ $(document).ready(function() {
 		  	}
 	  	});
 
-		$('#create-ads').ajaxForm({
-			url: Wo_Ajax_Requests_File() + '?f=ads&s=new',
-			type:"POST",
-			beforeSend: function() {
-				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
-				if (!$("[name='headline']").val()) {
-					$('.fcov_title').addClass('border_class');
-				}
-				else{
-					$('.fcov_title').removeClass('border_class');
-				}
-				if (!$("[name='description']").val()) {
-					$('.fads_headline').addClass('border_class');
-				}
-				else{
-					$('.fads_headline').removeClass('border_class');
-				}
-				if (!$("[name='location']").val()) {
-					$('.location').addClass('border_class');
-				}
-				else{
-					$('.location').removeClass('border_class');
-				}
-				if (!$("[name='name']").val()) {
-					$('.company').addClass('border_class');
-				}
-				else{
-					$('.company').removeClass('border_class');
-				}
-				if (!$("[name='website']").val()) {
-					$('#website').addClass('border_class');
-				}
-				else{
-					$('#website').removeClass('border_class');
-				}
-			},
-			success: function(data) {
-				scrollToTop();
-				if (data['status'] == 200) {
-					$("#create-ads-alert").html('<div class="alert alert-success">'+ data['message'] +'</div>');
-					window.location = data.url;
-				} 
-
-				else if (data['message']) {
-					$("#create-ads-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
-				} 
-
-				$('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
-			}
-		});
+		
 
 	});
 </script>

@@ -6,6 +6,7 @@ if ($f == 'chat') {
         if ($group_tab && is_array($group_tab)) {
             $wo['chat']['group']  = $group_tab;
             $wo['chat']['group']['avatar'] = $wo['config']['site_url'].'/'.$wo['chat']['group']['avatar'];
+            unset($wo['chat']['group']['messages']);
             $data                 = array(
                 'status' => 200,
                 'group' => $wo['chat']['group']

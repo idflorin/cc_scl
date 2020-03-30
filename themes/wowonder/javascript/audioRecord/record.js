@@ -403,7 +403,54 @@ function Wo_RegisterMessage(dataForm){
 }
 
 function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
+  text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
+  console.log(text);
   if(event.keyCode == 13 && event.shiftKey == 0 && recording_node == "comm") {
+    Wo_stopRecording(); 
+    if (recorder) { 
+      recorder.exportWAV(function(blob){
+        var comment_src_image = $('#post-' + post_id).find('#comment_src_image');
+        var comment_image = '';
+        if (comment_src_image.length > 0) {
+          comment_image = comment_src_image.val();
+        }       
+        var dataForm = new FormData();                    
+        dataForm.append('post_id',            post_id);
+        dataForm.append('text',                  text);
+        dataForm.append('user_id',            user_id);
+        dataForm.append('page_id',            page_id);
+        dataForm.append('comment_image',comment_image);
+        if (blob.size > 50) {
+          var fileName   = (new Date).toISOString().replace(/:|\./g, '-');
+          var file       = new File([blob], 'wo-' + fileName + '.wav', {type: 'audio/wav'});
+          dataForm.append('audio-filename', file.name);
+          dataForm.append('audio-blob', file);
+        }
+        Wo_InsertComment(dataForm,post_id);
+      });
+    }
+
+    else{
+        var comment_src_image = $('#post-' + post_id).find('#comment_src_image');
+        var comment_image = '';
+        if (comment_src_image.length > 0) {
+          comment_image = comment_src_image.val();
+        }       
+        var dataForm = new FormData();                    
+        dataForm.append('post_id',            post_id);
+        dataForm.append('text',                  text);
+        dataForm.append('user_id',            user_id);
+        dataForm.append('page_id',            page_id);
+        dataForm.append('comment_image',comment_image);
+        $('#charsLeft_'+post_id).text($('#charsLeft_'+post_id).attr('data_num')); 
+        Wo_InsertComment(dataForm,post_id);
+    }
+  }
+}
+
+function Wo_RegisterComment2(post_id, user_id, page_id, type) {
+  text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
+  if(recording_node == "comm") {
     Wo_stopRecording(); 
     if (recorder) { 
       recorder.exportWAV(function(blob){
@@ -455,7 +502,7 @@ function Wo_InsertComment(dataForm,post_id){
     comment_list = post_wrapper.find('.comments-list');   
     //event.preventDefault();
     textarea_wrapper.val('');
-	$('.wo_comment_combo_' + post_id).removeClass('comment-toggle');
+	
     post_wrapper.find('#wo_comment_combo .ball-pulse').fadeIn(100);
     $.ajax({
         url: Wo_Ajax_Requests_File() + '?f=posts&s=register_comment&hash=' + $('.main_session').val(),
@@ -466,6 +513,7 @@ function Wo_InsertComment(dataForm,post_id){
         processData: false,
         contentType: false,
     }).done(function(data) {
+      $('.wo_comment_combo_' + post_id).removeClass('comment-toggle');
       if(data.status == 200) {
         Wo_CleanRecordNodes();
         post_wrapper.find('.post-footer .comment-container:last-child').after(data.html);

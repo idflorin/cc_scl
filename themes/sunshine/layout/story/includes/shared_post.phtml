@@ -36,9 +36,13 @@
             ?>
          <span style="color:<?php echo $user_pro_type['color_name'];?>">
          <?php 
-            if (!empty(in_array($wo['story']['publisher']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['story']['publisher']['pro_type']]]['image']))) { ?>
+            if (!empty(in_array($wo['story']['publisher']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['story']['publisher']['pro_type']]]['image'])) && $_COOKIE['mode'] == 'day') { ?>
          <img src="<?php echo($wo['pro_packages'][$wo['pro_packages_types'][$wo['story']['publisher']['pro_type']]]['image']) ?>" class="pro_packages_icon_inline">
-         <?php }else{ ?>
+         <?php }
+         elseif (!empty(in_array($wo['story']['publisher']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['story']['publisher']['pro_type']]]['night_image'])) && $_COOKIE['mode'] == 'night') { ?>
+           <img src="<?php echo($wo['pro_packages'][$wo['pro_packages_types'][$wo['story']['publisher']['pro_type']]]['night_image']) ?>" class="pro_packages_icon_inline">
+         <?php }
+         else{ ?>
          <i class="fa fa-<?php echo $user_pro_type['icon'];?> fa-fw" title="<?php echo $user_pro_type['type_name'];?>" data-toggle="tooltip"></i>
          <?php } ?>
          </span>

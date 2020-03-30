@@ -5898,6 +5898,9 @@ function Wo_GetAllProInfo()
             if (!empty($fetched_data['image'])) {
                 $fetched_data['image'] = Wo_GetMedia($fetched_data['image']);
             }
+            if (!empty($fetched_data['night_image'])) {
+                $fetched_data['night_image'] = Wo_GetMedia($fetched_data['night_image']);
+            }
             $data[$fetched_data['type']] = $fetched_data;
         }
         return $data;

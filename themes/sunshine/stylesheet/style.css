@@ -117,7 +117,7 @@ iframe, .post-map img {border:1px solid #ededed;border-radius:3px;}
 .comment-reply .wo_commreply_combo .avatar {width:30px!important;height:30px!important}
 .comment-reply .wo_commreply_combo .textarea {margin-top:0;border-radius:15px!important;padding-right:60px;margin-left:5px}
 .comment-reply .wo_commreply_combo .image-comment {right: 10px;}
-.comment-reply .wo_commreply_combo .image-comment .btn-file {padding: 2px 0 !important;font-size: 0;margin: 7px 0px;}
+.comment-reply .wo_commreply_combo .image-comment .btn-file {padding: 2px 0 !important;font-size: 0;margin: 7px 0px;background: transparent;}
 .comment-edit{display:none;margin-bottom:15px}
 .options-buttons{position:absolute;margin-left:20px;margin-top:-40px;z-index:1}
 .no-posts{margin-top:20px;margin-bottom:20px}
@@ -2446,6 +2446,12 @@ body.search_open .navbar-nav.left_part_header .search-container {top: 0;}
 .wow_weather_forecast {overflow: hidden;padding: 0 3px;margin-top: 10px;}
 .wow_weather_forecast .fivedays {text-align: center;float: left;width: 25%;padding: 0 5px;}
 
+/*New*/
+.btn-add-comm-postt {
+	color: #4d91ea;background: transparent;
+    border: 0;
+    padding: 0 !important;
+}
 
 
 
@@ -2612,7 +2618,6 @@ footer .footer-wrapper{display:block}
 @media (max-width:985px) {
 .container,.header-fixed1000,.header-fixed1200{width:800px}
 .wo_event_profile .event-info-cont .col-xs-4{padding-left:0}
-.event_cdown li:last-child{display:none}
 }
 
 @media (max-width:900px) {

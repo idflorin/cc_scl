@@ -143,9 +143,9 @@ iframe, .post-map img {border:none;border-radius:3px;}
 .comment-reply{display:none}
 .comment-reply .wo_commreply_combo {margin-top:10px;display:flex;position: relative;}
 .comment-reply .wo_commreply_combo .avatar{width:30px!important;height:30px!important}
-.comment-reply .wo_commreply_combo .textarea{margin-top:0;border-radius:15px!important;padding-right:60px;margin-left:5px}
+.comment-reply .wo_commreply_combo .textarea{margin-top:0;border-radius:15px!important;padding-right:80px;margin-left:5px}
 .comment-reply .wo_commreply_combo .image-comment {right: 10px;}
-.comment-reply .wo_commreply_combo .image-comment .btn-file {padding: 2px 0 !important;font-size: 0;margin: 7px 0px;}
+.comment-reply .wo_commreply_combo .image-comment .btn-file {padding: 2px 0 !important;font-size: 0;margin: 7px 0px;background: transparent;}
 .comment-edit{display:none;margin-bottom:15px}
 .options-buttons{position:absolute;margin-left:20px;margin-top:-40px;z-index:1}
 .list-group-item{padding-left:15px}
@@ -1893,7 +1893,7 @@ to{top:0;opacity:1}
 #wo_comment_combo.comment-toggle .comment_combo_footer{display:block;animation:animatetop .2s}
 #wo_comment_combo .comment_combo_footer .emo-comment,#wo_comment_combo .comment_combo_footer .image-comment,#wo_comment_combo .comment_combo_footer .send-comment{position:relative;display:inline-block;right:auto}
 #wo_comment_combo .comment_combo_footer .wo_comment_fopt{text-align:right}
-#wo_comment_combo .comment_combo_footer .wo_comment_fopt .btn{padding:3px 8px}
+#wo_comment_combo .comment_combo_footer .wo_comment_fopt .btn{padding:3px 8px;background: transparent;}
 .wo_single_proimg{width:100%;height:300px;object-fit:cover}
 
 /*Shared Posts*/
@@ -3702,34 +3702,6 @@ svg {vertical-align: middle;}
 .wow_upgrd_ico {font-size: 20px;}
 .wow_upgrd_ico svg {background: transparent;opacity: 1;padding: 0;border-radius: 0;width: 110px;height: 110px;margin: 0 auto 25px;}
 
-/*Temp*/
-.my_pages_header{background:#fff;padding:0 7px;margin-bottom:20px;margin-right:-5px;margin-left:-5px;border:1px solid #f1f1f1}
-.my_pages_header ul{padding:0;margin:0}
-.my_pages_header ul li{margin-right:7px;padding:12px;display:inline-block;text-transform:capitalize}
-.my_pages_header ul li a{padding:13px 12px;font-size:13px;line-height:20px;text-decoration:none}
-.my_pages_header ul li.active a{font-weight:600;border-bottom:2px solid}
-.my_pages_header .btn-success{padding:0;border-radius:3px;box-shadow:0 1px 1px rgba(0,0,0,.2);text-transform:uppercase;font-weight:700;margin:8px 1px}
-.my_pages_header .btn-success a{padding:4px 16px;display:block;color:#fff;font-size:12px;text-decoration:none}
-.my_pages_header .btn-success a svg.feather{margin:-3px 4px 0 -5px;width:17px;height:17px}
-.wo-create-forms .wo_settings_page{box-shadow:0 1px 0 0 #e3e4e8,0 0 0 1px #f1f1f1;padding:10px 15px;position:relative;border-radius:0 0 2px 2px}
-.wo-create-forms .wo_settings_page form{margin-top:-35px;background-color:#fff}
-.wo-create-forms .wo_settings_page .setting-update-alert{margin:-20px 0 20px}
-.wo-create-forms .wo_settings_page .alert{margin:0 0 10px}
-.wo-create-forms .wo_create_form_cover span a{font-size:14px;font-weight:700;text-transform:uppercase;color: #ffff;vertical-align:text-top;line-height:0;letter-spacing:.33px;word-spacing:1px;top:15px;display:block;position:absolute;right:15px;}
-.wo-create-forms .wo_create_form_cover span a svg.feather{margin-top:-2px;transition:all .2s linear;width:19px;height:19px}
-.wo-create-forms .wo_create_form_cover span a:hover{color:#fff}
-.wo-create-forms .wo_create_form_cover span a:hover svg.feather{transform:translateX(-2px)}
-.wo-create-forms .wo_settings_page .help-block{opacity:0;-webkit-transition:all .2s cubic-bezier(.64,.09,.08,1);-moz-transition:all .2s cubic-bezier(.64,.09,.08,1);transition:all .2s cubic-bezier(.64,.09,.08,1)}
-.wo-create-forms .wo_settings_page input:focus+.help-block,.wo-create-forms .wo_settings_page textarea:focus+.help-block{opacity:1}
-.wo-create-forms .wo_settings_page .last-sett-btn{margin-right:-15px;margin-bottom:-10px}
-.wo-create-forms .wo_settings_page .setting-panel-mdbtn{margin:2px 10px}
-.wo-create-forms .wo_create_form_cover{color:#fff;padding:50px 15px 50px 35px;position:relative;background:url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264 1.088-.402l1.768-.661C33.64 15.347 39.647 14 50 14c10.271 0 15.362 1.222 24.629 4.928.955.383 1.869.74 2.75 1.072h6.225c-2.51-.73-5.139-1.691-8.233-2.928C65.888 13.278 60.562 12 50 12c-10.626 0-16.855 1.397-26.66 5.063l-1.767.662c-2.475.923-4.66 1.674-6.724 2.275h6.335zm0-20C13.258 2.892 8.077 4 0 4V2c5.744 0 9.951-.574 14.85-2h6.334zM77.38 0C85.239 2.966 90.502 4 100 4V2c-6.842 0-11.386-.542-16.396-2h-6.225zM0 14c8.44 0 13.718-1.21 22.272-4.402l1.768-.661C33.64 5.347 39.647 4 50 4c10.271 0 15.362 1.222 24.629 4.928C84.112 12.722 89.438 14 100 14v-2c-10.271 0-15.362-1.222-24.629-4.928C65.888 3.278 60.562 2 50 2 39.374 2 33.145 3.397 23.34 7.063l-1.767.662C13.223 10.84 8.163 12 0 12v2z' fill='%23000000' fill-opacity='0.07' fill-rule='evenodd'/%3E%3C/svg%3E");margin:0 0 -25px;font-size:23px;border-radius:2px 2px 0 0}
-.wo-create-forms .wo_create_form_cover::before{content:'';position:absolute;top:0;right:0;bottom:0;left:0;background-image:linear-gradient(to right,#4c77c6,#649bf2);z-index:-1}
-.wo-create-forms .wo_create_form_cover svg.feather{width:23px;height:23px}
-.wo-create-forms .wo_create_form_cover.group::before{background-image:linear-gradient(to right,#03A9F4,#0095d8)}
-.wo-create-forms .wo_create_form_cover.page::before{background-image:linear-gradient(to right,#f79f58,#de8843)}
-.wo-create-forms .wo_create_form_cover.event::before{background-image:linear-gradient(to right,#f25e4e,#dc4c3c)}
-.wo-create-forms .wo_create_form_cover.product::before{background-image:linear-gradient(to right,#6a7f9a,#5e7088)}
 
 
 
@@ -3846,7 +3818,6 @@ footer .footer-wrapper{display:block}
 
 @media (max-width:985px) {
 .container,.header-fixed1000,.header-fixed1200{width:800px}
-.event_cdown li:last-child{display:none}
 }
 
 @media (max-width:900px) {

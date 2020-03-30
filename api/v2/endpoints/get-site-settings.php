@@ -19,8 +19,8 @@ $get_config['blog_categories'] = $wo['blog_categories'];
 $get_config['products_categories'] = $wo['products_categories'];
 $get_config['job_categories'] = $wo['job_categories'];
 $get_config['genders'] = $wo['genders'];
-$get_config['currency_array'] = unserialize($get_config['currency_array']);
-$get_config['currency_symbol_array'] = unserialize($get_config['currency_symbol_array']);
+$get_config['currency_array'] = (Array) json_decode($get_config['currency_array']);
+$get_config['currency_symbol_array'] = (Array) json_decode($get_config['currency_symbol_array']);
 foreach ($wo['family'] as $key => $value) {
 	$wo['family'][$key] = $wo['lang'][$value];
 }

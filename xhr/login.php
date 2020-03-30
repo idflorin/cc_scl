@@ -49,7 +49,7 @@ if ($f == 'login') {
             $session             = Wo_CreateLoginSession(Wo_UserIdForLogin($username));
             $_SESSION['user_id'] = $session;
             setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
-            setcookie('ad-con', htmlentities(serialize(array(
+            setcookie('ad-con', htmlentities(json_encode(array(
                 'date' => date('Y-m-d'),
                 'ads' => array()
             ))), time() + (10 * 365 * 24 * 60 * 60));

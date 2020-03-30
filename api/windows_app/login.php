@@ -84,43 +84,58 @@ if ($type == 'user_login') {
                 echo json_encode($json_error_data, JSON_PRETTY_PRINT);
                 exit();
             } else {
-                $time           = time();
-                $cookie         = '';
-                $access_token   = sha1(rand(111111111, 999999999)) . md5(microtime()) . rand(11111111, 99999999) . md5(rand(5555, 9999));
-                $add_session = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `time`) VALUES ('{$user_id}', '{$access_token}', 'windows', '{$time}')");
-                if ($add_session) {
-                    if (!empty($_POST['timezone'])) {
-                        $timezone = Wo_Secure($_POST['timezone']);
+
+                if (Wo_TwoFactor($_POST['username']) != false) {
+                    $time           = time();
+                    $cookie         = '';
+                    $access_token   = sha1(rand(111111111, 999999999)) . md5(microtime()) . rand(11111111, 99999999) . md5(rand(5555, 9999));
+                    $add_session = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `time`) VALUES ('{$user_id}', '{$access_token}', 'windows', '{$time}')");
+                    if ($add_session) {
+                        if (!empty($_POST['timezone'])) {
+                            $timezone = Wo_Secure($_POST['timezone']);
+                        } else {
+                            $timezone = 'UTC';
+                        }
+                        $add_timezone = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `timezone` = '{$timezone}' WHERE `user_id` = {$user_id}");
+                        $json_success_data = array(
+                            'api_status' => '200',
+                            'api_text' => 'success',
+                            'api_version' => $api_version,
+                            'user_id' => Wo_UserIdFromUsername($username),
+                            'messages' => 'Successfully logged in, Please wait..',
+                            'access_token' => $access_token,
+                            'user_id' => $user_id,
+                            'timezone' => $timezone
+                        );
+                        header("Content-type: application/json");
+                        echo json_encode($json_success_data, JSON_PRETTY_PRINT);
+                        exit();
                     } else {
-                        $timezone = 'UTC';
+                        $json_error_data = array(
+                            'api_status' => '400',
+                            'api_text' => 'failed',
+                            'api_version' => $api_version,
+                            'errors' => array(
+                                'error_id' => '8',
+                                'error_text' => 'Error found, please try again later.'
+                            )
+                        );
+                        header("Content-type: application/json");
+                        echo json_encode($json_error_data, JSON_PRETTY_PRINT);
+                        exit();
                     }
-                    $add_timezone = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `timezone` = '{$timezone}' WHERE `user_id` = {$user_id}");
+                }
+                else{
                     $json_success_data = array(
-                        'api_status' => '200',
-                        'api_text' => 'success',
-                        'api_version' => $api_version,
-                        'user_id' => Wo_UserIdFromUsername($username),
-                        'messages' => 'Successfully logged in, Please wait..',
-                        'access_token' => $access_token,
-                        'user_id' => $user_id,
-                        'timezone' => $timezone
-                    );
-                    header("Content-type: application/json");
-                    echo json_encode($json_success_data, JSON_PRETTY_PRINT);
-                    exit();
-                } else {
-                    $json_error_data = array(
-                        'api_status' => '400',
-                        'api_text' => 'failed',
-                        'api_version' => $api_version,
-                        'errors' => array(
-                            'error_id' => '8',
-                            'error_text' => 'Error found, please try again later.'
-                        )
-                    );
-                    header("Content-type: application/json");
-                    echo json_encode($json_error_data, JSON_PRETTY_PRINT);
-                    exit();
+                            'api_status' => '200',
+                            'api_text' => 'success',
+                            'api_version' => $api_version,
+                            'messages' => 'Please enter your confirmation code',
+                            'user_id' => $user_id
+                        );
+                        header("Content-type: application/json");
+                        echo json_encode($json_success_data, JSON_PRETTY_PRINT);
+                        exit();
                 }
             }
         }

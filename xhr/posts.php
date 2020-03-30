@@ -761,12 +761,14 @@ if ($f == 'posts') {
                 $data = array(
                     'status' => 300,
                     'likes' => Wo_CountLikes($_GET['post_id']),
+                    'wonders' => Wo_CountWonders($_GET['post_id']),
                     'like_lang' => $wo['lang']['like']
                 );
             } else {
                 $data = array(
                     'status' => 200,
                     'likes' => Wo_CountLikes($_GET['post_id']),
+                    'wonders' => Wo_CountWonders($_GET['post_id']),
                     'like_lang' => $wo['lang']['liked']
                 );
                 if (Wo_CanSenEmails()) {
@@ -883,14 +885,16 @@ if ($f == 'posts') {
                 $data                = array(
                     'status' => 300,
                     'icon' => $wo['second_post_button_icon'],
-                    'wonders' => Wo_CountWonders($_GET['post_id'])
+                    'wonders' => Wo_CountWonders($_GET['post_id']),
+                    'likes' => Wo_CountLikes($_GET['post_id'])
                 );
                 $data['wonder_lang'] = ($config['second_post_button'] == 'dislike') ? $wo['lang']['dislike'] : $wo['lang']['wonder'];
             } else {
                 $data                = array(
                     'status' => 200,
                     'icon' => $wo['second_post_button_icon'],
-                    'wonders' => Wo_CountWonders($_GET['post_id'])
+                    'wonders' => Wo_CountWonders($_GET['post_id']),
+                    'likes' => Wo_CountLikes($_GET['post_id'])
                 );
                 $data['wonder_lang'] = ($config['second_post_button'] == 'dislike') ? $wo['lang']['disliked'] : $wo['lang']['wondered'];
                 if (Wo_CanSenEmails()) {

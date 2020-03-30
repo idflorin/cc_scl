@@ -40,7 +40,7 @@ if (empty($error_code)) {
         if (!empty($_POST['timezone'])) {
             $timezone = Wo_Secure($_POST['timezone']);
         }
-        $add_timezone = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `timezone` = '{$timezone}' WHERE `user_id` = {$user_id}");
+        $add_timezone = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `timezone` = '{$timezone}',`active` = '1' WHERE `user_id` = {$user_id}");
         // if (!empty($_POST['device_id'])) {
         //     $device_id = Wo_Secure($_POST['device_id']);
         //     $update    = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `device_id` = '{$device_id}' WHERE `user_id` = '{$user_id}'");

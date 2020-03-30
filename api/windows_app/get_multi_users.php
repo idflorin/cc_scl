@@ -76,6 +76,30 @@ if ($type == 'get_multi_users') {
                     if (empty($user_profile_data)) {
                         $continue = false;
                     } else {
+                        $user_profile_data['is_following'] = 0;
+                        $user_profile_data['can_follow'] = 0;
+                        if (Wo_IsFollowing($recipient_id, $logged_user_id)) {
+                            $user_profile_data['is_following'] = 1;
+                            $user_profile_data['can_follow'] = 1;
+                        } else {
+                            if (Wo_IsFollowRequested($recipient_id, $logged_user_id)) {
+                                $user_profile_data['is_following'] = 2;
+                                $user_profile_data['can_follow'] = 1;
+                            } else {
+                                if ($user_profile_data['follow_privacy'] == 1) {
+                                    if (Wo_IsFollowing($logged_user_id, $recipient_id)) {
+                                        $user_profile_data['is_following'] = 0;
+                                        $user_profile_data['can_follow'] = 1;
+                                    }
+                                } else if ($user_profile_data['follow_privacy'] == 0) {
+                                    $user_profile_data['can_follow'] = 1;
+                                }
+                            }
+                        }
+                        $user_profile_data['is_following_me'] = (Wo_IsFollowing( $wo['user']['user_id'], $user_profile_data['user_id'])) ? 1 : 0;
+                        $user_profile_data['lastseen_time_text'] = Wo_Time_Elapsed_String($user_profile_data['lastseen']);
+                        $user_profile_data['is_blocked']         = Wo_IsBlocked($user_profile_data['user_id']);
+
                     	$user_profile_data['gender'] = ($user_profile_data['gender'] == 'male') ? $wo['lang']['male']: $wo['lang']['female'];
                         $user_profile_data['lastseen_status'] = ($user_profile_data['lastseen'] > (time() - 60)) ? 'online': 'offline';
                         $user_profile_data['lastseen_text'] = ($user_profile_data['lastseen'] > (time() - 60)) ? $wo['lang']['online']: $wo['lang']['last_seen'] . ' ' . Wo_Time_Elapsed_String($user_profile_data['lastseen']);

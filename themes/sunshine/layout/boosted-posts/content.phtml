@@ -6,9 +6,12 @@
      $up = Wo_GetUserProType($wo['user']['pro_type']);
      ?>
       <div class="alert alert-warning">
-        <?php if (!empty(in_array($wo['user']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['image']))) { ?>
+        <?php if (!empty(in_array($wo['user']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['image'])) && $_COOKIE['mode'] == 'day') { ?>
           <img src="<?php echo($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['image']) ?>" class="pro_packages_icon_inline">
-        <?php }else{ ?>
+        <?php }
+        elseif (!empty(in_array($wo['user']['pro_type'], array_keys($wo['pro_packages_types'])) && !empty($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['night_image'])) && $_COOKIE['mode'] == 'night') { ?>
+          <img src="<?php echo($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['night_image']) ?>" class="pro_packages_icon_inline">
+        <?php } else{ ?>
           <i class="fa fa-<?php echo $up['icon'];?> fa-fw"></i> 
         <?php } ?>
         <?php 

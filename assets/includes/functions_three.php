@@ -4118,11 +4118,11 @@ function Wo_IsConversionExists($id) {
                 $result = true;
             } else {
                 $adv_ids['ads'][$id] = $id;
-                setcookie('ad-con', htmlentities(serialize($adv_ids)), time() + (10 * 365 * 24 * 60 * 60));
+                setcookie('ad-con', htmlentities(json_encode($adv_ids)), time() + (10 * 365 * 24 * 60 * 60));
             }
         }
     } else {
-        setcookie('ad-con', htmlentities(serialize(array(
+        setcookie('ad-con', htmlentities(json_encode(array(
             'date' => date('Y-m-d'),
             'ads' => array()
         ))), time() + (10 * 365 * 24 * 60 * 60));
@@ -5912,9 +5912,12 @@ function Wo_UpdateUserDetails($user_id = 0, $me = false, $time = true, $get_data
 
             $get_mutual_ids = Wo_GetMutualFriends($wo['user_profile']['user_id'], 'profile', 9);
             $mutual_ids = array();
-            foreach ($get_mutual_ids as $key => $user) {
-                $mutual_ids[] = $user['user_id'];
+            if (!empty($get_mutual_ids)) {
+                foreach ($get_mutual_ids as $key => $user) {
+                    $mutual_ids[] = $user['user_id'];
+                }
             }
+                
 
             $get_likes_ids = Wo_GetLikes($wo['user_profile']['user_id'], 'profile', 9);
             $likes_ids = array();
@@ -5935,11 +5938,11 @@ function Wo_UpdateUserDetails($user_id = 0, $me = false, $time = true, $get_data
                 'groups_data' => $groups_ids,
                 'mutual_friends_data' => $mutual_ids
             );
-            $sidebar_data = serialize($sidebar_data);
+            $sidebar_data = json_encode($sidebar_data);
         }
         
         $user_id = $wo['user_profile']['user_id'];
-        $details = serialize($final_data);
+        $details = json_encode($final_data);
 
         if ($counts == false) {
            $query = mysqli_query($sqlConnect, "UPDATE "  . T_USERS . " SET `last_data_update` = '$time_now', `details` = '$details', `sidebar_data` = '$sidebar_data' WHERE user_id = '$user_id'");
@@ -6164,7 +6167,7 @@ function Wo_VerfiyIP($username = '') {
         if (empty($getuser['last_login_data'])) {
             $create_new = true;
         } else {
-            $lastLoginData = unserialize($getuser['last_login_data']);
+            $lastLoginData = (Array) json_decode($getuser['last_login_data']);
             if (($getIpInfo['regionName'] != $lastLoginData['regionName']) || ($getIpInfo['countryCode'] != $lastLoginData['countryCode']) || ($getIpInfo['timezone'] != $lastLoginData['timezone']) || ($getIpInfo['city'] != $lastLoginData['city'])) {
                 // send email
                 $code = rand(111111, 999999);
@@ -6200,7 +6203,7 @@ function Wo_VerfiyIP($username = '') {
             }
         }
         if ($create_new == true) {
-            $lastLoginData = serialize($getIpInfo);
+            $lastLoginData = json_encode($getIpInfo);
             $update_user = $db->where('user_id', $getuser['user_id'])->update(T_USERS, array('last_login_data' => $lastLoginData));
             return true;
         }
@@ -6301,7 +6304,7 @@ function Wo_updateProInfo($update_data)
     $type = Wo_Secure($update_data['type']);
     $update = array();
     foreach ($update_data as $field => $data) {
-        if ($field == 'price' || $field == 'featured_member' ||  $field == 'profile_visitors' ||  $field == 'last_seen' ||  $field == 'verified_badge' || $field == 'posts_promotion' ||  $field == 'pages_promotion' ||  $field == 'discount' ||  $field == 'image' || $field == 'status' || $field == 'time') {
+        if ($field == 'price' || $field == 'featured_member' ||  $field == 'profile_visitors' ||  $field == 'last_seen' ||  $field == 'verified_badge' || $field == 'posts_promotion' ||  $field == 'pages_promotion' ||  $field == 'discount' ||  $field == 'image' ||  $field == 'night_image' || $field == 'status' || $field == 'time') {
             $update[] = '`' . $field . '` = \'' . Wo_Secure($data, 0) . '\'';
         }
     }
