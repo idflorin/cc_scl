@@ -46,7 +46,7 @@
               </span>
             </div>
         <?php } ?>
-      <span class="comment-options">
+      <span class="comment-options" <?php if ($wo['loggedin'] != true) { ?>onclick="location.href= '<?php echo $wo['config']['site_url'];?>'"<?php } ?>>
             <?php if ($wo['config']['second_post_button'] == 'reaction') { ?>
 				<div class="wo-reaction wo-reaction-lightbox-comment stat-item" id="comment_reactions" data-id="<?php echo $wo['comment']['id']; ?>">
                 <span class="like-btn like-btn-lightbox-comment" data-id="<?php echo $wo['comment']['id']; ?>">
@@ -155,7 +155,7 @@
       <div class="comment-edit">
          <input type="text" class="form-control" value="<?php echo $wo['comment']['Orginaltext']?>" onkeyup="Wo_EditComment(this.value,<?php echo $wo['comment']['id']?>, event)" placeholder="<?php echo $wo['lang']['edit_comment']; ?>" dir="auto">
       </div>
-      <div class="comment-replies">
+      <div class="comment-replies" <?php if ($wo['loggedin'] != true) { ?>onclick="location.href= '<?php echo $wo['config']['site_url'];?>'"<?php } ?>>
          <div class="comment-replies-text">
           <div class="reply-container"></div>
          </div>

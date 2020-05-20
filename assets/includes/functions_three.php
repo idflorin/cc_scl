@@ -4680,31 +4680,45 @@ function Wo_GenirateSiteMap($updating = 'daily') {
     while ($fetched_data = mysqli_fetch_assoc($profiles)) {
         $sitemap->addItem($fetched_data['username'], '1.0', $updating, 'Today');
     }
-    $groups = mysqli_query($sqlConnect, "SELECT `group_name` FROM " . T_GROUPS . " WHERE `active` = '1'");
-    while ($fetched_data = mysqli_fetch_assoc($groups)) {
-        $sitemap->addItem($fetched_data['group_name'], '0.9', $updating, 'Today');
+    if ($wo['config']['groups'] == 1) {
+        $groups = mysqli_query($sqlConnect, "SELECT `group_name` FROM " . T_GROUPS . " WHERE `active` = '1'");
+        while ($fetched_data = mysqli_fetch_assoc($groups)) {
+            $sitemap->addItem($fetched_data['group_name'], '0.9', $updating, 'Today');
+        }
     }
-    $pages = mysqli_query($sqlConnect, "SELECT `page_name` FROM " . T_PAGES . " WHERE `active` = '1'");
-    while ($fetched_data = mysqli_fetch_assoc($pages)) {
-        $sitemap->addItem($fetched_data['page_name'], '0.9', $updating, 'Today');
+    if ($wo['config']['pages'] == 1) {
+        $pages = mysqli_query($sqlConnect, "SELECT `page_name` FROM " . T_PAGES . " WHERE `active` = '1'");
+        while ($fetched_data = mysqli_fetch_assoc($pages)) {
+            $sitemap->addItem($fetched_data['page_name'], '0.9', $updating, 'Today');
+        }
     }
     $posts = mysqli_query($sqlConnect, "SELECT `id` FROM " . T_POSTS . " WHERE `postPrivacy` = '0'");
     while ($fetched_data = mysqli_fetch_assoc($posts)) {
         $sitemap->addItem('post/' . $fetched_data['id'], '0.8', $updating, 'Today');
     }
-    $blogs = mysqli_query($sqlConnect, "SELECT `id`,`title` FROM " . T_BLOG);
-    while ($fetched_data = mysqli_fetch_assoc($blogs)) {
-        $url = 'read-blog/' . $fetched_data['id'] . '_' . Wo_SlugPost($fetched_data['title']);
-        $sitemap->addItem($url, '0.7', $updating, 'Today');
+    if ($wo['config']['blogs'] == 1) {
+        $blogs = mysqli_query($sqlConnect, "SELECT `id`,`title` FROM " . T_BLOG);
+        while ($fetched_data = mysqli_fetch_assoc($blogs)) {
+            $url = 'read-blog/' . $fetched_data['id'] . '_' . Wo_SlugPost($fetched_data['title']);
+            $sitemap->addItem($url, '0.7', $updating, 'Today');
+        }
+        $sitemap->addItem('blog', '0.6', $updating, 'Today');
     }
-    $sitemap->addItem('blog', '0.6', $updating, 'Today');
-    $sitemap->addItem('forum', '0.5', $updating, 'Today');
-    $sitemap->addItem('movies', '0.5', $updating, 'Today');
+    if ($wo['config']['developers_page'] == 1) {
+        $sitemap->addItem('developers', '0.1', 'yearly');
+    }
+    if ($wo['config']['forum'] == 1) {
+        $sitemap->addItem('forum', '0.5', $updating, 'Today');
+    }
+    if ($wo['config']['movies'] == 1) {
+        $sitemap->addItem('movies', '0.5', $updating, 'Today');
+    }
+    
     $sitemap->addItem('terms/about-us', '0.1', 'never');
     $sitemap->addItem('contact-us', '0.1', 'never');
     $sitemap->addItem('terms/privacy-policy', '0.1', 'yearly');
     $sitemap->addItem('terms/terms', '0.1', 'yearly');
-    $sitemap->addItem('developers', '0.1', 'yearly');
+    
     $sitemap->createSitemapIndex($site . '/xml/', 'Today');
     return true;
 }

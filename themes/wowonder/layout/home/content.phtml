@@ -157,15 +157,6 @@ document.addEventListener("msfullscreenchange", function() {
 function loadposts() {
 	$("#posts-laoded").load(Wo_Ajax_Requests_File() + '?f=load_posts', function enter() {
 		Wo_FinishBar();
-	  	$('.video-js').each(function(index, el) {
-	  		fluidPlayer($(this).attr('id'), {
-		        layoutControls: {
-		            primaryColor:           "<?php echo $wo['config']['btn_background_color'];?>",
-		            fillToContainer: true,
-		            playbackRateEnabled: true,
-		        }
-	        });
-	  	});
 	  	$(".post-description p, .product-description").each(function(index, el) {
 	  		$(this).readmore({
 		      speed: 75,

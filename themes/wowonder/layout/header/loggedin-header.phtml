@@ -249,6 +249,18 @@ if ($followers_alert == 0) {
 				</a>
 			</li>
 			<?php } ?>
+			<?php if ($wo['config']['memories_system'] == 1) { ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=memories'); ?>" data-ajax="?link1=memories"><?php echo $wo['lang']['memories'];?>
+				</a>
+			</li>
+			<?php } ?>
+			<?php if ($wo['config']['offer_system'] == 1) { ?>
+			<li class="dropdown-search-link">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=offers'); ?>" data-ajax="?link1=offers"><?php echo $wo['lang']['offers'];?>
+				</a>
+			</li>
+			<?php } ?>
 
 			
 			<?php if ($wo['config']['groups'] == 1 || $wo['config']['pages'] == 1) { ?><li><hr></li><?php } ?>

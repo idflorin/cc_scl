@@ -6645,7 +6645,7 @@ function Wo_GetPostReactionsTypes($object_id, $col = "post") {
    $sql_query_one = mysqli_query($sqlConnect, $query_one);
    while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
        $reactions[$fetched_data['reaction']] = 1;
-       if ($fetched_data['user_id'] == $wo['user']['id']) {
+       if ($wo['loggedin'] && $fetched_data['user_id'] == $wo['user']['id']) {
            $reactions['is_reacted'] = true;
            $reactions['type'] = $fetched_data['reaction'];
        }
@@ -7473,9 +7473,9 @@ function Wo_GetPostCommentsLimited($post_id = 0, $comment_id = 0) {
     if (empty($post_id) || !is_numeric($post_id) || $post_id < 0) {
         return false;
     }
-    if ($wo['loggedin'] == false) {
-        return false;
-    }
+    // if ($wo['loggedin'] == false) {
+    //     return false;
+    // }
 
     $logged_user_id = Wo_Secure($wo['user']['user_id']);
     $post_id        = Wo_Secure($post_id);
@@ -7494,14 +7494,17 @@ function Wo_GetPostComments($post_id = 0, $limit = 5, $offset = 0) {
     if (empty($post_id) || !is_numeric($post_id) || $post_id < 0) {
         return false;
     }
-    if ($wo['loggedin'] == false) {
-        return false;
-    }
+    // if ($wo['loggedin'] == false) {
+    //     return false;
+    // }
     $offset_query = "";
     if (!empty($offset)) {
         $offset_query = " AND `id` > ".$offset;
     }
-    $logged_user_id = Wo_Secure($wo['user']['user_id']);
+    $logged_user_id = 0;
+    if ($wo['loggedin']) {
+        $logged_user_id = Wo_Secure($wo['user']['user_id']);
+    }
     $post_id        = Wo_Secure($post_id);
     $data           = array();
     $query          = "SELECT `id` FROM " . T_COMMENTS . " WHERE `post_id` = {$post_id} AND `user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$logged_user_id}') AND `user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$logged_user_id}') {$offset_query} ORDER BY `id` ASC";

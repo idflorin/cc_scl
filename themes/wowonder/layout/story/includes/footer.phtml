@@ -58,8 +58,7 @@
 <div class="clear"></div>
 <hr>
 <?php } ?>
-<?php if($wo['loggedin'] == true) { ?>
-<div class="stats <?php echo Wo_RightToLeft('pull-left');?>" id="wo_post_stat_button">
+<div class="stats <?php echo Wo_RightToLeft('pull-left');?>" id="wo_post_stat_button" <?php if ($wo['loggedin'] != true) { ?>onclick="location.href= '<?php echo $wo['config']['site_url'];?>'"<?php } ?>>
    <?php echo Wo_LoadPage('buttons/like-wonder');?>
    <div class="btn btn-default stat-item" onclick="Wo_ShowComments(<?php echo $wo['story']['id']; ?>);" title="<?php echo $wo['lang']['comments'];?>">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle">
@@ -96,21 +95,8 @@
    </div>
    <?php } } ?>
 </div>
-<?php } else {  ?>
-<?php 
-   $text_not_loggedin = $wo['lang']['post_login_requriement'];
-   if ($wo['config']['second_post_button'] == 'dislike') {
-     $text_not_loggedin = $wo['lang']['post_login_requriement_dislike'];
-   } else if ($wo['config']['second_post_button'] == 'disabled') {
-     $text_not_loggedin = $wo['lang']['post_login_requriement_none'];
-   }
-   ?>
-<span class="<?php echo Wo_RightToLeft('pull-left');?> please-login-text"><a href="<?php echo Wo_SeoLink('index.php?link1=welcome&last_url=' . urlencode($wo['story']['url']));?>"><?php echo $text_not_loggedin;?></a></span>
-<div class="clear"></div>
-<?php } ?>
 <div class="clear"></div>
 </div>
-<?php if ($wo['loggedin'] == true) { ?>
 <div class="post-footer post-likes"></div>
 <div class="clear"></div>
 <div class="post-footer post-wonders"></div>
@@ -164,10 +150,12 @@
    <?php } ?>
    <?php } ?>
    <?php if ($wo['story']['comments_status'] == 1) { ?> 
-   <div class="post-commet-textarea dropdown">
+   <div class="post-commet-textarea dropdown" <?php if ($wo['loggedin'] != true) { ?>onclick="location.href= '<?php echo $wo['config']['site_url'];?>'"<?php } ?> >
       <div id="wo_comment_combo" class="remove_combo_on_click wo_comment_combo_<?php echo $wo['story']['id']; ?>" onclick="Wo_ShowCommentCombo(<?php echo $wo['story']['id']; ?>);">
          <div style="display: flex;">
+           <?php if ($wo['loggedin'] == true) { ?>
             <img class="avatar" src="<?php echo $wo['user']['avatar'];?>"/>
+         <?php } ?>
             <textarea class="form-control comment-textarea textarea" placeholder="<?php echo $wo['lang']['write_comment'];?>" type="text" onkeyup="Wo_LiveComment(this.value,event,<?php echo $wo['story']['id']; ?>);Wo_RegisterComment(this.value,<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, event, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>);" onkeydown="textAreaAdjust(this, 31,'comm'); " dir="auto" oninput="count_char(this,<?php echo $wo['story']['id']; ?>)"></textarea>
          </div>
          <div class="comment_combo_footer">
@@ -176,6 +164,7 @@
                <div></div>
                <div></div>
             </div>
+            <?php if ($wo['loggedin'] == true) { ?>
             <div class="wo_comment_fopt">
                <div class="pull-right">
                   <button type="button" onclick="Wo_LiveComment(this.value,event,<?php echo $wo['story']['id']; ?>,1);Wo_RegisterComment2(<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" class="btn btn-file" title="<?php echo $wo['lang']['post']; ?>">
@@ -227,6 +216,7 @@
                <?php } ?>
                </div>
             </div>
+         <?php } ?>
          </div>
       </div>
    </div>
@@ -235,4 +225,3 @@
    <small style="color: #777; font-size: 12px;"><?php echo str_replace('%d', $wo['story']['publisher']['name'],$wo['lang']['comments_disabled']);?></small>
    <?php } ?>
 </div>
-<?php } ?>

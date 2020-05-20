@@ -150,15 +150,6 @@ function loadposts() {
 
     $("#posts-laoded").load(Wo_Ajax_Requests_File() + '?f=load_posts', function enter() {
         Wo_FinishBar();
-        $('.video-js').each(function(index, el) {
-            fluidPlayer($(this).attr('id'), {
-                layoutControls: {
-                    primaryColor:           "<?php echo $wo['config']['btn_background_color'];?>",
-                    fillToContainer: true,
-                    playbackRateEnabled: true,
-                }
-            });
-        });
         $(".post-description p, .product-description").each(function(index, el) {
             $(this).readmore({
               speed: 75,
@@ -177,18 +168,18 @@ function loadposts() {
            trigger: "@"
         });
         $('#load-more-posts').show();
-        $('.sun_comm_addmore .dropdown-toggle').on('click', function (event) {
-            $(this).parent().toggleClass('open');
-        });
-        $(document).ready(function(){
-          $('.sun_comm_addmore > .dropdown-menu .dropdown-toggle').on("click", function(e){
-            $(this).next('ul').toggle();
-            e.stopPropagation();
-            e.preventDefault();
-          });
-        });
+        
+        
     });
 }
+$('.sun_comm_addmore .dropdown-toggle').on('click', function (event) {
+    $(this).parent().toggleClass('open');
+});
+$(document).ready(function(){
+  $('.sun_comm_addmore > .dropdown-menu .dropdown-toggle').on("click", function(e){
+    $(this).next('ul').toggle();
+  });
+});
   <?php if ($wo['user']['social_login'] == 1) { ?>
   $(window).on("load", function (e) {
        $('#create-password').modal('show');

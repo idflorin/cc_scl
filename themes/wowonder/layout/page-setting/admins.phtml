@@ -60,9 +60,11 @@
      .done(function(data) {
        if (data.status == 200 && data.code == 1) {
          $(self).find('i').replaceWith('<i class="fa fa-times-circle-o"></i>');
+         $('#privileges_admin_page_'+member_id).slideDown();
        }
        else if(data.status == 200 && data.code == 0){
          $(self).find('i').replaceWith('<i class="fa fa-plus-square-o"></i>');
+         $('#privileges_admin_page_'+member_id).slideUp();
        }
      })
      .fail(function() {

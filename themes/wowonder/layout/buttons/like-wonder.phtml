@@ -4,7 +4,7 @@
     <div class="wo-reaction wo-reaction-lightbox stat-item unselectable" data-id="<?php echo $wo['story']['id']; ?>">
 		<span class="like-btn like-btn-lightbox unselectable" data-id="<?php echo $wo['story']['id']; ?>" >
 			<?php
-				if (Wo_IsReacted($wo['story']['id'], $wo['user']['user_id']) === true) {    
+				if ($wo['loggedin'] && Wo_IsReacted($wo['story']['id'], $wo['user']['user_id']) === true) {    
 					echo Wo_GetReactedTextIcon($wo['story']['id'], $wo['user']['user_id']);
 				} else {   
 					echo '<span class="status-reaction-'.$wo['story']['id'].' unselectable"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> <span class="t_likes'.$wo['story']['id'].'"></span> ' . $wo['lang']['like'] . '</span>';   
@@ -83,9 +83,9 @@
 	<?php } else { ?>
 
 	<div class="wo-reaction wo-reaction-post stat-item unselectable" data-id="<?php echo $wo['story']['id']; ?>">
-		<span class="like-btn like-btn-post unselectable"  data-id="<?php echo $wo['story']['id']; ?>" id="react_<?php echo $wo['story']['id']; ?>" <?php if (Wo_IsReacted($wo['story']['id'], $wo['user']['user_id'])) { ?> data_react="1" <?php }else{ ?> data_react="0"<?php } ?> data-reaction-id="<?php echo $wo['reactions_types'][1]['id'];?>"  data-reaction="Like" data-reaction-lang="<?php echo $wo['lang']['like'];?>" data-post-id="<?php echo $wo['story']['id']; ?>" onclick="Wo_RegisterReactionLike(this,'<?php echo($wo['reactions_types'][1]['wowonder_small_icon']) ?>',<?php echo($wo['reactions_types'][1]['is_html']) ?>);">
+		<span class="like-btn like-btn-post unselectable"  data-id="<?php echo $wo['story']['id']; ?>" id="react_<?php echo $wo['story']['id']; ?>" <?php if ($wo['loggedin'] && Wo_IsReacted($wo['story']['id'], $wo['user']['user_id'])) { ?> data_react="1" <?php }else{ ?> data_react="0"<?php } ?> data-reaction-id="<?php echo $wo['reactions_types'][1]['id'];?>"  data-reaction="Like" data-reaction-lang="<?php echo $wo['lang']['like'];?>" data-post-id="<?php echo $wo['story']['id']; ?>" onclick="Wo_RegisterReactionLike(this,'<?php echo($wo['reactions_types'][1]['wowonder_small_icon']) ?>',<?php echo($wo['reactions_types'][1]['is_html']) ?>);">
 			<?php
-				if (Wo_IsReacted($wo['story']['id'], $wo['user']['user_id']) === true) {    
+				if ($wo['loggedin'] && Wo_IsReacted($wo['story']['id'], $wo['user']['user_id']) === true) {    
 					echo Wo_GetReactedTextIcon($wo['story']['id'], $wo['user']['user_id']);
 				} else {   
 					echo '<span class="status-reaction-'.$wo['story']['id'].' unselectable"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> <span class="t_likes'.$wo['story']['id'].'"></span> ' . $wo['lang']['like'] . '</span>';   

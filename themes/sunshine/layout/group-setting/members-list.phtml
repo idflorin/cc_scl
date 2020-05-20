@@ -32,7 +32,7 @@
       <?php endif; ?>
       <?php echo $wo['lang']['admin']; ?>
       </span>
-      <span class="btn btn-default btn-sm"><a href="<?php echo Wo_SeoLink('index.php?link1=group-setting&group=' . $wo['setting']['group_name'] . '&link3=group-members');?>?name=<?php echo $wo['member']['username']?>"  data-ajax="?link1=group-setting&group=<?php echo $wo['setting']['group_name'];?>&link3=group-members&name=<?php echo $wo['member']['username']?>"><?php echo $wo['lang']['privileges'];?></a></span>
+      <span class="btn btn-default btn-sm" id="privileges_admin_<?php echo($wo['member']['user_id']) ?>" style="<?php echo Wo_IsGroupUserExists($wo['member']['user_id'],$wo['setting']['id']) ? '' : 'display: none;'; ?>"><a href="<?php echo Wo_SeoLink('index.php?link1=group-setting&group=' . $wo['setting']['group_name'] . '&link3=group-members');?>?name=<?php echo $wo['member']['username']?>"  data-ajax="?link1=group-setting&group=<?php echo $wo['setting']['group_name'];?>&link3=group-members&name=<?php echo $wo['member']['username']?>"><?php echo $wo['lang']['privileges'];?></a></span>
    <?php endif;?>
    </div>
 </div>

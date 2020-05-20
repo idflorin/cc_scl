@@ -170,6 +170,12 @@ if (!empty($wo['story']['parent_id'])) {
          <?php } ?>
          </span>
          <?php } } ?>
+         <span class="user-popover" data-type="<?php echo $wo['story']['shared_from']['type']; ?>" data-id="<?php echo $wo['story']['shared_from']['id']; ?>">         
+         <span><?php echo $wo['lang']['shared_a_post']; ?></span> 
+         </span>
+         <a href="<?php echo $post_shared_from['url']; ?>" class="pointer"><span style="color: #666;"><?php echo strtolower($wo['lang']['post']); ?></span></a>
+         </span>
+         &nbsp;
          <?php if ($wo['story']['shared_from'] && is_array($wo['story']['shared_from'])): ?>
          <span class="user-popover" data-type="<?php echo $wo['story']['shared_from']['type']; ?>" data-id="<?php echo $wo['story']['shared_from']['id']; ?>">
             <span><?php echo $wo['lang']['shared']; ?></span> 
@@ -239,14 +245,11 @@ if (!empty($wo['story']['parent_id'])) {
          <?php if (!empty($wo['story']['product_id']) && empty($wo['story']['shared_from'])) {  ?>
          <small class="small-text"><?php echo $wo['lang']['added_new_product_for_sell']; ?></small>
          <?php } ?>
-         <?php if (!empty($wo['story']['blog_id'])  && empty($wo['story']['shared_from'])) {  ?>
-         <small class="small-text"><?php echo $wo['lang']['created_new_blog'] ?></small>
-         <?php } ?>
          <?php if (!empty($wo['story']['forum_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['forum'])) {  ?>
-         <small class="small-text"><?php echo $wo['lang']['shared_forum'] ?></small>
+         <!-- <small class="small-text"><?php echo $wo['lang']['shared_forum'] ?></small> -->
          <?php } ?>
          <?php if (!empty($wo['story']['thread_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['thread'])) {  ?>
-         <small class="small-text"><?php echo $wo['lang']['shared_thread'] ?></small>
+         <!-- <small class="small-text"><?php echo $wo['lang']['shared_thread'] ?></small> -->
          <?php } ?>
          <?php if (empty($wo['story']['shared_from'])): ?>
          <small class="small-text">
@@ -510,9 +513,13 @@ if (!empty($wo['story']['parent_id'])) {
 
 <div class="post-heading">
    <div class="<?php echo Wo_RightToLeft('pull-left');?> image">
-      <a href="<?php echo $wo['story']['publisher']['url']; ?>" <?php if (!isset($anonymous)) { ?> data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']?>"<?php } ?>>
+      <?php if (!isset($anonymous)) { ?>
+      <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']?>">
       <img src="<?php echo $wo['story']['publisher']['avatar']; ?>" id="updateImage-<?php echo $wo['story']['publisher']['user_id']?>" class="avatar" alt="<?php echo $wo['story']['publisher']['name']; ?> profile picture">
       </a>
+   <?php }else{ ?>
+      <img src="<?php echo $wo['story']['publisher']['avatar']; ?>" id="updateImage-<?php echo $wo['story']['publisher']['user_id']?>" class="avatar" alt="<?php echo $wo['story']['publisher']['name']; ?> profile picture">
+   <?php } ?>
    </div>
    <div class="<?php echo Wo_RightToLeft('pull-right');?>">
       <?php  if ($wo['story']['admin'] === true || $wo['story']['group_admin'] === true) { ?>
@@ -649,9 +656,13 @@ if (!empty($wo['story']['parent_id'])) {
    </div>
    <div class="meta">
       <div class="title h5">
+         <?php if (!isset($anonymous)) { ?>  
          <span class="user-popover" data-type="<?php echo $wo['story']['publisher']['type']; ?>" data-id="<?php echo $wo['story']['publisher']['id']; ?>">
-         <a href="<?php echo $wo['story']['publisher']['url']; ?>" <?php if (!isset($anonymous)) { ?>data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"<?php } ?>><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
+         <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
          </span>
+         <?php }else{ ?>
+            <b><?php echo $wo['story']['publisher']['name']; ?></b>
+         <?php } ?>
          <?php if($wo['story']['publisher']['verified'] == 1) { ?>
          <span class="verified-color">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo $wo['lang']['verified_user'];?>">

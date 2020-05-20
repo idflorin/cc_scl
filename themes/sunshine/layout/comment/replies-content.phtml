@@ -1,15 +1,21 @@
 <?php
  if ($wo['config']['shout_box_system'] == 1 && Wo_CheckAnonymous($wo['reply']['id'],'reply')) {
+ 	$anonymous = true;
    $wo['reply']['publisher']['username'] = 'anonymous';
    $wo['reply']['publisher']['name'] = $wo['lang']['anonymous'];
    $wo['reply']['publisher']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
    $wo['reply']['publisher']['verified'] = 0;
    $wo['reply']['publisher']['type'] = '';
+   $wo['reply']['publisher']['url'] = 'javascript:void(0)';
 } ?>
 <div class="reply reply-container" id="comment_reply_<?php echo $wo['reply']['id'];?>" data-reply-id="<?php echo $wo['reply']['id'];?>">
+	<?php if (!isset($anonymous)) { ?>
 	<a class="<?php echo Wo_RightToLeft('pull-left'); ?>" href="<?php echo $wo['reply']['publisher']['url']?>" onclick="InjectAPI('{&quot;profile_id&quot; : &quot;<?php echo $wo['reply']['publisher']['id']?>&quot;, &quot;type&quot;:&quot;<?php echo $wo['reply']['publisher']['type']?>&quot;}', event);">
 		<img class="avatar <?php echo Wo_RightToLeft('pull-left'); ?>" src="<?php echo $wo['reply']['publisher']['avatar']?>" alt="avatar">
 	</a>
+	<?php }else{ ?>
+		<img class="avatar <?php echo Wo_RightToLeft('pull-left'); ?>" src="<?php echo $wo['reply']['publisher']['avatar']?>" alt="avatar">
+	<?php } ?>
 	<div class="comment-body">
 		<div class="<?php echo Wo_RightToLeft('pull-right');?> comment-options comment_edele_options">
             <?php if ($wo['reply']['post_onwer'] === true|| $wo['reply']['onwer'] === true || Wo_IsAdmin()) {?>
@@ -26,6 +32,7 @@
 		</div>
 		<div class="comment-heading reply-heading">
 			<div class="sun_innr_comm">
+				<?php if (!isset($anonymous)) { ?>
 				<span class="user-popover" data-id="<?php echo $wo['reply']['publisher']['id'];?>" data-type="<?php echo $wo['reply']['publisher']['type'];?>">
 					<a href="<?php echo $wo['reply']['publisher']['url']?>" data-ajax="?link1=timeline&u=<?php echo $wo['reply']['publisher']['username'];?>"  onclick="InjectAPI('{&quot;profile_id&quot; : &quot;<?php echo $wo['reply']['publisher']['id']?>&quot;, &quot;type&quot;:&quot;<?php echo $wo['reply']['publisher']['type']?>&quot;}', event);">
 						<h4 class="user"><?php echo $wo['reply']['publisher']['name']?></h4>
@@ -34,6 +41,9 @@
 						<span class="verified-color" title="<?php echo $wo['lang']['verified_user'];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle"><path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"></path></svg></span>
 					<?php } ?>
 				</span>
+				<?php }else{ ?>
+					<h4 class="user"><?php echo $wo['reply']['publisher']['name']?></h4>
+				<?php } ?>
 				<div class="reply-text" data-post-comm-reply-text="<?php echo $wo['reply']['id']?>"><?php echo $wo['reply']['text']?></div>
 				<div class="comment-image">
             <?php if (!empty($wo['reply']['c_file'])): ?>

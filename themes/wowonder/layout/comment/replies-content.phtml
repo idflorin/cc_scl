@@ -1,5 +1,6 @@
 <?php
  if ($wo['config']['shout_box_system'] == 1 && Wo_CheckAnonymous($wo['reply']['id'],'reply')) {
+  $anonymous = true;
    $wo['reply']['publisher']['username'] = 'anonymous';
    $wo['reply']['publisher']['name'] = $wo['lang']['anonymous'];
    $wo['reply']['publisher']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
@@ -7,11 +8,16 @@
    $wo['reply']['publisher']['type'] = '';
 } ?>
 <div class="reply reply-container" id="comment_reply_<?php echo $wo['reply']['id'];?>" data-reply-id="<?php echo $wo['reply']['id'];?>">
+  <?php if (!isset($anonymous)) { ?>
    <a class="<?php echo Wo_RightToLeft('pull-left'); ?>" href="<?php echo $wo['reply']['publisher']['url']?>" onclick="InjectAPI('{&quot;profile_id&quot; : &quot;<?php echo $wo['reply']['publisher']['id']?>&quot;, &quot;type&quot;:&quot;<?php echo $wo['reply']['publisher']['type']?>&quot;}', event);">
    <img class="avatar <?php echo Wo_RightToLeft('pull-left'); ?>" src="<?php echo $wo['reply']['publisher']['avatar']?>" alt="avatar">
    </a>
+   <?php }else{ ?>
+    <img class="avatar <?php echo Wo_RightToLeft('pull-left'); ?>" src="<?php echo $wo['reply']['publisher']['avatar']?>" alt="avatar">
+  <?php } ?>
    <div class="comment-body">
       <div class="comment-heading reply-heading">
+        <?php if (!isset($anonymous)) { ?>
          <span class="user-popover" data-id="<?php echo $wo['reply']['publisher']['id'];?>" data-type="<?php echo $wo['reply']['publisher']['type'];?>">
          <a href="<?php echo $wo['reply']['publisher']['url']?>" data-ajax="?link1=timeline&u=<?php echo $wo['reply']['publisher']['username'];?>"  onclick="InjectAPI('{&quot;profile_id&quot; : &quot;<?php echo $wo['reply']['publisher']['id']?>&quot;, &quot;type&quot;:&quot;<?php echo $wo['reply']['publisher']['type']?>&quot;}', event);">
             <h4 class="user">
@@ -19,6 +25,9 @@
             </h4>
          </a>
          </span>
+         <?php }else{ ?>
+          <h4 class="user"><?php echo $wo['reply']['publisher']['name']?></h4>
+        <?php } ?>
          <?php  if($wo['reply']['publisher']['verified'] == 1) {   ?>
          <span class="verified-color" data-toggle="tooltip" title="<?php echo $wo['lang']['verified_user'];?>"><i class="fa fa-check-circle"></i></span>
          <?php } ?>

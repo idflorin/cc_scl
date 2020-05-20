@@ -300,8 +300,6 @@
    $(document).ready(function(){
      $('.sun_comm_dd_<?php echo $wo['story']['id']; ?> > .sun_comm_dd_menu_<?php echo $wo['story']['id']; ?> .sun_comm_dd_dt_<?php echo $wo['story']['id']; ?>').on("click", function(e){
        $(this).next('ul').toggle();
-       e.stopPropagation();
-       e.preventDefault();
      });
    });
 <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name']) && $wo['story']['is_still_live'] && $wo['story']['comments_status'] == 1 && $wo['story']['live_ended'] == 0) { ?>

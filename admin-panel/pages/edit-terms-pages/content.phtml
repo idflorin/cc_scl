@@ -65,6 +65,7 @@ $(function() {
           arr.push({name:'terms_of_use', value:btoa(unescape(encodeURIComponent($('#terms_of_use').val())))}); 
           arr.push({name:'privacy_policy', value:btoa(unescape(encodeURIComponent($('#privacy_policy').val())))});
           arr.push({name:'about', value:btoa(unescape(encodeURIComponent($('#about').val())))});
+          arr.push({name:'refund', value:btoa(unescape(encodeURIComponent($('#refund').val())))});
         },
         success: function(data) {
             if (data.status == 200) {

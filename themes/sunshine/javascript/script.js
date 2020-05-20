@@ -2683,6 +2683,11 @@ var Wo_Delay = (function(){
   };
 })();
 function Wo_AddVideoViews(post_id){
+  $('.video-js').each(function(index, el) {
+    if ($(this).attr('data-post-video') != post_id) {
+      $(this).get(0).pause();
+    }
+  });
     if (post_id && typeof(Number(post_id)) == 'number'  && post_id > 0) {
       Wo_Delay(function(){
         $.ajax({
@@ -2829,9 +2834,11 @@ function Wo_AddGroupUserAdmin(member_id, group_id, self){
   .done(function(data) {
     if (data.status == 200 && data.code == 1) {
       $(self).find('span').html('<i class="fa fa-times-circle-o"></i>');
+      $('#privileges_admin_'+member_id).slideDown();
     }
     else if(data.status == 200 && data.code == 0){
       $(self).find('span').html('<i class="fa fa-plus-square-o"></i>');
+      $('#privileges_admin_'+member_id).slideUp();
     }
   })
   .fail(function() {
@@ -3055,6 +3062,7 @@ function Wo_RegisterReplyReaction(user_id,reply_id,reaction){
 
 
 function load_ajax_emojii(id, path){
+  $('.sun_comm_dd_menu_'+id).find('.dropdown-submenu').addClass('open');
     var emojjii = "😀*😁*😂*🤣*😃*😄*😅*😆*😉*😊*😋*😎*😍*😘*😗*😙*😚*🙂*🤗*🤩*🤔*🤨*😐*😑*😶*🙄*😏*😣*😥*😮*🤐*😯*😪*😫*😴*😌*😛*😜*😝*🤤*😒*😓*😔*😕*🙃*🤑*😲*☹️*🙁*😖*😞*😟*😤*😢*😭*😦*😧*😨*😩*🤯*😬*😰*😱*😳*🤪*😵*😡*😠*🤬*😷*🤒*🤕*🤢*🤮*🤧*😇*🤠*🤡*🤥*🤫*🤭*🧐*🤓*😈*👿*👹*👺*💀*👻*👽*🤖*💩*😺*😸*😹*😻*😼*😽*🙀*😿*😾*👶*👧*🧒*👦*👩*🧑*👨*👵*🧓*👴*👲*💅*🤳*💃*🕺*🕴*👫*👭*👬*💑*🤲*👐*🙌*👏*🤝*👍*👎*👊*✊*🤛*🤜*🤞*✌️*🤟*🤘*👌*👈*👉*👆*👇*☝️*✋*🤚*🖐*🖖*👋*🤙*💪*🖕*✍️*🙏*💍*💄*💋*👄*👅*👂*👃*👣*👁*👀*🧠*🗣*👤*👥";
     
 	$('.emo-comment-container-' + id ).html("");

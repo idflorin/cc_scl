@@ -1,5 +1,6 @@
 <?php $replies = Wo_CountCommentReplies($wo['comment']['id']);
 if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 && $wo['comment']['publisher']['id'] == $wo['story']['user_id']) {
+  $anonymous = true;
    $wo['comment']['publisher']['username'] = 'anonymous';
    $wo['comment']['publisher']['name'] = $wo['lang']['anonymous'];
    $wo['comment']['publisher']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
@@ -8,11 +9,16 @@ if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 &
 }
 ?>
 <div class="comment comment-container" id="comment_<?php echo $wo['comment']['id'];?>" data-comment-id ="<?php echo $wo['comment']['id'];?>">
+  <?php if (!isset($anonymous)) { ?>
    <a onclick="InjectAPI('{&quot;profile_id&quot; : &quot;<?php echo $wo['comment']['publisher']['id']?>&quot;, &quot;type&quot;:&quot;<?php echo $wo['comment']['publisher']['type']?>&quot;}', event);" class="<?php echo Wo_RightToLeft('pull-left'); ?>" href="<?php echo $wo['comment']['publisher']['url']?>">
       <img class="avatar <?php echo Wo_RightToLeft('pull-left'); ?>" src="<?php echo $wo['comment']['publisher']['avatar']?>" alt="avatar">
    </a>
+   <?php }else{ ?>
+      <img class="avatar <?php echo Wo_RightToLeft('pull-left'); ?>" src="<?php echo $wo['comment']['publisher']['avatar']?>" alt="avatar">
+    <?php } ?>
    <div class="comment-body">
       <div class="comment-heading">
+        <?php if (!isset($anonymous)) { ?>
          <span class="user-popover" data-id="<?php echo $wo['comment']['publisher']['id'];?>" data-type="<?php echo $wo['comment']['publisher']['type'];?>">
             <a href="<?php echo $wo['comment']['publisher']['url']?>" data-ajax="?link1=timeline&u=<?php echo $wo['comment']['publisher']['username'];?>" onclick="InjectAPI('{&quot;profile_id&quot; : &quot;<?php echo $wo['comment']['publisher']['id']?>&quot;, &quot;type&quot;:&quot;<?php echo $wo['comment']['publisher']['type']?>&quot;}', event);">
                <h4 class="user">
@@ -20,6 +26,9 @@ if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 &
                </h4>
             </a>
          </span>
+         <?php }else{ ?>
+          <h4 class="user"><?php echo $wo['comment']['publisher']['name']?></h4>
+        <?php } ?>
          <?php  if($wo['comment']['publisher']['verified'] == 1) {   ?>
          <span class="verified-color" data-toggle="tooltip" title="<?php echo $wo['lang']['verified_user'];?>"><i class="fa fa-check-circle"></i></span>
          <?php } ?>
@@ -82,12 +91,12 @@ if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 &
             </div>
         <?php } ?>
 		
-      <span class="comment-options">
+      <span class="comment-options" <?php if ($wo['loggedin'] != true) { ?>onclick="location.href= '<?php echo $wo['config']['site_url'];?>'"<?php } ?>>
         <?php if ($wo['config']['second_post_button'] == 'reaction') { ?>
 			<div class="wo-reaction wo-reaction-comment stat-item" id="comment_reactions" data-id="<?php echo $wo['comment']['id']; ?>">
                 <span class="like-btn like-btn-comment" data-id="<?php echo $wo['comment']['id']; ?>">
                     <?php
-                    if (Wo_IsReacted($wo['comment']['id'], $wo['user']['user_id'], "comment") === true) {    
+                    if ($wo['loggedin'] && Wo_IsReacted($wo['comment']['id'], $wo['user']['user_id'], "comment") === true) {    
                         echo '<span class="comment-status-reaction-'.$wo['comment']['id'].' active-like unselectable"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> <span class="c_likes-'.$wo['comment']['id'].'"></span></span>'; 
                     } else {   
                         echo '<span class="comment-status-reaction-'.$wo['comment']['id'].' unselectable"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> <span class="c_likes'.$wo['comment']['id'].'"></span></span>';   
@@ -200,15 +209,16 @@ if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 &
       <div class="comment-edit">
          <textarea onkeydown="textAreaAdjust(this, 26)" class="edit-box form-control" onkeyup="Wo_EditComment(this.value,<?php echo $wo['comment']['id']?>, event)" placeholder="Edit Comment" dir="auto"  id="edit_comment_<?php echo $wo['comment']['id']?>"><?php echo $wo['comment']['Orginaltext']?></textarea>
       </div>
-      <div class="comment-replies">
+      <div class="comment-replies" <?php if ($wo['loggedin'] != true) { ?>onclick="location.href= '<?php echo $wo['config']['site_url'];?>'"<?php } ?>>
          <div class="comment-replies-text">
             <div class="reply-container"></div>
          </div>
          <?php if ($replies > 0) { ?>
-         <div class="view-more-replies" onclick="Wo_ViewMoreReplies(<?php echo $wo['comment']['id'];?>);">
+         <div class="view-more-replies" onclick="Wo_ViewMoreReplies(<?php echo $wo['comment']['id'];?>);" >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-corner-down-right" style="margin-top: -3px;"><polyline points="15 10 20 15 15 20"></polyline><path d="M4 4v7a4 4 0 0 0 4 4h12"></path></svg> <?php echo $replies;?> <?php echo ($replies == 1)? $wo['lang']['reply'] : $wo['lang']['replies']?>
          </div>
          <?php } ?>
+         <?php if ($wo['loggedin'] == true) { ?>
          <div class="comment-reply">
 			<div class="wo_commreply_combo" id="post-<?php echo $wo["comment"]["id"];?>">
 				<img class="avatar" src="<?php echo $wo['user']['avatar'];?>"/>
@@ -258,6 +268,7 @@ if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 &
 
             <div id="hidden_inputbox_comment_reply"></div>
          </div>
+       <?php } ?>
       </div>
    </div>
    <?php echo Wo_LoadPage('modals/delete-comment');?>

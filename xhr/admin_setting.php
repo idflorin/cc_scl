@@ -2509,20 +2509,43 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             if ($add == true) {
 
                 if (!empty($_FILES['wowonder'])) {
+                    $cover = getimagesize($_FILES["wowonder"]["tmp_name"]);
+                    if ($cover[0] > 48 || $cover[1] > 48) {
+                        $data['status'] = 400;
+                        $data['message'] = $error_icon . " wowonder image size should not be more than 48x48 ";
+                        header("Content-type: application/json");
+                        echo json_encode($data);
+                        exit();
+                    }
                     $fileInfo = array(
                         'file' => $_FILES["wowonder"]["tmp_name"],
                         'name' => $_FILES['wowonder']['name'],
                         'size' => $_FILES["wowonder"]["size"],
                         'type' => $_FILES["wowonder"]["type"],
-                        'types' => 'jpeg,png,jpg,gif,svg'
+                        'types' => 'png'
                     );
                     $media    = Wo_ShareFile($fileInfo,true);
                     if (!empty($media) && !empty($media['filename'])) {
                         $wowonder_image = $media['filename'];
                     }
+                    else{
+                        $data['status'] = 400;
+                        $data['message'] = $error_icon . " wowonder image type must be png ";
+                        header("Content-type: application/json");
+                        echo json_encode($data);
+                        exit();
+                    }
                 }
 
                 if (!empty($_FILES['sunshine'])) {
+                    $cover = getimagesize($_FILES["sunshine"]["tmp_name"]);
+                    if ($cover[0] > 48 || $cover[1] > 48) {
+                        $data['status'] = 400;
+                        $data['message'] = $error_icon . " sunshine image size should not be more than 48x48 ";
+                        header("Content-type: application/json");
+                        echo json_encode($data);
+                        exit();
+                    }
                     $fileInfo = array(
                         'file' => $_FILES["sunshine"]["tmp_name"],
                         'name' => $_FILES['sunshine']['name'],
@@ -2533,6 +2556,13 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                     $media    = Wo_ShareFile($fileInfo,true);
                     if (!empty($media) && !empty($media['filename'])) {
                         $sunshine_image = $media['filename'];
+                    }
+                    else{
+                        $data['status'] = 400;
+                        $data['message'] = $error_icon . " sunshine image type must be png ";
+                        header("Content-type: application/json");
+                        echo json_encode($data);
+                        exit();
                     }
                 }
 
@@ -2695,6 +2725,14 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 $update_data = array();
 
                 if (!empty($_FILES['wowonder'])) {
+                    $cover = getimagesize($_FILES["wowonder"]["tmp_name"]);
+                    if ($cover[0] > 48 || $cover[1] > 48) {
+                        $data['status'] = 400;
+                        $data['message'] = $error_icon . " wowonder image size should not be more than 48x48 ";
+                        header("Content-type: application/json");
+                        echo json_encode($data);
+                        exit();
+                    }
                     $fileInfo = array(
                         'file' => $_FILES["wowonder"]["tmp_name"],
                         'name' => $_FILES['wowonder']['name'],
@@ -2706,9 +2744,24 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                     if (!empty($media) && !empty($media['filename'])) {
                         $update_data['wowonder_icon'] = $media['filename'];
                     }
+                    else{
+                        $data['status'] = 400;
+                        $data['message'] = $error_icon . " wowonder image type must be png ";
+                        header("Content-type: application/json");
+                        echo json_encode($data);
+                        exit();
+                    }
                 }
 
                 if (!empty($_FILES['sunshine'])) {
+                    $cover = getimagesize($_FILES["sunshine"]["tmp_name"]);
+                    if ($cover[0] > 48 || $cover[1] > 48) {
+                        $data['status'] = 400;
+                        $data['message'] = $error_icon . " sunshine image size should not be more than 48x48 ";
+                        header("Content-type: application/json");
+                        echo json_encode($data);
+                        exit();
+                    }
                     $fileInfo = array(
                         'file' => $_FILES["sunshine"]["tmp_name"],
                         'name' => $_FILES['sunshine']['name'],
@@ -2719,6 +2772,13 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                     $media    = Wo_ShareFile($fileInfo,true);
                     if (!empty($media) && !empty($media['filename'])) {
                         $update_data['sunshine_icon'] = $media['filename'];
+                    }
+                    else{
+                        $data['status'] = 400;
+                        $data['message'] = $error_icon . " sunshine image type must be png ";
+                        header("Content-type: application/json");
+                        echo json_encode($data);
+                        exit();
                     }
                 }
 
