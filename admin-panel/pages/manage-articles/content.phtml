@@ -20,6 +20,9 @@
 					                  <th>Link</th>
 					                  <th>Author</th>
 					                  <th>Posted</th>
+                            <?php if ($wo['config']['blog_approval'] == 1) { ?>
+                              <th>Status</th>
+                            <?php } ?>
 					                  <th>Action</th>
                                 </tr>
                             </thead>
@@ -51,5 +54,14 @@ function Wo_DeleteBlog(id) {
     $(this).remove();
   });
   $.get(Wo_Ajax_Requests_File(),{f:'delete-my-blog',id: id});
+}
+function Wo_AdminApprovePost(blog_id) {
+    if (confirm("Are you sure you want to approve this blog?") == false) {
+      return false;
+    }
+    hash_id = $('#hash_id').val();
+    $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=approve_blog', {blog_id:blog_id, hash_id:hash_id}, function(data, textStatus, xhr) {
+      location.reload();
+    });
 }
 </script>

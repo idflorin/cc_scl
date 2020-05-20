@@ -7,6 +7,9 @@ if ($f == 'load_more_products') {
     if (!empty($_POST['c_id'])) {
         $array['c_id'] = Wo_Secure($_POST['c_id']);
     }
+    if (!empty($_POST['sub_id'])) {
+        $array['sub_id'] = Wo_Secure($_POST['sub_id']);
+    }
     if (!empty($_POST['last_id'])) {
         $array['after_id'] = $_POST['last_id'];
     }

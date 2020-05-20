@@ -155,6 +155,9 @@ if ($application == 'windows_app') {
             break;  
         case 'active_account_sms':
             include "api/$application/active_account_sms.php";
+            break;  
+        case 'social-login':
+            include "api/$application/social-login.php";
             break;   
     }
 } else if ($application == 'phone') {

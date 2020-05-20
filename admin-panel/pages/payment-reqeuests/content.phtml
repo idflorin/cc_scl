@@ -85,15 +85,15 @@
     </div>
     <!-- #END# Vertical Layout -->
 <script>
-$(function () {
-  $('table').DataTable();
-});
 function Wo_DeclinePayment(id) {
   if (confirm("Are you sure you want to decline this request?") == false) {
     return false;
   }
   hash_id = $('#hash_id').val();
   $('#UserID_' + id).fadeOut(300, function() {
+    $(this).remove();
+  });
+  $('#review-verif-request-info-' + id).fadeOut(300, function() {
     $(this).remove();
   });
   $.get(Wo_Ajax_Requests_File(),{f:'admin_setting', s:'decline_payment', id: id, hash_id: hash_id});
@@ -105,7 +105,51 @@ function Wo_MarkPaid(id) {
   $('#UserID_' + id).fadeOut(300, function() {
     $(this).remove();
   });
+  $('#review-verif-request-info-' + id).fadeOut(300, function() {
+    $(this).remove();
+  });
   hash_id = $('#hash_id').val();
   $.get(Wo_Ajax_Requests_File(),{f:'admin_setting', s:'mark_as_paid', id: id, hash_id: hash_id});
 }
+
+function Wo_ToggleVerfRequest(id,self){
+  if (!id || !self) {
+    return false;
+  }
+  $(self).find('i').toggleClass('rotate-90d');
+  $("#review-verif-request-info-"+id).slideToggle();
+
+}
+
+jQuery(document).ready(function($) {
+  $(document).on('click', '.toggle-verification-request', function(event) {
+    event.preventDefault();
+    $(this).find('i').toggleClass('rotate-90d');
+  });
+});
 </script>
+<style>
+  .review-verif-request-cont{
+    width: 100%;
+    overflow: hidden;
+    margin: 5px 0;
+  }
+  .review-verif-request-cont div{
+    width: 200px;
+    height: 150px;
+    float: left;
+    cursor: pointer;
+    margin: 0 5px 5px 0;
+  }
+
+  .review-verif-request-cont h4{
+    width: 100%;
+    color: #666;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .toggle-verification-request{
+    padding: 3px 5px;
+  }
+</style>

@@ -9,6 +9,7 @@
                      $requests = Wo_GetPageAdmins($wo['setting']['page_id']);
                      if (count($requests) > 0) {
                         foreach ($requests as $wo['member']) {
+                          $wo['member']['page_name'] = $wo['setting']['page_name'];
                             echo Wo_LoadPage('page-setting/admin-list');
                         }
                      } else {

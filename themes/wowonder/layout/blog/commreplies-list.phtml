@@ -45,7 +45,24 @@
 		                    ?>
 		                </span>
 		                <ul class="reactions-box reactions-box-comment-replay-container-<?php echo $wo['comm-reply']['id']; ?>" data-id="<?php echo $wo['comm-reply']['id']; ?>" style="<?php if ($wo['language_type'] == 'rtl') {?> left: auto; <?php }else{ ?> right: auto; <?php }?>">
-		                    <li class="reaction reaction-like animated_2" data-reaction="Like" onclick="Wo_RegisterBlogReplyReaction(<?php echo $wo['comm-reply']['user_id']; ?>,<?php echo $wo['comm-reply']['id']; ?>,'Like');">
+
+		                	<?php if (!empty($wo['reactions_types'])) {
+		                      foreach ($wo['reactions_types'] as $key => $value) {
+		                        if ($value['status'] == 1) {
+		                          
+		                       ?>
+		                    <li class="reaction reaction-<?php echo $value['id'];?>" data-reaction="<?php echo $value['name'];?>" data-reaction-id="<?php echo $value['id'];?>" data-reaction-lang="<?php echo $value['name'];?>" onclick="Wo_RegisterBlogReplyReaction(<?php echo $wo['comm-reply']['user_id']; ?>,<?php echo $wo['comm-reply']['id']; ?>,<?php echo $value['id'];?>);">
+		                      <?php if (preg_match("/<[^<]+>/",$value['wowonder_icon'],$m)) {
+		                            echo($value['wowonder_icon']);
+		                         }
+		                         else{ ?>
+		                          <img src="<?php echo($value['wowonder_icon']) ?>">
+		                        <?php } ?>
+		                    </li>
+		                  <?php } } } ?>
+
+
+		                    <!-- <li class="reaction reaction-like animated_2" data-reaction="Like" onclick="Wo_RegisterBlogReplyReaction(<?php echo $wo['comm-reply']['user_id']; ?>,<?php echo $wo['comm-reply']['id']; ?>,'Like');">
 								<div class="emoji emoji--like">
 									<div class="emoji__hand"><div class="emoji__thumb"></div></div>
 								</div>
@@ -91,7 +108,7 @@
 										<div class="emoji__mouth"></div>
 									</div>
 								</div>
-							</li>
+							</li> -->
 		                </ul>
 		            </div>
 		            <?php }else{ ?>

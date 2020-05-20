@@ -41,7 +41,7 @@
 							</div>
 							<div class="col-lg-6">
 								<div class="sun_input">
-									<select class="form-control" name="category" id="category">
+									<select class="form-control" name="category" id="category" onchange="GetProductSubCategory(this)">
 										<?php 
 										foreach ($wo['products_categories'] as $key => $category) {
 											if ($key > 1) {
@@ -57,6 +57,21 @@
 									<label for="category"><?php echo $wo['lang']['category'] ?></label>  
 								</div>
 							</div>
+							<?php if (!empty($wo['products_sub_categories'])) { ?>
+							<div class="col-lg-6">
+								<div class="sun_input">
+									<select class="form-control" name="product_sub_category" id="product_sub_category">
+										<?php
+										unset($wo['products_categories'][1]);
+										if (!empty($wo['products_sub_categories'][array_keys($wo['products_categories'])[0]])) {
+										foreach ($wo['products_sub_categories'][array_keys($wo['products_categories'])[0]] as $id => $sub_category) { ?>
+											<option value="<?php echo $sub_category['id']?>"><?php echo $sub_category['lang']; ?></option>
+										<?php } } ?>
+									</select>
+									<label for="product_sub_category"><?php echo $wo['lang']['sub_category'] ?></label>  
+								</div>
+							</div>
+						    <?php } ?>
 							<div class="col-lg-6">
 								<div class="sun_input">
 									<select name="currency" id="currency" class="form-control">
@@ -88,6 +103,13 @@
 									<label for="description"><?php echo $wo['lang']['description'] ?></label>  
 									<span class="help-block"><?php echo $wo['lang']['please_describe_your_product'] ?></span>	
 								</div>
+								<?php $fields = Wo_GetCustomFields('product'); 
+								if (!empty($fields)) {
+									foreach ($fields as $key => $wo['field']) {
+										echo Wo_LoadPage('products/fields');
+									}
+								}
+								?>
 							</div>
 							<div class="form-group col-lg-12">
 								<label class="col-md-12" for="photos" style="display: block;"><?php echo $wo['lang']['photos'];?></label>
@@ -120,6 +142,7 @@
 						<input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
 						<input type="hidden" name="lat-product" id="lat-product" class="form-control input-md" value="">
 						<input type="hidden" name="lng-product" id="lng-product" class="form-control input-md" value="">
+						<input type="hidden" name="page_id" id="page_id_product" class="form-control input-md" value="<?php echo(!empty($wo['page_profile']) && !empty($wo['page_profile']['page_id']) ? $wo['page_profile']['page_id'] : 0) ?>">
 						<div class="form-group last-sett-btn modal-footer">
 							<div class="ball-pulse"><div></div><div></div><div></div></div>
 							<button type="submit" class="btn btn-main setting-panel-mdbtn"><?php echo $wo['lang']['publish'] ?></button>
@@ -131,6 +154,23 @@
 	</div>
 </div>
 <script type="text/javascript">
+	<?php 
+$js_array = json_encode($wo['products_sub_categories']);
+echo "var sub_categories_array = ". $js_array . ";\n";
+?>
+	function GetProductSubCategory(self) {
+		id = $(self).val();
+		var text = "";
+		if (typeof(sub_categories_array[id]) == 'undefined') {
+		    $('#product_sub_category').html('');
+		}
+		else{
+		   	sub_categories_array[id].forEach(function(entry) {
+				text = text + "<option value='"+entry.id+"'>"+entry.lang+"</option>";
+			});
+		    $('#product_sub_category').html(text);
+		}
+	}
 $(document).ready(function() {
 	$("#product-photos").on('change', function() {
 	//Get count of selected files

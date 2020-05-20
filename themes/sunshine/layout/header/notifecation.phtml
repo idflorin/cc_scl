@@ -50,27 +50,30 @@ if (!empty($wo['notification']['type'])) {
         }else if( $wo['notification']['text'] == "replay" ){
             $wo['notification']['type_text'] .= $wo['lang']['reacted_to_your_replay'];
         }
+        if (!empty($wo['reactions_types'][$notificationType2]['sunshine_small_icon'])) {
+            $wo['notification']['icon'] .= "<div class='inline_post_count_emoji'><img src='{$wo['reactions_types'][$notificationType2]['sunshine_small_icon']}' alt=\"" . $wo['reactions_types'][$notificationType2]['name'] . "\"></div></span>";
+        }
 
-        switch (strtolower($notificationType2)) {
-			case 'like':
-				$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/like-sm.png"></div>';
-				break;
-			case 'love':
-				$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/love-sm.png"></div>';
-				break;
-			case 'haha':
-				$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/haha-sm.png"></div>';
-				break;
-			case 'wow':
-				$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/wow-sm.png"></div>';
-				break;
-			case 'sad':
-				$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/sad-sm.png"></div>';
-				break;
-			case 'angry':
-				$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/angry-sm.png"></div>';
-				break;
-			}
+   //      switch (strtolower($notificationType2)) {
+			// case 'like':
+			// 	$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/like-sm.png"></div>';
+			// 	break;
+			// case 'love':
+			// 	$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/love-sm.png"></div>';
+			// 	break;
+			// case 'haha':
+			// 	$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/haha-sm.png"></div>';
+			// 	break;
+			// case 'wow':
+			// 	$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/wow-sm.png"></div>';
+			// 	break;
+			// case 'sad':
+			// 	$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/sad-sm.png"></div>';
+			// 	break;
+			// case 'angry':
+			// 	$wo['notification']['icon'] .= '<div class="inline_post_emoji inline_act_emoji"><img src="' . $wo['config']['theme_url'] . '/reaction/angry-sm.png"></div>';
+			// 	break;
+			// }
     }
     if ($wo['notification']['type'] == "gift") {
         $wo['notification']['type_text'] .= $wo['lang']['send_gift_to_you'];
@@ -82,6 +85,10 @@ if (!empty($wo['notification']['type'])) {
     }
     if ($wo['notification']['type'] == "following") {
         $wo['notification']['type_text'] .= $wo['lang']['followed_you'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus active"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>';
+    }
+    if ($wo['notification']['type'] == "live_video") {
+        $wo['notification']['type_text'] .= $wo['lang']['started_live_video'];
         $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus active"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>';
     }
     if ($wo['notification']['type'] == 'comment_mention') {
@@ -235,7 +242,7 @@ if (!empty($wo['notification']['type'])) {
     if ($wo['notification']['type'] == 'admin_notification') {
         $theme                                    = $wo['config']['theme'];
         $wo['notification']['type_text']          = $wo['notification']['text'];
-        if ($wo['notification']['type2'] != 'no_name' && $wo['notification']['type2'] != 'approve_post' ) {
+        if ($wo['notification']['type2'] != 'no_name' && $wo['notification']['type2'] != 'approve_post'  && $wo['notification']['type2'] != 'approve_blog' ) {
             $wo['notification']['url']                = $wo['notification']['full_link']; 
             $wo['notification']['ajax_url']           = $wo['notification']['full_link']; 
             $wo['notification']['wo_url']             = false; 
@@ -247,6 +254,21 @@ if (!empty($wo['notification']['type'])) {
         if ($wo['notification']['type2'] == 'approve_post') {
             $wo['notification']['type_text'] = $wo['lang']['approve_post'];
             $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus active"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>';
+        }
+        if ($wo['notification']['type2'] == 'approve_blog') {
+            $wo['notification']['type_text'] = $wo['lang']['approve_blog'];
+            $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus active"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>';
+        }
+        if ($wo['notification']['type2'] == 'refund_decline') {
+            $wo['notification']['type_text'] = $wo['lang']['refund_decline'];
+        }
+        if ($wo['notification']['type2'] == 'withdraw_approve') {
+            $wo['notification']['type_text'] = $wo['lang']['withdraw_approve'];
+            $wo['notification']['url']       = Wo_SeoLink('index.php?link1=setting&page=payments');
+        }
+        if ($wo['notification']['type2'] == 'withdraw_declined') {
+            $wo['notification']['type_text'] = $wo['lang']['withdraw_declined'];
+            $wo['notification']['url']       = Wo_SeoLink('index.php?link1=setting&page=payments');
         }
 
     }
@@ -290,6 +312,10 @@ if (!empty($wo['notification']['type'])) {
         $wo['notification']['url']       = $wo['notification']['url']; 
         $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle active"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';;
     }
+    if ($wo['notification']['type'] == 'new_post') {
+        $wo['notification']['type_text'] = $wo['lang']['created_new_post'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user active"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+    }
     // Share post
     if ($wo['notification']['type'] == 'shared_your_post') {
         $wo['notification']['type_text'] = $wo['lang']['shared_your_post'];
@@ -308,6 +334,27 @@ if (!empty($wo['notification']['type'])) {
         $wo['notification']['type_text'] = $wo['lang']['bank_decline'];
         $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user active"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
     }
+    if ($wo['notification']['type'] == 'memory') {
+        $wo['notification']['type_text'] = $wo['lang']['memory_this_day'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user active"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+        $wo['notification']['notifier']['name']   = $wo['config']['siteName']; 
+        $wo['notification']['notifier']['avatar'] = $wo['config']['theme_url'] . "/img/icon.png"; 
+    }
+    if ($wo['notification']['type'] == 'thread_reply') {
+        $wo['notification']['type_text'] = $wo['lang']['thread_reply'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle active"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>';
+    }
+    if ($wo['notification']['type'] == 'remaining') {
+        $wo['notification']['type_text'] = $wo['notification']['text'];
+        $wo['notification']['icon'] .= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user active"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+        $wo['notification']['notifier']['name']   = $wo['config']['siteName']; 
+        $wo['notification']['notifier']['avatar'] = $wo['config']['theme_url'] . "/img/icon.png"; 
+    }
+}
+
+if ($wo['notification']['type2'] == 'anonymous') {
+    $wo['notification']['notifier']['name']   = $wo['lang']['anonymous']; 
+    $wo['notification']['notifier']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
 }
 ?>
 

@@ -7,13 +7,22 @@
    if (!empty($wo['story']['fund_id'])) {
       $wo['story']['fund_data'] = GetFundingById($wo['story']['fund_id']);
     }
+    if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4) {
+      $anonymous = true;
+       $wo['story']['publisher']['username'] = 'anonymous';
+       $wo['story']['publisher']['name'] = $wo['lang']['anonymous'];
+       $wo['story']['publisher']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
+       $wo['story']['publisher']['verified'] = 0;
+       $wo['story']['publisher']['type'] = '';
+       $wo['story']['publisher']['url'] = 'javascript:void(0)';
+    }
     ?>
 <div>
   <div class="clear"></div>
   <div class="bs-callout bs-callout-default">
     <div class="post-heading" style="padding: 5px 5px;height: 50px">
       <div class="<?php echo Wo_RightToLeft('pull-left');?> image">
-                <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']?>">
+                <a href="<?php echo $wo['story']['publisher']['url']; ?>" <?php if (!isset($anonymous)) { ?>data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']?>"<?php } ?>>
                 <img src="<?php echo $wo['story']['publisher']['avatar']; ?>" id="updateImage-<?php echo $wo['story']['publisher']['user_id']?>" class="avatar" alt="<?php echo $wo['story']['publisher']['name']; ?> profile picture" style="width: 40px;height: 40px;">
                 </a>
             </div>
@@ -21,10 +30,12 @@
               
         <span class="user-popover" data-type="<?php echo $wo['story']['publisher']['type']; ?>" data-id="<?php echo $wo['story']['publisher']['id']; ?>">
 
-        <a class="main-color" href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>">
+        <a class="main-color" href="<?php echo $wo['story']['publisher']['url']; ?>" <?php if (!isset($anonymous)) { ?>data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"<?php } ?>>
           <b style="margin-right:0px;"><?php echo $wo['story']['publisher']['name']; ?></b>
         </a>
-        <?php if($wo['story']['publisher']['verified'] == 1) { ?>
+        <?php 
+        if ($wo['config']['shout_box_system'] != 1 || $wo['story']['postPrivacy'] != 4) {
+        if($wo['story']['publisher']['verified'] == 1) { ?>
           <span class="verified-color">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo $wo['lang']['verified_user'];?>" data-toggle="tooltip"><path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" /></svg>
           </span>
@@ -46,7 +57,9 @@
          <i class="fa fa-<?php echo $user_pro_type['icon'];?> fa-fw" title="<?php echo $user_pro_type['type_name'];?>" data-toggle="tooltip"></i>
          <?php } ?>
          </span>
-         <?php } } ?>
+         <?php } } 
+         }
+         ?>
         </span>
 
         <?php if ($wo['story']['recipient_exists'] == true) {  ?>
@@ -71,6 +84,9 @@
          <?php if (!empty($wo['story']['fund_raise_id']) && empty($wo['story']['parent_id'])) {?>
          <small class="small-text"> <?php echo $wo['lang']['donated_to_request'] ?></small>
          <?php } ?>
+         <?php if (!empty($wo['story']['offer_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['created_offer'] ?></small>
+         <?php } ?>
             <?php if (!empty($wo['story']['event_id']) && $wo['page'] != 'events') {  ?>
             <i class="fa fa-arrow-right"></i> <a href="<?php echo $wo['story']['event']['url']; ?>" data-ajax="?link1=show-event&eid=<?php echo $wo['story']['event']['id']; ?>"><b><?php echo $wo['story']['event']['name']; ?></b></a>
             <?php } ?>
@@ -91,6 +107,15 @@
             <?php if (!empty($wo['story']['blog_id'])  && empty($wo['story']['shared_from'])) {  ?>
             <small class="small-text"><?php echo $wo['lang']['created_new_blog'] ?></small>
             <?php } ?>
+            <?php if (!empty($wo['story']['forum_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['forum'])) {  ?>
+           <small class="small-text"><?php echo $wo['lang']['shared_forum'] ?></small>
+           <?php } ?>
+           <?php if (!empty($wo['story']['thread_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['thread'])) {  ?>
+         <small class="small-text"><?php echo $wo['lang']['shared_thread'] ?></small>
+         <?php } ?>
+         <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name'])) { ?>
+         <span><span style="color: #666;" class="was_live_text_<?php echo($wo['story']['id']) ?>"><?php echo ($wo['story']['is_still_live'] ? $wo['lang']['is_live'] : $wo['lang']['was_live']); ?></span></span>
+      <?php } ?>
             <?php if (empty($wo['story']['shared_from'])): ?>
               <small class="small-text">
                 <?php 
@@ -195,17 +220,17 @@
          <?php } ?>
          <?php if (!empty($wo['story']['color_id']) && !empty($wo['post_colors'][$wo['story']['color_id']])) { ?>
         <div dir="auto" 
-		<?php if($wo['config']['colored_posts_system'] == 1){ ?>
-			class="wo_actual_colrd_post" style="
-			<?php if (!empty($wo['post_colors'][$wo['story']['color_id']]) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_1) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_2) && !empty($wo['post_colors'][$wo['story']['color_id']]->text_color)) { ?>
-				background-image: linear-gradient(45deg, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_1; ?> 0%, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_2; ?> 100%);margin: 10px -10px -5px;
-			<?php }else{ ?>
-				background-image:url('<?php echo Wo_GetMedia($wo['post_colors'][$wo['story']['color_id']]->image); ?>');margin: 10px -10px -5px; <?php } ?>
-			<?php if(strlen($wo['story']['postText']) > 330){ ?>font-size: 16px;font-weight: normal;<?php } ?>"
-		<?php } ?>
-	>
-	<span <?php if($wo['config']['colored_posts_system'] == 1){ ?> style="<?php if (!empty($wo['post_colors'][$wo['story']['color_id']]) && !empty($wo['post_colors'][$wo['story']['color_id']]->text_color)) { ?>color:<?php echo $wo['post_colors'][$wo['story']['color_id']]->text_color; ?><?php } ?>"<?php } ?>> <?php echo $wo['story']['postText']; ?></span>
-	</div>
+    <?php if($wo['config']['colored_posts_system'] == 1){ ?>
+      class="wo_actual_colrd_post" style="
+      <?php if (!empty($wo['post_colors'][$wo['story']['color_id']]) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_1) && !empty($wo['post_colors'][$wo['story']['color_id']]->color_2) && !empty($wo['post_colors'][$wo['story']['color_id']]->text_color)) { ?>
+        background-image: linear-gradient(45deg, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_1; ?> 0%, <?php echo $wo['post_colors'][$wo['story']['color_id']]->color_2; ?> 100%);margin: 10px -10px -5px;
+      <?php }else{ ?>
+        background-image:url('<?php echo Wo_GetMedia($wo['post_colors'][$wo['story']['color_id']]->image); ?>');margin: 10px -10px -5px; <?php } ?>
+      <?php if(strlen($wo['story']['postText']) > 330){ ?>font-size: 16px;font-weight: normal;<?php } ?>"
+    <?php } ?>
+  >
+  <span <?php if($wo['config']['colored_posts_system'] == 1){ ?> style="<?php if (!empty($wo['post_colors'][$wo['story']['color_id']]) && !empty($wo['post_colors'][$wo['story']['color_id']]->text_color)) { ?>color:<?php echo $wo['post_colors'][$wo['story']['color_id']]->text_color; ?><?php } ?>"<?php } ?>> <?php echo $wo['story']['postText']; ?></span>
+  </div>
         <?php } ?>
     </div>
 
@@ -271,6 +296,40 @@
       <?php endif; ?>
 
 
+        <?php } ?>
+
+        <?php if (!empty($wo['story']['offer_id'])) { ?>
+          <div class="post-fetched-url wo_post_fetch_event">
+             <a href="<?php echo $wo['story']['offer']['url'];?>">
+                <?php if (!empty($wo['story']['offer']['image'])) {?>
+                <div class="post-fetched-url-con">
+                   <img src="<?php echo $wo['story']['offer']['image'];?>" class="<?php echo Wo_RightToLeft('pull-left');?>"/>
+                   <div class="description">
+                      <p>
+                         <?php if (strlen($wo['story']['offer']['description']) > 175):?>
+                         <?php echo mb_substr($wo['story']['offer']['description'],0,175,"UTF-8") . "..."; ?>
+                         <?php else:?>
+                         <?php echo $wo['story']['offer']['description']; ?>
+                         <?php endif;?>
+                      </p>
+                   </div>
+                </div>
+                <?php } ?>
+                <div class="fetched-url-text">
+                   <h4><?php echo $wo['story']['offer']['offer_text'].' '.$wo['story']['offer']['discounted_items']; ?></h4>
+                   <div class="url">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                         <line x1="16" y1="2" x2="16" y2="6"></line>
+                         <line x1="8" y1="2" x2="8" y2="6"></line>
+                         <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                      <?php echo $wo['lang']['end_date']." ".$wo['story']['offer']['expire_date'];?>
+                   </div>
+                </div>
+                <div class="clear"></div>
+             </a>
+          </div>
         <?php } ?>
         <!-- start decs -->
       <?php  $wo['story'] = $current_post; ?>
@@ -458,6 +517,39 @@
             </a>
           </div>
         <?php } ?>
+        <?php if(!empty($wo['story']['forum_id']) && !empty($wo['story']['forum'])) { ?>
+<div class="post-fetched-url wo_post_fetch_blog">
+   <a href="<?php echo $wo['config']['site_url'].'/forums/'.$wo['story']['forum']['id'];?>">
+      <div class="fetched-url-text">
+         <h4>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book">
+               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <?php echo $wo['story']['forum']['name'];?>
+         </h4>
+         <div class="description"><?php echo $wo['story']['forum']['description'];?></div>
+      </div>
+      <div class="clear"></div>
+   </a>
+</div>
+<?php } ?>
+<?php if(!empty($wo['story']['thread_id']) && !empty($wo['story']['thread'])) { ?>
+<div class="post-fetched-url wo_post_fetch_blog">
+   <a href="<?php echo $wo['config']['site_url'].'/forums/thread/'.$wo['story']['thread_id'];?>">
+      <div class="fetched-url-text">
+         <h4>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book">
+               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <?php echo $wo['story']['thread']['headline'];?>
+         </h4>
+      </div>
+      <div class="clear"></div>
+   </a>
+</div>
+<?php } ?>
         <?php if(!empty($wo['story']['postFile'])) { ?>
           <div class="post-file" id="fullsizeimg" style="width: 100%;margin-left:0;">
             <?php
@@ -498,6 +590,39 @@
               echo  Wo_DisplaySharedFile($media,'record');
             ?>
           </div>
+        <?php } ?>
+        <?php 
+        if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name'])) { ?>
+      <div class="post-file" <?php echo $wo['story']['is_still_live'] ? 'style="/*height: 440px;*/"' : ''; ?> id="fullsizeimg">
+        <?php if ($wo['story']['is_still_live']) { ?>
+          <div class="embed-responsive embed-responsive-4by3">
+            <iframe src="https://viewer.millicast.com/v2?streamId=<?php echo($wo['config']['live_account_id']) ?>/<?php echo($wo['story']['stream_name']) ?>" class="embed-responsive-item"></iframe>
+            <div class="wow_liv_counter"><span id="live_word_<?php echo($wo['story']['id']) ?>"><?php echo $wo['lang']['live']; ?></span> <span id="live_count_<?php echo($wo['story']['id']) ?>"> <?php echo $wo['story']['live_sub_users']; ?></span></div>
+          </div>
+          <?php if (!empty($wo['page']) && $wo['page']  == 'story' && $wo['story']['comments_status'] == 1) { ?>
+            <div id="live_post_comments_<?php echo($wo['story']['id']) ?>" class="wow_liv_comments_feed">
+              <?php if (!empty($wo['story']['get_post_comments'])) { 
+                $count = 0;
+                for ($i=count($wo['story']['get_post_comments'])-1; $i >= 0 ; $i--){ 
+                  $wo['comment'] = $wo['story']['get_post_comments'][$i];
+                  if (!empty($wo['comment']['text'])) { 
+                    echo Wo_LoadPage('story/includes/live_comment');
+                    $count = $count + 1;
+                    if ($count == 4) {
+                      break;
+                    }
+                  }
+                }
+              }
+              ?>
+            </div>
+          <?php } ?>
+        <?php } else{
+          $wo['media'] = array('filename' => 'https://viewer.millicast.com/v2?streamId='.$wo['config']['live_account_id'].'/'.$wo['story']['stream_name']);
+          echo Wo_LoadPage('players/chat-video');
+          }
+        ?>
+      </div>
         <?php } ?>
         <div id="fullsizeimg" style="position: relative; width: 100%;margin-left:0;">
           

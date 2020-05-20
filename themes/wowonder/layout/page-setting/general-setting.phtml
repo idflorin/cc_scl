@@ -17,7 +17,7 @@
 			<div class="col-md-5">
 				<div class="wow_form_fields">
 					<label for="page_category"><?php echo $wo['lang']['category'] ?></label>
-					<select id="page_category" name="page_category">
+					<select id="page_category" name="page_category" onchange="GetPageSubCategory(this)">
 						<?php 
 							foreach ($wo['page_categories'] as $categories => $category) { 
 							$category_id = $wo['setting']['page_category'];
@@ -25,6 +25,20 @@
 						?>
 						<option value="<?php echo $categories;?>" <?php echo $selected_contry;?> ><?php echo $category;?></option>
 						<?php } ?>
+					</select>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<div class="wow_form_fields">
+					<label for="page_sub_category"><?php echo $wo['lang']['sub_category']; ?></label>
+					<select name="page_sub_category" id="page_sub_category">
+						<?php
+						if (!empty($wo['page_sub_categories'][$wo['setting']['page_category']])) {
+						foreach ($wo['page_sub_categories'][$wo['setting']['page_category']] as $id => $sub_category) {
+							$sub_selected = ($sub_category['id'] == $wo['setting']['sub_category']) ? ' selected' : '' ;
+						 ?>
+							<option value="<?php echo $sub_category['id']?>" <?php echo $sub_selected; ?>><?php echo $sub_category['lang']; ?></option>
+						<?php } } ?>
 					</select>
 				</div>
 			</div>
@@ -59,6 +73,33 @@
 				</div>
 			</div>
 		</div>
+		<?php $fields = Wo_GetCustomFields('page'); 
+		if (!empty($fields)) {
+			foreach ($fields as $key => $wo['field']) {
+				echo Wo_LoadPage('page-setting/fields');
+			}
+		}
+		?>
+		<?php
+			$selected_post_yes = ($wo['setting']['users_post'] == 1)   ? ' checked' : '';
+			$selected_post_no  = ($wo['setting']['users_post'] == 0)   ? ' checked' : '';
+		?>
+		<div class="wow_form_fields mb-0">
+			<label for="users_post"><?php echo $wo['lang']['users_can_post'] ?></label>
+		</div>
+		<div>
+			<label class="radio-inline" for="users_post-0">
+				<input type="radio" name="users_post" id="users_post-0" value="1" <?php echo $selected_post_yes; ?> >
+				<?php echo $wo['lang']['enable']; ?>
+			</label>
+		</div>
+		<div>
+			<label class="radio-inline" for="users_post-1">
+				<input type="radio" name="users_post" id="users_post-1" value="0" <?php echo $selected_post_no; ?>>
+				<?php echo $wo['lang']['disable']; ?>
+			</label>
+		</div>
+
 		<?php if (Wo_IsAdmin() || Wo_IsModerator()) { ?>
 			<?php
 				$selected_verified_yes = ($wo['setting']['verified'] == 1)   ? ' checked' : '';
@@ -96,6 +137,23 @@
 	</form>
 </div>
 <script type="text/javascript">
+		<?php 
+$js_array = json_encode($wo['page_sub_categories']);
+echo "var sub_categories_array = ". $js_array . ";\n";
+?>
+	function GetPageSubCategory(self) {
+		id = $(self).val();
+		var text = "";
+		if (typeof(sub_categories_array[id]) == 'undefined') {
+		    $('#page_sub_category').html('');
+		}
+		else{
+		   	sub_categories_array[id].forEach(function(entry) {
+				text = text + "<option value='"+entry.id+"'>"+entry.lang+"</option>";
+			});
+		    $('#page_sub_category').html(text);
+		}
+	}
 $(function() {
   $('form.setting-general-form').ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=pages&s=update_general_settings',

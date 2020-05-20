@@ -33,6 +33,13 @@
                                 <label class="form-label">About (HTML Allowed)</label>
                             </div>
                         </div>
+                        <br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <textarea name="refund" id="refund" class="form-control" cols="30" rows="10"><?php echo $wo['terms']['refund'];?></textarea>
+                                <label class="form-label">Refund (HTML Allowed)</label>
+                            </div>
+                        </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                     </form>

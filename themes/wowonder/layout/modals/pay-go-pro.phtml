@@ -83,6 +83,30 @@
 						<?php echo $wo['lang']['2checkout'] ?>
 					</button>
 				<?php } ?>
+				<?php if ($wo['config']['paystack_payment'] == 'yes') { ?>
+				<!-- Card -->
+					<button class="btn-paystack btn" onclick="pay_using_paystack('{pro_type}');">
+						<img src="<?php echo $wo['config']['theme_url'];?>/img/paystack.png"> <?php echo $wo['lang']['paystack'] ?>
+					</button>
+				<?php } ?>
+				<?php if ($wo['config']['cashfree_payment'] == 'yes') { ?>
+				<!-- Card -->
+					<button class="btn-cashfree btn" onclick="pay_using_cashfree('{pro_type}');">
+						<img src="<?php echo $wo['config']['theme_url'];?>/img/cashfree.png"> <?php echo $wo['lang']['cashfree'] ?>
+					</button>
+				<?php } ?>
+				<?php if ($wo['config']['razorpay_payment'] == 'yes' && !empty($wo['config']['razorpay_key_id']) && !empty($wo['config']['razorpay_key_secret'])) { ?>
+				<!-- Card -->
+					<button class="btn-razorpay btn" onclick="pay_using_razorpay('{pro_type}');">
+						<img src="<?php echo $wo['config']['theme_url'];?>/img/razorpay.png"> <?php echo $wo['lang']['razorpay'] ?>
+					</button>
+				<?php } ?>
+				<?php if ($wo['config']['paysera_payment'] == 'yes' && !empty($wo['config']['paysera_project_id']) && !empty($wo['config']['paysera_sign_password'])) { ?>
+				<!-- Card -->
+					<button class="btn-paysera btn" onclick="pay_using_paysera('{pro_type}');">
+						<img src="<?php echo $wo['config']['theme_url'];?>/img/paysera.png"> <?php echo $wo['lang']['paysera'] ?>
+					</button>
+				<?php } ?>
 			</div>
 		</div>
 	</div>

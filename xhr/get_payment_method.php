@@ -12,7 +12,7 @@ if ($f == 'get_payment_method') {
             switch ($_GET['type']) {
                 case 1:
                     $type        = 'week';
-                    $description = 'Star package';
+                    $description = $wo['lang']['star'].' package';
                     if (strpos($wo['pro_packages']['star']['price'], ".") !== false) {
                         $price = str_replace('.', "", $wo['pro_packages']['star']['price']);
                     } else {
@@ -21,7 +21,7 @@ if ($f == 'get_payment_method') {
                     break;
                 case 2:
                     $type        = 'month';
-                    $description = 'Hot package';
+                    $description = $wo['lang']['hot'].' package';
                     if (strpos($wo['pro_packages']['hot']['price'], ".") !== false) {
                         $price = str_replace('.', "", $wo['pro_packages']['hot']['price']);
                     } else {
@@ -30,7 +30,7 @@ if ($f == 'get_payment_method') {
                     break;
                 case 3:
                     $type        = 'year';
-                    $description = 'Ultima package';
+                    $description = $wo['lang']['ultima'].' package';
                     if (strpos($wo['pro_packages']['ultima']['price'], ".") !== false) {
                         $price = str_replace('.', "", $wo['pro_packages']['ultima']['price']);
                     } else {
@@ -39,7 +39,7 @@ if ($f == 'get_payment_method') {
                     break;
                 case 4:
                     $type        = 'life-time';
-                    $description = 'Vip package';
+                    $description = $wo['lang']['vip'].' package';
                     if (strpos($wo['pro_packages']['vip']['price'], ".") !== false) {
                         $price = str_replace('.', "", $wo['pro_packages']['vip']['price']);
                     } else {

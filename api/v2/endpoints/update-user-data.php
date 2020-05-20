@@ -20,7 +20,7 @@ if (!empty($_POST)) {
 $escape = array('server_key');
 $genders = array('male', 'female');
 $keys = array();
-$remove_from_list = array('user_id', 'background_image', 'background_image_status', 'last_data_update', 'sidebar_data', 'details', 'id'. 'following_data', 'name', 'url', 'followers_data', 'likes_data', 'groups_data', 'album_data', 'css_file', 'joined', 'admin', 'email_code', 'ip_address', 'active', 'type', 'sms_code', 'is_pro', 'balance', 'referrer', 'wallet', 'points');
+$remove_from_list = array('user_id', 'background_image', 'background_image_status', 'last_data_update', 'sidebar_data', 'details', 'id'. 'following_data', 'name', 'url', 'followers_data', 'likes_data', 'groups_data', 'album_data', 'css_file', 'joined', 'admin', 'email_code', 'ip_address', 'active', 'type', 'sms_code', 'is_pro', 'balance', 'referrer', 'wallet', 'points','relationship','relationship_user');
 foreach ($wo['user'] as $key => $value) {
 	if (!in_array($key, $remove_from_list )) {
 		$keys[] = $key;
@@ -165,6 +165,38 @@ if (!empty($user_data['two_factor']) && $user_data['two_factor'] == 'off') {
 }
 elseif (!empty($user_data['two_factor']) && $user_data['two_factor'] == 'on') {
     $user_data['two_factor'] = 1;
+}
+
+if (!is_numeric($_POST['relationship']) || empty($_POST['relationship'])) {
+    $user_data['relationship_id'] = 0;
+    Wo_DeleteMyRelationShip();
+}
+if (!empty($_POST['relationship']) && is_numeric($_POST['relationship']) && $_POST['relationship'] > 0 && $_POST['relationship'] <= 4) {
+    if ($_POST['relationship'] > 1 && isset($_POST['relationship_user']) && is_numeric($_POST['relationship_user']) && $_POST['relationship_user'] > 0) {
+        $relationship_user = Wo_Secure($_POST['relationship_user']);
+        $user              = Wo_Secure($wo['user']['id']);
+        if (!Wo_IsRelationRequestExists($user, $relationship_user, $_POST['relationship'])) {
+            $registration_data = array(
+                'from_id' => $user,
+                'to_id' => $relationship_user,
+                'relationship' => Wo_Secure($_POST['relationship']),
+                'active' => 0
+            );
+            $registration_id   = Wo_RegisterRelationship($registration_data);
+            if ($registration_id) {
+                $relationship_user_data  = Wo_UserData($relationship_user);
+                $notification_data_array = array(
+                    'recipient_id' => $relationship_user,
+                    'type' => 'added_u_as',
+                    'user_id' => $wo['user']['id'],
+                    'text' => $wo['lang']['relationship_request'],
+                    'url' => 'index.php?link1=timeline&u=' . $relationship_user_data['username'] . '&type=requests'
+                );
+                Wo_RegisterNotification($notification_data_array);
+            }
+        }
+    }
+    $user_data['relationship_id'] = Wo_Secure($_POST['relationship']);
 }
 
 if (empty($error_code)) {

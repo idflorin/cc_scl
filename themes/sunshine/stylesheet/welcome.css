@@ -124,3 +124,23 @@ footer:empty {padding: 0}
 @media (max-width:390px) {
 .login {min-width: 100%}
 }
+.payment_box .btn {width: 100%;background-color: white;color: #2c2c2c;text-align: inherit;display: flex;align-items: center;border-bottom: 1px solid rgba(0, 0, 0, 0.07);border-radius: 0;padding: 20px 25px;transition: all 0.15s;font-family: "Lato", sans-serif; font-weight: 600;box-shadow: none;}
+.payment_box .btn:hover {background-color: rgba(0, 0, 0, 0.04);}
+.payment_box .btn:last-child {border:0;}
+.payment_box .btn svg {margin-right: 15px;width: 32px;height: 32px;}
+
+
+
+/*Plans*/
+.wow_membr_signup_plan {box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.2);border-radius: 7px;padding: 10px;margin-top: 20px;background-color: white;}
+.wow_sup_plan_hdr {display: flex;align-items: center;flex-wrap: wrap;justify-content: space-between;}
+.wow_sup_plan_hdr > div {font-size: 23px;}
+.wow_sup_plan_hdr > div span {display: inline-block;vertical-align: text-top;line-height: 1;}
+.wow_sup_plan_hdr > div img, .wow_sup_plan_hdr > div svg {width: 24px;height: 24px;vertical-align: middle;}
+.wow_sup_plan_hdr b {margin: 0;}
+.wow_membr_signup_plan .col-lg-6 svg {vertical-align: middle;width: 20px;height: 20px;}
+.wow_membr_signup_plan .modal-footer {padding: 10px 0 0;margin-top: 10px;}
+
+/*Password Check*/
+.helper-text {display: none;margin-top: 6px;font-size: 12px;line-height: 18px;}
+.helper-text li.valid {color: #1aac20;}

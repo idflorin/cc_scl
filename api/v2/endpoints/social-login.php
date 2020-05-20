@@ -8,6 +8,8 @@
 // | WoWonder - The Ultimate Social Networking Platform
 // | Copyright (c) 2018 WoWonder. All rights reserved.
 // +------------------------------------------------------------------------+
+
+use AppleSignIn\ASDecoder;
 $response_data   = array(
     'api_status' => 400
 );
@@ -41,19 +43,31 @@ if (empty($error_code)) {
     	}
     } else if ($provider == 'google') {
         
-		$get_user_details = fetchDataFromURL("https://www.googleapis.com/plus/v1/people/me?access_token={$access_token}");
+		$get_user_details = fetchDataFromURL("https://oauth2.googleapis.com/tokeninfo?id_token={$access_token}");
 		$json_data = json_decode($get_user_details);
 		if (!empty($json_data->error)) {
     		$error_code    = 4;
     		$error_message = $json_data->error;
-    	} else if (!empty($json_data->id)) {
-    		$social_id = $json_data->id;
-    		$social_email = $json_data->emails[0]->value;
-    		$social_name = $json_data->displayName;
+    	} else if (!empty($json_data->kid)) {
+    		$social_id = $json_data->kid;
+    		$social_email = $json_data->email;
+    		$social_name = $json_data->name;
     		if (empty($social_email)) {
     			$social_email = 'go_' . $social_id . '@google.com';
     		}
     	}
+    }
+    elseif ($provider == 'apple') {
+        include_once('assets/libraries/apple/vendor/autoload.php');
+        try{
+            $appleSignInPayload = ASDecoder::getAppleSignInPayload($access_token);
+            $social_email = $appleSignInPayload->getEmail();
+            $social_id = $social_name = $appleSignInPayload->getUser();
+        }
+        catch(exception $e){
+            $error_code    = 4;
+            $error_message = $e;
+        }
     }
     if (!empty($social_id)) {
     	$create_session = false;
@@ -88,6 +102,23 @@ if (empty($error_code)) {
             $timezone       = 'UTC';
             $create_session = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `time`) VALUES ('{$user_id}', '{$access_token}', 'phone', '{$time}')");
             $add_timezone = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `timezone` = '{$timezone}' WHERE `user_id` = {$user_id}");
+            
+            if (!empty($_POST['android_m_device_id'])) {
+                $device_id  = Wo_Secure($_POST['android_m_device_id']);
+                $update  = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `android_m_device_id` = '{$device_id}' WHERE `user_id` = '{$user_id}'");
+            }
+            if (!empty($_POST['ios_m_device_id'])) {
+                $device_id  = Wo_Secure($_POST['ios_m_device_id']);
+                $update  = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `ios_m_device_id` = '{$device_id}' WHERE `user_id` = '{$user_id}'");
+            }
+            if (!empty($_POST['android_n_device_id'])) {
+                $device_id  = Wo_Secure($_POST['android_n_device_id']);
+                $update  = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `android_n_device_id` = '{$device_id}' WHERE `user_id` = '{$user_id}'");
+            }
+            if (!empty($_POST['ios_n_device_id'])) {
+                $device_id  = Wo_Secure($_POST['ios_n_device_id']);
+                $update  = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `ios_n_device_id` = '{$device_id}' WHERE `user_id` = '{$user_id}'");
+            }
             if ($create_session) {
                 $response_data = array(
                     'api_status' => 200,

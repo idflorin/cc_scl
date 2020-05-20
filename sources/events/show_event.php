@@ -13,7 +13,7 @@ if ($wo['config']['events'] == 0) {
 if (isset($_GET['eid']) && is_numeric($_GET['eid'])){
 		$event              = Wo_EventData($_GET['eid']);
 	if ($event && !empty($event)) {
-		$wo['description']  = $wo['config']['siteDesc'];
+		$wo['description']  = strip_tags($event['description']);
 		$wo['keywords']     = $wo['config']['siteKeywords'];
 		$wo['page']         = 'events';
 		$wo['event']        = $event;

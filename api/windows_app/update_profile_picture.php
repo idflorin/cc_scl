@@ -54,7 +54,7 @@ if ($type == 'update_profile_picture' || $type == 'set_profile_picture') {
             echo json_encode($json_error_data, JSON_PRETTY_PRINT);
             exit();
         } else {
-            $image_type = 'avater';
+            $image_type = 'avatar';
             if (!empty($_POST['image_type'])) {
                 $image_type = $_POST['image_type'];
             }

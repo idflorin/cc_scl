@@ -22,18 +22,24 @@
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16M12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12A2,2 0 0,1 12,10M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4Z"></path></svg>
 				</a>
 				<ul class="dropdown-menu dropdown-menu-right clearfix" role="menu">
-					<?php if ($wo['config']['audio_chat'] == 1) { ?>
+					<?php if ($wo['config']['audio_chat'] == 1) {
+						if ($wo['config']['Who_call'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin()) {}
+						else{
+					 ?>
 					<?php if ($wo['chat']['recipient']['lastseen'] > (time() - 60)) { ?>
 						<li><a href="javascript:void(0);" onclick="Wo_GenerateVoiceCall(<?php echo $wo['user']['user_id'];?>, <?php echo $wo['chat']['recipient']['user_id'];?>)"><?php echo $wo['lang']['audio_call'];?></a></li>
 					<?php } else { ?>
 						<li class="disabled"><a href="javascript:void(0);"><?php echo $wo['lang']['audio_call'];?></a></li>
-					<?php } } ?>
-					<?php if ($wo['config']['video_chat'] == 1) { ?>
+					<?php } } } ?>
+					<?php if ($wo['config']['video_chat'] == 1) {
+						if ($wo['config']['Who_call'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin()) {}
+						else{
+					 ?>
 					<?php if ($wo['chat']['recipient']['lastseen'] > (time() - 60)) { ?>
 						<li><a href="javascript:void(0);" onclick="Wo_GenerateVideoCall(<?php echo $wo['user']['user_id'];?>, <?php echo $wo['chat']['recipient']['user_id'];?>)"><?php echo $wo['lang']['video_call'];?></a></li>
 					<?php } else { ?>
 						<li class="disabled"><a href="javascript:void(0);"><?php echo $wo['lang']['video_call'];?></a></li>
-					<?php } } ?>
+					<?php } } } ?>
 					<li class="dropdown-submenu chat_dd_sub_<?php echo $wo['chat']['recipient']['user_id'];?>">
 						<a href="javascript:void(0);" class="change_color dropdown-toggle" data-toggle="dropdown" aria-expanded="true" role="button">
 							<i class="fa fa-circle select-color" aria-hidden="true" style="color: <?php echo $wo['chat']['color']; ?>"></i> <?php echo $wo['lang']['change_color'];?>
@@ -326,6 +332,13 @@ $(function() {
                 $("#file_not_supported").modal('hide');
               },3000);
               $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('.loading').addClass('hidden');
+            }
+            else if(data.status == 500 && data.invalid_file == 3){
+              $("#pro_upload_file").modal('show');
+              Wo_Delay(function(){
+                $("#pro_upload_file").modal('hide');
+              },3000);
+              $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('.ball-pulse').fadeOut(100);
             }
             setTimeout(function() {
               chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);

@@ -109,7 +109,7 @@
 				</div>
 			</div>
 				
-			<?php if ($wo['loggedin'] == true): ?>           
+			<?php //if ($wo['loggedin'] == true): ?>           
 			<div class="page-margin wow_content blog-com-wrapper" id="respond">
 				<div class="wo_page_hdng">
 					<div class="wo_page_hdng_innr">
@@ -119,7 +119,9 @@
                 <div class="blog-com-box">
 					<form class="form">
 						<div class="w100 wo_blogcomm_combo">
+              <?php if ($wo['loggedin'] == true): ?>
 							<img class="avatar" src="<?php echo $wo['user']['avatar'];?>"/>
+              <?php endif; ?>      
 							<textarea id="blog-comment" name="text" class="form-control" placeholder="<?php echo $wo['lang']['write_comment'];?>"></textarea>
 							<button id="add-art-comment" class="btn btn-main btn-mat add_wow_loader" type="button" data-toggle="tooltip" title="<?php echo $wo['lang']['post']; ?>">
 								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z"></path></svg>
@@ -143,7 +145,7 @@
                    <?php endif ?>
                 </div>
 			</div>
-            <?php endif;?>
+            <?php //endif;?>
 		</div>
 		<div class="col-md-4">
 			<div class="wow_content">
@@ -255,6 +257,9 @@ jQuery(document).ready(function($) {
   });
 
   $("#add-art-comment").click(function(event) {
+    <?php if ($wo['loggedin'] != true) { ?>
+      document.location = "<?php echo($wo['config']['site_url']) ?>";
+    <?php } ?>
     $.ajax({
       url: Wo_Ajax_Requests_File() + '?f=add-blog-comm',
       type: 'POST',
@@ -375,6 +380,9 @@ function Wo_AddBlogCommReplyDisLike(id){
 }
 
 function Wo_RegisterBlogCommReply(id,event,self){
+  <?php if ($wo['loggedin'] != true) { ?>
+      document.location = "<?php echo($wo['config']['site_url']) ?>";
+    <?php } ?>
   if (event.keyCode==13&&event.shiftKey==0&&event&&id&&self) {
     var text = self.value;
     if (text.length >= 2) {

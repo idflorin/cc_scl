@@ -297,18 +297,12 @@ if (!empty($user_stories)) {
         </div>
 		
         <?php if ($wo['config']['user_ads'] == 1): ?>
-        <div id="sidebar-sticky">
             <?php 
                 foreach (Wo_GetSideBarAds() as $wo['sidebar-ad']) {
                     echo Wo_LoadPage('ads/includes/sidebar-ad');
                 }
             ?>
             <div class="clear"></div>
-            <div>
-                
-                <div class="clear"></div>
-            </div>
-        </div>
         <?php endif; ?>
         <?php echo Wo_LoadPage('footer/sidebar-footer')?>
     </div>

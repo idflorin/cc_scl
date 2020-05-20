@@ -179,12 +179,15 @@ if ($type == 'new_post') {
             $html          = '';
             $recipient_id  = 0;
             $page_id       = 0;
+            $event_id       = 0;
             $group_id      = 0;
             $image_array   = array();
             if (isset($_POST['recipient_id']) && !empty($_POST['recipient_id'])) {
                 $recipient_id = Wo_Secure($_POST['recipient_id']);
             } else if (isset($_POST['page_id']) && !empty($_POST['page_id'])) {
                 $page_id = Wo_Secure($_POST['page_id']);
+            } else if (isset($_POST['event_id']) && !empty($_POST['event_id'])) {
+                $event_id = Wo_Secure($_POST['event_id']);
             } else if (isset($_POST['group_id']) && !empty($_POST['group_id'])) {
                 $group_id = Wo_Secure($_POST['group_id']);
                 $group    = Wo_GroupData($group_id);
@@ -208,6 +211,12 @@ if ($type == 'new_post') {
                     $mediaFilename = $media['filename'];
                     $mediaName     = $media['name'];
                 }
+                if (empty($mediaFilename)) {
+                    $errors = array(
+                        'error_id' => '7',
+                        'error_text' => 'invalid file'
+                    );
+                }
             }
             if (isset($_FILES['postVideo']['name']) && empty($mediaFilename)) {
                 $fileInfo = array(
@@ -222,6 +231,12 @@ if ($type == 'new_post') {
                     $mediaFilename = $media['filename'];
                     $mediaName     = $media['name'];
                 }
+                if (empty($mediaFilename)) {
+                    $errors = array(
+                        'error_id' => '8',
+                        'error_text' => 'invalid file'
+                    );
+                }
             }
             if (isset($_FILES['postMusic']['name']) && empty($mediaFilename)) {
                 $fileInfo = array(
@@ -235,6 +250,12 @@ if ($type == 'new_post') {
                 if (!empty($media)) {
                     $mediaFilename = $media['filename'];
                     $mediaName     = $media['name'];
+                }
+                if (empty($mediaFilename)) {
+                    $errors = array(
+                        'error_id' => '9',
+                        'error_text' => 'invalid file'
+                    );
                 }
             }
             $multi = 0;
@@ -257,6 +278,12 @@ if ($type == 'new_post') {
                             $mediaFilename = $media['filename'];
                             $mediaName     = $media['name'];
                         }
+                        if (empty($mediaFilename)) {
+                            $errors = array(
+                                'error_id' => '10',
+                                'error_text' => 'invalid file'
+                            );
+                        }
                     }
                 } else {
                     $multi = 1;
@@ -270,7 +297,8 @@ if ($type == 'new_post') {
                 '0',
                 '1',
                 '2',
-                '3'
+                '3',
+                '4'
             );
             if (isset($_POST['postPrivacy'])) {
                 if (in_array($_POST['postPrivacy'], $privacy_array)) {
@@ -359,7 +387,11 @@ if ($type == 'new_post') {
                         $new_string = pathinfo($_FILES['postPhotos']['name']);
                     }
                     if (!in_array(strtolower($new_string['extension']), $allowed)) {
-                        $errors[] = $error_icon . $wo['lang']['please_check_details'];
+
+                        $errors = array(
+                            'error_id' => '11',
+                            'error_text' => $error_icon . $wo['lang']['please_check_details']
+                        );
                     }
                 }
             }
@@ -367,11 +399,17 @@ if ($type == 'new_post') {
                 if (!empty($_POST['postText'])) {
                     foreach ($_POST['answer'] as $key => $value) {
                         if (empty($value) || ctype_space($value)) {
-                            $errors = 'Answer #' . ($key + 1) . ' is empty.';
+                            $errors = array(
+                                'error_id' => '12',
+                                'error_text' => 'Answer #' . ($key + 1) . ' is empty.'
+                            );
                         }
                     }
                 } else {
-                    $errors = 'Please write the question.';
+                    $errors = array(
+                        'error_id' => '13',
+                        'error_text' => 'Please write the question.'
+                    );
                 }
             }
             if (empty($errors)) {
@@ -382,6 +420,7 @@ if ($type == 'new_post') {
                 $post_data = array(
                     'user_id' => Wo_Secure($user_id),
                     'page_id' => Wo_Secure($page_id),
+                    'event_id' => Wo_Secure($event_id),
                     'group_id' => Wo_Secure($group_id),
                     'postText' => Wo_Secure($post_text),
                     'recipient_id' => Wo_Secure($recipient_id),
@@ -514,6 +553,19 @@ if ($type == 'new_post') {
                             }
                         }
                     }
+                }
+                else{
+                    header("Content-type: application/json");
+                    echo json_encode(array(
+                        'api_status' => 400,
+                        'api_text' => 'failed',
+                        'api_version' => $api_version,
+                        'errors' => array(
+                            'error_id' => '14',
+                            'error_text' => 'something went wrong'
+                        )
+                    ));
+                    exit();
                 }
             } else {
                 header("Content-type: application/json");

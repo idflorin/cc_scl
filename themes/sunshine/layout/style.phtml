@@ -263,7 +263,15 @@ body, .navbar-default, .wo_about_wrapper_parent{padding-left: 205px;padding-righ
     background-color: #4d91ea;
 }
 
-.reaction-like::before {
+<?php
+if (!empty($wo['reactions_types'])) {
+    foreach ($wo['reactions_types'] as $key => $value) {
+?>
+.reaction-<?php echo $value['id'];?>::before {
+    content: "<?php echo $value['name'];?>";
+}
+<?php } } ?>
+/*.reaction-like::before {
     content: "<?php echo $wo['lang']['like'];?>";
 }
 .reaction-love::before {
@@ -280,7 +288,7 @@ body, .navbar-default, .wo_about_wrapper_parent{padding-left: 205px;padding-righ
 }
 .reaction-angry::before {
     content: "<?php echo $wo['lang']['angry'];?>";
-}
+}*/
 
 .navbar-default .dropdown-menu.ani-acc-menu >li>a:hover {
     color: #ffffff;background-color: #4d91ea;

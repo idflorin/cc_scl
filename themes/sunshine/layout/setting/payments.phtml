@@ -18,11 +18,24 @@
 		
 		<div class="setting-panel row">
 			<!-- Text input-->
-			<div class="form-group col-lg-6">
-				<label class="col-md-12" for="paypal_email"><?php echo $wo['lang']['paypal_email']; ?></label>  
+			<?php if ($wo['config']['bank_withdrawal_system'] == 1) { ?>
 				<div class="col-md-12">
-					<input id="paypal_email" name="paypal_email" type="text" class="form-control input-md" value="<?php echo $wo['setting']['email']?>" autocomplete="off">
-					<span class="help-block checking"></span>  
+					<div class="wow_form_fields">
+						<label for="withdraw_method"><?php echo $wo['lang']['withdraw_method']; ?></label>  
+						<select id="withdraw_method" name="withdraw_method" class="form-control" onchange="Wo_ShowWithdrawMethod(this)">
+							<option value="paypal"><?php echo $wo['lang']['paypal']; ?></option>
+							<option value="bank"><?php  echo $wo['lang']['bank']; ?></option>
+						</select>
+					</div>
+				</div>
+			<?php } ?>
+			<div class="paypal_withdrawal">
+				<div class="form-group col-lg-6">
+					<label class="col-md-12" for="paypal_email"><?php echo $wo['lang']['paypal_email']; ?></label>  
+					<div class="col-md-12">
+						<input id="paypal_email" name="paypal_email" type="text" class="form-control input-md" value="<?php echo $wo['setting']['email']?>" autocomplete="off">
+						<span class="help-block checking"></span>  
+					</div>
 				</div>
 			</div>
 			<div class="form-group col-lg-6">
@@ -31,6 +44,40 @@
 					<input name="amount" id="amount" type="text" class="form-control input-md" value="<?php echo $wo['setting']['balance'];?>">
 				</div>
 			</div>
+			<?php if ($wo['config']['bank_withdrawal_system'] == 1) { ?>
+				<div class="bank_withdrawal" style="display: none;">
+					<div class="form-group col-lg-6">
+						<label class="col-md-12" for="iban"><?php echo $wo['lang']['iban']; ?></label>  
+						<div class="col-md-12">
+							<input name="iban" id="iban" type="text" class="form-control input-md">
+						</div>
+					</div>
+					<div class="form-group col-lg-6">
+						<label class="col-md-12" for="country"><?php echo $wo['lang']['country']; ?></label>  
+						<div class="col-md-12">
+							<input name="country" id="country" type="text" class="form-control input-md">
+						</div>
+					</div>
+					<div class="form-group col-lg-6">
+						<label class="col-md-12" for="full_name"><?php echo $wo['lang']['full_name']; ?></label>  
+						<div class="col-md-12">
+							<input name="full_name" id="full_name" type="text" class="form-control input-md">
+						</div>
+					</div>
+					<div class="form-group col-lg-6">
+						<label class="col-md-12" for="swift_code"><?php echo $wo['lang']['swift_code']; ?></label>  
+						<div class="col-md-12">
+							<input name="swift_code" id="swift_code" type="text" class="form-control input-md">
+						</div>
+					</div>
+					<div class="form-group col-lg-12">
+						<label class="col-md-12" for="address"><?php echo $wo['lang']['address']; ?></label>  
+						<div class="col-md-12">
+							<textarea name="address" id="address" type="text" class="form-control input-md"></textarea>
+						</div>
+					</div>
+				</div>
+			<?php } ?>
 		</div>
 		<div class="form-group last-sett-btn modal-footer">
 			<div class="ball-pulse"><div></div><div></div><div></div></div>
@@ -77,6 +124,16 @@
 	</div>
 </div>
 <script type="text/javascript">
+function Wo_ShowWithdrawMethod(self) {
+	if ($(self).val() == 'bank') {
+		$('.paypal_withdrawal').slideUp();
+		$('.bank_withdrawal').slideDown();
+	}
+	else{
+		$('.bank_withdrawal').slideUp();
+		$('.paypal_withdrawal').slideDown();
+	}
+}
 $(function() {
   $('form.setting-general-form').ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=request_payment',

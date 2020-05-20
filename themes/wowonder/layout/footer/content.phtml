@@ -17,6 +17,10 @@ $pages = Wo_GetCustomPages();
 				<li><a href="<?php echo Wo_SeoLink('index.php?link1=contact-us');?>"><?php echo $wo['lang']['contact_us'];?></a></li>
 				<li><a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=privacy-policy');?>"><?php echo $wo['lang']['privacy_policy'];?></a></li>
 				<li><a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=terms');?>"><?php echo $wo['lang']['terms_of_use'];?></a></li>
+				<?php if ($wo['config']['refund_system'] == 'on') { ?>
+					<li><a href="<?php echo Wo_SeoLink('index.php?link1=terms&type=refund');?>"><?php echo $wo['lang']['request_refund'];?></a></li>
+				<?php } ?>
+				
 				<?php  if ($wo['config']['blogs'] == 1) { ?>
 					<li><a href="<?php echo Wo_SeoLink('index.php?link1=blogs');?>"><?php echo $wo['lang']['blog'];?></a></li>
 				<?php }?>

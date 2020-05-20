@@ -25,6 +25,17 @@ if ($f == "threadreply" && Wo_CheckMainSession($hash_id) === true) {
             'posted_time' => time()
         );
         if (Wo_ThreadReply($registration_data)) {
+            $thread = Wo_GetForumThreads(array("id" => $_GET['tid'], "preview" => true));
+            $thread = $thread[0];
+            $notification_data_array = array(
+                'recipient_id' => $thread['user'],
+                'type' => 'thread_reply',
+                'thread_id' => Wo_Secure($_GET['tid']),
+                'text' => '',
+                'url' => 'index.php?link1=showthread&tid=' . Wo_Secure($_GET['tid'])
+            );
+            Wo_RegisterNotification($notification_data_array);
+
             Wo_UpdateThreadLastPostTime($_GET['tid']);
             $data = array(
                 'message' => $success_icon . $wo['lang']['reply_added'],

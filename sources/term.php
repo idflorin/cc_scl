@@ -4,6 +4,9 @@ if (empty($_GET['type']) || !isset($_GET['type'])) {
 	exit();
 }
 $pages = array('terms','privacy-policy','about-us','developers');
+if ($wo['config']['refund_system'] == 'on') {
+	$pages[] = 'refund';
+}
 if (!in_array($_GET['type'], $pages)) {
 	header("Location: " . $wo['config']['site_url']);
 	exit();
@@ -28,6 +31,8 @@ if ($type == 'terms') {
 	    exit();
 	}
     $wo['title']  = $wo['lang']['developers'];
+} else if ($type == 'refund') {
+	$wo['title']  = $wo['lang']['refund'];
 }
 
 $page = 'terms/' . $type;

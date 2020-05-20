@@ -77,6 +77,8 @@
                             <label for="sms_provider-disabled" class="m-l-20">BulkSMS</label>
                             <input type="radio" name="sms_provider" id="sms_provider-enabled1" value="infobip" <?php echo ($wo['config']['sms_provider'] == 'infobip') ? 'checked': '';?>>
                             <label for="sms_provider-enabled1" class="m-l-20">Infobip</label>
+                            <input type="radio" name="sms_provider" id="sms_provider-enabled2" value="msg91" <?php echo ($wo['config']['sms_provider'] == 'msg91') ? 'checked': '';?>>
+                            <label for="sms_provider-enabled2" class="m-l-20">Msg91</label>
                         </div>
                         <br>
                         <div class="form-group form-float">
@@ -128,6 +130,14 @@
                             <div class="form-line">
                                 <input type="text" id="infobip_password" name="infobip_password" class="form-control" value="<?php echo $wo['config']['infobip_password'];?>">
                                 <label class="form-label">Infobip password</label>
+                            </div>
+                        </div>
+                        <br>
+
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="msg91_authKey" name="msg91_authKey" class="form-control" value="<?php echo $wo['config']['msg91_authKey'];?>">
+                                <label class="form-label">Msg91 AuthKey</label>
                             </div>
                         </div>
 

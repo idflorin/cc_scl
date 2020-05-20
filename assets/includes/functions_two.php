@@ -1574,6 +1574,101 @@ function Wo_IsPageOnwer($page_id) {
     $query = mysqli_query($sqlConnect, " SELECT COUNT(`user_id`) FROM " . T_PAGES . " WHERE `page_id` = {$page_id} AND `user_id` = {$user_id} AND `active` = '1'");
     return (Wo_Sql_Result($query, '0') == 1 || Wo_IsPageAdminExists($user_id,$page_id)) ? true : false;
 }
+function Wo_IsCanGroupUpdate($group_id,$page)
+{
+    global $sqlConnect, $wo;
+    $array = array('general' , 'privacy' , 'avatar' , 'members' , 'analytics' , 'delete_group');
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($group_id) || !is_numeric($group_id) || $group_id < 0 || empty($page) || !in_array($page, $array)) {
+        return false;
+    }
+    $user_id = $wo['user']['id'];
+    $page = Wo_Secure($page);
+    $group_id = Wo_Secure($group_id);
+    $query = mysqli_query($sqlConnect, " SELECT COUNT(*) FROM " . T_GROUP_ADMINS . " WHERE `group_id` = {$group_id} AND `user_id` = {$user_id} AND `{$page}` = '1'");
+    return (Wo_Sql_Result($query, '0') == 1) ? true : false;
+
+}
+function Wo_GetAllowedGroupPages($group_id)
+{
+    global $sqlConnect, $wo;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($group_id) || !is_numeric($group_id) || $group_id < 0) {
+        return false;
+    }
+    $array = array('general' => 'general-setting', 'privacy' => 'privacy-setting', 'avatar' => 'avatar-setting', 'members' => 'group-members', 'analytics' => 'analytics', 'delete_group' => 'delete-group');
+    $data = array();
+    $user_id = $wo['user']['id'];
+    $group_id = Wo_Secure($group_id);
+    $query = mysqli_query($sqlConnect, " SELECT * FROM " . T_GROUP_ADMINS . " WHERE `group_id` = {$group_id} AND `user_id` = {$user_id}");
+    $fetched_data = mysqli_fetch_assoc($query);
+    if (!empty($fetched_data)) {
+        foreach ($fetched_data as $key => $value) {
+            if (in_array($key, array_keys($array)) && $value == 1) {
+                $data[] = $array[$key]; 
+            }
+        }
+    }
+    return $data;
+}
+function Wo_GetGroupAdminInfo($user_id,$group_id)
+{
+    global $sqlConnect, $wo;
+    if ($wo['loggedin'] == false || empty($group_id) || !is_numeric($group_id) || empty($user_id) || !is_numeric($user_id)) {
+        return false;
+    }
+    $group_id = Wo_Secure($group_id);
+    $user_id = Wo_Secure($user_id);
+    $sql     = " SELECT * FROM " . T_GROUP_ADMINS . " WHERE `group_id` = {$group_id} AND `user_id` = {$user_id}";
+    $data    = array();
+    $query   = mysqli_query($sqlConnect, $sql);
+    return mysqli_fetch_assoc($query);
+}
+function Wo_IsCanPageUpdate($page_id,$page)
+{
+    global $sqlConnect, $wo;
+    $array = array('general' , 'info' , 'social' , 'avatar' , 'design' , 'admins' , 'analytics' , 'delete_page');
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($page_id) || !is_numeric($page_id) || $page_id < 0 || empty($page) || !in_array($page, $array)) {
+        return false;
+    }
+    $user_id = $wo['user']['id'];
+    $page = Wo_Secure($page);
+    $page_id = Wo_Secure($page_id);
+    $query = mysqli_query($sqlConnect, " SELECT COUNT(*) FROM " . T_PAGE_ADMINS . " WHERE `page_id` = {$page_id} AND `user_id` = {$user_id} AND `{$page}` = '1'");
+    return (Wo_Sql_Result($query, '0') == 1) ? true : false;
+
+}
+function Wo_GetAllowedPages($page_id)
+{
+    global $sqlConnect, $wo;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($page_id) || !is_numeric($page_id) || $page_id < 0) {
+        return false;
+    }
+    $array = array('general' => 'general-setting', 'info' => 'profile-setting', 'social' => 'social-links', 'avatar' => 'avatar-setting', 'design' => 'design-setting', 'admins' => 'admins', 'analytics' => 'analytics', 'delete_page' => 'delete-page');
+    $data = array();
+    $user_id = $wo['user']['id'];
+    $page_id = Wo_Secure($page_id);
+    $query = mysqli_query($sqlConnect, " SELECT * FROM " . T_PAGE_ADMINS . " WHERE `page_id` = {$page_id} AND `user_id` = {$user_id}");
+    $fetched_data = mysqli_fetch_assoc($query);
+    if (!empty($fetched_data)) {
+        foreach ($fetched_data as $key => $value) {
+            if (in_array($key, array_keys($array)) && $value == 1) {
+                $data[] = $array[$key]; 
+            }
+        }
+    }
+    return $data;
+}
 function Wo_PageExists($page_name = '') {
     global $sqlConnect;
     if (empty($page_name)) {
@@ -1633,8 +1728,16 @@ function Wo_PageData($page_id = 0) {
     $fetched_data['name']     = $fetched_data['page_title'];
     $fetched_data['rating']   = Wo_PageRating($fetched_data['page_id']);
     $fetched_data['category'] = '';
+    $fetched_data['page_sub_category'] = '';
     if (!empty($wo['page_categories'][$fetched_data['page_category']])) {
         $fetched_data['category'] = $wo['page_categories'][$fetched_data['page_category']];
+    }
+    if (!empty($fetched_data['sub_category']) && !empty($wo['page_sub_categories'][$fetched_data['page_category']])) {
+        foreach ($wo['page_sub_categories'][$fetched_data['page_category']] as $key => $value) {
+            if ($value['id'] == $fetched_data['sub_category']) {
+                $fetched_data['page_sub_category'] = $value['lang'];
+            }
+        }
     }
     $fetched_data['is_page_onwer'] = false;
     $fetched_data['username']      = $fetched_data['page_name'];
@@ -1653,16 +1756,39 @@ function Wo_PageActive($page_name) {
     return (Wo_Sql_Result($query, 0) == 1) ? true : false;
 }
 function Wo_GetPagePostPublisherBox($page_id = 0) {
-    global $wo;
+    global $wo,$sqlConnect;
     if ($wo['loggedin'] == false) {
         return false;
     }
     if (!is_numeric($page_id) or $page_id < 1 or !is_numeric($page_id)) {
         return false;
     }
+    if (!Wo_IsPageOnwer($page_id) && Wo_UserCanPostPage($page_id)) {
+        $wo['page_profile']['avatar'] = $wo['user']['avatar'];
+        $wo['page_profile']['name'] = $wo['user']['name'];
+        return Wo_LoadPage('story/publisher-box');
+    }
     if (Wo_IsPageOnwer($page_id)) {
         return Wo_LoadPage('story/publisher-box');
     }
+}
+function Wo_UserCanPostPage($page_id = 0)
+{
+    global $wo,$sqlConnect;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (!is_numeric($page_id) or $page_id < 1 or !is_numeric($page_id)) {
+        return false;
+    }
+    $page_id = Wo_Secure($page_id);
+    $query_one      = "SELECT * FROM " . T_PAGES . " WHERE `page_id` = {$page_id}";
+    $sql          = mysqli_query($sqlConnect, $query_one);
+    $fetched_data = mysqli_fetch_assoc($sql);
+    if (!empty($fetched_data) && !empty($fetched_data['page_id']) && $fetched_data['users_post'] == 1) {
+        return true;
+    }
+    return false;
 }
 function Wo_GetLikeButton($page_id = 0) {
     global $wo;
@@ -1839,6 +1965,67 @@ function Wo_UpdatePageData($page_id = 0, $update_data) {
     if ($wo['config']['cacheSystem'] == 1) {
         $cache->delete(md5($page_id) . '_PAGE_Data.tmp');
     }
+    if ($query) {
+        return true;
+    } else {
+        return false;
+    }
+}
+function Wo_UpdatePageAdminData($page_id, $update_data,$user_id) {
+    global $wo, $sqlConnect, $cache;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($page_id) || !is_numeric($page_id) || $page_id < 0) {
+        return false;
+    }
+    if (empty($user_id) || !is_numeric($user_id) || $user_id < 0) {
+        return false;
+    }
+    if (empty($update_data)) {
+        return false;
+    }
+    $user_id = Wo_Secure($user_id);
+    $page_id = Wo_Secure($page_id);
+    $update = array();
+    foreach ($update_data as $field => $data) {
+        $update[] = '`' . $field . '` = \'' . Wo_Secure($data, 0) . '\'';
+    }
+    $impload   = implode(', ', $update);
+    $query_one = " UPDATE " . T_PAGE_ADMINS . " SET {$impload} WHERE `page_id` = {$page_id} AND `user_id` = '{$user_id}' ";
+    $query     = mysqli_query($sqlConnect, $query_one);
+    if ($wo['config']['cacheSystem'] == 1) {
+        $cache->delete(md5($page_id) . '_PAGE_Data.tmp');
+    }
+    if ($query) {
+        return true;
+    } else {
+        return false;
+    }
+}
+function Wo_UpdateGroupAdminData($group_id, $update_data,$user_id) {
+    global $wo, $sqlConnect, $cache;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($group_id) || !is_numeric($group_id) || $group_id < 0) {
+        return false;
+    }
+    if (empty($user_id) || !is_numeric($user_id) || $user_id < 0) {
+        return false;
+    }
+    if (empty($update_data)) {
+        return false;
+    }
+    $user_id = Wo_Secure($user_id);
+    $group_id = Wo_Secure($group_id);
+    $update = array();
+    foreach ($update_data as $field => $data) {
+        $update[] = '`' . $field . '` = \'' . Wo_Secure($data, 0) . '\'';
+    }
+    $impload   = implode(', ', $update);
+    $query_one = " UPDATE " . T_GROUP_ADMINS . " SET {$impload} WHERE `group_id` = {$group_id} AND `user_id` = '{$user_id}' ";
+    $query     = mysqli_query($sqlConnect, $query_one);
     if ($query) {
         return true;
     } else {
@@ -2171,7 +2358,6 @@ function Wo_GetMyGroupsAPI($limit = 0,$offset = 0,$sort = '') {
     }
     $query_text = "SELECT `id` FROM " . T_GROUPS . " WHERE $offset_query (`user_id` = {$user_id} 
                    OR `id` IN (SELECT `group_id` FROM ".T_GROUP_ADMINS." WHERE `user_id` = {$user_id})) $sort_query $limit_query ";
-                   print_r($query_text);
     $query_one  = mysqli_query($sqlConnect, $query_text);
    
     while ($fetched_data = mysqli_fetch_assoc($query_one)) {
@@ -2249,6 +2435,16 @@ function Wo_GroupData($group_id = 0) {
     $fetched_data['type']        = 'group';
     $fetched_data['username']    = $fetched_data['group_name'];
     $fetched_data['category']    = $wo['group_categories'][$fetched_data['category']];
+    $fetched_data['group_sub_category'] = '';
+    if (!empty($fetched_data['sub_category']) && !empty($wo['group_sub_categories'][$fetched_data['category_id']])) {
+        foreach ($wo['group_sub_categories'][$fetched_data['category_id']] as $key => $value) {
+            if ($value['id'] == $fetched_data['sub_category']) {
+                $fetched_data['group_sub_category'] = $value['lang'];
+            }
+        }
+    }
+
+    
     return $fetched_data;
 }
 function Wo_GroupActive($group_name) {
@@ -2492,6 +2688,7 @@ function Wo_LeaveGroup($group_id = 0, $user_id = 0) {
     }
     $query = mysqli_query($sqlConnect, " DELETE FROM " . T_GROUP_MEMBERS . " WHERE `user_id` = {$user_id} AND `group_id` = '{$group_id}'");
     if ($query) {
+        @mysqli_query($sqlConnect, "DELETE FROM " . T_GROUP_ADMINS . " WHERE `user_id` = {$user_id} AND `group_id` = {$group_id}");
         return true;
     }
 }
@@ -3649,6 +3846,10 @@ function Wo_RegisterCommentReply($data = array()) {
     $query        = mysqli_query($sqlConnect, "INSERT INTO  " . T_COMMENTS_REPLIES . " ({$fields}) VALUES ({$comment_data})");
     if ($query) {
         $inserted_reply_id       = mysqli_insert_id($sqlConnect);
+        $post_data = Wo_PostData($comment['post_id']);
+        if ($wo['config']['shout_box_system'] == 1 && !empty($post_data) && $post_data['postPrivacy'] == 4 && $post_data['user_id'] == $data['user_id']) {
+            $type2 = 'anonymous';
+        }
         $notification_data_array = array(
             'recipient_id' => $user_id,
             'page_id' => $page_id,
@@ -3666,6 +3867,7 @@ function Wo_RegisterCommentReply($data = array()) {
                     'type' => 'comment_reply_mention',
                     'post_id' => $comment['post_id'],
                     'text' => $text,
+                    'type2' => $type2,
                     'page_id' => $page_id,
                     'url' => 'index.php?link1=post&id=' . $comment['post_id'] . '&ref=' . $comment['id']
                 );
@@ -3684,6 +3886,7 @@ function Wo_RegisterCommentReply($data = array()) {
                         'type' => 'also_replied',
                         'post_id' => $comment['post_id'],
                         'text' => $text,
+                        'type2' => $type2,
                         'url' => 'index.php?link1=post&id=' . $comment['post_id'] . '&ref=' . $comment['id']
                     );
                     Wo_RegisterNotification($notification_data_array);
@@ -4645,6 +4848,46 @@ function Wo_SendSMSMessage($to, $message) {
         } else {
             return $result;
         }
+    } else if ($wo['config']['sms_provider'] == 'msg91' && !empty($wo['config']['msg91_authKey'])) {
+        //Your authentication key
+        $authKey = $wo['config']['msg91_authKey'];
+        //Multiple mobiles numbers separated by comma
+        $mobileNumber = $to;
+        //Sender ID,While using route4 sender id should be 6 characters long.
+        $senderId = uniqid();
+        //Define route 
+        $route = "default";
+        //Prepare you post parameters
+        $postData = array(
+            'authkey' => $authKey,
+            'mobiles' => $mobileNumber,
+            'message' => $message,
+            'sender' => $senderId,
+            'route' => $route
+        );
+        //API URL
+        $url="http://api.msg91.com/api/sendhttp.php";
+        // init the resource
+        $ch = curl_init();
+        curl_setopt_array($ch, array(
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $postData
+            //,CURLOPT_FOLLOWLOCATION => true
+        ));
+        //Ignore SSL certificate verification
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        //get response
+        $output = curl_exec($ch);
+        //Print error if any
+        if(curl_errno($ch))
+        {
+            return false;
+        }
+        curl_close($ch);
+        return true;
     }
     return false;
 }
@@ -4745,6 +4988,15 @@ use PayPal\Api\Transaction;
 use PayPal\Api\RedirectUrls;
 use PayPal\Api\Payment;
 use PayPal\Api\PaymentExecution;
+
+use PayPal\Api\ChargeModel;
+use PayPal\Api\Currency;
+use PayPal\Api\MerchantPreferences;
+use PayPal\Api\PaymentDefinition;
+use PayPal\Api\Plan;
+use PayPal\Api\Agreement;
+use PayPal\Api\ShippingAddress;
+use PayPal\Api\AgreementDetails;
 function Wo_PayPal($type = 'week', $type2 = '') {
     global $wo;
     if ($wo['config']['pro'] == 0 || $wo['config']['paypal'] == 'no') {
@@ -4778,47 +5030,171 @@ function Wo_PayPal($type = 'week', $type2 = '') {
         $pro_type = 4;
     }
     $total = $price;
-    $payer = new Payer();
-    $payer->setPaymentMethod('paypal');
-    $item = new Item();
-    $item->setName($product)->setQuantity(1)->setPrice($price)->setCurrency($wo['config']['paypal_currency']);
-    $itemList = new ItemList();
-    $itemList->setItems(array(
-        $item
-    ));
-    $details = new Details();
-    $details->setSubtotal($price);
-    $amount = new Amount();
-    $amount->setCurrency($wo['config']['paypal_currency'])->setTotal($total)->setDetails($details);
-    $transaction = new Transaction();
-    $transaction->setAmount($amount)->setItemList($itemList)->setDescription('Pay For ' . $wo['config']['siteName'])->setInvoiceNumber(uniqid());
-    $redirectUrls = new RedirectUrls();
-    if (!empty($type2) && $type2 == 'upgrade') {
-        $redirectUrls->setReturnUrl($wo['config']['site_url'] . "/requests.php?f=upgrade&success=true&pro_type={$pro_type}")->setCancelUrl($wo['config']['site_url'] . '/requests.php?f=payment&success=false');
-    } else {
-        $redirectUrls->setReturnUrl($wo['config']['site_url'] . "/requests.php?f=payment&success=true&pro_type={$pro_type}")->setCancelUrl($wo['config']['site_url'] . '/requests.php?f=payment&success=false');
-    }
-    $payment = new Payment();
-    $payment->setIntent('sale')->setPayer($payer)->setRedirectUrls($redirectUrls)->setTransactions(array(
-        $transaction
-    ));
-    try {
-        $payment->create($paypal);
-    }
-    catch (Exception $e) {
-        $data = array(
-            'type' => 'ERROR',
-            'details' => json_decode($e->getData())
-        );
-        if (empty($data['details'])) {
-            $data['details'] = json_decode($e->getCode());
+    if ($wo['config']['recurring_payment'] == 'off') {
+
+        $payer = new Payer();
+        $payer->setPaymentMethod('paypal');
+        $item = new Item();
+        $item->setName($product)->setQuantity(1)->setPrice($price)->setCurrency($wo['config']['paypal_currency']);
+        $itemList = new ItemList();
+        $itemList->setItems(array(
+            $item
+        ));
+        $details = new Details();
+        $details->setSubtotal($price);
+        $amount = new Amount();
+        $amount->setCurrency($wo['config']['paypal_currency'])->setTotal($total)->setDetails($details);
+        $transaction = new Transaction();
+        $transaction->setAmount($amount)->setItemList($itemList)->setDescription('Pay For ' . $wo['config']['siteName'])->setInvoiceNumber(uniqid());
+        $redirectUrls = new RedirectUrls();
+        if (!empty($type2) && $type2 == 'upgrade') {
+            $redirectUrls->setReturnUrl($wo['config']['site_url'] . "/requests.php?f=upgrade&success=true&pro_type={$pro_type}")->setCancelUrl($wo['config']['site_url'] . '/requests.php?f=payment&success=false');
+        } else {
+            $redirectUrls->setReturnUrl($wo['config']['site_url'] . "/requests.php?f=payment&success=true&pro_type={$pro_type}")->setCancelUrl($wo['config']['site_url'] . '/requests.php?f=payment&success=false');
         }
-        return $data;
+        $payment = new Payment();
+        $payment->setIntent('sale')->setPayer($payer)->setRedirectUrls($redirectUrls)->setTransactions(array(
+            $transaction
+        ));
+        try {
+            $payment->create($paypal);
+        }
+        catch (Exception $e) {
+            $data = array(
+                'type' => 'ERROR',
+                'details' => json_decode($e->getData())
+            );
+            if (empty($data['details'])) {
+                $data['details'] = json_decode($e->getCode());
+            }
+            return $data;
+        }
+        $data = array(
+            'type' => 'SUCCESS',
+            'url' => $payment->getApprovalLink()
+        );
     }
-    $data = array(
-        'type' => 'SUCCESS',
-        'url' => $payment->getApprovalLink()
-    );
+    else{
+        $p_type = 'Year';
+        if ($type == 'week') {
+            $p_type = 'Week';
+        }
+        if ($type == 'month') {
+            $p_type = 'Month';
+        }
+        if ($type == 'year') {
+            $p_type = 'Year';
+        }
+        $plan = new \PayPal\Api\Plan();
+        $plan->setName('Purchase pro package user'.$wo['user']['id'])
+          ->setDescription('Purchase pro package user'.$wo['user']['id'])
+          ->setType('fixed');
+
+                    // Set billing plan definitions
+        $paymentDefinition = new \PayPal\Api\PaymentDefinition();
+        $paymentDefinition->setName('Regular Payments user'.$wo['user']['id'])
+          ->setType('REGULAR')
+          ->setFrequency($p_type)
+          ->setFrequencyInterval('1')
+          ->setCycles('48')
+          ->setAmount(new \PayPal\Api\Currency(array('value' => $total, 'currency' => $wo['config']['paypal_currency'])));
+
+        $merchantPreferences = new \PayPal\Api\MerchantPreferences();
+        $merchantPreferences->setReturnUrl($wo['config']['site_url'] . "/requests.php?f=payment&success=true&pro_type={$pro_type}")->setCancelUrl($wo['config']['site_url'] . '/requests.php?f=payment&success=false')
+            ->setCancelUrl($wo['config']['site_url'])
+            ->setAutoBillAmount('yes')
+            ->setInitialFailAmountAction('CONTINUE')
+            ->setMaxFailAttempts('0')
+            ->setSetupFee(
+                new PayPal\Api\Currency(
+                    array(
+                        'currency' => $wo['config']['paypal_currency'],
+                        'value' => $total,
+                    )
+                )
+            );
+
+        $plan->setPaymentDefinitions(array($paymentDefinition));
+        $plan->setMerchantPreferences($merchantPreferences);
+
+        try {
+            $output = $plan->create($paypal);
+            
+        } catch (Exception $ex) {
+            //ResultPrinter::printError("Created Plan", "Plan", null, $request, $ex);
+            
+        }
+        // ResultPrinter::printResult("Created Plan", "Plan", $output->getId(), $request, $output);
+        // exit();  
+        $p_currency =  (!empty($wo['currencies'][$wo['config']['paypal_currency']]['symbol'])) ? $wo['currencies'][$wo['config']['paypal_currency']]['symbol'] : '$';
+
+        // if ($pt->config->payment_currency == 'EUR') {
+        //  $p_currency    = '€';
+        // }
+
+        $patch = new \PayPal\Api\Patch();
+        $patch->setOp('replace')
+            ->setPath('/')
+            ->setValue(new \PayPal\Common\PayPalModel('{
+                "state": "ACTIVE"
+            }'));
+
+        $patchRequest = new \PayPal\Api\PatchRequest();
+        $patchRequest->addPatch($patch);
+
+        $resActivate = $plan->update($patchRequest, $paypal);
+
+
+        // Create new agreement
+
+        // Create new agreement
+        $plan->setState('ACTIVE');
+        $agreement = new Agreement();
+        $agreement->setName('Purchase Pro package user'.$wo['user']['id'])
+          ->setDescription('Upgrade to Pro Member - '.$p_currency.''.$total.'/mo user'.$wo['user']['id'])
+          ->setStartDate(gmdate("Y-m-d\TH:i:s\Z", time()+2629743));
+
+
+        // Set plan id
+        $cplan = new Plan();
+        $cplan->setId($plan->getId());
+        $agreement->setPlan($cplan);
+
+        // Add payer type
+        $payer = new Payer();
+        $payer->setPaymentMethod('paypal');
+        $agreement->setPayer($payer);
+
+        // Adding shipping details
+        // $shippingAddress = new ShippingAddress();
+        // $shippingAddress->setLine1('111 First Street')
+        //   ->setCity('Saratoga')
+        //   ->setState('CA')
+        //   ->setPostalCode('95070')
+        //   ->setCountryCode('US');
+        // $agreement->setShippingAddress($shippingAddress);
+
+        //$request = clone $agreement;
+        //*********************
+
+        try {
+          // Create agreement
+          $agreement = $agreement->create($paypal);
+          // Extract approval URL to redirect user
+          $approvalUrl = $agreement->getApprovalLink();
+        } catch (PayPal\Exception\PayPalConnectionException $ex) {
+            // ResultPrinter::printError("Created Plan", "Plan", null, $request, $ex);
+            // exit(1);
+        } catch (Exception $ex) {
+          die($ex);
+        }
+        $data = array(
+            'type' => 'SUCCESS',
+            'url' => $agreement->getApprovalLink()
+        );
+    }
+
+
     return $data;
 }
 function Wo_CheckPayment($paymentId, $PayerID) {
@@ -4827,14 +5203,29 @@ function Wo_CheckPayment($paymentId, $PayerID) {
         return false;
     }
     include_once  'assets/includes/paypal_config.php';
-    $payment = Payment::get($paymentId, $paypal);
-    $execute = new PaymentExecution();
-    $execute->setPayerId($PayerID);
-    try {
-        $result = $payment->execute($execute, $paypal);
+    if ($wo['config']['recurring_payment'] == 'off') {
+        $payment = Payment::get($paymentId, $paypal);
+        $execute = new PaymentExecution();
+        $execute->setPayerId($PayerID);
+        try {
+            $result = $payment->execute($execute, $paypal);
+        }
+        catch (Exception $e) {
+            return json_decode($e->getData(), true);
+        }
     }
-    catch (Exception $e) {
-        return json_decode($e->getData(), true);
+    else{
+        $agreement = new \PayPal\Api\Agreement();
+        try {
+            // Execute agreement
+            $agreement->execute($token, $paypal);
+        } catch (PayPal\Exception\PayPalConnectionException $ex) {
+            echo $ex->getCode();
+            echo $ex->getData();
+            die($ex);
+        } catch (Exception $ex) {
+            die($ex);
+        }
     }
     return true;
 }
@@ -5908,6 +6299,201 @@ function Wo_GetAllProInfo()
     return false;
 }
 // manage packages 
+function Wo_GetReactionsTypes($type = 'page')
+{
+    global $sqlConnect, $wo;
+    $data = array();
+    $reactions = mysqli_query($sqlConnect, "SELECT * FROM " . T_REACTIONS_TYPES);
+    if (!empty($reactions)) {
+        while ($fetched_data = mysqli_fetch_assoc($reactions)) {
+            $fetched_data['name'] = $wo['lang'][$fetched_data['name']];
+            if ($type == 'page') {
+
+                if (!empty($fetched_data['wowonder_icon'])) {
+                    $fetched_data['wowonder_icon'] = Wo_GetMedia($fetched_data['wowonder_icon']);
+                    $explode2  = @end(explode('.', $fetched_data['wowonder_icon']));
+                    $explode3  = @explode('.', $fetched_data['wowonder_icon']);
+                    $fetched_data['wowonder_small_icon'] = $explode3[0] . '_small.' . $explode2;
+                    $fetched_data['is_html'] = 0;
+                }
+                elseif (!file_exists('./themes/' . $wo['config']['theme'] . '/reaction/like-sm.png')) {
+                    if ($fetched_data['id'] == 1) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--like"><div class="emoji__hand"><div class="emoji__thumb"></div></div></div>';
+                    }
+                    if ($fetched_data['id'] == 2) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--love"><div class="emoji__heart"></div></div>';
+                    }
+                    if ($fetched_data['id'] == 3) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--haha"><div class="emoji__face"><div class="emoji__eyes"></div><div class="emoji__mouth"><div class="emoji__tongue"></div></div></div></div>';
+                    }
+                    if ($fetched_data['id'] == 4) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--wow"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                    }
+                    if ($fetched_data['id'] == 5) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--sad"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                    }
+                    if ($fetched_data['id'] == 6) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--angry"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                    }
+                    $fetched_data['wowonder_small_icon'] = '';
+                    $fetched_data['is_html'] = 1;
+                }
+
+                if (!empty($fetched_data['sunshine_icon'])) {
+                    $fetched_data['sunshine_icon'] = Wo_GetMedia($fetched_data['sunshine_icon']);
+                    $explode2  = @end(explode('.', $fetched_data['sunshine_icon']));
+                    $explode3  = @explode('.', $fetched_data['sunshine_icon']);
+                    $fetched_data['sunshine_small_icon'] = $explode3[0] . '_small.' . $explode2;
+                }
+                elseif (file_exists('./themes/' . $wo['config']['theme'] . '/reaction/like-sm.png')) {
+                    if ($fetched_data['id'] == 1) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/like.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['theme_url']."/reaction/like-sm.png";
+                    }
+                    if ($fetched_data['id'] == 2) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/love.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['theme_url']."/reaction/love-sm.png";
+                    }
+                    if ($fetched_data['id'] == 3) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/haha.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['theme_url']."/reaction/haha-sm.png";
+                    }
+                    if ($fetched_data['id'] == 4) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/wow.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['theme_url']."/reaction/wow-sm.png";
+                    }
+                    if ($fetched_data['id'] == 5) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/sad.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['theme_url']."/reaction/sad-sm.png";
+                    }
+                    if ($fetched_data['id'] == 6) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/angry.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['theme_url']."/reaction/angry-sm.png";
+                    }
+                }
+            }
+            else{
+
+                if (!empty($fetched_data['wowonder_icon'])) {
+                    $fetched_data['wowonder_icon'] = Wo_GetMedia($fetched_data['wowonder_icon']);
+                    $explode2  = @end(explode('.', $fetched_data['wowonder_icon']));
+                    $explode3  = @explode('.', $fetched_data['wowonder_icon']);
+                    $fetched_data['wowonder_small_icon'] = $explode3[0] . '_small.' . $explode2;
+                    $fetched_data['is_html'] = 0;
+                }
+                else {
+                    if ($fetched_data['id'] == 1) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--like"><div class="emoji__hand"><div class="emoji__thumb"></div></div></div>';
+                    }
+                    if ($fetched_data['id'] == 2) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--love"><div class="emoji__heart"></div></div>';
+                    }
+                    if ($fetched_data['id'] == 3) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--haha"><div class="emoji__face"><div class="emoji__eyes"></div><div class="emoji__mouth"><div class="emoji__tongue"></div></div></div></div>';
+                    }
+                    if ($fetched_data['id'] == 4) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--wow"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                    }
+                    if ($fetched_data['id'] == 5) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--sad"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                    }
+                    if ($fetched_data['id'] == 6) {
+                        $fetched_data['wowonder_icon'] = '<div class="emoji emoji--angry"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                    }
+                    $fetched_data['wowonder_small_icon'] = '';
+                    $fetched_data['is_html'] = 1;
+                }
+
+                if (!empty($fetched_data['sunshine_icon'])) {
+                    $fetched_data['sunshine_icon'] = Wo_GetMedia($fetched_data['sunshine_icon']);
+                    $explode2  = @end(explode('.', $fetched_data['sunshine_icon']));
+                    $explode3  = @explode('.', $fetched_data['sunshine_icon']);
+                    $fetched_data['sunshine_small_icon'] = $explode3[0] . '_small.' . $explode2;
+                }
+                else {
+                    if ($fetched_data['id'] == 1) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/like.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/like-sm.png";
+                    }
+                    if ($fetched_data['id'] == 2) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/love.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/love-sm.png";
+                    }
+                    if ($fetched_data['id'] == 3) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/haha.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/haha-sm.png";
+                    }
+                    if ($fetched_data['id'] == 4) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/wow.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/wow-sm.png";
+                    }
+                    if ($fetched_data['id'] == 5) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/sad.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/sad-sm.png";
+                    }
+                    if ($fetched_data['id'] == 6) {
+                        $fetched_data['sunshine_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/angry.gif";
+                        $fetched_data['sunshine_small_icon'] = $wo['config']['site_url']."/themes/sunshine/reaction/angry-sm.png";
+                    }
+                }
+
+                // if (!empty($fetched_data['wowonder_icon']) && !empty($fetched_data['sunshine_icon'])) {
+                //     $fetched_data['sunshine_icon'] = Wo_GetMedia($fetched_data['sunshine_icon']);
+                //     $fetched_data['wowonder_icon'] = Wo_GetMedia($fetched_data['wowonder_icon']);
+                // }
+                // else{
+                //     //if (!file_exists('./themes/' . $wo['config']['theme'] . '/reaction/like-sm.png')) {
+                //         if ($fetched_data['id'] == 1) {
+                //             $fetched_data['wowonder_icon'] = '<div class="emoji emoji--like"><div class="emoji__hand"><div class="emoji__thumb"></div></div></div>';
+                //         }
+                //         if ($fetched_data['id'] == 2) {
+                //             $fetched_data['wowonder_icon'] = '<div class="emoji emoji--love"><div class="emoji__heart"></div></div>';
+                //         }
+                //         if ($fetched_data['id'] == 3) {
+                //             $fetched_data['wowonder_icon'] = '<div class="emoji emoji--haha"><div class="emoji__face"><div class="emoji__eyes"></div><div class="emoji__mouth"><div class="emoji__tongue"></div></div></div></div>';
+                //         }
+                //         if ($fetched_data['id'] == 4) {
+                //             $fetched_data['wowonder_icon'] = '<div class="emoji emoji--wow"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                //         }
+                //         if ($fetched_data['id'] == 5) {
+                //             $fetched_data['wowonder_icon'] = '<div class="emoji emoji--sad"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                //         }
+                //         if ($fetched_data['id'] == 6) {
+                //             $fetched_data['wowonder_icon'] = '<div class="emoji emoji--angry"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                //         }
+                //    // }
+                //     //else{
+                //         if ($fetched_data['id'] == 1) {
+                //             $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/like.gif";
+                //         }
+                //         if ($fetched_data['id'] == 2) {
+                //             $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/love.gif";
+                //         }
+                //         if ($fetched_data['id'] == 3) {
+                //             $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/haha.gif";
+                //         }
+                //         if ($fetched_data['id'] == 4) {
+                //             $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/wow.gif";
+                //         }
+                //         if ($fetched_data['id'] == 5) {
+                //             $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/sad.gif";
+                //         }
+                //         if ($fetched_data['id'] == 6) {
+                //             $fetched_data['sunshine_icon'] = $wo['config']['theme_url']."/reaction/angry.gif";
+                //         }
+                //     //}
+
+                // }
+            }
+            
+            $data[$fetched_data['id']] = $fetched_data;
+        }
+
+        return $data;
+    }
+    return $data;
+}
+
 function Wo_GetCategories($table)
 {
     global $sqlConnect, $wo;
@@ -5975,5 +6561,269 @@ function Wo_GetAllColors()
         }
     }
     return $data;
+}
+
+function Wo_GetMemoriesPosts($user_id) {
+    global $wo, $sqlConnect;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    // $year = date('Y')-1;
+    // $start_time = strtotime(date('d').' '.date('F').' '.$year.' 12:00am');
+    // $end_time = strtotime(date('d').' '.date('F').' '.$year.' 11:59pm');
+    $day = date('d');
+    $month = date('n');
+    $year = date('Y') - 1;
+    $user_id = Wo_Secure($user_id);
+    $data           = array();
+    //$query_one = "SELECT `post_id` FROM " . T_POSTS . " WHERE `user_id` = {$user_id} AND `time` >= '{$start_time}' AND `time` <= '{$end_time}'";
+    $query_one = "SELECT `post_id` FROM " . T_POSTS . " WHERE `user_id` = '{$user_id}' AND DAY(FROM_UNIXTIME(time)) = '{$day}' AND MONTH(FROM_UNIXTIME(time)) = '{$month}' AND YEAR(FROM_UNIXTIME(time)) = '{$year}'";
+    $query          = mysqli_query($sqlConnect, $query_one);
+    while ($fetched_data = mysqli_fetch_assoc($query)) {
+        $post = Wo_PostData($fetched_data['post_id']);
+        if (is_array($post)) {
+            $data[] = $post;
+        }
+    }
+    return $data;
+}
+
+function Wo_GetMemoriesFreinds($user_id) {
+    global $wo, $sqlConnect;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    $day = date('d');
+    $month = date('n');
+    $year = date('Y') - 1;
+    $user_id = Wo_Secure($user_id);
+    $data           = array();
+    $query_one = " SELECT `user_id`,b.`time` FROM " . T_USERS . " a," . T_FOLLOWERS . " b WHERE a.`user_id` IN (SELECT `follower_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` <> {$user_id} AND `following_id` = {$user_id} AND `active` = '1' AND  DAY(FROM_UNIXTIME(time)) = '{$day}' AND MONTH(FROM_UNIXTIME(time)) = '{$month}') AND YEAR(FROM_UNIXTIME(time)) = '{$year}' AND a.`active` = '1' GROUP BY a.`user_id`";
+    $query          = mysqli_query($sqlConnect, $query_one);
+    while ($fetched_data = mysqli_fetch_assoc($query)) {
+        $user = Wo_UserData($fetched_data['user_id']);
+        $user['time'] = $fetched_data['time'];
+        if (is_array($user)) {
+            $data[] = $user;
+        }
+    }
+    return $data;
+}
+
+function Wo_AddNotifyMemories() {
+    global $wo, $sqlConnect,$db;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    $user_id = $wo['user']['id'];
+    $day = date('d');
+    $month = date('n');
+    $year = date('Y');
+
+    $query_one = " SELECT COUNT(*) AS count FROM " . T_NOTIFICATION . " WHERE `recipient_id` = " . $user_id . " AND DAY(FROM_UNIXTIME(time)) = '{$day}' AND MONTH(FROM_UNIXTIME(time)) = '{$month}' AND YEAR(FROM_UNIXTIME(time)) = '{$year}' AND `type` = 'memory'";
+    $query          = mysqli_query($sqlConnect, $query_one);
+    $fetched_data = mysqli_fetch_assoc($query);
+    $notify = false;
+    if ($fetched_data['count'] < 1) {
+        $friends = Wo_GetMemoriesFreinds($user_id);
+        if (count($friends) < 1) {
+            $posts = Wo_GetMemoriesPosts($user_id);
+            if (count($posts) < 1) {
+                $notify = false;
+            }
+            else{
+                $notify = true;
+            }
+        }
+        else{
+            $notify = true;
+        }
+    }
+
+    if ($notify == true) {
+        $db->insert(T_NOTIFICATION,array('recipient_id' => $wo['user']['id'],
+                                         'type' => 'memory',
+                                         'text' => $wo['lang']['memory_this_day'],
+                                         'url'  => 'index.php?link1=memories',
+                                         'time' => time()));
+    }
+}
+
+function Wo_GetSubCategories()
+{
+    global $sqlConnect, $wo;
+    $wo['page_sub_categories'] = array();
+    $wo['group_sub_categories'] = array();
+    $wo['products_sub_categories'] = array();
+    $categories = mysqli_query($sqlConnect, "SELECT * FROM " . T_SUB_CATEGORIES);
+    if ($categories) {
+        while ($fetched_data = mysqli_fetch_assoc($categories)) {
+            if ($fetched_data['type'] == 'page') {
+                $fetched_data['lang'] = $wo['lang'][$fetched_data['lang_key']];
+                $wo['page_sub_categories'][$fetched_data['category_id']][] = $fetched_data;
+            }
+            if ($fetched_data['type'] == 'group') {
+                $fetched_data['lang'] = $wo['lang'][$fetched_data['lang_key']];
+                $wo['group_sub_categories'][$fetched_data['category_id']][] = $fetched_data;
+            }
+            if ($fetched_data['type'] == 'product') {
+                $fetched_data['lang'] = $wo['lang'][$fetched_data['lang_key']];
+                $wo['products_sub_categories'][$fetched_data['category_id']][] = $fetched_data;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+function Wo_GetCustomFields($type = 'all') {
+    global $wo, $sqlConnect;
+    $data       = array();
+    $where      = '';
+    $placements = array(
+        'page',
+        'group',
+        'product'
+    );
+    $type      = Wo_Secure($type);
+    if ($type != 'all' && in_array($type, $placements)) {
+        $where = "WHERE `placement` = '{$type}' ";
+    }
+    
+    $query_one = "SELECT * FROM " . T_CUSTOM_FIELDS . " {$where} ORDER BY `id` ASC";
+    $sql       = mysqli_query($sqlConnect, $query_one);
+    if ($sql) {
+        while ($fetched_data = mysqli_fetch_assoc($sql)) {
+            $fetched_data['fid'] = 'fid_' . $fetched_data['id'];
+            $fetched_data['name'] = preg_replace_callback("/{{LANG (.*?)}}/", function($m) use ($wo) {
+                return (isset($wo['lang'][$m[1]])) ? $wo['lang'][$m[1]] : '';
+            }, $fetched_data['name']);
+            $fetched_data['description'] = preg_replace_callback("/{{LANG (.*?)}}/", function($m) use ($wo) {
+                return (isset($wo['lang'][$m[1]])) ? $wo['lang'][$m[1]] : '';
+            }, $fetched_data['description']);
+            $fetched_data['options'] = preg_replace_callback("/{{LANG (.*?)}}/", function($m) use ($wo) {
+                return (isset($wo['lang'][$m[1]])) ? $wo['lang'][$m[1]] : '';
+            }, $fetched_data['options']);
+            $data[]               = $fetched_data;
+        }
+    }
+    return $data;
+}
+function Wo_RegisterNewCustomField($registration_data) {
+    global $wo, $sqlConnect;
+    if (empty($registration_data)) {
+        return false;
+    }
+    $fields = '`' . implode('`, `', array_keys($registration_data)) . '`';
+    $data   = '\'' . implode('\', \'', $registration_data) . '\'';
+    $query  = mysqli_query($sqlConnect, "INSERT INTO " . T_CUSTOM_FIELDS . " ({$fields}) VALUES ({$data})");
+    if ($query) {
+        $sql_id  = mysqli_insert_id($sqlConnect);
+        $column  = 'fid_' . $sql_id;
+        $length  = $registration_data['length'];
+        $types_array = array('page' => T_PAGES,'group' => T_GROUPS,'product' => T_PRODUCTS);
+        $query_2 = mysqli_query($sqlConnect, "ALTER TABLE " . $types_array[$registration_data['placement']] . " ADD COLUMN `{$column}` varchar({$length}) NOT NULL DEFAULT ''");
+        return true;
+    }
+    return false;
+}
+function Wo_DeleteCustomField($id,$type) {
+    global $wo, $sqlConnect;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (Wo_IsAdmin() === false) {
+        return false;
+    }
+    $types_array = array('page' => T_PAGES,'group' => T_GROUPS,'product' => T_PRODUCTS);
+    $id    = Wo_Secure($id);
+    $type    = Wo_Secure($type);
+    $query = mysqli_query($sqlConnect, "DELETE FROM " . T_CUSTOM_FIELDS . " WHERE `id` = {$id} AND `placement` = '{$type}'");
+    if ($query) {
+        $query2 = mysqli_query($sqlConnect, "ALTER TABLE " . $types_array[$type] . " DROP `fid_{$id}`;");
+        if ($query2) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function Wo_UpdateCustomField($id, $update_data) {
+    global $wo, $sqlConnect, $cache;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($id) || !is_numeric($id) || $id < 0) {
+        return false;
+    }
+    if (empty($update_data)) {
+        return false;
+    }
+    $id = Wo_Secure($id);
+    if (Wo_IsAdmin() === false) {
+        return false;
+    }
+    $update = array();
+    $types_array = array('page' => T_PAGES,'group' => T_GROUPS,'product' => T_PRODUCTS);
+    foreach ($update_data as $field => $data) {
+        $update[] = '`' . $field . '` = \'' . Wo_Secure($data, 0) . '\'';
+        if ($field == 'length') {
+            $mysqli = mysqli_query($sqlConnect, "ALTER TABLE " . $types_array[$update_data['placement']] . " CHANGE `fid_{$id}` `fid_{$id}` VARCHAR(" . Wo_Secure($data) . ") CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '';");
+        }
+    }
+    $impload   = implode(', ', $update);
+    $query_one = "UPDATE " . T_CUSTOM_FIELDS . " SET {$impload} WHERE `id` = {$id} ";
+    $query     = mysqli_query($sqlConnect, $query_one);
+    if ($query) {
+        return true;
+    }
+    return false;
+}
+
+function Wo_CheckPaystackPayment($ref)
+{
+    global $wo, $db;
+    if (empty($ref) || $wo['loggedin'] == false) {
+        return false;
+    }
+    $ref = Wo_Secure($ref);
+    $user = $db->where('user_id',$wo['user']['id'])->where('paystack_ref',$ref)->getValue(T_USERS,"COUNT(*)");
+    if ($user < 1) {
+        return false;
+    }
+    $result = array();
+    //The parameter after verify/ is the transaction reference to be verified
+    $url = 'https://api.paystack.co/transaction/verify/'.$ref;
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt(
+      $ch, CURLOPT_HTTPHEADER, [
+        'Authorization: Bearer '.$wo['config']['paystack_secret_key']]
+    );
+    $request = curl_exec($ch);
+    curl_close($ch);
+
+    if ($request) {
+        $result = json_decode($request, true);
+        if($result){
+          if($result['data']){
+            if($result['data']['status'] == 'success'){
+                $db->where('user_id',$wo['user']['id'])->where('paystack_ref',$ref)->update(T_USERS,array('paystack_ref' => ''));
+                return true;
+            }else{
+              die("Transaction was not successful: Last gateway response was: ".$result['data']['gateway_response']);
+            }
+          }else{
+            die($result['message']);
+          }
+
+        }else{
+          die("Something went wrong while trying to convert the request variable to json. Uncomment the print_r command to see what is in the result variable.");
+        }
+      }else{
+        die("Something went wrong while executing curl. Uncomment the var_dump line above this line to see what the issue is. Please check your CURL command to make sure everything is ok");
+      }
 }
 ?>

@@ -14,8 +14,19 @@
 							$data['c_id'] = Wo_Secure($_GET['c_id']);
 						}
 					}
+					if (!empty($wo['products_sub_categories'][$_GET['c_id']]) && !empty($_GET['sub_id'])) {
+						foreach ($wo['products_sub_categories'][$_GET['c_id']] as $key => $value) {
+							if ($_GET['sub_id'] == $value['id']) { ?>
+								<input type="hidden" value="<?php echo Wo_Secure($_GET['sub_id']); ?>" id="sub_id" />
+								<?php
+								$data['sub_id'] = Wo_Secure($value['id']);
+								break;
+							}
+						}
+					}
 				} else {
 					echo '<input type="hidden" value="0" id="c_id" />';
+					echo '<input type="hidden" value="" id="sub_id" />';
 				}
 			?>
 			<div class="market_search_header">
@@ -46,6 +57,22 @@
 					</ul>
 				</div>
 			</div>
+			<?php if ( !empty($_GET['c_id']) && !empty($wo['products_sub_categories'][$_GET['c_id']])) { ?>
+			<div class="market_widget">
+				<div class="m_widget_head"><?php echo $wo['lang']['sub_category'];?></div>
+				<div class="market_categories">
+					<ul class="product-category-slider-sub">
+						<?php 
+							$category_id = (!empty($_GET['sub_id'])) ? (int) $_GET['sub_id'] : 0;
+							foreach ($wo['products_sub_categories'][$_GET['c_id']] as $key => $category) {
+								$active = ($category_id == $category['id']) ? 'active' : '';
+						?>
+							<li class="<?php echo $active?>" data_prodect_cat_id="<?php echo($category['id']) ?>"><a href="<?php echo Wo_SeoLink('index.php?link1=products&c_id=' . $_GET['c_id'].'&sub_id='.$category['id']);?>"><?php echo $category['lang'];?></a></li>
+						<?php } ?>
+					</ul>
+				</div>
+			</div>
+			<?php } ?>
 			<div class="market_widget">
 				<div class="m_widget_head"><?php echo $wo['lang']['location_dist'];?> (km)</div>
 				<div class="select-nearby-users-distance">
@@ -57,6 +84,10 @@
 			</div>
 			<?php if ($wo['loggedin'] == true) { ?>
 			<a href="#" class="btn btn-main btn-block side_mkt_btn" data-toggle="modal" data-target="#create-product-modal" data-backdrop="static" data-keyboard="false"><?php echo $wo['lang']['new_product'] ?></a>
+			<?php if ($wo['config']['nearby_shop_system'] == 1) { ?>
+			
+			<a href="<?php echo($wo['config']['site_url'].'/nearby_shops') ?>" data-ajax="?link1=nearby_shops" class="btn btn-main btn-block side_mkt_btn"><?php echo $wo['lang']['nearby_shops'] ?></a>
+			<?php } ?>
 			<?php } ?>
 		</div>
 		
@@ -112,11 +143,12 @@ function changePriceSortValue(price_sort) {
 	array['price_low'] = "<?php echo $wo['lang']['price_low'] ?>";
 	array['price_high'] = "<?php echo $wo['lang']['price_high'] ?>";
 	cat_id = $('.product-category-slider').find('.active').attr('data_prodect_cat_id');
+	sub_id = $('.product-category-slider-sub').find('.active').attr('data_prodect_cat_id');
 	distance = $('#distance_val').text();
 	$('#PriceSortValue').html(array[price_sort]);
 	$('#PriceSortValue').attr('data_PriceSortType',price_sort);
 	
-	$.post(Wo_Ajax_Requests_File() + '?f=get_prodects_by_filter', {price_sort: price_sort, cat_id:cat_id, distance: distance}, function (data) {
+	$.post(Wo_Ajax_Requests_File() + '?f=get_prodects_by_filter', {price_sort: price_sort, cat_id:cat_id, sub_id:sub_id, distance: distance}, function (data) {
 		if (data.status == 200) {
 			if (data.html.length > 0) {
 				$('#products').html(data.html);
@@ -134,7 +166,8 @@ function Wo_SearchProductsNearBy() {
 	if ($('#c_id').length > 0) {
 		c_id = $('#c_id').val();
 	}
-	$.post(Wo_Ajax_Requests_File() + '?f=search_products', {value: text_value, c_id:c_id, length: length}, function (data) {
+	var sub_id = $('#sub_id').val();
+	$.post(Wo_Ajax_Requests_File() + '?f=search_products', {value: text_value, c_id:c_id, sub_id:sub_id, length: length}, function (data) {
 		if (data.status == 200) {
 			if (data.html.length > 0) {
 				$('#products').html(data.html);
@@ -147,12 +180,13 @@ function Wo_SearchProductsNearBy() {
 function Wo_LoadProducts() {
 	$('.load-produts').html('<div class="white-loading list-group"><div class="cs-loader"><div class="cs-loader-inner"><label> ●</label><label> ●</label><label> ●</label><label> ●</label><label> ●</label><label> ●</label></div></div></div>');
 	var $c_id = $('#c_id').val();
+	var sub_id = $('#sub_id').val();
 	var text = $('#product-text').val();
 	var $last_id = $('.product:last').attr('data-id');
 	var price = $('.product:last').attr('data_price');
 	var length = $('#distance_val').text();
 	var price_sort = $('#PriceSortValue').attr('data_PriceSortType');
-	$.post(Wo_Ajax_Requests_File() + '?f=load_more_products', {last_id: $last_id, c_id:$c_id, length: length,price_sort:price_sort,price:price,text:text}, function (data) {
+	$.post(Wo_Ajax_Requests_File() + '?f=load_more_products', {last_id: $last_id, c_id:$c_id, sub_id:sub_id, length: length,price_sort:price_sort,price:price,text:text}, function (data) {
 		if (data.status == 200) {
 			if (data.html.length > 0) {
 				$('.load-produts').html('<div class="load-more"><button class="btn btn-default text-center pointer" onclick="Wo_LoadProducts();"><i class="fa fa-arrow-down progress-icon" data-icon="arrow-down"></i> <?php echo $wo['lang']['load_more_products'] ?></button></div>');
@@ -170,7 +204,8 @@ function Wo_SearchProducts(value) {
 	if ($('#c_id').length > 0) {
 		c_id = $('#c_id').val();
 	}
-	$.post(Wo_Ajax_Requests_File() + '?f=search_products', {value: value, c_id:c_id, length: length,price_sort:price_sort}, function (data) {
+	var sub_id = $('#sub_id').val();
+	$.post(Wo_Ajax_Requests_File() + '?f=search_products', {value: value, c_id:c_id, sub_id:sub_id, length: length,price_sort:price_sort}, function (data) {
 		if (data.status == 200) {
 			if (data.html.length > 0) {
 				$('#products').html(data.html);

@@ -14,7 +14,8 @@ $response_data = array(
 
 $required_fields =  array(
                         'create',
-                        'fetch'
+                        'fetch',
+                        'add'
                     );
 
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
@@ -109,6 +110,42 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_message = 'user_id (POST) is missing';
         }
         $albums = Wo_GetUserAlbums($wo['user_id']);
+    }
+    if ($_POST['type'] == 'add') {
+        if (!empty($_POST['id']) && !empty($_FILES['postPhotos']['name'])) {
+            $id = Wo_Secure($_POST['id']);
+            if (count($_FILES['postPhotos']['name']) > 0) {
+                for ($i = 0; $i < count($_FILES['postPhotos']['name']); $i++) {
+                    $fileInfo = array(
+                        'file' => $_FILES["postPhotos"]["tmp_name"][$i],
+                        'name' => $_FILES['postPhotos']['name'][$i],
+                        'size' => $_FILES["postPhotos"]["size"][$i],
+                        'type' => $_FILES["postPhotos"]["type"][$i],
+                        'types' => 'jpg,png,jpeg,gif'
+                    );
+                    $file     = Wo_ShareFile($fileInfo, 1);
+                    if (!empty($file)) {
+                        $media_album = Wo_RegisterAlbumMedia($id, $file['filename']);
+                    }
+                }
+            }
+            $new_post = Wo_PostData($id);
+            if (!empty($new_post['publisher'])) {
+                foreach ($non_allowed as $key4 => $value4) {
+                  unset($new_post['publisher'][$value4]);
+                }
+            }
+
+            $response_data = array(
+                                'api_status' => 200,
+                                'data' => $new_post
+                            );
+        }
+        else{
+            $error_code    = 5;
+            $error_message = 'id and postPhotos can not be empty';
+        }
+
     }
 }
 else{

@@ -18,7 +18,7 @@ $required_fields = array(
 );
 
 if (empty($_POST['product_id'])) {
-    if (empty($_POST['text']) && $_POST['text'] != 0) {
+    if (empty($_POST['text']) && $_POST['text'] != 0 && empty($_POST['lat']) && empty($_POST['lng'])) {
     	if (empty($_FILES['file']['name']) && empty($_POST['image_url']) && empty($_POST['gif'])) {
     	    $error_code    = 3;
     	    $error_message = 'file (STREAM FILE) AND text (POST) AND image_url AND gif (POST) are missing, at least one is required';
@@ -54,7 +54,7 @@ if (empty($error_code)) {
                 );
                 $media         = Wo_ShareFile($fileInfo);
                 $mediaFilename = $media['filename'];
-                $mediaName     = $media['name'];
+                $mediaName     = $_FILES['file']['name'];
             }
             if (!empty($_POST['image_url'])) {
             	$fileend = '_url_image';
@@ -69,6 +69,12 @@ if (empty($error_code)) {
                     $gif = Wo_Secure($_POST['gif']);
                 }
             }
+            $lng = 0;
+            $lat = 0;
+            if (!empty($_POST['lng']) && !empty($_POST['lat'])) {
+                $lng = Wo_Secure($_POST['lng']);
+                $lat = Wo_Secure($_POST['lat']);
+            }
         	$message_data = array(
                 'from_id' => Wo_Secure($wo['user']['user_id']),
                 'to_id' => Wo_Secure($recipient_id),
@@ -78,11 +84,21 @@ if (empty($error_code)) {
                 'type_two' => (!empty($_POST['contact'])) ? 'contact' : '',
                 'text' => '',
                 'stickers' => $gif,
+                'lng' => $lng,
+                'lat' => $lat,
             );
-    		if (!empty($_POST['text']) || $_POST['text'] == 0) {
+    		if (!empty($_POST['text']) || (isset($_POST['text']) && $_POST['text'] === '0') ) {
     		 	$message_data['text'] = Wo_Secure($_POST['text']);
     		}
-            $last_id      = Wo_RegisterMessage($message_data);
+            else{
+                if (empty($lng) && empty($lat) && empty($_FILES['file']['name']) && empty($_POST['image_url']) && empty($_POST['gif'])) {
+                    $error_code    = 5;
+                    $error_message = 'Please check your details.';
+                }
+            }
+            if (empty($error_message)) {
+                $last_id      = Wo_RegisterMessage($message_data);
+            }
         }
         else{
             $last_id = Wo_RegisterMessage(array(
@@ -121,6 +137,9 @@ if (empty($error_code)) {
                 if ($message['type_two'] == 'contact') {
                     $message['type']   = 'contact';
                 }
+                if (!empty($message['lng']) && !empty($message['lat'])) {
+                    $message['type']   = 'map';
+                }
                 $message['type']     = $message_po . '_' . $message['type'];
                 $message['file_size'] = 0;
                 if (!empty($message['media'])) {
@@ -149,6 +168,10 @@ if (empty($error_code)) {
 	                'message_data' => $messages
 	            );
 	        }
+        }
+        else{
+            $error_code    = 6;
+            $error_message = 'something went wrong.';
         }
     }
 }

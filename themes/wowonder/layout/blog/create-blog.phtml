@@ -118,6 +118,12 @@ jQuery(document).ready(function($) {
         if (data['status'] == 200) {
           $("#blog-alert").html('<div class="alert alert-success">'+ data['message'] +'</div>');
           window.location = data.url;
+        } else if (data['status'] == 300) {
+          $("#approve_post").modal('show');
+          Wo_Delay(function(){
+            $("#approve_post").modal('hide');
+            location.reload();
+          },3000);
         } else if (data['message']) {
           $("#blog-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
         } 

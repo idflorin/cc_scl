@@ -132,6 +132,7 @@
    </div>
 
    <?php } ?>
+   <?php if ($wo['config']['live_video'] != 1 || ($wo['config']['live_video'] == 1 && !$wo['story']['is_still_live']) ) { ?>
    <div class="comments-list">
       <span class="comment-container"></span>
       <?php 
@@ -148,7 +149,9 @@
       <br>
       <div class="clear"></div>
    <?php } ?>
+   <?php } ?>
    <?php if ($wo['story']['comments_status'] == 1) { ?> 
+
    <div class="post-commet-textarea">
       <div class="loading_cont">
          <div class="loading hidden"></div>
@@ -156,7 +159,7 @@
       <div id="wo_comment_combo" class="remove_combo_on_click">
          <div style="display: flex;">
             <img class="avatar" src="<?php echo $wo['user']['avatar'];?>"/>
-            <textarea class="form-control comment-textarea textarea" placeholder="<?php echo $wo['lang']['write_comment'];?>" type="text" onkeyup="Wo_RegisterComment(this.value,<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, event, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" onkeydown="textAreaAdjust(this, 31,'comm'); " dir="auto" oninput="count_char(this,<?php echo $wo['story']['id']; ?>)"></textarea>
+            <textarea class="form-control comment-textarea textarea" placeholder="<?php echo $wo['lang']['write_comment'];?>" type="text" onkeyup="Wo_LiveComment(this.value,event,<?php echo $wo['story']['id']; ?>);Wo_RegisterComment(this.value,<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, event, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" onkeydown="textAreaAdjust(this, 31,'comm'); " dir="auto" oninput="count_char(this,<?php echo $wo['story']['id']; ?>)"></textarea>
             <div class="<?php echo Wo_RightToLeft('pull-left');?> charsLeft-post"><span id="charsLeft_<?php echo $wo['story']['id']; ?>" data_num="<?php if ($wo['config']['maxCharacters'] != 10000) { echo $wo['config']['maxCharacters']; } ?>">
                   <?php if ($wo['config']['maxCharacters'] != 10000) { echo $wo['config']['maxCharacters']; } ?>
                </span></div>
@@ -167,6 +170,7 @@
                   </svg>
                </div>
                <ul class="dropdown-menu dropdown-menu-right sun_comm_dd_menu_<?php echo $wo['story']['id']; ?>">
+                  <?php if (!$wo['story']['is_still_live']) { ?>
                   <?php if ($wo['config']['audio_upload'] == 1) { ?>
                   <li class="rec">
                      <span data-record="0" class="btn record-comment-audio" id="<?php echo $wo['story']['id']; ?>">
@@ -176,6 +180,7 @@
                      </span>
                      <span class="sun_comm_rec_time hidden" data-comment-rtime="<?php echo $wo['story']['id']; ?>">00:00</span>
                   </li>
+                  <?php } ?>
                   <?php } ?>
                   <li class="emo dropdown-submenu">
                      <span data-toggle="dropdown" role="button" aria-expanded="false" class="dropdown-toggle sun_comm_dd_dt_<?php echo $wo['story']['id']; ?>" onclick="load_ajax_emojii('<?php echo $wo["story"]["id"];?>','<?php echo $wo['config']['theme_url'];?>/emoji/');">
@@ -187,6 +192,7 @@
                      </span>
                      <ul class="dropdown-menu dropdown-menu-right emo-comment-container-<?php echo $wo["story"]["id"];?>" id="wo_comm_emojis"></ul>
                   </li>
+                  <?php if (!$wo['story']['is_still_live']) { ?>
                   <li class="img">
                      <form action="#" method="post" class="hidden">
                         <input accept="image/x-png, image/jpeg" type="file" name="comment_image" id="comment_image_<?php echo $wo['story']['id']; ?>" onchange="Wo_UploadCommentImage(<?php echo $wo['story']['id']; ?>);">
@@ -198,9 +204,10 @@
                         </svg>
                      </span>
                   </li>
+               <?php } ?>
                </ul>
             </nav>
-			&nbsp;<button type="button" onclick="Wo_RegisterComment2(<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" class="btn btn-add-comm-postt" title="<?php echo $wo['lang']['post']; ?>">
+			&nbsp;<button type="button" onclick="Wo_LiveComment(this.value,event,<?php echo $wo['story']['id']; ?>,1);Wo_RegisterComment2(<?php echo $wo['story']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" class="btn btn-add-comm-postt" title="<?php echo $wo['lang']['post']; ?>">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" /></svg>
 			</button>
          </div>

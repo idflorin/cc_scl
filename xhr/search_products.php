@@ -7,6 +7,9 @@ if ($f == 'search_products') {
     if (!empty($_POST['c_id'])) {
         $array['c_id'] = Wo_Secure($_POST['c_id']);
     }
+    if (!empty($_POST['sub_id'])) {
+        $array['sub_id'] = Wo_Secure($_POST['sub_id']);
+    }
     if (!empty($_POST['value'])) {
         $array['keyword'] = $_POST['value'];
     }

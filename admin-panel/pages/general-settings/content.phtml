@@ -394,6 +394,83 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-4 col-md-4">
+            <div class="card">
+                <div class="header">
+                    <h2>Prevent Login System</h2>
+                </div>
+                <div class="body">
+
+                    <div class="alert alert-success lock-settings-alert"></div>
+                    <div class="alert lock-settings-test-alert"></div>
+                    <form class="lock-settings" method="POST">
+                        <label for="prevent_system">Prevent Login System <span class="black" data-toggle="popover" data-trigger="hover"></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="prevent_system" id="prevent_system-enabled" value="1" <?php echo ($wo['config']['prevent_system'] == 1) ? 'checked': '';?>>
+                            <label for="prevent_system-enabled">Enabled</label>
+                            <input type="radio" name="prevent_system" id="prevent_system-disabled" value="0" <?php echo ($wo['config']['prevent_system'] == 0) ? 'checked': '';?>>
+                            <label for="prevent_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="bad_login_limit" name="bad_login_limit" class="form-control" value="<?php echo $wo['config']['bad_login_limit']?>">
+                                <label class="form-label">Bad Login Limit</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="lock_time" name="lock_time" class="form-control" value="<?php echo $wo['config']['lock_time']?>">
+                                <label class="form-label">Lockout Time (Minutes)</label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4">
+            <div class="card">
+                <div class="header">
+                    <h2>Invite Links System</h2>
+                </div>
+                <div class="body">
+
+                    <div class="alert alert-success invite_links-settings-alert"></div>
+                    <div class="alert invite_links-settings-test-alert"></div>
+                    <form class="invite_links-settings" method="POST">
+                        <label for="invite_links_system">Invite Links System <span class="black" data-toggle="popover" data-trigger="hover"></span></label>
+                        <div class="form-group">
+                            <input type="radio" name="invite_links_system" id="invite_links_system-enabled" value="1" <?php echo ($wo['config']['invite_links_system'] == 1) ? 'checked': '';?>>
+                            <label for="invite_links_system-enabled">Enabled</label>
+                            <input type="radio" name="invite_links_system" id="invite_links_system-disabled" value="0" <?php echo ($wo['config']['invite_links_system'] == 0) ? 'checked': '';?>>
+                            <label for="invite_links_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="user_links_limit" name="user_links_limit" class="form-control" value="<?php echo $wo['config']['user_links_limit']?>">
+                                <label class="form-label">Links Limit Per User</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <br>
+                                <select class="form-control show-tick" id="expire_user_links" name="expire_user_links">
+                                      <option value="hour" <?php echo ($wo['config']['expire_user_links'] == 'hour')   ? ' selected': '';?>>1 Hour</option>
+                                      <option value="day" <?php echo ($wo['config']['expire_user_links'] == 'day')   ? ' selected': '';?>>1 Day</option>
+                                      <option value="week" <?php echo ($wo['config']['expire_user_links'] == 'week')   ? ' selected': '';?>>1 Week</option>
+                                      <option value="month" <?php echo ($wo['config']['expire_user_links'] == 'month')   ? ' selected': '';?>>1 Month</option>
+                                      <option value="year" <?php echo ($wo['config']['expire_user_links'] == 'year')   ? ' selected': '';?>>1 Year</option>
+                                </select>
+                                <label class="form-label">Per User Can Generate Links Every </label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="clearfix"></div>
     </div>
     <!-- #END# Vertical Layout -->
@@ -417,6 +494,38 @@ function Wo_TestVisionApi() {
     });
 }
 $(function() {
+    var form_invite_links_settings = $('form.invite_links-settings');
+    form_invite_links_settings.ajaxForm({
+        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
+        beforeSend: function() {
+            form_invite_links_settings.find('.waves-effect').text('Please wait..');
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_invite_links_settings.find('.waves-effect').text('Save');
+                $('.invite_links-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                setTimeout(function () {
+                    $('.invite_links-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+    var form_lock_settings = $('form.lock-settings');
+    form_lock_settings.ajaxForm({
+        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
+        beforeSend: function() {
+            form_lock_settings.find('button').text('Please wait..');
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_lock_settings.find('button').text('Save');
+                $('.lock-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                setTimeout(function () {
+                    $('.lock-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
     var form_funding_settings = $('form.funding-settings');
     form_funding_settings.ajaxForm({
         url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',

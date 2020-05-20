@@ -150,6 +150,13 @@ if (empty($error_code)) {
                     $page_data['background_image_status'] = 0;
                 }
             }
+            $array       = array(0,1);
+            $page_data['users_post'] = 0;
+            if (!empty($_POST['users_post'])) {
+                if (in_array($_POST['users_post'], $array)) {
+                    $page_data['users_post'] = Wo_Secure($_POST['users_post']);
+                }
+            }
 
 
 			$update = Wo_UpdatePageData($page['page_id'], $page_data);

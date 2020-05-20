@@ -32,6 +32,21 @@ if (Wo_IsPageOnwer($page_id) === false) {
         exit();
 	}
 }
+$array = array('general-setting' => 'general','profile-setting' => 'info','social-links' => 'social','delete-page' => 'delete_page','avatar-setting' => 'avatar','design-setting' => 'design','admins' => 'admins','analytics' => 'analytics');
+$s_page = 'general';
+if (!empty($_GET['link3']) && in_array($_GET['link3'], array_keys($array))) {
+    $s_page = $array[$_GET['link3']];
+}
+if ($wo['setting']['user_id'] != $wo['user']['id'] && !Wo_IsCanPageUpdate($wo['setting']['page_id'],$s_page)) {
+    $allowed = Wo_GetAllowedPages($page_id);
+    if (!empty($allowed) && !empty($allowed[0])) {
+        $_GET['link3'] = $allowed[0];
+    }
+    else{
+        header("Location: " . $wo['config']['site_url']);
+        exit();
+    }
+}
 
 $wo['description'] = $wo['config']['siteDesc'];
 $wo['keywords']    = $wo['config']['siteKeywords'];

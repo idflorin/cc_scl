@@ -33,13 +33,28 @@
 						<div class="form-group col-lg-8">
 							<label class="col-md-12" for="category"><?php echo $wo['lang']['category'] ?></label>  
 							<div class="col-md-12">
-								<select class="form-control" name="category">
+								<select class="form-control" name="category" onchange="GetProductSubCategory(this)">
 									<?php 
 										foreach ($wo['products_categories'] as $key => $category) {
 											$selected = ($key == $wo['product']['category']) ? 'selected' : '';
 											if ($key > 0) {
 									?>
 										<option value="<?php echo $key;?>" <?php echo $selected?>><?php echo $category;?></option>
+									<?php } } ?>
+								</select>
+							</div>
+						</div>
+						<div class="form-group col-lg-8">
+							<label class="col-md-12" for="product_sub_category"><?php echo $wo['lang']['sub_category'] ?></label>  
+							<div class="col-md-12">
+								<select class="form-control" name="product_sub_category" id="product_sub_category">
+									<?php
+									unset($wo['products_categories'][1]);
+									if (!empty($wo['products_sub_categories'][$wo['product']['category']])) {
+									foreach ($wo['products_sub_categories'][$wo['product']['category']] as $id => $sub_category) { 
+										$sub_selected = ($sub_category['id'] == $wo['product']['sub_category']) ? ' selected' : '' ;
+										?>
+										<option value="<?php echo $sub_category['id']?>" <?php echo $sub_selected; ?>><?php echo $sub_category['lang']; ?></option>
 									<?php } } ?>
 								</select>
 							</div>
@@ -75,6 +90,13 @@
 								<textarea class="form-control" name="description" rows="5"><?php echo $wo['product']['edit_description']?></textarea>
 								<span class="help-block"><?php echo $wo['lang']['please_describe_your_product'] ?>.</span>	
 							</div>
+							<?php $fields = Wo_GetCustomFields('product'); 
+						if (!empty($fields)) {
+							foreach ($fields as $key => $wo['field']) {
+								echo Wo_LoadPage('products/edit_fields');
+							}
+						}
+						?>
 						</div>
 						<input type="hidden" name="product_id" value="<?php echo $wo['product']['id'];?>">
 						
@@ -150,6 +172,23 @@
 </style>
 <!-- .page-margin -->
 <script type="text/javascript">
+	<?php 
+$js_array = json_encode($wo['products_sub_categories']);
+echo "var sub_categories_array = ". $js_array . ";\n";
+?>
+	function GetProductSubCategory(self) {
+		id = $(self).val();
+		var text = "";
+		if (typeof(sub_categories_array[id]) == 'undefined') {
+		    $('#product_sub_category').html('');
+		}
+		else{
+		   	sub_categories_array[id].forEach(function(entry) {
+				text = text + "<option value='"+entry.id+"'>"+entry.lang+"</option>";
+			});
+		    $('#product_sub_category').html(text);
+		}
+	}
 var deleted_images_ids = [];
 function DeleteProductImageById(image_id) {
 	deleted_images_ids.push(image_id);

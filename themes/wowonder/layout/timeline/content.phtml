@@ -121,9 +121,14 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 						<span class="user-follow-button btn-glossy">
                         <?php echo Wo_GetFollowButton($wo['user_profile']['user_id']);?>
                         </span>
-                        <span class="profile-message-btn btn-glossy">
+						<span class="profile-message-btn btn-glossy">
                         <?php echo Wo_GetMessageButton($wo['user_profile']['user_id']);?>
                         </span>
+                        <?php if ($wo['config']['notify_new_post'] == 1) { ?>
+                        	<span class="user-follow-button">
+	                        <?php echo Wo_GetNotifyButton($wo['user_profile']['user_id']);?>
+	                        </span>
+                        <?php } ?>
 						<?php if($IsOwnerUser === true) { ?>
 						<span class="btn-glossy">
 							<a class="btn btn-default" href="<?php echo Wo_SeoLink('index.php?link1=setting&user=' . $wo['user_profile']['username'] . '&page=general-setting') ?>" data-ajax="?link1=setting&user=<?php echo $wo['user_profile']['username'] . '&page=general-setting'; ?>">
@@ -140,7 +145,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 						<?php } else { ?>
 						<?php if($wo['loggedin'] == true) { ?>
 						<div class="dropup btn-glossy">
-							<button class="btn btn-default dropdown-toggle" type="button" id="user-dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+							<button class="btn btn-default wo_user_folw_empty_btns dropdown-toggle" type="button" id="user-dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-vertical"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
 							</button>
 							<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="user-dropdownMenu">
@@ -592,7 +597,11 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 						?>
 					</div>
 					<?php
-						$stories = Wo_GetPosts(array('filter_by' => 'all','publisher_id' => $wo['user_profile']['user_id'],'placement' => 'multi_image_post')); 
+					    $array = array('filter_by' => 'all','publisher_id' => $wo['user_profile']['user_id'],'placement' => 'multi_image_post');
+					    if ($wo['loggedin'] && $wo['user_profile']['user_id'] == $wo['user']['id']) {
+					    	$array['anonymous'] = true;
+					    }
+						$stories = Wo_GetPosts($array); 
 						if (count($stories) == 0 && count($pinedstory) == 0) {
 							echo Wo_LoadPage('story/profile-no-stories');
 						} else {

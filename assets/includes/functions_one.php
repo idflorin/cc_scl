@@ -185,6 +185,7 @@ function Wo_Login($username, $password) {
     $username            = Wo_Secure($username);
     $query_hash          = mysqli_query($sqlConnect, "SELECT * FROM " . T_USERS . " WHERE (`username` = '{$username}' OR `email` = '{$username}' OR `phone_number` = '{$username}')");
     $mysqli_hash_upgrade = mysqli_fetch_assoc($query_hash);
+    $login_password = '';
     $hash                = 'md5';
     if (preg_match('/^[a-f0-9]{32}$/', $mysqli_hash_upgrade['password'])) {
         $hash = 'md5';
@@ -504,6 +505,7 @@ function Wo_UserData($user_id, $password = true) {
     $fetched_data['avatar'] = Wo_GetMedia($fetched_data['avatar']) . '?cache=' . $fetched_data['last_avatar_mod'];
     $fetched_data['cover']  = Wo_GetMedia($fetched_data['cover']) . '?cache=' . $fetched_data['last_cover_mod'];
     $fetched_data['id']     = $fetched_data['user_id'];
+    $fetched_data['user_platform'] = Wo_GetPlatformFromUser_ID($fetched_data['user_id']);
     $fetched_data['type']   = 'user';
     $fetched_data['url']    = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['username']);
     $fetched_data['name']   = '';
@@ -658,6 +660,7 @@ function Wo_RegisterUser($registration_data, $invited = false) {
     if ($query) {
         if ($invited) {
             @Wo_DeleteAdminInvitation('code', $invited);
+            Wo_AddInvitedUser($user_id,$invited);
         }
         return true;
     } else {
@@ -1084,6 +1087,8 @@ function Wo_GetMedia($media) {
         return  'https://' . $wo['config']['space_name'] . '.' . $wo['config']['space_region'] . '.digitaloceanspaces.com/' . $media;
     } else if ($wo['config']['ftp_upload'] == 1) {
         return addhttp($wo['config']['ftp_endpoint']) . '/' . $media;
+    } else if ($wo['config']['cloud_upload'] == 1) {
+        return 'https://storage.cloud.google.com/'. $wo['config']['cloud_bucket_name'] . '/' . $media;
     }
     return $wo['config']['site_url'] . '/' . $media;
 }
@@ -1363,6 +1368,46 @@ function Wo_GetAllUsersByType($type = 'all') {
     }
     return $data;
 }
+function Wo_GetUsersByTime($type = 'week') {
+    global $sqlConnect;
+    $types = array('week','month','3month','6month','9month','year');
+    if (empty($type) || !in_array($type, $types)) {
+        return array();
+    }
+    $data      = array();
+    $end = time() - (60 * 60 * 24 * 7);
+    $start = time() - (60 * 60 * 24 * 14);
+    if ($type == 'month') {
+        $end = time() - (60 * 60 * 24 * 30);
+        $start = time() - (60 * 60 * 24 * 60);
+    }
+    if ($type == '3month') {
+        $end = time() - (60 * 60 * 24 * 61);
+        $start = time() - (60 * 60 * 24 * 150);
+    }
+    if ($type == '6month') {
+        $end = time() - (60 * 60 * 24 * 151);
+        $start = time() - (60 * 60 * 24 * 210);
+    }
+    if ($type == '9month') {
+        $end = time() - (60 * 60 * 24 * 211);
+        $start = time() - (60 * 60 * 24 * 300);
+    }
+    if ($type == 'year') {
+        $end = time() - (60 * 60 * 24 * 365);
+    }
+    $sub1 = " WHERE `lastseen` >= '{$start}' ";
+    $sub2 = " AND `lastseen` <= '{$end}' ";
+    if ($type == 'year') {
+        $sub2 = "";
+    }
+    $query_one = " SELECT `user_id` FROM " . T_USERS.$sub1.$sub2;
+    $sql = mysqli_query($sqlConnect, $query_one);
+    while ($fetched_data = mysqli_fetch_assoc($sql)) {
+        $data[] = Wo_UserData($fetched_data['user_id']);
+    }
+    return $data;
+}
 function Wo_GetFollowingSug($limit, $query) {
     global $wo, $sqlConnect;
     $data = array();
@@ -1597,6 +1642,23 @@ function Wo_ImportImageFromUrl($media, $custom_name = '_url_image') {
     } else {
         return false;
     }
+}
+
+function Wo_IsFollowingNotify($following_id, $user_id = 0) {
+    global $sqlConnect, $wo;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($following_id) || !is_numeric($following_id) || $following_id < 0) {
+        return false;
+    }
+    if ((empty($user_id) || !is_numeric($user_id) || $user_id < 0)) {
+        $user_id = $wo['user']['user_id'];
+    }
+    $following_id = Wo_Secure($following_id);
+    $user_id      = Wo_Secure($user_id);
+    $query        = mysqli_query($sqlConnect, " SELECT COUNT(`id`) FROM " . T_FOLLOWERS . " WHERE `following_id` = {$following_id} AND `follower_id` = {$user_id} AND `active` = '1' AND `notify` = '1'");
+    return (Wo_Sql_Result($query, 0) == 1) ? true : false;
 }
 function Wo_IsFollowing($following_id, $user_id = 0) {
     global $sqlConnect, $wo;
@@ -2072,7 +2134,9 @@ function Wo_GetFollowers($user_id, $type = '', $limit = '', $after_user_id = '',
     $sql_query = mysqli_query($sqlConnect, $query);
     while ($fetched_data = mysqli_fetch_assoc($sql_query)) {
         $user_data                  = Wo_UserData($fetched_data['user_id'], false);
-        $user_data['family_member'] = Wo_GetFamalyMember($fetched_data['user_id'], $wo['user']['id']);
+        if ($wo['loggedin']) {
+            $user_data['family_member'] = Wo_GetFamalyMember($fetched_data['user_id'], $wo['user']['id']);
+        }
         $data[]                     = $user_data;
     }
     return $data;
@@ -2129,6 +2193,57 @@ function Wo_GetFollowButton($user_id = 0) {
             }
         }
     }
+}
+function Wo_GetNotifyButton($user_id = 0) {
+    global $wo;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (!is_numeric($user_id) or $user_id < 0) {
+        return false;
+    }
+    if ($user_id == $wo['user']['user_id']) {
+        return false;
+    }
+    $account = $wo['follow'] = Wo_UserData($user_id);
+    if (!isset($wo['follow']['user_id'])) {
+        return false;
+    }
+    $user_id           = Wo_Secure($user_id);
+    $logged_user_id    = Wo_Secure($wo['user']['user_id']);
+    $wo['user_name_n'] = $account['name'];
+    $notify_button     = 'buttons/notify';
+    $unnotify_button   = 'buttons/unnotify';
+    if (Wo_IsFollowing($user_id, $logged_user_id)) {
+        if (Wo_IsFollowingNotify($user_id, $logged_user_id)) {
+            if ($wo['config']['connectivitySystem'] == 1) {
+                return Wo_LoadPage($unnotify_button);
+            } else {
+                return Wo_LoadPage($unnotify_button);
+            }
+        }
+        else{
+            return Wo_LoadPage($notify_button);
+        }
+    }
+    return '';
+        
+}
+function Wo_GetFollowNotifyUsers($user_id = 0) {
+    global $wo,$sqlConnect;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (!is_numeric($user_id) or $user_id < 0) {
+        return false;
+    }
+    $user_id = Wo_Secure($user_id);
+    $data = array();
+    $query        = mysqli_query($sqlConnect, " SELECT `follower_id` FROM " . T_FOLLOWERS . " WHERE `following_id` = {$user_id} AND `active` = '1' AND `notify` = '1'");
+    while ($fetched_data = mysqli_fetch_assoc($query)) {
+        $data[]                     = $fetched_data['follower_id'];
+    }
+    return $data;
 }
 
 function Wo_RegisterNotification($data = array()) {
@@ -2792,6 +2907,80 @@ function Wo_GetMessagesUsers($user_id, $searchQuery = '', $limit = 50, $new = fa
     return $data;
 }
 
+function Wo_GetMessagesUsersAPP2($fetch_array = array()) {
+    global $wo, $sqlConnect;
+    if (empty($fetch_array['session_id'])) {
+        if ($wo['loggedin'] == false) {
+            return false;
+        }
+    }
+    if (!is_numeric($fetch_array['user_id']) or $fetch_array['user_id'] < 1) {
+        return false;
+    }
+    if (!isset($fetch_array['user_id'])) {
+        $user_id = $wo['user']['user_id'];
+    }
+    $user_id     = Wo_Secure($fetch_array['user_id']);
+    $searchQuery = '';
+    if (!empty($fetch_array['searchQuery'])) {
+        $searchQuery = Wo_Secure($fetch_array['searchQuery']);
+    }
+    $data     = array();
+    $excludes = array();
+    $offset_query = "";
+    if (!empty($fetch_array['offset'])) {
+        $offset_query = " AND `time` < ".$fetch_array['offset'];
+    }
+    if (isset($searchQuery) AND !empty($searchQuery)) {
+        $query_one = "SELECT `user_id` as `conversation_user_id` FROM " . T_USERS . " WHERE (`user_id` IN (SELECT `from_id` FROM " . T_MESSAGES . " WHERE `to_id` = {$user_id} AND `page_id` = 0 AND `user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}') AND `active` = '1' ";
+        if (isset($fetch_array['new']) && $fetch_array['new'] == true) {
+            $query_one .= " AND `seen` = 0";
+        }
+
+        $query_one .= " ORDER BY `user_id` DESC)";
+        if (!isset($fetch_array['new']) or $fetch_array['new'] == false) {
+            $query_one .= " OR `user_id` IN (SELECT `to_id` FROM " . T_MESSAGES . " WHERE `from_id` = {$user_id} AND `page_id` = 0 ORDER BY `id` DESC)";
+        }
+        $query_one .= ") AND ((`username` LIKE '%{$searchQuery}%') OR CONCAT( `first_name`,  ' ', `last_name` ) LIKE  '%{$searchQuery}%')";
+        if (!empty($fetch_array['limit'])) {
+            $limit = Wo_Secure($fetch_array['limit']);
+            $query_one .= "LIMIT {$limit}";
+        }
+    } else {
+        $time       = time() - 60;
+        $query_one_2 = '';
+        $full = '';
+        if (!empty($fetch_array['type']) && $fetch_array['type'] == 'online') {
+            $query_one_2 = " `lastseen` > {$time}";
+        } else if (!empty($fetch_array['type']) && $fetch_array['type'] == 'offline') {
+            $query_one_2 = " `lastseen` < {$time}";
+        }
+        if (!empty($query_one_2)) {
+            $full = " AND (`user_id` IN (SELECT `user_id` FROM " . T_USERS . " WHERE {$query_one_2})) ";
+        }
+        $query_one = "SELECT * FROM " . T_U_CHATS . " WHERE `user_id` = '$user_id' AND `page_id` = 0 AND (`conversation_user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `conversation_user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}')) {$full} {$offset_query}  ORDER BY `time` DESC";
+    }
+    if (!empty($fetch_array['limit'])) {
+        $limit = Wo_Secure($fetch_array['limit']);
+        $query_one .= " LIMIT {$limit}";
+    }
+    $sql_query_one = mysqli_query($sqlConnect, $query_one);
+    if (mysqli_num_rows($sql_query_one) > 0) {
+        while ($sql_fetch_one = mysqli_fetch_assoc($sql_query_one)) {
+            $new_data = Wo_UserData($sql_fetch_one['conversation_user_id']);
+            if (!empty($new_data) && !empty($new_data['username'])) {
+                //$new_data['chat_time'] = $sql_fetch_one['time'];
+                if (!empty($sql_fetch_one['time'])) {
+                    $new_data['chat_time'] = $sql_fetch_one['time'];
+                }
+                $data[] = $new_data;
+            }
+            
+        }
+    }
+    return $data;
+}
+
 
 function Wo_GetPageChatList($user_id,$limit = 50, $new = false, $update = 0) {
     global $wo, $sqlConnect,$db;
@@ -2893,7 +3082,7 @@ function Wo_GetMessages($data = array(), $limit = 50) {
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $fetched_data['messageUser'] = Wo_UserData($fetched_data['from_id']);
         $fetched_data['text']        = Wo_Markup($fetched_data['text']);
-        $fetched_data['text']        = Wo_Emo($fetched_data['text']);
+        //$fetched_data['text']        = Wo_Emo($fetched_data['text']);
         $fetched_data['onwer']       = ($fetched_data['messageUser']['user_id'] == $wo['user']['user_id']) ? 1 : 0;
         if (!empty($fetched_data['stickers']) && !Wo_IsUrl($fetched_data['stickers'])) {
             $fetched_data['stickers'] = Wo_GetMedia($fetched_data['stickers']);
@@ -3377,7 +3566,9 @@ function Wo_RegisterPageMessage($ms_data = array()) {
     if (empty($ms_data['text']) || !isset($ms_data['text']) || strlen($ms_data['text']) < 0) {
         if (empty($ms_data['media']) || !isset($ms_data['media']) || strlen($ms_data['media']) < 0 ) {
             if (empty($ms_data['stickers'])) {
-                return false;
+                if (empty($ms_data['lng']) && empty($ms_data['lat'])) {
+                    return false;
+                }
             }
         }
     }
@@ -4070,9 +4261,11 @@ function Wo_ShareFile($data = array(), $type = 0, $crop = true) {
                     $last_file = $explode3[0] . '_small.' . $explode2;
 
                     if (Wo_Resize_Crop_Image(400, 400, $filename, $last_file, 60)) {
-                        if (($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1) && !empty($last_file)) {
-                            $upload_s3 = Wo_UploadToS3($last_file);
-                        }
+                        if (empty($data['local_upload'])) {
+                            if (($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) && !empty($last_file)) {
+                                $upload_s3 = Wo_UploadToS3($last_file);
+                            }
+                        } 
                     }
                 } else {
                     if (!isset($data['compress']) && $second_file != 'gif') {
@@ -4085,8 +4278,10 @@ function Wo_ShareFile($data = array(), $type = 0, $crop = true) {
         if (!empty($data['crop'])) {
             $crop_image = Wo_Resize_Crop_Image($data['crop']['width'], $data['crop']['height'], $filename, $filename, 60);
         }
-        if (($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1) && !empty($filename)) {
-            $upload_s3 = Wo_UploadToS3($filename);
+        if (empty($data['local_upload'])) {
+            if (($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) && !empty($filename)) {
+                $upload_s3 = Wo_UploadToS3($filename);
+            }
         }
         $last_data             = array();
         $last_data['filename'] = $filename;
@@ -4311,7 +4506,7 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         return false;
     }
     if (!empty($re_data['page_id'])) {
-        if (Wo_IsPageOnwer($re_data['page_id']) === false) {
+        if (Wo_IsPageOnwer($re_data['page_id']) === false && Wo_UserCanPostPage($re_data['page_id']) === false) {
             return false;
         }
     }
@@ -4572,8 +4767,6 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         else{
             Wo_RegisterPoint($post_id, "createpost");
         }
-        
-
         return $post_id;
     }
 }
@@ -4887,6 +5080,10 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
     if (!empty($story['job_id'])) {
         $story['job'] = Wo_GetJobById($story['job_id']); 
     }
+    $story['offer'] = array();
+    if (!empty($story['offer_id'])) {
+        $story['offer'] = Wo_GetOfferById($story['offer_id']); 
+    }
     $story['fund'] = array();
     if (!empty($story['fund_raise_id'])) {
         $story['fund'] = GetFundByRaiseId($story['fund_raise_id'],$story['user_id']);
@@ -4897,6 +5094,33 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
         $story['fund_data'] = GetFundingById($story['fund_id']);
         unset($story['fund_data']['user_data']);
     }
+    $story['forum'] = array();
+    if (!empty($story['forum_id'])) {
+        $forum = Wo_GetForumInfo($story['forum_id']);
+        if (!empty($forum) && !empty($forum['forum'])) {
+            if (strlen($forum['forum']['description']) > 200) {
+                $forum['forum']['description'] = substr($forum['forum']['description'], 0,200).'...';
+            }
+            $story['forum'] = $forum['forum'];
+        }
+    }
+    $story['thread'] = array();
+    if (!empty($story['thread_id'])) {
+        $thread = Wo_GetForumThreads(array("id" => $story['thread_id'], "preview" => true));
+        if (!empty($thread) && !empty($thread[0])) {
+            if (strlen($thread[0]['orginal_headline']) > 200) {
+                $thread[0]['orginal_headline'] = substr($thread[0]['orginal_headline'], 0,200).'...';
+            }
+            $story['thread'] = $thread[0];
+        }
+    }
+    $story['is_still_live'] = false;
+    $story['live_sub_users'] = 0;
+    if (!empty($story['stream_name']) && !empty($story['live_time']) && $story['live_time'] >= (time() - 10) && $story['live_ended'] == 0) {
+        $story['is_still_live'] = true;
+        $story['live_sub_users'] = $db->where('post_id',$story['id'])->where('time',time()-6,'>=')->getValue(T_LIVE_SUB,'COUNT(*)');
+    }
+    
     return $story;
 }
 function Wo_CountPostShare($post_id) {
@@ -5047,9 +5271,10 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
-        if ($Wo_publisher['user_id'] != $wo['user']['id']) {
+        if (!$wo['loggedin'] || $Wo_publisher['user_id'] != $wo['user']['id']) {
             $query_text .= " AND `postPrivacy` <> '3'";
         }
+        $query_text .= " AND `postPrivacy` <> '4' ";
     } else if (isset($Wo_page_publisher['page_id'])) {
         $page_id = Wo_Secure($Wo_page_publisher['page_id']);
         $query_text .= " AND (`page_id` = {$page_id}) AND `id` NOT IN (SELECT `post_id` from " . T_PINNED_POSTS . " WHERE `page_id` = {$page_id})";
@@ -5081,7 +5306,7 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 }
                 break;
         }
-        if ($Wo_page_publisher['user_id'] != $wo['user']['id']) {
+        if (!$wo['loggedin'] || $Wo_page_publisher['user_id'] != $wo['user']['id']) {
             $query_text .= " AND `postPrivacy` <> '3'";
         }
 
@@ -5108,7 +5333,7 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
-        if ($Wo_group_publisher['user_id'] != $wo['user']['id']) {
+        if (!$wo['loggedin'] || $Wo_group_publisher['user_id'] != $wo['user']['id']) {
             $query_text .= " AND `postPrivacy` <> '3'";
         }
     } else if (isset($Wo_event_publisher['id'])) {
@@ -5134,7 +5359,7 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
-        if ($Wo_event_publisher['user_id'] != $wo['user']['id']) {
+        if (!$wo['loggedin'] || $Wo_event_publisher['user_id'] != $wo['user']['id']) {
             $query_text .= " AND `postPrivacy` <> '3'";
         }
     } else {
@@ -5196,6 +5421,9 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 $query_text .= " AND `postMap` <> ''";
                 break;
         }
+    }
+    if (empty($data['anonymous']) || $data['anonymous'] != true) {
+        $query_text .= " AND `postPrivacy` <> '4' ";
     }
     if ($data['filter_by'] != 'job' && empty($Wo_page_publisher['page_id'])) {
         $query_text .= " AND `job_id` = '0' ";
@@ -5358,6 +5586,16 @@ function Wo_DeletePost($post_id = 0,$type = '') {
             }
             $db->where('id',$post_info->job_id)->delete(T_JOB);
             $db->where('job_id',$post_info->job_id)->delete(T_JOB_APPLY);
+        }
+        if (!empty($post_info->offer_id)) {
+            $offer = $db->where('id',$post_info->offer_id)->getOne(T_OFFER);
+            if (!empty($offer)) {
+                if (!empty($offer->image)) {
+                    @unlink($offer->image);
+                    Wo_DeleteFromToS3($offer->image);
+                }
+            }
+            $db->where('id',$post_info->offer_id)->delete(T_OFFER);
         }
         if (!empty($fetched_data['postText'])) {
             $hashtag_regex = '/(#\[([0-9]+)\])/i';
@@ -6055,6 +6293,10 @@ function Wo_AddReplayReactions($user_id,$reply_id, $reaction) {
         $query_two     = "INSERT INTO " . T_REACTIONS . " (`user_id`, `replay_id`, `reaction`) VALUES ({$logged_user_id}, {$reply_id},'{$reaction}')";
         $sql_query_two = mysqli_query($sqlConnect, $query_two);
         if ($sql_query_two) {
+            $post_data = Wo_PostData($post_id);
+            if ($wo['config']['shout_box_system'] == 1 && !empty($post_data) && $post_data['postPrivacy'] == 4 && $post_data['user_id'] == $logged_user_id) {
+                $type2 = 'anonymous';
+            }
             // $activity_data = array(
             //     'post_id' => $post_id,
             //     'reply_id' => $reply_id,
@@ -6110,6 +6352,10 @@ function Wo_AddCommentReactions($comment_id, $reaction) {
         $query_two     = "INSERT INTO " . T_REACTIONS . " (`user_id`, `comment_id`, `reaction`) VALUES ({$logged_user_id}, {$comment_id},'{$reaction}')";
         $sql_query_two = mysqli_query($sqlConnect, $query_two);
         if ($sql_query_two) {
+            $post_data = Wo_PostData($post_id);
+            if ($wo['config']['shout_box_system'] == 1 && !empty($post_data) && $post_data['postPrivacy'] == 4 && $post_data['user_id'] == $logged_user_id) {
+                $type2 = 'anonymous';
+            }
             // $activity_data = array(
             //     'post_id' => $post_id,
             //     'comment_id' => $comment_id,
@@ -6171,65 +6417,101 @@ function Wo_GetReactedTextIcon($object_id, $user_id, $col = "post") {
         $reaction_icon = "";
         $reaction_color = "";
         if (!file_exists('./themes/' . $wo['config']['theme'] . '/reaction/like-sm.png')) {
+
+            if ($wo['reactions_types'][$sql_fetch_one['reaction']]['is_html'] == 1) {
+
+                switch (strtolower($sql_fetch_one['reaction'])) {
+                   case 1:
+                       $reaction_icon = "<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--like'><div class='emoji__hand'><div class='emoji__thumb'></div></div></div></div>";
+                       break;
+                   case 2:
+                       $reaction_icon = "<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--love'><div class='emoji__heart'></div></div></div>";
+                       break;
+                   case 3:
+                      $reaction_icon = "<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--haha'><div class='emoji__face'><div class='emoji__eyes'></div><div class='emoji__mouth'><div class='emoji__tongue'></div></div></div></div></div>";
+                       break;
+                   case 4:
+                       $reaction_icon = "<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--wow'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div>";
+                       break;
+                   case 5:
+                       $reaction_icon = "<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--sad'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div>";
+                       break;
+                   case 6:
+                       $reaction_icon = "<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--angry'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div>";
+                       break;
+               }
+            }
+            else{
+                if (!empty($wo['reactions_types'][$sql_fetch_one['reaction']]['wowonder_small_icon'])) {
+                    $reaction_icon = "<div class='inline_post_count_emoji reaction'><img src='{$wo['reactions_types'][$sql_fetch_one['reaction']]['wowonder_small_icon']}' alt=\"" . $wo['reactions_types'][$sql_fetch_one['reaction']]['name'] . "\"></div>";
+                }
+            }
+            return '<span class="status-reaction-'.$object_id.' active-like">' . $reaction_icon . ' &nbsp;  '.$wo['reactions_types'][strtolower($sql_fetch_one['reaction'])]['name'].'</span>';
+
+
+
         
-        switch ($sql_fetch_one['reaction']) {
-            case 'Like':
-                $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--like"><div class="emoji__hand"><div class="emoji__thumb"></div></div></div></div>';
-                $reaction_color = '#1da1f2';
-                break;
-            case 'Love':
-                $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--love"><div class="emoji__heart"></div></div></div>';
-                $reaction_color = '#f25268';
-                break;
-            case 'HaHa':
-                $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--haha"><div class="emoji__face"><div class="emoji__eyes"></div><div class="emoji__mouth"><div class="emoji__tongue"></div></div></div></div></div>';
-                $reaction_color = '#f3b715';
-                break;
-            case 'Wow':
-                $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--wow"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div></div>';
-                $reaction_color = '#f3b715';
-                break;
-            case 'Sad':
-                $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--sad"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div></div>';
-                $reaction_color = '#f3b715';
-                break;
-            case 'Angry':
-                $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--angry"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div></div>';
-                $reaction_color = '#f7806c';
-                break;
-        }
+            // switch ($sql_fetch_one['reaction']) {
+            //     case 1:
+            //         $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--like"><div class="emoji__hand"><div class="emoji__thumb"></div></div></div></div>';
+            //         $reaction_color = '#1da1f2';
+            //         break;
+            //     case 2:
+            //         $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--love"><div class="emoji__heart"></div></div></div>';
+            //         $reaction_color = '#f25268';
+            //         break;
+            //     case 3:
+            //         $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--haha"><div class="emoji__face"><div class="emoji__eyes"></div><div class="emoji__mouth"><div class="emoji__tongue"></div></div></div></div></div>';
+            //         $reaction_color = '#f3b715';
+            //         break;
+            //     case 4:
+            //         $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--wow"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div></div>';
+            //         $reaction_color = '#f3b715';
+            //         break;
+            //     case 5:
+            //         $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--sad"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div></div>';
+            //         $reaction_color = '#f3b715';
+            //         break;
+            //     case 6:
+            //         $reaction_icon = '<div class="inline_post_emoji no_anim"><div class="emoji emoji--angry"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div></div>';
+            //         $reaction_color = '#f7806c';
+            //         break;
+            // }
         }
         else{
-        
-            switch ($sql_fetch_one['reaction']) {
-                case 'Like':
-                    $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/like-sm.png" alt="' . $wo['lang']['like'] . '"></div>';
-                    $reaction_color = '#1da1f2';
-                    break;
-                case 'Love':
-                    $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/love-sm.png" alt="' . $wo['lang']['love'] . '"></div>';
-                    $reaction_color = '#f25268';
-                    break;
-                case 'HaHa':
-                    $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/haha-sm.png" alt="' . $wo['lang']['haha'] . '"></div>';
-                    $reaction_color = '#f3b715';
-                    break;
-                case 'Wow':
-                    $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/wow-sm.png" alt="' . $wo['lang']['wow'] . '"></div>';
-                    $reaction_color = '#f3b715';
-                    break;
-                case 'Sad':
-                    $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/sad-sm.png" alt="' . $wo['lang']['sad'] . '"></div>';
-                    $reaction_color = '#f3b715';
-                    break;
-                case 'Angry':
-                    $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/angry-sm.png" alt="' . $wo['lang']['angry'] . '"></div>';
-                    $reaction_color = '#f7806c';
-                    break;
+            if (!empty($wo['reactions_types'][$sql_fetch_one['reaction']]['sunshine_small_icon'])) {
+                $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['reactions_types'][$sql_fetch_one['reaction']]['sunshine_small_icon'] . '" alt="' . $wo['reactions_types'][$sql_fetch_one['reaction']]['name'] . '"></div>';
             }
+        
+            // switch ($sql_fetch_one['reaction']) {
+            //     case 'Like':
+            //         $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/like-sm.png" alt="' . $wo['lang']['like'] . '"></div>';
+            //         $reaction_color = '#1da1f2';
+            //         break;
+            //     case 'Love':
+            //         $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/love-sm.png" alt="' . $wo['lang']['love'] . '"></div>';
+            //         $reaction_color = '#f25268';
+            //         break;
+            //     case 'HaHa':
+            //         $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/haha-sm.png" alt="' . $wo['lang']['haha'] . '"></div>';
+            //         $reaction_color = '#f3b715';
+            //         break;
+            //     case 'Wow':
+            //         $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/wow-sm.png" alt="' . $wo['lang']['wow'] . '"></div>';
+            //         $reaction_color = '#f3b715';
+            //         break;
+            //     case 'Sad':
+            //         $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/sad-sm.png" alt="' . $wo['lang']['sad'] . '"></div>';
+            //         $reaction_color = '#f3b715';
+            //         break;
+            //     case 'Angry':
+            //         $reaction_icon = '<div class="inline_post_emoji"><img class="" src="' . $wo['config']['theme_url'] . '/reaction/angry-sm.png" alt="' . $wo['lang']['angry'] . '"></div>';
+            //         $reaction_color = '#f7806c';
+            //         break;
+            // }
         }
 
-        return '<span class="status-reaction-'.$object_id.' active-like">' . $reaction_icon . '<span style="color: '. $reaction_color .';"> '.$wo['lang'][strtolower($sql_fetch_one['reaction'])].'</span></span>';
+        return '<span class="status-reaction-'.$object_id.' active-like">' . $reaction_icon . '<span style="color: '. $reaction_color .';"> '.$wo['reactions_types'][strtolower($sql_fetch_one['reaction'])]['name'].'</span></span>';
     }
 }
 function Wo_CountReactions($object_id, $reaction, $col = "post") {
@@ -6281,51 +6563,63 @@ function Wo_GetPostReactions($object_id, $col = "post",$type = '') {
         
 
         if (!file_exists('./themes/' . $wo['config']['theme'] . '/reaction/like-sm.png')) {
-           
-           switch (strtolower($key)) {
-               case 'like':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--like'><div class='emoji__hand'><div class='emoji__thumb'></div></div></div></div></span>";
-                   break;
-               case 'love':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--love'><div class='emoji__heart'></div></div></div></span>";
-                   break;
-               case 'haha':
-                  $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--haha'><div class='emoji__face'><div class='emoji__eyes'></div><div class='emoji__mouth'><div class='emoji__tongue'></div></div></div></div></div></span>";
-                   break;
-               case 'wow':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--wow'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div></span>";
-                   break;
-               case 'sad':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--sad'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div></span>";
-                   break;
-               case 'angry':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--angry'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div></span>";
-                   break;
-           }
+
+            if ($wo['reactions_types'][$key]['is_html'] == 1) {
+
+                switch (strtolower($key)) {
+                   case 1:
+                       $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--like'><div class='emoji__hand'><div class='emoji__thumb'></div></div></div></div></span>";
+                       break;
+                   case 2:
+                       $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--love'><div class='emoji__heart'></div></div></div></span>";
+                       break;
+                   case 3:
+                      $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--haha'><div class='emoji__face'><div class='emoji__eyes'></div><div class='emoji__mouth'><div class='emoji__tongue'></div></div></div></div></div></span>";
+                       break;
+                   case 4:
+                       $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--wow'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div></span>";
+                       break;
+                   case 5:
+                       $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--sad'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div></span>";
+                       break;
+                   case 6:
+                       $reactions_html .= $first."<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--angry'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div></span>";
+                       break;
+               }
+            }
+            else{
+                if (!empty($wo['reactions_types'][$key]['wowonder_small_icon'])) {
+                    $reactions_html .= $first."<div class='inline_post_count_emoji reaction'><img src='{$wo['reactions_types'][$key]['wowonder_small_icon']}' alt=\"" . $wo['reactions_types'][$key]['name'] . "\"></div></span>";
+                }
+            }
+
         }
         else{
 
+            if (!empty($wo['reactions_types'][$key]['sunshine_small_icon'])) {
+                $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['reactions_types'][$key]['sunshine_small_icon']}' alt=\"" . $wo['reactions_types'][$key]['name'] . "\"></div></span>";
+            }
            
-           switch (strtolower($key)) {
-               case 'like':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/like-sm.png' alt=\"" . $wo['lang']['like'] . "\"></div></span>";
-                   break;
-               case 'love':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/love-sm.png' alt=\"" . $wo['lang']['love'] . "\"></div></span>";
-                   break;
-               case 'haha':
-                  $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/haha-sm.png' alt=\"" . $wo['lang']['haha'] . "\"></div></span>";
-                   break;
-               case 'wow':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/wow-sm.png' alt=\"" . $wo['lang']['wow'] . "\"></div></span>";
-                   break;
-               case 'sad':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/sad-sm.png' alt=\"" . $wo['lang']['sad'] . "\"></div></span>";
-                   break;
-               case 'angry':
-                   $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/angry-sm.png' alt=\"" . $wo['lang']['angry'] . "\"></div></span>";
-                   break;
-           }
+           // switch (strtolower($key)) {
+           //     case 1:
+           //         $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/like-sm.png' alt=\"" . $wo['lang']['like'] . "\"></div></span>";
+           //         break;
+           //     case 2:
+           //         $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/love-sm.png' alt=\"" . $wo['lang']['love'] . "\"></div></span>";
+           //         break;
+           //     case 3:
+           //        $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/haha-sm.png' alt=\"" . $wo['lang']['haha'] . "\"></div></span>";
+           //         break;
+           //     case 4:
+           //         $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/wow-sm.png' alt=\"" . $wo['lang']['wow'] . "\"></div></span>";
+           //         break;
+           //     case 5:
+           //         $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/sad-sm.png' alt=\"" . $wo['lang']['sad'] . "\"></div></span>";
+           //         break;
+           //     case 6:
+           //         $reactions_html .= $first."<div class='inline_post_count_emoji'><img src='{$wo['config']['theme_url']}/reaction/angry-sm.png' alt=\"" . $wo['lang']['angry'] . "\"></div></span>";
+           //         break;
+           // }
         }
            //$reactions_html .= "<span class=\"like-btn-".strtolower($key)."\" id=\"_".$col.$object_id."\" onclick=\"Wo_OpenPostReactedUsers(".$object_id.",'".strtolower($key)."');\"></span>";
        }
@@ -6767,7 +7061,7 @@ function Wo_GetPostShared($post_id = 0,$limit = 20,$offset=0) {
     }
     return $data;
 }
-function Wo_GetPostReactionUsers($post_id = 0, $type="Like",$limit = 20,$offset=0,$col='post') {
+function Wo_GetPostReactionUsers($post_id = 0, $type="1",$limit = 20,$offset=0,$col='post') {
     global $sqlConnect;
     if (empty($post_id) or !is_numeric($post_id) or $post_id < 1) {
         return false;
@@ -7935,4 +8229,49 @@ function Wo_AddBlogReplyReactions($user_id,$reply_id, $reaction) {
 
         return 'reacted';
     }
+}
+
+
+function WoAddBadLoginLog() {
+    global $wo, $sqlConnect;
+    if ($wo['loggedin'] == true) {
+        return false;
+    }
+    $ip = get_ip_address();
+    if (empty($ip)) {
+        return true;
+    }
+    $time      = time();
+    $query     = mysqli_query($sqlConnect, "INSERT INTO " . T_BAD_LOGIN . " (`ip`, `time`) VALUES ('{$ip}', '{$time}')");
+    if ($query) {
+        return true;
+    }
+}
+
+function WoCanLogin() {
+    global $wo, $sqlConnect,$db;
+    if ($wo['loggedin'] == true) {
+        return false;
+    }
+    $ip = get_ip_address();
+    if (empty($ip)) {
+        return true;
+    }
+    if ($wo['config']['lock_time'] < 1) {
+        return true;
+    }
+    if ($wo['config']['bad_login_limit'] < 1) {
+        return true;
+    }
+
+    $time      = time() - (60 * $wo['config']['lock_time']);
+    $login = $db->where('ip',$ip)->get(T_BAD_LOGIN);
+    if (count($login) >= $wo['config']['bad_login_limit']) {
+        $last = end($login);
+        if ($last->time >= $time) {
+            return false;
+        }
+    }
+    $db->where('time',time()-(60 * $wo['config']['lock_time'] * 2),'<')->delete(T_BAD_LOGIN);
+    return true;
 }

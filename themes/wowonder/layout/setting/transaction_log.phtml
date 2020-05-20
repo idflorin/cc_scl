@@ -1,5 +1,5 @@
 <?php 
-$wo['trans'] = Wo_GetMytransactions();
+$wo['trans'] = Wo_GetMytransactions(array('user_id' => $wo['setting']['user_id']));
 ?>
 <div class="wo_settings_page wow_content">
 	<div class="avatar-holder">

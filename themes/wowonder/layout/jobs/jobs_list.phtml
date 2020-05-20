@@ -1,15 +1,17 @@
 <div class="product wo_jobs_list" id="product-<?php echo $wo['job']['id']?>" data-id="<?php echo $wo['job']['id']?>">
 	<div class="wo_jlist_headimg">
 		<a href="<?php echo $wo['job']['url']?>"><img src="<?php echo Wo_GetMedia($wo['job']['image']);?>"></a>
+		<?php if (Wo_IsModerator() || Wo_IsAdmin()) { ?>
+			<a class="btn btn-danger btn-mat" href="javascript:void(0)" onclick="Wo_OpenJobDeleteBox(<?php echo  $wo['job']['id']; ?>);"><?php echo $wo['lang']['delete'] ?></a>
+		<?php } ?>
 	</div>
 	<div class="wo_jlist_info">
 		<div class="wo_jlist_info_head">
 			<h2><a href="<?php echo $wo['job']['url']?>" title="<?php echo $wo['job']['title']?>"><?php echo $wo['job']['title']?></a></h2>
 			<div>
-				<?php if (Wo_IsModerator() || Wo_IsAdmin()) { ?>
-					<a class="btn btn-main" href="javascript:void(0)" onclick="Wo_OpenJobDeleteBox(<?php echo  $wo['job']['id']; ?>);"><?php echo $wo['lang']['delete'] ?></a>
+				<?php if ($wo['job']['user_id'] != $wo['user']['id']) { ?>
+					<a class="btn btn-mat" href="<?php echo $wo['job']['url']?>"><?php echo $wo['lang']['apply_now'] ?></a>
 				<?php } ?>
-			    <a class="btn btn-main" href="<?php echo $wo['job']['url']?>"><?php echo $wo['lang']['apply_now'] ?></a>
 			</div>
 		</div>
 		<div class="wo_jlist_info_main">
@@ -21,7 +23,7 @@
 			?>
 			<span><a href="<?php echo Wo_SeoLink('index.php?link1=jobs');?>?c_id=<?php echo($wo['job']['category']) ?>"><?php echo $wo['job_categories'][$wo['job']['category']];?></a></span>
 		</div>
-		<p><?php echo stripslashes(mb_substr($wo['job']['description'], 0, 150, "UTF-8")) . '...';?></p>
+		<!--<p><?php echo stripslashes(mb_substr($wo['job']['description'], 0, 150, "UTF-8")) . '...';?></p>-->
 	</div>
 	<div class="clear"></div>
 </div>

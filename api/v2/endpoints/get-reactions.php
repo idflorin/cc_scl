@@ -26,11 +26,20 @@ $haha = (!empty($_POST['haha']) && is_numeric($_POST['haha']) && $_POST['haha'] 
 $wow = (!empty($_POST['wow']) && is_numeric($_POST['wow']) && $_POST['wow'] > 0 ? Wo_Secure($_POST['wow']) : 0);
 $sad = (!empty($_POST['sad']) && is_numeric($_POST['sad']) && $_POST['sad'] > 0 ? Wo_Secure($_POST['sad']) : 0);
 $angry = (!empty($_POST['angry']) && is_numeric($_POST['angry']) && $_POST['angry'] > 0 ? Wo_Secure($_POST['angry']) : 0);
+$offset_array = array();
+foreach ($wo['reactions_types'] as $key => $value) {
+	if (!empty($_POST[$key."_offset"]) && is_numeric($_POST[$key."_offset"]) && $_POST[$key."_offset"] > 0) {
+		$offset_array[$key] = Wo_Secure($_POST[$key."_offset"]);
+	}
+	else{
+		$offset_array[$key] = 0;
+	}
+}
 
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 	if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
 
-		$react_array = array('like' => 'Like','love' => 'Love' ,'haha' => 'HaHa' ,'wow' => 'WoW' ,'sad' => 'Sad' ,'angry' => 'Angry' );
+		//$react_array = array('like' => 'Like','love' => 'Love' ,'haha' => 'HaHa' ,'wow' => 'WoW' ,'sad' => 'Sad' ,'angry' => 'Angry' );
 
 		if (!empty($_POST['reaction'])) {
 			$col = Wo_Secure($_POST['type']);
@@ -40,25 +49,26 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 			$id = Wo_Secure($_POST['id']);
 			$all = array();
 			foreach (explode(",", $_POST['reaction']) as $i => $react) {
-				if (in_array($react,array_keys($react_array))) {
-					if ($react == 'like') {
-						$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$like,$col);
-					}
-					if ($react == 'love') {
-						$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$love,$col);
-					}
-					if ($react == 'haha') {
-						$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$haha,$col);
-					}
-					if ($react == 'wow') {
-						$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$wow,$col);
-					}
-					if ($react == 'sad') {
-						$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$sad,$col);
-					}
-					if ($react == 'angry') {
-						$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$angry,$col);
-					}
+				if (in_array($react,array_keys($wo['reactions_types']))) {
+					$users = Wo_GetPostReactionUsers($id, $react ,$limit,$offset_array[$react],$col);
+					// if ($react == 'like') {
+					// 	$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$like,$col);
+					// }
+					// if ($react == 'love') {
+					// 	$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$love,$col);
+					// }
+					// if ($react == 'haha') {
+					// 	$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$haha,$col);
+					// }
+					// if ($react == 'wow') {
+					// 	$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$wow,$col);
+					// }
+					// if ($react == 'sad') {
+					// 	$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$sad,$col);
+					// }
+					// if ($react == 'angry') {
+					// 	$users = Wo_GetPostReactionUsers($id, $react_array[$react] ,$limit,$angry,$col);
+					// }
 
 					$all[$react] = array();
 					foreach ($users as $key1 => $value) {

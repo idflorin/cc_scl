@@ -38,6 +38,7 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     $wo['description']   = str_replace('</ br>', "", $wo['description']);
     $wo['description']   = str_replace('<br />', "", $wo['description']);
     $wo['keywords']      = '';
+
 } else {
     header("Location: " . $wo['config']['site_url']);
     exit();
@@ -54,5 +55,9 @@ if (empty($wo['description'])) {
 }
 if (!empty($wo['story']['album_name'])) {
     $wo['title'] = $wo['story']['album_name'];
+}
+if (!empty($wo['story']['product_id'])) {
+    $wo['description']   = strip_tags($wo['story']['product']['description']);
+    $wo['title']   = $wo['story']['product']['name'];
 }
 ?>

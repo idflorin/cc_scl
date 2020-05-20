@@ -20,3 +20,23 @@
 .btn-loading {position: relative;box-shadow: none;}
 .btn-loading:before {display: none;}
 .btn-loading:after {top: 0;right: 0;bottom: 0;left: 0;opacity: 1;width: 100%;height: 100%;padding: 0 16px;border-radius: 4px;transform: none;background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='50px' height='50px' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='xMidYMid'%3e%3crect x='0' y='0' fill='none' class='bk'%3e%3c/rect%3e%3ccircle cx='50' cy='50' r='40' stroke='%23fff' fill='none' stroke-width='6' stroke-linecap='round'%3e%3canimate attributeName='stroke-dashoffset' dur='1.5s' repeatCount='indefinite' from='0' to='502'%3e%3c/animate%3e%3canimate attributeName='stroke-dasharray' dur='1.5s' repeatCount='indefinite' values='150.6 100.4;1 250;150.6 100.4'%3e%3c/animate%3e%3c/circle%3e%3c/svg%3e");background-position: center;background-repeat: no-repeat;background-size: 24px;transition: none;}
+.payment_box .btn {width: 100%;background-color: white;color: #2c2c2c;text-align: inherit;display: flex;align-items: center;border-bottom: 1px solid rgba(0, 0, 0, 0.07);border-radius: 0;padding: 20px 25px;transition: all 0.15s;font-family: "Lato", sans-serif; font-weight: 600;box-shadow: none;}
+.payment_box .btn:hover {background-color: rgba(0, 0, 0, 0.04);}
+.payment_box .btn:last-child {border:0;}
+.payment_box .btn svg {margin-right: 15px;width: 32px;height: 32px;}
+
+/*Plans*/
+.login form.wow_membr_signup {padding: 15px 30px 30px;}
+.wow_membr_signup .title {margin: 0 0 32px;}
+.wow_membr_signup_plan {box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.2);border-radius: 7px;padding: 10px;margin-top: 20px;}
+.wow_sup_plan_hdr {display: flex;align-items: center;flex-wrap: wrap;justify-content: space-between;}
+.wow_sup_plan_hdr > div {font-size: 23px;}
+.wow_sup_plan_hdr > div span {display: inline-block;vertical-align: text-top;line-height: 1;}
+.wow_sup_plan_hdr > div img, .wow_sup_plan_hdr > div svg {width: 24px;height: 24px;vertical-align: middle;}
+.wow_sup_plan_hdr b {margin: 0;}
+.wow_membr_signup_plan .col-lg-6 svg {vertical-align: middle;width: 20px;height: 20px;}
+.wow_membr_signup_plan .modal-footer {padding: 10px 0 0;margin-top: 10px;}
+
+/*Password Check*/
+.helper-text {display: none;margin-top: 6px;font-size: 12px;line-height: 18px;}
+.helper-text li.valid {color: #1aac20;}

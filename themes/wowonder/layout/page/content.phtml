@@ -77,9 +77,12 @@
 					<span class="user-follow-button page-message-btn"><?php echo Wo_GetPageMessageButton($wo['page_profile']['page_id']);?></span>
 					<?php if ($wo['page_profile']['is_page_onwer'] == true) { ?>
 						<?php if ($wo['config']['job_system'] == 1) { ?>
-							<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=jobs" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=jobs');?>" class="btn btn-success btn-sm btn-mat btn-mat-raised"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> <?php echo $wo['lang']['offer_job']; ?></a>
+							<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=jobs" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=jobs');?>" class="btn btn-success btn-sm btn-mat btn-mat-raised"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> <?php echo $wo['lang']['create_job']; ?></a>
 						<?php } ?>
-						<a href="<?php echo Wo_SeoLink('index.php?link1=page-setting&page=' .  $wo['page_profile']['page_name']); ?>" data-ajax="?link1=page-setting&page=<?php echo $wo['page_profile']['page_name'];?>" class="btn btn-info btn-sm btn-mat btn-mat-raised"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg> <?php echo $wo['lang']['edit']; ?></a>
+						<?php if ($wo['config']['offer_system'] == 1) { ?>
+							<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=offer" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=offer');?>" class="btn btn-info btn-sm btn-mat btn-mat-raised"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> <?php echo $wo['lang']['offer']; ?></a>
+						<?php } ?>
+						<a href="<?php echo Wo_SeoLink('index.php?link1=page-setting&page=' .  $wo['page_profile']['page_name']); ?>" data-ajax="?link1=page-setting&page=<?php echo $wo['page_profile']['page_name'];?>" class="btn btn-default btn-sm btn-mat btn-mat-raised"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg> <?php echo $wo['lang']['edit']; ?></a>
 					<?php } ?>
 					<span class="user-follow-button page_info_cta" style="display:none">
 						<?php echo Wo_GetCallInAction($wo['page_profile']['call_action_type'], $wo['page_profile']['call_action_type_url']);?>
@@ -228,6 +231,7 @@
 				?>
 				<div id="posts" data-story-page="<?php echo $wo['page_profile']['page_id'];?>">
 					<div class="post-container sun_post">
+						<input id="page_post_jobs_filter" type="hidden">
 						
 				<?php foreach ($page_jobs as $key => $wo['story']) {
 					$wo['story']['job']['page_type'] = 'page';
@@ -267,6 +271,11 @@
 				</div>
 		  <?php  }
 		    }
+		    elseif ($_GET['type'] == 'offer' && $wo['config']['offer_system'] == 1) {
+				if ($wo['page_profile']['user_id'] == $wo['user']['id']) {
+					echo '<div class="list-group profile-lists"><h5 class="search-filter-center-text empty_state" style="margin: 30px 0;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>' . str_replace('{{page_name}}', $wo['page_profile']['page_name'], $wo['lang']['post_offer_text']).' '.$wo['config']['siteName'] . '.<br><br><br><br><span class="btn btn-main btn-mat" onclick="OpenCreateOfferModal()">'.$wo['lang']['create_offer'].' </span></h5></div>';
+				}
+			}
 
 		 } else { ?>
 		
@@ -396,6 +405,24 @@
 				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" title="<?php echo $wo['lang']['category']; ?>"><path fill="currentColor" d="M5.5,7A1.5,1.5 0 0,1 4,5.5A1.5,1.5 0 0,1 5.5,4A1.5,1.5 0 0,1 7,5.5A1.5,1.5 0 0,1 5.5,7M21.41,11.58L12.41,2.58C12.05,2.22 11.55,2 11,2H4C2.89,2 2,2.89 2,4V11C2,11.55 2.22,12.05 2.59,12.41L11.58,21.41C11.95,21.77 12.45,22 13,22C13.55,22 14.05,21.77 14.41,21.41L21.41,14.41C21.78,14.05 22,13.55 22,13C22,12.44 21.77,11.94 21.41,11.58Z"></path></svg>
 				<?php echo $wo['page_profile']['category']; ?>
 			</li>
+			<?php if (!empty($wo['page_profile']['page_sub_category'])) { ?>
+			<li class="list-group-item">
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" title="<?php echo $wo['lang']['sub_category']; ?>"><path fill="currentColor" d="M5.5,7A1.5,1.5 0 0,1 4,5.5A1.5,1.5 0 0,1 5.5,4A1.5,1.5 0 0,1 7,5.5A1.5,1.5 0 0,1 5.5,7M21.41,11.58L12.41,2.58C12.05,2.22 11.55,2 11,2H4C2.89,2 2,2.89 2,4V11C2,11.55 2.22,12.05 2.59,12.41L11.58,21.41C11.95,21.77 12.45,22 13,22C13.55,22 14.05,21.77 14.41,21.41L21.41,14.41C21.78,14.05 22,13.55 22,13C22,12.44 21.77,11.94 21.41,11.58Z"></path></svg>
+				<?php echo $wo['page_profile']['page_sub_category']; ?>
+			</li>
+			<?php } ?>
+			<?php 
+			    $fields = Wo_GetCustomFields('page'); 
+				if (!empty($fields)) {
+					foreach ($fields as $key => $wo['field']) { 
+						if (!empty($wo['page_profile']['fid_'.$wo['field']['id']])) {
+
+						?>
+						<li class="list-group-item">
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" title="<?php echo $wo['lang']['sub_category']; ?>"><path fill="currentColor" d="M13.5,4A1.5,1.5 0 0,0 12,5.5A1.5,1.5 0 0,0 13.5,7A1.5,1.5 0 0,0 15,5.5A1.5,1.5 0 0,0 13.5,4M13.14,8.77C11.95,8.87 8.7,11.46 8.7,11.46C8.5,11.61 8.56,11.6 8.72,11.88C8.88,12.15 8.86,12.17 9.05,12.04C9.25,11.91 9.58,11.7 10.13,11.36C12.25,10 10.47,13.14 9.56,18.43C9.2,21.05 11.56,19.7 12.17,19.3C12.77,18.91 14.38,17.8 14.54,17.69C14.76,17.54 14.6,17.42 14.43,17.17C14.31,17 14.19,17.12 14.19,17.12C13.54,17.55 12.35,18.45 12.19,17.88C12,17.31 13.22,13.4 13.89,10.71C14,10.07 14.3,8.67 13.14,8.77Z"></path></svg>
+							<?php echo $wo['page_profile']['fid_'.$wo['field']['id']]; ?>
+						</li>
+			<?php } } } ?>
 			<?php  if(!empty($wo['page_profile']['company'])) {  ?>
 				<li class="list-group-item">
 					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" title="<?php echo $wo['lang']['company']; ?>"><path fill="currentColor" d="M18,15H16V17H18M18,11H16V13H18M20,19H12V17H14V15H12V13H14V11H12V9H20M10,7H8V5H10M10,11H8V9H10M10,15H8V13H10M10,19H8V17H10M6,7H4V5H6M6,11H4V9H6M6,15H4V13H6M6,19H4V17H6M12,7V3H2V21H22V7H12Z"></path></svg>
@@ -496,6 +523,182 @@
 	</div>
 </div>
 
+<?php if ($wo['config']['offer_system'] == 1) { ?>
+<script src="https://cdn.jsdelivr.net/npm/jquery-ui-timepicker-addon@1.6.3/dist/jquery-ui-timepicker-addon.min.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    var thumb_drop_block = $("[data-block='thumdrop-zone']");
+    if (typeof(window.FileReader) == 'undefined') {
+      thumb_drop_block.find('.thumbnail-rendderer div').text('Drag drop is not supported in your browser!');
+    }
+    else{
+      thumb_drop_block[0].ondragover = function() {
+          thumb_drop_block.addClass('hover');
+          return false;
+      };
+          
+      thumb_drop_block[0].ondragleave = function() {
+          thumb_drop_block.removeClass('hover');
+          return false;
+      };
+
+      thumb_drop_block[0].ondrop = function(event) {
+          event.preventDefault();
+          thumb_drop_block.removeClass('hover');
+          var file = event.dataTransfer.files;
+          $("#thumbnail_two").prop('files', file);
+          $("#wow_fcov_img_holder").html("<img src='" + window.URL.createObjectURL(event.dataTransfer.files[0]) + "' alt='Picture'>")
+      };
+    }
+    $("#thumbnail_two").change(function(event) {
+      $("#wow_fcov_img_holder").html("<img src='" + window.URL.createObjectURL(this.files[0]) + "' alt='Picture'>")
+    });
+ });
+	function OpenCreateOfferModal() {
+		$('#create-offer-modal').modal('show');
+	}
+</script>
+<div class="modal fade sun_modal" id="create-offer-modal" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="wow_pops_head">
+				<svg height="100px" preserveAspectRatio="none" version="1.1" viewBox="0 0 300 100" width="300px" xmlns="http://www.w3.org/2000/svg"><path d="M30.913,43.944c0,0,42.911-34.464,87.51-14.191c77.31,35.14,113.304-1.952,146.638-4.729 c48.654-4.056,69.94,16.218,69.94,16.218v54.396H30.913V43.944z" fill="currentColor" opacity="0.6"></path> <path d="M-35.667,44.628c0,0,42.91-34.463,87.51-14.191c77.31,35.141,113.304-1.952,146.639-4.729 c48.653-4.055,69.939,16.218,69.939,16.218v54.396H-35.667V44.628z" fill="currentColor" opacity="0.6"></path> <path d="M-34.667,62.998c0,0,56-45.667,120.316-27.839C167.484,57.842,197,41.332,232.286,30.428 c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.998z" fill="currentColor"></path></svg>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"></path></svg></button>
+				<h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5.5,7A1.5,1.5 0 0,1 4,5.5A1.5,1.5 0 0,1 5.5,4A1.5,1.5 0 0,1 7,5.5A1.5,1.5 0 0,1 5.5,7M21.41,11.58L12.41,2.58C12.05,2.22 11.55,2 11,2H4C2.89,2 2,2.89 2,4V11C2,11.55 2.22,12.05 2.59,12.41L11.58,21.41C11.95,21.77 12.45,22 13,22C13.55,22 14.05,21.77 14.41,21.41L21.41,14.41C21.78,14.05 22,13.55 22,13C22,12.44 21.77,11.94 21.41,11.58Z"></path></svg> <?php echo $wo['lang']['create_offer'] ?></h4>
+			</div>
+			<form class="create-offer-form form-horizontal" method="post">
+				<div class="modal-body">
+					<div class="app-offer-alert"></div>
+					<div class="clear"></div>
+					<div class="row">
+						<div class="col-lg-6">
+							<div class="wow_form_fields">
+								<label for="discount_type"><?php echo $wo['lang']['type'] ?></label>
+								<select id="discount_type" name="discount_type">
+									<option value="discount_percent"><?php echo $wo['lang']['discount_percent'] ?></option>
+									<option value="discount_amount"><?php echo $wo['lang']['discount_amount'] ?></option>
+									<option value="buy_get_discount"><?php echo $wo['lang']['buy_get_discount'] ?></option>
+									<option value="spend_get_off"><?php echo $wo['lang']['spend_get_off'] ?></option>
+									<option value="free_shipping"><?php echo $wo['lang']['free_shipping'] ?></option>
+								</select>
+							</div>
+						</div>
+						<div class="col-lg-6 discount_percent_input">
+							<div class="wow_form_fields">
+								<label for="discount_percent"><?php echo $wo['lang']['discount_percent'] ?></label>
+								<select id="discount_percent" name="discount_percent">
+									<?php for ($i=1; $i < 100 ; $i++) {  ?>
+										<option value="<?php echo $i ?>"><?php echo $i ?>%</option>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-12 discount_amount_input" style="display: none;">
+							<div class="wow_form_fields">
+								<label for="discount_amount"><?php echo $wo['lang']['discount_amount'] ?></label>
+								<input id="discount_amount" name="discount_amount" type="text" value="">
+							</div>
+						</div>
+					</div>
+					<div class="row buy_get_discount_input" style="display: none;">
+						<div class="col-lg-6">
+							<div class="wow_form_fields">
+								<label for="buy"><?php echo $wo['lang']['buy'] ?></label>
+								<input id="buy" name="buy" type="text" value="">
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<div class="wow_form_fields">
+								<label for="get"><?php echo $wo['lang']['get'] ?></label>
+								<input id="get" name="get" type="text" value="">
+							</div>
+						</div>
+					</div>
+					<div class="row spend_get_off_input" style="display: none;">
+						<div class="col-lg-6">
+							<div class="wow_form_fields">
+								<label for="spend"><?php echo $wo['lang']['spend'] ?></label>
+								<input id="spend" name="spend" type="text" value="">
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<div class="wow_form_fields">
+								<label for="amount_off"><?php echo $wo['lang']['amount_off'] ?></label>
+								<input id="amount_off" name="amount_off" type="text" value="">
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-9">
+							<div class="wow_form_fields">
+								<label for="discounted_items"><?php echo $wo['lang']['discounted_items'] ?></label>
+								<input id="discounted_items" name="discounted_items" type="text" value="" maxlength="100">
+								<span class="help-block"><?php echo $wo['lang']['items_services'] ?></span>
+							</div>
+						</div>
+						<div class="col-lg-3">
+							<div class="wow_form_fields">
+								<label for="currency"><?php echo $wo['lang']['currency'] ?></label>
+								<select id="currency" name="currency">
+									<?php foreach ($wo['currencies'] as $key => $currency) { ?>
+										<option value="<?php echo $key; ?>"><?php echo $currency['text'] ?> (<?php echo $currency['symbol'] ?>)</option>
+									<?php } ?>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="wow_form_fields">
+						<label for="description"><?php echo $wo['lang']['description'] ?></label>
+						<textarea name="description" rows="3" id="description"></textarea>
+					</div>
+					<div class="wow_form_fields">
+						<label for="event-end-date"><?php echo $wo['lang']['end_date']; ?></label>
+						<div class="row">
+							<div class="col-md-6">
+								<input type="text" class="date1" name="expire_date" id="event-end-date">
+							</div>
+							<div class="col-md-6">
+								<input type="text" class="time1" name="expire_time">
+							</div>
+						</div>
+					</div>
+					<div class="wow_form_fields">
+						<label><?php echo $wo['lang']['thumbnail']; ?></label>
+						<div class="wow_fcov_image" data-block="thumdrop-zone">
+							<div id="wow_fcov_img_holder">
+								<img src="<?php echo $wo['config']['theme_url'];?>/img/ad_pattern.png">
+							</div>
+							<div class="upload_ad_image" onclick="document.getElementById('thumbnail_two').click(); return false">
+								<div class="upload_ad_image_content">
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"></path></svg> <?php echo $wo['lang']['drop_img_here']; ?> <?php echo $wo['lang']['or']; ?> <?php echo $wo['lang']['browse_to_upload']; ?>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="publisher-hidden-option">
+						<div id="progress" class="create-offer-progress">
+							<span id="percent" class="create-product-percent <?php echo Wo_RightToLeft('pull-right');?>">0%</span>
+							<div class="progress">
+								<div id="bar" class="progress-bar active create-product-bar"></div> 
+							</div>
+							<div class="clear"></div>
+						</div>
+					</div>
+					<input type="file" class="hidden" id="thumbnail_two" name="thumbnail" accept="image/*">
+					<input type="hidden" name="page_id" id="page_id" class="form-control input-md" value="<?php echo $wo['page_profile']['page_id'];?>">
+					<input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+				</div>
+				<div class="form-group last-sett-btn modal-footer">
+					<button type="submit" class="btn btn-main btn-mat add_wow_loader"><?php echo $wo['lang']['publish'] ?></button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<?php } ?>
+
 <div class="modal fade" id="report_page" role="dialog">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
@@ -549,7 +752,75 @@
 </div>
 <!-- JS Pages functions -->
 <script>
+	$(document).on('change', '#discount_type', function(event) {
+		var type = $(this).val();
+		$('.discount_percent_input').slideUp('slow');
+		$('.discount_amount_input').slideUp('slow');
+		$('.buy_get_discount_input').slideUp('slow');
+		$('.spend_get_off_input').slideUp('slow');
+		if (type == 'discount_percent') {
+			$('.discount_percent_input').slideDown('slow');
+		}
+		else if(type == 'discount_amount'){
+            $('.discount_amount_input').slideDown('slow');
+		}
+		else if(type == 'buy_get_discount'){
+            $('.buy_get_discount_input').slideDown('slow');
+            $('.discount_percent_input').slideDown('slow');
+		}
+		else if(type == 'spend_get_off'){
+            $('.spend_get_off_input').slideDown('slow');
+		}
+	});
+
+
 $(document).ready(function() {
+
+	$('form.create-offer-form').ajaxForm({
+	        url: Wo_Ajax_Requests_File() + '?f=offer&s=create_offer',
+	        beforeSend: function() {
+	         var percentVal = '0%';
+	         create_bar.width(percentVal);
+	         create_percent.html(percentVal);
+	         
+	         
+	          $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
+	        },
+	        uploadProgress: function (event, position, total, percentComplete) {
+	           var percentVal = percentComplete + '%';
+	           create_bar.width(percentVal);
+	           $('.create-offer-progress').slideDown(200);
+	           create_percent.html(percentVal);
+	        },
+	        success: function(data) {
+	         if (data.status == 200) {
+	           $('.app-offer-alert').html("<div class='alert alert-success'><?php echo($wo['lang']['offer_successfully_created']) ?></div>");
+		       $('.app-offer-alert').find('.alert-success').fadeIn(300);
+		       setTimeout(function (argument) {
+		        $('.app-offer-alert').find('.alert-success').fadeOut(300);
+		        window.location.reload(true);
+
+		       },3000);
+	         } else {
+	         	$('#create-offer-modal').animate({
+			        scrollTop: $('html, body').offset().top //#DIV_ID is an example. Use the id of your destination on the page
+			    });
+	             $('.app-offer-alert').html('<div class="alert alert-danger">' + data.error + '</div>');
+	             $('.alert-danger').fadeIn(300);
+	             setTimeout(function (argument) {
+	             	$('.alert-danger').fadeOut(300);
+	             },3000);
+	         }
+	         $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeOut(100);
+	        }
+	    });
+
+
+
+
+
+		$( ".date1" ).datepicker({ dateFormat: 'yy-mm-dd', minDate: '+1day',prevText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" /></svg>',nextText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" /></svg>'});
+      $( ".time1" ).timepicker();
 
   var create_bar = $('.create-product-bar');
   var create_percent = $('.create-product-percent');

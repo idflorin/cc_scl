@@ -14,10 +14,27 @@ if ($f == "add-blog-commreply") {
             $comment = Wo_GetBlogCommentReplies(array(
                 'id' => $lastId
             ));
+            $main_comment = Wo_GetBlogComments(array('id' => $_POST['c_id']));
+            if (!empty($main_comment) && !empty($main_comment[0])) {
+                $main_comment = $main_comment[0];
+            }
             if ($comment && count($comment) > 0) {
                 foreach ($comment as $wo['comm-reply']) {
                     $html .= Wo_LoadPage('blog/commreplies-list');
                 }
+                if (!empty($main_comment) && !empty($main_comment['user_id'])) {
+                    $notification_data_array = array(
+                        'recipient_id' => $main_comment['user_id'],
+                        'type' => 'comment_reply',
+                        'blog_id' => Wo_Secure($_POST['b_id']),
+                        'text' => '',
+                        'url' => 'index.php?link1=read-blog&id=' . Wo_Secure($_POST['b_id'])
+                    );
+                    Wo_RegisterNotification($notification_data_array);
+                }
+
+                
+
                 $data = array(
                     'status' => 200,
                     'html' => $html,

@@ -288,6 +288,12 @@ jQuery(document).ready(function($) {
 	          },3000);
 	          $('form.page-chat-sending-<?php echo $wo['chat']['page']['page_id'];?>').find('.ball-pulse').fadeOut(100);
 	        }
+	        else if(data.status == 500 && data.invalid_file == 3){
+              $("#pro_upload_file").modal('show');
+              Wo_Delay(function(){
+                $("#pro_upload_file").modal('hide');
+              },3000);
+            }
 	        $(".chat_page_<?php echo $wo['chat']['page']['page_id'];?>").find('#sendMessasgeFile').val('');
 	        $(".chat_page_<?php echo $wo['chat']['page']['page_id'];?>").find('textarea').val('');
 	        setTimeout(function() {

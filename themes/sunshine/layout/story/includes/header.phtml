@@ -16,6 +16,11 @@ if (!empty($wo['story']['parent_id'])) {
             </svg>
          </a>
          <ul class="dropdown-menu post-privacy-menu post-options" role="menu">
+            <?php if ($wo['loggedin'] == true && !empty($wo['story']['offer_id']) && (Wo_IsModerator() || Wo_IsAdmin() || $wo['story']['offer']['user_id'] == $wo['user']['id'])) { ?>
+               <li>
+                  <div class="pointer" onclick="Wo_OpenOfferEditBox(<?php echo $wo['story']['offer_id']; ?>);"><?php echo $wo['lang']['edit_offer'];?></div>
+               </li>
+            <?php } ?>
             <?php if ($wo['story']['admin'] === true && empty($wo['story']['product_id']) && empty($wo['story']['shared_from'])) { ?>
             <li>
                <div class="pointer" onclick="Wo_OpenPostEditBox(<?php echo $wo['story']['id']; ?>);"><?php echo $wo['lang']['edit_post'];?></div>
@@ -51,14 +56,14 @@ if (!empty($wo['story']['parent_id'])) {
                   $pin_post_id = $wo['story']['publisher']['id'];
                   $pin_post_text = 'profile';
                   if (!empty($wo['story']['page_id'])) {
-                  	$pin_post_id = $wo['story']['page_id'];
-                  	$pin_post_text = 'page';
+                     $pin_post_id = $wo['story']['page_id'];
+                     $pin_post_text = 'page';
                   } else if (!empty($wo['story']['group_id'])) {
-                  	$pin_post_id = $wo['story']['group_id'];
-                  	$pin_post_text = 'group';
+                     $pin_post_id = $wo['story']['group_id'];
+                     $pin_post_text = 'group';
                   }  else if (!empty($wo['story']['event_id'])) {
-                  	$pin_post_id = $wo['story']['event_id'];
-                  	$pin_post_text = 'event';
+                     $pin_post_id = $wo['story']['event_id'];
+                     $pin_post_text = 'event';
                   }
                   ?>
                <div class="pin-post pointer" onclick="Wo_PinPost(<?php echo $wo['story']['id']; ?>, <?php echo $pin_post_id;?>, '<?php echo $pin_post_text; ?>');">
@@ -209,6 +214,9 @@ if (!empty($wo['story']['parent_id'])) {
          <?php if (!empty($wo['story']['fund_raise_id']) && empty($wo['story']['parent_id'])) {?>
          <small class="small-text"> <?php echo $wo['lang']['donated_to_request'] ?></small>
          <?php } ?>
+         <?php if (!empty($wo['story']['offer_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['created_offer'] ?></small>
+         <?php } ?>
          <?php if (!empty($wo['story']['event_id']) && $wo['page'] != 'events') {  ?>
          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
@@ -234,26 +242,32 @@ if (!empty($wo['story']['parent_id'])) {
          <?php if (!empty($wo['story']['blog_id'])  && empty($wo['story']['shared_from'])) {  ?>
          <small class="small-text"><?php echo $wo['lang']['created_new_blog'] ?></small>
          <?php } ?>
+         <?php if (!empty($wo['story']['forum_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['forum'])) {  ?>
+         <small class="small-text"><?php echo $wo['lang']['shared_forum'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['thread_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['thread'])) {  ?>
+         <small class="small-text"><?php echo $wo['lang']['shared_thread'] ?></small>
+         <?php } ?>
          <?php if (empty($wo['story']['shared_from'])): ?>
          <small class="small-text">
          <?php 
             if($wo['story']['postType'] == 'profile_picture') { 
-            	$changed_profile_pic_lang = $wo['lang']['changed_profile_picture_male'];
-            	if ($wo['story']['publisher']['gender'] == 'female') {
-            		$changed_profile_pic_lang = $wo['lang']['changed_profile_picture_female'];
-            	} else {
-            		$changed_profile_pic_lang = $wo['lang']['changed_profile_picture_male'];
-            	}
-            	echo $changed_profile_pic_lang;
+               $changed_profile_pic_lang = $wo['lang']['changed_profile_picture_male'];
+               if ($wo['story']['publisher']['gender'] == 'female') {
+                  $changed_profile_pic_lang = $wo['lang']['changed_profile_picture_female'];
+               } else {
+                  $changed_profile_pic_lang = $wo['lang']['changed_profile_picture_male'];
+               }
+               echo $changed_profile_pic_lang;
             } 
             if($wo['story']['postType'] == 'profile_cover_picture') { 
-            	$changed_profile_cover_pic_lang = $wo['lang']['changed_profile_cover_picture_male'];
-            	if ($wo['story']['publisher']['gender'] == 'female') {
-            		$changed_profile_cover_pic_lang = $wo['lang']['changed_profile_cover_picture_female'];
-            	} else {
-            		$changed_profile_cover_pic_lang = $wo['lang']['changed_profile_cover_picture_male'];
-            	}
-            	echo $changed_profile_cover_pic_lang;
+               $changed_profile_cover_pic_lang = $wo['lang']['changed_profile_cover_picture_male'];
+               if ($wo['story']['publisher']['gender'] == 'female') {
+                  $changed_profile_cover_pic_lang = $wo['lang']['changed_profile_cover_picture_female'];
+               } else {
+                  $changed_profile_cover_pic_lang = $wo['lang']['changed_profile_cover_picture_male'];
+               }
+               echo $changed_profile_cover_pic_lang;
             } 
             ?>
          </small>
@@ -264,10 +278,10 @@ if (!empty($wo['story']['parent_id'])) {
          <?php 
             $extra_exists = 0;
             if (!empty($wo['story']['postFeeling'])) {
-            	if (empty($changed_profile_pic_lang) 
-            		&& $wo['story']['via_type'] != 'share'
-            		&& $wo['story']['group_recipient_exists'] != true
-            		&& empty($wo['story']['album_name'])) {
+               if (empty($changed_profile_pic_lang) 
+                  && $wo['story']['via_type'] != 'share'
+                  && $wo['story']['group_recipient_exists'] != true
+                  && empty($wo['story']['album_name'])) {
             ?>
          <span class="feeling-text"> <?php echo $wo['lang']['is_feeling'];?> <i class="twa-lg twa twa-<?php echo $wo['story']['postFeelingIcon'];?>"></i> <?php echo $wo['lang'][$wo['story']['postFeeling']];?></span>
          <?php
@@ -276,22 +290,22 @@ if (!empty($wo['story']['parent_id'])) {
             }
             }
             if (!empty($wo['story']['postTraveling'])) {
-            	if (empty($changed_profile_pic_lang) 
-            		&& $wo['story']['via_type'] != 'share'
-            		&& $wo['story']['group_recipient_exists'] != true
-            		&& empty($wo['story']['album_name'])) {
+               if (empty($changed_profile_pic_lang) 
+                  && $wo['story']['via_type'] != 'share'
+                  && $wo['story']['group_recipient_exists'] != true
+                  && empty($wo['story']['album_name'])) {
             ?>
          <span class="feeling-text"><i class="fa fa-plane"></i> <?php echo $wo['lang']['is_traveling'];?> <?php echo $wo['story']['postTraveling'];?></span>
          <?php
             } else {
-            	$extra_exists = 1;
+               $extra_exists = 1;
             }
             }
             if (!empty($wo['story']['postListening'])) {
-            	if (empty($changed_profile_pic_lang) 
-            		&& $wo['story']['via_type'] != 'share'
-            		&& $wo['story']['group_recipient_exists'] != true
-            		&& empty($wo['story']['album_name'])) {
+               if (empty($changed_profile_pic_lang) 
+                  && $wo['story']['via_type'] != 'share'
+                  && $wo['story']['group_recipient_exists'] != true
+                  && empty($wo['story']['album_name'])) {
             ?>
          <span class="feeling-text"><i class="fa fa-headphones"></i> <?php echo $wo['lang']['is_listening'];?> <?php echo $wo['story']['postListening'];?></span>
          <?php
@@ -300,10 +314,10 @@ if (!empty($wo['story']['parent_id'])) {
             }
             }
             if (!empty($wo['story']['postPlaying'])) {
-            	if (empty($changed_profile_pic_lang) 
-            		&& $wo['story']['via_type'] != 'share'
-            		&& $wo['story']['group_recipient_exists'] != true
-            		&& empty($wo['story']['album_name'])) {
+               if (empty($changed_profile_pic_lang) 
+                  && $wo['story']['via_type'] != 'share'
+                  && $wo['story']['group_recipient_exists'] != true
+                  && empty($wo['story']['album_name'])) {
             ?>
          <span class="feeling-text"><i class="fa fa-gamepad"></i> <?php echo $wo['lang']['is_playing'];?> <?php echo $wo['story']['postPlaying'];?></span>
          <?php
@@ -312,10 +326,10 @@ if (!empty($wo['story']['parent_id'])) {
             }
             }
             if (!empty($wo['story']['postWatching'])) {
-            	if (empty($changed_profile_pic_lang) 
-            		&& $wo['story']['via_type'] != 'share'
-            		&& $wo['story']['group_recipient_exists'] != true
-            		&& empty($wo['story']['album_name'])) {
+               if (empty($changed_profile_pic_lang) 
+                  && $wo['story']['via_type'] != 'share'
+                  && $wo['story']['group_recipient_exists'] != true
+                  && empty($wo['story']['album_name'])) {
             ?>
          <span class="feeling-text"><i class="fa fa-eye"></i> <?php echo $wo['lang']['is_watching'];?> <?php echo $wo['story']['postWatching'];?></span>
          <?php
@@ -450,26 +464,26 @@ if (!empty($wo['story']['parent_id'])) {
             $small_icon = '';
             $icon_type = '';
             if(!empty($wo['story']['postVine'])) { 
-            	$small_icon = 'vine';
-            	$icon_type = 'Vine';
+               $small_icon = 'vine';
+               $icon_type = 'Vine';
             } else if (!empty($wo['story']['postVimeo'])) {
-            	$small_icon = 'vimeo';
-            	$icon_type = 'Vimeo';
+               $small_icon = 'vimeo';
+               $icon_type = 'Vimeo';
             } else if (!empty($wo['story']['postFacebook'])) {
-            	$small_icon = 'facebook-official';
-            	$icon_type = 'Facebook';
+               $small_icon = 'facebook-official';
+               $icon_type = 'Facebook';
             } else if (!empty($wo['story']['postDailymotion'])) {
-            	$small_icon = 'film';
-            	$icon_type = 'Dailymotion';
+               $small_icon = 'film';
+               $icon_type = 'Dailymotion';
             } else if (!empty($wo['story']['postYoutube'])) {
-            	$small_icon = 'youtube-square';
-            	$icon_type = 'Youtube';
+               $small_icon = 'youtube-square';
+               $icon_type = 'Youtube';
             } else if (!empty($wo['story']['postPlaytube'])) {
-            	// $small_icon = 'play-circle';
-            	// $icon_type = 'PlayTube';
+               // $small_icon = 'play-circle';
+               // $icon_type = 'PlayTube';
             } else if (!empty($wo['story']['postSoundCloud'])) {
-            	$small_icon = 'soundcloud';
-            	$icon_type = 'SoundCloud';
+               $small_icon = 'soundcloud';
+               $icon_type = 'SoundCloud';
             }
             if (!empty($icon_type)) {
             ?>
@@ -482,11 +496,21 @@ if (!empty($wo['story']['parent_id'])) {
    </div>
 </div>
 <?php 
-}elseif (empty($wo['story']['parent_id'])) { ?>
+}elseif (empty($wo['story']['parent_id'])) { 
+   if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4) {
+      $anonymous = true;
+      $wo['story']['publisher']['username'] = 'anonymous';
+      $wo['story']['publisher']['name'] = $wo['lang']['anonymous'];
+      $wo['story']['publisher']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
+      $wo['story']['publisher']['verified'] = 0;
+      $wo['story']['publisher']['type'] = '';
+	  $wo['story']['publisher']['url'] = 'javascript:void(0)';
+   }
+   ?>
 
 <div class="post-heading">
    <div class="<?php echo Wo_RightToLeft('pull-left');?> image">
-      <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']?>">
+      <a href="<?php echo $wo['story']['publisher']['url']; ?>" <?php if (!isset($anonymous)) { ?> data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']?>"<?php } ?>>
       <img src="<?php echo $wo['story']['publisher']['avatar']; ?>" id="updateImage-<?php echo $wo['story']['publisher']['user_id']?>" class="avatar" alt="<?php echo $wo['story']['publisher']['name']; ?> profile picture">
       </a>
    </div>
@@ -499,6 +523,11 @@ if (!empty($wo['story']['parent_id'])) {
             </svg>
          </a>
          <ul class="dropdown-menu post-privacy-menu post-options" role="menu">
+            <?php if (!empty($wo['story']['offer_id']) && (Wo_IsModerator() || Wo_IsAdmin() || $wo['story']['offer']['user_id'] == $wo['user']['id'])) { ?>
+               <li>
+                  <div class="pointer" onclick="Wo_OpenOfferEditBox(<?php echo $wo['story']['offer_id']; ?>);"><?php echo $wo['lang']['edit_offer'];?></div>
+               </li>
+            <?php } ?>
             <?php if ($wo['story']['admin'] === true && empty($wo['story']['product_id']) && empty($wo['story']['shared_from'])) { ?>
             <li>
                <div class="pointer" onclick="Wo_OpenPostEditBox(<?php echo $wo['story']['id']; ?>);"><?php echo $wo['lang']['edit_post'];?></div>
@@ -621,7 +650,7 @@ if (!empty($wo['story']['parent_id'])) {
    <div class="meta">
       <div class="title h5">
          <span class="user-popover" data-type="<?php echo $wo['story']['publisher']['type']; ?>" data-id="<?php echo $wo['story']['publisher']['id']; ?>">
-         <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
+         <a href="<?php echo $wo['story']['publisher']['url']; ?>" <?php if (!isset($anonymous)) { ?>data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"<?php } ?>><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
          </span>
          <?php if($wo['story']['publisher']['verified'] == 1) { ?>
          <span class="verified-color">
@@ -630,7 +659,9 @@ if (!empty($wo['story']['parent_id'])) {
             </svg>
          </span>
          <?php } ?>
-         <?php if (isset($wo['story']['publisher']['is_pro'])) { 
+         <?php 
+         if ($wo['config']['shout_box_system'] != 1 || $wo['story']['postPrivacy'] != 4) {
+         if (isset($wo['story']['publisher']['is_pro'])) { 
             if(Wo_IsUserPro($wo['story']['publisher']['is_pro']) === true) { ?>
          <?php 
             $user_pro_type = Wo_GetUserProType($wo['story']['publisher']['pro_type']);
@@ -647,7 +678,9 @@ if (!empty($wo['story']['parent_id'])) {
          <i class="fa fa-<?php echo $user_pro_type['icon'];?> fa-fw" title="<?php echo $user_pro_type['type_name'];?>" data-toggle="tooltip"></i>
          <?php } ?>
          </span>
-         <?php } } ?>
+         <?php } } 
+         }
+         ?>
          <?php if ($wo['story']['shared_from'] && is_array($wo['story']['shared_from'])): ?>
          <span class="user-popover" data-type="<?php echo $wo['story']['shared_from']['type']; ?>" data-id="<?php echo $wo['story']['shared_from']['id']; ?>">
             <span><?php echo $wo['lang']['shared']; ?></span> 
@@ -660,12 +693,15 @@ if (!empty($wo['story']['parent_id'])) {
             </span>
             <?php } ?>
          </span>
-         <?php endif; ?>
          <?php if ($wo['story']['shared_from'] && is_array($wo['story']['shared_from'])): ?>
          <span>  
          <a href="<?php echo $wo['story']['post_url']; ?>" class="pointer"><span style="color: #666;"><?php echo strtolower($wo['lang']['post']); ?></span></a>
          </span>
          <?php endif; ?>
+         <?php endif; ?>
+         <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name'])) { ?>
+         <span><span style="color: #666;" class="was_live_text_<?php echo($wo['story']['id']) ?>"><?php echo ($wo['story']['is_still_live'] ? $wo['lang']['is_live'] : $wo['lang']['was_live']); ?></span></span>
+      <?php } ?>
          <?php if ($wo['story']['recipient_exists'] == true) {  ?>
          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
@@ -692,6 +728,9 @@ if (!empty($wo['story']['parent_id'])) {
          <?php if (!empty($wo['story']['fund_raise_id']) && empty($wo['story']['parent_id'])) {?>
          <small class="small-text"> <?php echo $wo['lang']['donated_to_request'] ?></small>
          <?php } ?>
+         <?php if (!empty($wo['story']['offer_id']) && empty($wo['story']['parent_id'])) {?>
+         <small class="small-text"> <?php echo $wo['lang']['created_offer'] ?></small>
+         <?php } ?>
          <?php if (!empty($wo['story']['event_id']) && $wo['page'] != 'events') {  ?>
          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
             <path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
@@ -716,6 +755,12 @@ if (!empty($wo['story']['parent_id'])) {
          <?php } ?>
          <?php if (!empty($wo['story']['blog_id'])  && empty($wo['story']['shared_from'])) {  ?>
          <small class="small-text"><?php echo $wo['lang']['created_new_blog'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['forum_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['forum'])) {  ?>
+         <small class="small-text"><?php echo $wo['lang']['shared_forum'] ?></small>
+         <?php } ?>
+         <?php if (!empty($wo['story']['thread_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['thread'])) {  ?>
+         <small class="small-text"><?php echo $wo['lang']['shared_thread'] ?></small>
          <?php } ?>
          <?php if (empty($wo['story']['shared_from'])): ?>
          <small class="small-text">

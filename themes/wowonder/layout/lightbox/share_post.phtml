@@ -1,3 +1,12 @@
+<?php if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4) {
+	$anonymous = true;
+   $wo['story']['publisher']['username'] = 'anonymous';
+   $wo['story']['publisher']['name'] = $wo['lang']['anonymous'];
+   $wo['story']['publisher']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
+   $wo['story']['publisher']['verified'] = 0;
+   $wo['story']['publisher']['type'] = '';
+   $wo['story']['publisher']['url'] = 'javascript:void(0)';
+} ?>
 <div class="modal fade share_post_modal_" id="share_post_modal" role="dialog">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -137,7 +146,7 @@
     <div class="panel panel-white panel-shadow">
       <div class="post-heading">
         <div class="<?php echo Wo_RightToLeft('pull-left');?> image">
-            <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']?>">
+            <a href="<?php echo $wo['story']['publisher']['url']; ?>" <?php if (!isset($anonymous)) { ?>data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']?>"<?php } ?>>
             <img src="<?php echo $wo['story']['publisher']['avatar']; ?>" id="updateImage-<?php echo $wo['story']['publisher']['user_id']?>" class="avatar" alt="<?php echo $wo['story']['publisher']['name']; ?> profile picture">
             </a>
         </div>
@@ -152,7 +161,7 @@
           <div class="title h5">
             <span class="user-popover" data-type="<?php echo $wo['story']['publisher']['type']; ?>" data-id="<?php echo $wo['story']['publisher']['id']; ?>">
 
-              <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
+              <a href="<?php echo $wo['story']['publisher']['url']; ?>" <?php if (!isset($anonymous)) { ?>data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"<?php } ?>><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
               <?php if($wo['story']['publisher']['verified'] == 1) { ?>
                 <span class="verified-color">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle" title="<?php echo $wo['lang']['verified_user'];?>" data-toggle="tooltip"><path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z" /></svg>
@@ -179,6 +188,9 @@
               <a href="<?php echo $wo['story']['post_url']; ?>" class="pointer"><span style="color: #666;"><?php echo strtolower($wo['lang']['post']); ?></span></a>
             </span>
             <?php endif; ?>
+            <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name'])) { ?>
+         <span><span style="color: #666;"><?php echo ($wo['story']['is_still_live'] ? $wo['lang']['is_live'] : $wo['lang']['was_live']); ?></span></span>
+      <?php } ?>
 
           
 
@@ -218,6 +230,12 @@
             <?php if (!empty($wo['story']['blog_id'])  && empty($wo['story']['shared_from'])) {  ?>
             <small class="small-text"><?php echo $wo['lang']['created_new_blog'] ?></small>
             <?php } ?>
+            <?php if (!empty($wo['story']['forum_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['forum'])) {  ?>
+            <small class="small-text"><?php echo $wo['lang']['shared_forum'] ?></small>
+            <?php } ?>
+            <?php if (!empty($wo['story']['thread_id'])  && empty($wo['story']['shared_from']) && !empty($wo['story']['thread'])) {  ?>
+         <small class="small-text"><?php echo $wo['lang']['shared_thread'] ?></small>
+         <?php } ?>
             <?php if (empty($wo['story']['shared_from'])): ?>
               <small class="small-text">
                 <?php 
@@ -434,6 +452,27 @@
 
 
         <?php } ?>
+        <?php if (!empty($wo['story']['offer_id'])) { ?>
+          <div class="post-fetched-url wo_post_fetch_event" id="fullsizeimg">
+             <a href="<?php echo $wo['story']['offer']['url'];?>">
+                <?php if (!empty($wo['story']['offer']['image'])) {?>
+                   <img src="<?php echo $wo['story']['offer']['image'];?>"/>
+                <?php } ?>
+                <div class="fetched-url-text">
+                   <div class="short_start_dt">
+                      <b><?php echo $wo['lang']['end_date']." ".$wo['story']['offer']['expire_date'];?></b>
+                   </div>
+                   <h4><?php if (strlen($wo['story']['offer']['description']) > 175):?>
+                      <?php echo mb_substr($wo['story']['offer']['description'],0,175,"UTF-8") . "..."; ?>
+                      <?php else:?>
+                      <?php echo $wo['story']['offer']['description']; ?>
+                      <?php endif;?></h4>
+                   <div class="url"><?php echo $wo['story']['offer']['offer_text'].' '.$wo['story']['offer']['discounted_items']; ?></div>
+                </div>
+                <div class="clear"></div>
+             </a>
+          </div>
+        <?php } ?>
 
 
 
@@ -621,6 +660,39 @@
             </a>
         </div>
         <?php } ?>
+        <?php if(!empty($wo['story']['forum_id']) && !empty($wo['story']['forum'])) { ?>
+<div class="post-fetched-url wo_post_fetch_blog">
+   <a href="<?php echo $wo['config']['site_url'].'/forums/'.$wo['story']['forum']['id'];?>">
+      <div class="fetched-url-text">
+         <h4>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book">
+               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <?php echo $wo['story']['forum']['name'];?>
+         </h4>
+         <div class="description"><?php echo $wo['story']['forum']['description'];?></div>
+      </div>
+      <div class="clear"></div>
+   </a>
+</div>
+<?php } ?>
+<?php if(!empty($wo['story']['thread_id']) && !empty($wo['story']['thread'])) { ?>
+<div class="post-fetched-url wo_post_fetch_blog">
+   <a href="<?php echo $wo['config']['site_url'].'/forums/thread/'.$wo['story']['thread_id'];?>">
+      <div class="fetched-url-text">
+         <h4>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book">
+               <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <?php echo $wo['story']['thread']['headline'];?>
+         </h4>
+      </div>
+      <div class="clear"></div>
+   </a>
+</div>
+<?php } ?>
         <?php if(!empty($wo['story']['postFile'])) { ?>
 
         <div class="post-file" id="fullsizeimg">
@@ -637,6 +709,20 @@
             ?>
         </div>
 
+        <?php } ?>
+        <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name'])) { ?>
+			<div class="post-file" <?php echo $wo['story']['is_still_live'] ? 'style="/*height: 440px;*/"' : ''; ?> id="fullsizeimg">
+				<?php if ($wo['story']['is_still_live']) { ?>
+					<div class="embed-responsive embed-responsive-4by3">
+						<iframe src="https://viewer.millicast.com/v2?streamId=<?php echo($wo['config']['live_account_id']) ?>/<?php echo($wo['story']['stream_name']) ?>" class="embed-responsive-item"></iframe>
+						<div class="wow_liv_counter"><span id="live_word_<?php echo($wo['story']['id']) ?>"><?php echo $wo['lang']['live']; ?></span> <span id="live_count_<?php echo($wo['story']['id']) ?>"> <?php echo $wo['story']['live_sub_users']; ?></span></div>
+					</div>
+				<?php } else{
+					$wo['media'] = array('filename' => 'https://viewer.millicast.com/v2?streamId='.$wo['config']['live_account_id'].'/'.$wo['story']['stream_name']);
+					echo Wo_LoadPage('players/chat-video');
+					}
+				?>
+			</div>
         <?php } ?>
         <?php if (Wo_IsUrl($wo['story']['postSticker'])): ?>
           <div class="post-file wo_video_post">

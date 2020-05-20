@@ -17,8 +17,9 @@ if (empty($error_code)) {
         $error_message = 'Page not found';
     } else {
         $offset = (!empty($_POST['offset']) && is_numeric($_POST['offset']) && $_POST['offset'] > 0 ? Wo_Secure($_POST['offset']) : 0);
+        $limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);
 
-        $reviews = Wo_GetPageReviews($page_id, $offset);
+        $reviews = Wo_GetPageReviews($page_id, $offset,$limit);
 
         foreach ($reviews as $key => $value) {
             if (!empty($value['user_data'])) {

@@ -78,7 +78,7 @@
         <div class="col-lg-6 col-md-6">
             <div class="card">
                 <div class="header">
-                    <h2>Post Settings <span class="pull-right"><a href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>">Manage Colored Posts</a></span></h2>
+                    <h2>Post Settings <!-- <span class="pull-right"><a href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>">Manage Colored Posts</a></span> <br><br><span class="pull-right"><a href="<?php echo Wo_LoadAdminLinkSettings('manage-reactions'); ?>">Reactions</a></span> --></h2>
                 </div>
                 <div class="body">
                     <div class="alert alert-success site-settings-alert2"></div>
@@ -114,6 +114,7 @@
                             <input type="radio" name="post_approval" id="post_approval-disabled" value="0" <?php echo ($wo['config']['post_approval'] == 0) ? 'checked': '';?>>
                             <label for="post_approval-disabled" class="m-l-20">Disabled</label>
                         </div>
+                        
                         <br>
 
                         <label for="maxCharacters">Max Allowed Characters Length</label>
@@ -135,12 +136,22 @@
                         </select>
                         <div class="clearfix"></div>
                         <br><br>
+                        <label for="second_post_button">Second Post Reaction</label>
+                        <select class="form-control show-tick" id="second_post_button" name="second_post_button">
+                          <option value="wonder" <?php echo ($wo['config']['second_post_button'] == 'wonder')   ? ' selected' : '';?> >Wonder</option>
+                          <option value="dislike" <?php echo ($wo['config']['second_post_button'] == 'dislike')   ? ' selected' : '';?> >Dislike</option>
+                          <option value="reaction" <?php echo ($wo['config']['second_post_button'] == 'reaction')   ? ' selected' : '';?> >Reaction System</option>
+                          <option value="disabled" <?php echo ($wo['config']['second_post_button'] == 'disabled')   ? ' selected' : '';?> >Disable Button (just Like)</option>
+                        </select>
+                        <div class="clearfix"></div>
+                        <br><br>
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <input type="text" id="post_limit" name="post_limit" class="form-control" value="<?php echo $wo['config']['post_limit']?>">
                                 <label class="form-label">Post Limit For Per User p/hour</label>
                             </div>
                         </div>
+
 
 
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">

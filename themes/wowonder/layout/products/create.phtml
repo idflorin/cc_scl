@@ -32,7 +32,7 @@
 						<div class="col-md-8">
 							<div class="wow_form_fields">
 								<label for="category"><?php echo $wo['lang']['category'] ?></label>
-								<select name="category" id="category">
+								<select name="category" id="category" onchange="GetProductSubCategory(this)">
 									<?php 
 										foreach ($wo['products_categories'] as $key => $category) {
 											if ($key > 1) {
@@ -46,6 +46,21 @@
 								</select>
 							</div>
 						</div>
+						<?php if (!empty($wo['products_sub_categories'])) { ?>
+						<div class="col-md-8">
+							<div class="wow_form_fields">
+								<label for="product_sub_category"><?php echo $wo['lang']['sub_category'] ?></label>
+								<select name="product_sub_category" id="product_sub_category">
+									<?php
+										unset($wo['products_categories'][1]);
+										if (!empty($wo['products_sub_categories'][array_keys($wo['products_categories'])[0]])) {
+										foreach ($wo['products_sub_categories'][array_keys($wo['products_categories'])[0]] as $id => $sub_category) { ?>
+											<option value="<?php echo $sub_category['id']?>"><?php echo $sub_category['lang']; ?></option>
+										<?php } } ?>
+								</select>
+							</div>
+						</div>
+					    <?php } ?>
 						<div class="col-md-4">
 							<div class="wow_form_fields">
 								<label for="type"><?php echo $wo['lang']['type']; ?></label>
@@ -74,6 +89,13 @@
 							</div>
 						</div>
 					</div>
+					<?php $fields = Wo_GetCustomFields('product'); 
+						if (!empty($fields)) {
+							foreach ($fields as $key => $wo['field']) {
+								echo Wo_LoadPage('products/fields');
+							}
+						}
+					?>
 					<div class="wow_form_fields mb-0">
 						<label for="photos"><?php echo $wo['lang']['photos']; ?></label>
 					</div>
@@ -111,6 +133,23 @@
 	</div>
 </div>
 <script type="text/javascript">
+	<?php 
+$js_array = json_encode($wo['products_sub_categories']);
+echo "var sub_categories_array = ". $js_array . ";\n";
+?>
+	function GetProductSubCategory(self) {
+		id = $(self).val();
+		var text = "";
+		if (typeof(sub_categories_array[id]) == 'undefined') {
+		    $('#product_sub_category').html('');
+		}
+		else{
+		   	sub_categories_array[id].forEach(function(entry) {
+				text = text + "<option value='"+entry.id+"'>"+entry.lang+"</option>";
+			});
+		    $('#product_sub_category').html(text);
+		}
+	}
 $(document).ready(function() {
 	$("#product-photos").on('change', function() {
 	//Get count of selected files

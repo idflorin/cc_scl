@@ -43,6 +43,10 @@
 						<?php endif; ?>
 					</div>
 				    <?php } ?>
+				    <?php if($wo['config']['googleLogin'] != 0): ?>
+				    <br>
+				    <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+				    <?php endif; ?>
 				</div>
 			</div>
 		</div>
@@ -90,6 +94,37 @@
 var working = false;
 var $this = $('#login');
 var $state = $this.find('.errors');
+
+<?php if($wo['config']['googleLogin'] != 0): ?>
+function signOut() {
+	var auth2 = gapi.auth2.getAuthInstance();
+	auth2.signOut().then(function () {
+	  console.log('User signed out.');
+	});
+}
+
+function onSignIn(googleUser) {
+    // The ID token you need to pass to your backend:
+    var id_token = googleUser.getAuthResponse().id_token;
+    $.post(Wo_Ajax_Requests_File() + '?f=google_login', {id_token: id_token}, function(data, textStatus, xhr) {
+    	if (data.status == 200) {
+    		signOut();
+    		$state.addClass('success');
+	        $state.html('<?php echo $wo['lang']['welcome_back'] ?>');
+			$this.find('.add_wow_loader').removeClass('btn-loading');
+	        setTimeout(function () {
+	        	window.location.href = data.location;
+	        }, 1000);
+    	}
+    	else{
+			$this.find('button').attr("disabled", false);
+			$this.find('.add_wow_loader').removeClass('btn-loading');
+	        $state.html(data.message);
+    	}
+    });
+}
+<?php endif; ?>
+
 $(function() {
   $('#login').ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=login',

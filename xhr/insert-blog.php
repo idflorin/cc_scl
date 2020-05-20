@@ -5,6 +5,9 @@ if ($f == "insert-blog") {
         $request[] = (empty($_POST['blog_title']) || empty($_POST['blog_content']));
         $request[] = (empty($_POST['blog_description']) || empty($_POST['blog_category']));
         $request[] = (empty($_FILES["thumbnail"]));
+        if ($wo['config']['who_upload'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin() && !empty($_FILES['thumbnail'])) {
+            $error = $error_icon . $wo['lang']['free_plan_upload_pro'];
+        }
         if (in_array(true, $request)) {
             $error = $error_icon . $wo['lang']['please_check_details'];
         } else {
@@ -23,6 +26,10 @@ if ($f == "insert-blog") {
         }
         if (empty($error)) {
             $_POST['blog_content'] = preg_replace($wo['regx_attr'], '', $_POST['blog_content']);
+            $active = 1;
+            if ($wo['config']['blog_approval'] == 1 && !Wo_IsAdmin()) {
+                $active = 0;
+            }
 
             $registration_data = array(
                 'user' => $wo['user']['id'],
@@ -31,7 +38,8 @@ if ($f == "insert-blog") {
                 'description' => substr(Wo_Secure($_POST['blog_description']), 0, 290),
                 'posted' => time(),
                 'category' => Wo_Secure($_POST['blog_category']),
-                'tags' => Wo_Secure($_POST['blog_tags'])
+                'tags' => Wo_Secure($_POST['blog_tags']),
+                'active' => $active
             );
             $last_id           = Wo_InsertBlog($registration_data);
             if ($last_id && is_numeric($last_id)) {
@@ -63,7 +71,8 @@ if ($f == "insert-blog") {
                     'blog_id' => Wo_Secure($last_id),
                     'postText' => Wo_Secure($_POST['blog_title']) . ' | ' . $tags,
                     'time' => time(),
-                    'postPrivacy' => '0'
+                    'postPrivacy' => '0',
+                    'active' => $active
                 ));
                 if ($register) {
                     $data = array(
@@ -71,6 +80,11 @@ if ($f == "insert-blog") {
                         'status' => 200,
                         'url' => Wo_SeoLink('index.php?link1=read-blog&id=' . $last_id)
                     );
+                    if ($active == 0) {
+                        $data = array(
+                            'status' => 300,
+                        );
+                    }
                 }
             }
         } else {

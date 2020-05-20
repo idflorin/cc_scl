@@ -117,4 +117,12 @@ define('T_JOB_APPLY', 'Wo_Job_Apply');
 define('T_BLOG_REACTION', 'Wo_Blog_Reaction');
 define('T_FUNDING', 'Wo_Funding');
 define('T_FUNDING_RAISE', 'Wo_Funding_Raise');
+define('T_REACTIONS_TYPES', 'Wo_Reactions_Types');
+define('T_SUB_CATEGORIES', 'Wo_Sub_Categories');
+define('T_CUSTOM_FIELDS', 'Wo_Custom_Fields');
+define('T_REFUND', 'Wo_Refund');
+define('T_OFFER', 'Wo_Offers');
+define('T_BAD_LOGIN', 'Wo_Bad_Login');
+define('T_INVITAION_LINKS', 'Wo_Invitation_Links');
+define('T_LIVE_SUB', 'Wo_Live_Sub_Users');
 ?>

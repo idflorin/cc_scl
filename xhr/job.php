@@ -128,10 +128,10 @@ if ($f == 'job' && $wo['config']['job_system'] == 1) {
 		    		$job_id = $db->insert(T_JOB,$insert_array);
 
 		    		$post_id = $db->insert(T_POSTS,array('page_id' => $page_data->page_id,
-				    	                                 'postText' => $insert_array['title'],
+				    	                                 'postText' => '"'.$insert_array['title'].'"',
 				    	                                 'job_id' => $job_id,
                                                          'postType' => 'job',
-                                                         'postPrivacy' => 0,
+                                                         'postPrivacy' => '0',
                                                          'time' => time()));
 		    		$db->where('id',$post_id)->update(T_POSTS,array('post_id' => $post_id));
 

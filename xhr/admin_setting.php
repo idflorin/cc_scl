@@ -1,5 +1,6 @@
 <?php 
 use Aws\S3\S3Client;
+use Google\Cloud\Storage\StorageClient;
 if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
 
     if ($s == 'search_in_pages') {
@@ -621,6 +622,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             $post = $db->where('id',Wo_Secure($_POST['post_id']))->getOne(T_POSTS);
             if (!empty($post)) {
                 $db->where('id',Wo_Secure($_POST['post_id']))->update(T_POSTS,array('active' => 1));
+                if (!empty($post->blog_id)) {
+                    $db->where('id',$post->blog_id)->update(T_BLOG,array('active' => '1'));
+                }
                 $notification_data_array = array(
                     'recipient_id' => $post->user_id,
                     'type' => 'admin_notification',
@@ -1098,6 +1102,15 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         'is_html' => true
                     );
                     $send_message      = Wo_SendMessage($send_message_data);
+
+                    $notification_data_array = array(
+                        'recipient_id' => $get_payment_info['user_id'],
+                        'type' => 'admin_notification',
+                        'url' => 'index.php?link1=setting&page=payments',
+                        'text' => $wo['lang']['withdraw_approve'],
+                        'type2' => 'withdraw_approve'
+                    );
+                    Wo_RegisterNotification($notification_data_array);
                     if ($send_message) {
                         $data['status'] = 200;
                     }
@@ -1130,6 +1143,15 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         'is_html' => true
                     );
                     $send_message      = Wo_SendMessage($send_message_data);
+
+                    $notification_data_array = array(
+                        'recipient_id' => $get_payment_info['user_id'],
+                        'type' => 'admin_notification',
+                        'url' => 'index.php?link1=setting&page=payments',
+                        'text' => $wo['lang']['withdraw_declined'],
+                        'type2' => 'withdraw_declined'
+                    );
+                    Wo_RegisterNotification($notification_data_array);
                     if ($send_message) {
                         $data['status'] = 200;
                     }
@@ -1385,6 +1407,21 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'update_general_setting' && Wo_CheckSession($hash_id) === true) {
         $saveSetting         = false;
         $delete_follow_table = 0;
+        if (!empty($_FILES) && !empty($_FILES["cloud_file"])) {
+            $fileInfo = array(
+                'file' => $_FILES["cloud_file"]["tmp_name"],
+                'name' => $_FILES['cloud_file']['name'],
+                'size' => $_FILES["cloud_file"]["size"],
+                'type' => $_FILES["cloud_file"]["type"],
+                'types' => 'json',
+                'local_upload' => 1
+            );
+            $media    = Wo_ShareFile($fileInfo);
+            if (!empty($media) && !empty($media['filename'])) {
+                Wo_SaveConfig('cloud_file_path', $media['filename']);
+            }
+        }
+            
         foreach ($_POST as $key => $value) {
             if (isset($wo['config'][$key]) || $key == 'googleAnalytics_en') {
                 if ($key == 'googleAnalytics_en') {
@@ -1408,6 +1445,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         if ($wo['config']['spaces'] == 1) {
                             $saveSetting = Wo_SaveConfig('spaces', 0);
                         }
+                        if ($wo['config']['cloud_upload'] == 1) {
+                            $saveSetting = Wo_SaveConfig('cloud_upload', 0);
+                        }
                     }
                 }
                 if ($key == 'amazone_s3') {
@@ -1417,6 +1457,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         }
                         if ($wo['config']['spaces'] == 1) {
                             $saveSetting = Wo_SaveConfig('spaces', 0);
+                        }
+                        if ($wo['config']['cloud_upload'] == 1) {
+                            $saveSetting = Wo_SaveConfig('cloud_upload', 0);
                         }
                     }
                 }
@@ -1428,8 +1471,25 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         if ($wo['config']['amazone_s3'] == 1) {
                             $saveSetting = Wo_SaveConfig('amazone_s3', 0);
                         }
+                        if ($wo['config']['cloud_upload'] == 1) {
+                            $saveSetting = Wo_SaveConfig('cloud_upload', 0);
+                        }
                     }
                 }
+                if ($key == 'cloud_upload') {
+                    if ($value == 1) {
+                        if ($wo['config']['ftp_upload'] == 1) {
+                            $saveSetting = Wo_SaveConfig('ftp_upload', 0);
+                        }
+                        if ($wo['config']['amazone_s3'] == 1) {
+                            $saveSetting = Wo_SaveConfig('amazone_s3', 0);
+                        }
+                        if ($wo['config']['spaces'] == 1) {
+                            $saveSetting = Wo_SaveConfig('spaces', 0);
+                        }
+                    }
+                }
+
                 
                 
                 if ($key == 'free_day_limit' && (!is_numeric($value) || $value < 1)) {
@@ -1469,6 +1529,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 'upload/photos/d-film.jpg',
                 'upload/photos/app-default-icon.png',
                 'upload/photos/index.html',
+                'upload/photos/incognito.png',
                 'upload/.htaccess'
             );
             foreach ($array as $key => $value) {
@@ -1637,6 +1698,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         'upload/photos/d-blog.jpg',
                         'upload/photos/game-icon.png',
                         'upload/photos/d-film.jpg',
+                        'upload/photos/incognito.png',
                         'upload/photos/app-default-icon.png'
                     );
                     foreach ($array as $key => $value) {
@@ -1694,6 +1756,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         'upload/photos/d-blog.jpg',
                         'upload/photos/game-icon.png',
                         'upload/photos/d-film.jpg',
+                        'upload/photos/incognito.png',
                         'upload/photos/app-default-icon.png'
                     );
                     foreach ($array as $key => $value) {
@@ -1866,6 +1929,21 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         }
         
 
+        $data['status'] = 200;
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_offer' && isset($_POST['offer_id'])) {
+        $offer_id = Wo_Secure($_POST['offer_id']);
+        $offer = $db->where('id',$offer_id)->getOne(T_OFFER);
+        if (!empty($offer)) {
+            if (!empty($offer->image)) {
+                @unlink($offer->image);
+                Wo_DeleteFromToS3($offer->image);
+            }
+        }
+        $db->where('id',$offer_id)->delete(T_OFFER);
         $data['status'] = 200;
         header("Content-type: application/json");
         echo json_encode($data);
@@ -2219,6 +2297,73 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         }
         exit();
     }
+    if ($s == 'send_mail_to_mock_users') {
+        $isset_test = 'off';
+        $types = array('week','month','3month','6month','9month','year');
+        if (empty($_POST['message']) || empty($_POST['subject']) || empty($_POST['send_to']) || !in_array($_POST['send_to'], $types)) {
+            $send_errors = $error_icon . $wo['lang']['please_check_details'];
+        } else {
+            if (!empty($_POST['test_message'])) {
+                if ($_POST['test_message'] == 'on') {
+                    $isset_test = 'on';
+                }
+            }
+            if ($isset_test == 'on') {
+                $send_message_data = array(
+                    'from_email' => $wo['config']['siteEmail'],
+                    'from_name' => $wo['config']['siteName'],
+                    'to_email' => $wo['user']['email'],
+                    'to_name' => $wo['user']['name'],
+                    'subject' => $_POST['subject'],
+                    'charSet' => 'utf-8',
+                    'message_body' => $_POST['message'],
+                    'is_html' => true
+                );
+                $send              = Wo_SendMessage($send_message_data);
+            } else {
+                $users      = array();
+                if (isset($_POST['selected_emails']) && strlen($_POST['selected_emails']) > 0) {
+                    $user_ids = explode(',', $_POST['selected_emails']);
+                    if (is_array($user_ids) && count($user_ids) > 0) {
+                        foreach ($user_ids as $user_id) {
+                            $users[] = Wo_UserData($user_id);
+                        }
+                    }
+                } else {
+                    $users = Wo_GetUsersByTime($_POST['send_to']);
+                }
+                Wo_RunInBackground(array('status' => 300));
+                foreach ($users as $user) {
+                    $send_message_data = array(
+                        'from_email' => $wo['config']['siteEmail'],
+                        'from_name' => $wo['config']['siteName'],
+                        'to_email' => $user['email'],
+                        'to_name' => $user['name'],
+                        'subject' => $_POST['subject'],
+                        'charSet' => 'utf-8',
+                        'message_body' => $_POST['message'],
+                        'is_html' => true
+                    );
+                    $send              = Wo_SendMessage($send_message_data);
+                    $mail->ClearAddresses();
+                }
+            }
+        }
+        header("Content-type: application/json");
+        if (!empty($send_errors)) {
+            $send_errors_data = array(
+                'status' => 400,
+                'message' => $send_errors
+            );
+            echo json_encode($send_errors_data);
+        } else {
+            $data = array(
+                'status' => 200
+            );
+            echo json_encode($data);
+        }
+        exit();
+    }
     if ($s == 'get_users_emails' && isset($_GET['name'])) {
         $name  = Wo_Secure($_GET['name']);
         $html  = '';
@@ -2341,4 +2486,630 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+
+    if ($s == 'add_reaction') {
+        $data['status'] = 400;
+        $data['message'] = 'Please check your details';
+        if (!empty($_FILES['wowonder']) && !empty($_FILES['sunshine'])) {
+            $wowonder_image = '';
+            $sunshine_image = '';
+            $add = false;
+            $insert_data = array();
+            foreach (Wo_LangsNamesFromDB() as $key => $lang) {
+                if (!empty($_POST[$lang])) {
+                    $insert_data[$lang] = Wo_Secure($_POST[$lang]);
+                    $add = true;
+                }
+            }
+            if ($add == true && !empty($insert_data)) {
+                $id = $db->insert(T_LANGS,$insert_data);
+                $db->where('id',$id)->update(T_LANGS,array('lang_key' => $id));
+                $data = array('status' => 200);
+            }
+            if ($add == true) {
+
+                if (!empty($_FILES['wowonder'])) {
+                    $fileInfo = array(
+                        'file' => $_FILES["wowonder"]["tmp_name"],
+                        'name' => $_FILES['wowonder']['name'],
+                        'size' => $_FILES["wowonder"]["size"],
+                        'type' => $_FILES["wowonder"]["type"],
+                        'types' => 'jpeg,png,jpg,gif,svg'
+                    );
+                    $media    = Wo_ShareFile($fileInfo,true);
+                    if (!empty($media) && !empty($media['filename'])) {
+                        $wowonder_image = $media['filename'];
+                    }
+                }
+
+                if (!empty($_FILES['sunshine'])) {
+                    $fileInfo = array(
+                        'file' => $_FILES["sunshine"]["tmp_name"],
+                        'name' => $_FILES['sunshine']['name'],
+                        'size' => $_FILES["sunshine"]["size"],
+                        'type' => $_FILES["sunshine"]["type"],
+                        'types' => 'jpeg,png,jpg,gif,svg'
+                    );
+                    $media    = Wo_ShareFile($fileInfo,true);
+                    if (!empty($media) && !empty($media['filename'])) {
+                        $sunshine_image = $media['filename'];
+                    }
+                }
+
+                if (!empty($sunshine_image) && !empty($wowonder_image)) {
+                    $db->insert(T_REACTIONS_TYPES,array('name' => $id,
+                                      'wowonder_icon' => $wowonder_image,
+                                      'sunshine_icon' => $sunshine_image));
+                    
+                    $data = array('status' => 200);
+                }
+                else{
+                    $data['message'] = 'Invalid image type';
+                }
+            }
+            else{
+                $data['status'] = 400;
+                $data['message'] = 'Please check your details';
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+    if ($s == 'reaction_status') {
+        $data['status'] = 400;
+        $data['message'] = 'Please check your details';
+        if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
+            $active_reactions = $db->where('status',1)->getValue(T_REACTIONS_TYPES,'COUNT(*)');
+            if ($active_reactions > 0) {
+                $id = Wo_Secure($_POST['id']);
+                $reaction = $db->where('id',$id)->getOne(T_REACTIONS_TYPES);
+                if (!empty($reaction)) {
+                    $status = 1;
+                    if ($reaction->status == 1) {
+                        $status = 0;
+                    }
+                    if ($active_reactions == 1 && $status == 0) {
+                        $data['message'] = 'You cant disable all reactions';
+                    }
+                    else{
+                        $db->where('id',$id)->update(T_REACTIONS_TYPES,array('status' => $status));
+                        $data = array('status' => 200);
+                    }
+                }
+            }
+            else{
+                $data['message'] = 'You cant disable all reactions';
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+    if ($s == 'delete_reaction') {
+        $data['status'] = 400;
+        $data['message'] = 'Please check your details';
+        if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
+            $id = Wo_Secure($_POST['id']);
+            $reaction = $db->where('id',$id)->getOne(T_REACTIONS_TYPES);
+            if ($id > 6 && !empty($reaction)) {
+                $explode2  = @end(explode('.', $reaction->wowonder_icon));
+                $explode3  = @explode('.', $reaction->wowonder_icon);
+                $wowonder_small = $explode3[0] . '_small.' . $explode2;
+                
+                $explode2  = @end(explode('.', $reaction->sunshine_icon));
+                $explode3  = @explode('.', $reaction->sunshine_icon);
+                $sunshine_small = $explode3[0] . '_small.' . $explode2;
+                if (file_exists($wowonder_small)) {
+                    @unlink(trim($wowonder_small));
+                }
+                else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                    @Wo_DeleteFromToS3($wowonder_small);
+                }
+
+                if (file_exists($sunshine_small)) {
+                    @unlink(trim($sunshine_small));
+                }
+                else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                    @Wo_DeleteFromToS3($sunshine_small);
+                }
+
+                if (file_exists($reaction->wowonder_icon)) {
+                    @unlink(trim($reaction->wowonder_icon));
+                }
+                else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                    @Wo_DeleteFromToS3($reaction->wowonder_icon);
+                }
+
+                if (file_exists($reaction->sunshine_icon)) {
+                    @unlink(trim($reaction->sunshine_icon));
+                }
+                else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                    @Wo_DeleteFromToS3($reaction->sunshine_icon);
+                }
+                $db->where('lang_key',$reaction->name)->delete(T_LANGS);
+                $db->where('reaction',$id)->delete(T_REACTIONS);
+                $db->where('reaction',$id)->delete(T_BLOG_REACTION);
+
+                $db->where('id',$id)->delete(T_REACTIONS_TYPES);
+                $data = array('status' => 200);
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+    if ($s == 'get_reaction_form') {
+        $data['status'] = 400;
+        $data['message'] = 'Please check your details';
+        if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
+            $id = Wo_Secure($_POST['id']);
+            $reaction = $db->where('id',$id)->getOne(T_REACTIONS_TYPES);
+            $html = '';
+            if (!empty($reaction)) {
+                $lang_html = '';
+                $langs = Wo_GetLangDetails($reaction->name);
+                if (count($langs) > 0) {
+                    foreach ($langs as $key => $wo['langs']) {
+                        foreach ($wo['langs'] as $wo['key_'] => $wo['lang_vlaue']) {
+                            $lang_html .= Wo_LoadAdminPage('edit-lang/form-list');
+                        }
+                    }
+                } 
+                $wo['reaction_name'] = $lang_html;
+                $wo['reaction_id'] = $reaction->id;
+                $wo['wowonder_icon'] = $reaction->wowonder_icon;
+                $wo['sunshine_icon'] = $reaction->sunshine_icon;
+                $html = Wo_LoadAdminPage('manage-reactions/form');
+                $data = array('status' => 200,
+                              'html' => $html);
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+    if ($s == 'edit_reaction') {
+        $data['status'] = 400;
+        $data['message'] = 'Please check your details';
+        if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
+            $id = Wo_Secure($_POST['id']);
+            $reaction = $db->where('id',$id)->getOne(T_REACTIONS_TYPES);
+
+            if (!empty($reaction)) {
+                $lang_key    = $reaction->name;
+                $langs       = Wo_LangsNamesFromDB();
+                foreach ($_POST as $key => $value) {
+                    if (in_array($key, $langs)) {
+                        $key   = Wo_Secure($key);
+                        $value = Wo_Secure($value);
+                        $query = mysqli_query($sqlConnect, "UPDATE " . T_LANGS . " SET `{$key}` = '{$value}' WHERE `lang_key` = '{$lang_key}'");
+                    }
+                }
+
+
+                $update_data = array();
+
+                if (!empty($_FILES['wowonder'])) {
+                    $fileInfo = array(
+                        'file' => $_FILES["wowonder"]["tmp_name"],
+                        'name' => $_FILES['wowonder']['name'],
+                        'size' => $_FILES["wowonder"]["size"],
+                        'type' => $_FILES["wowonder"]["type"],
+                        'types' => 'jpeg,png,jpg,gif,svg'
+                    );
+                    $media    = Wo_ShareFile($fileInfo,true);
+                    if (!empty($media) && !empty($media['filename'])) {
+                        $update_data['wowonder_icon'] = $media['filename'];
+                    }
+                }
+
+                if (!empty($_FILES['sunshine'])) {
+                    $fileInfo = array(
+                        'file' => $_FILES["sunshine"]["tmp_name"],
+                        'name' => $_FILES['sunshine']['name'],
+                        'size' => $_FILES["sunshine"]["size"],
+                        'type' => $_FILES["sunshine"]["type"],
+                        'types' => 'jpeg,png,jpg,gif,svg'
+                    );
+                    $media    = Wo_ShareFile($fileInfo,true);
+                    if (!empty($media) && !empty($media['filename'])) {
+                        $update_data['sunshine_icon'] = $media['filename'];
+                    }
+                }
+
+                if (!empty($_POST['wowonder_to_use']) && $_POST['wowonder_to_use'] == 1) {
+
+                    $explode2  = @end(explode('.', $reaction->wowonder_icon));
+                    $explode3  = @explode('.', $reaction->wowonder_icon);
+                    $wowonder_small = $explode3[0] . '_small.' . $explode2;
+                    if (file_exists($reaction->wowonder_icon)) {
+                        @unlink(trim($reaction->wowonder_icon));
+                    }
+                    else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                        @Wo_DeleteFromToS3($reaction->wowonder_icon);
+                    }
+
+                    if (file_exists($wowonder_small)) {
+                        @unlink(trim($wowonder_small));
+                    }
+                    else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                        @Wo_DeleteFromToS3($wowonder_small);
+                    }
+                    $update_data['wowonder_icon'] = '';
+                }
+
+                if (!empty($_POST['sunshine_to_use']) && $_POST['sunshine_to_use'] == 1) {
+
+                    $explode2  = @end(explode('.', $reaction->sunshine_icon));
+                    $explode3  = @explode('.', $reaction->sunshine_icon);
+                    $sunshine_small = $explode3[0] . '_small.' . $explode2;
+
+                    if (file_exists($sunshine_small)) {
+                        @unlink(trim($sunshine_small));
+                    }
+                    else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                        @Wo_DeleteFromToS3($sunshine_small);
+                    }
+
+                    if (file_exists($reaction->sunshine_icon)) {
+                        @unlink(trim($reaction->sunshine_icon));
+                    }
+                    else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                        @Wo_DeleteFromToS3($reaction->sunshine_icon);
+                    }
+                    $update_data['sunshine_icon'] = '';
+                }
+                if (!empty($update_data)) {
+                    $db->where('id',$id)->update(T_REACTIONS_TYPES,$update_data);
+                }
+
+                
+
+                $data = array('status' => 200);
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'add_new_sub_category') {
+        $data['status'] = 400;
+        $data['message'] = 'Please check your details';
+        $types = array('page','group','product');
+        $all_categories = array('page' => $wo['page_categories'],'group' => $wo['group_categories'],'product' => $wo['products_categories']);
+        if (!empty($_GET['type']) && in_array($_GET['type'], $types) && in_array($_GET['type'], array_keys($all_categories)) && !empty($_POST['category_id']) && in_array($_POST['category_id'], array_keys($all_categories[$_GET['type']]))) {
+            $type = Wo_Secure($_GET['type']);
+            $add = false;
+            $insert_data = array();
+            foreach (Wo_LangsNamesFromDB() as $key => $lang) {
+                if (!empty($_POST[$lang])) {
+                    $insert_data[$lang] = Wo_Secure($_POST[$lang]);
+                    $add = true;
+                }
+            }
+            if ($add == true && !empty($insert_data)) {
+                $id = $db->insert(T_LANGS,$insert_data);
+                $db->insert(T_SUB_CATEGORIES,array('lang_key' => $id,
+                                                   'category_id' => Wo_Secure($_POST['category_id']),
+                                                   'type' => $type));
+                $db->where('id',$id)->update(T_LANGS,array('lang_key' => $id));
+                $data = array('status' => 200);
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+    if ($s == 'delete_sub_category' && !empty($_POST['lang_key'])) {
+        $types = array('page','group','product');
+        if (!empty($_GET['type']) && in_array($_GET['type'], $types)) {
+
+
+                $lang_key = Wo_Secure($_POST['lang_key']);
+                $category = $db->where('lang_key',$lang_key)->where('type',Wo_Secure($_GET['type']))->getOne(T_SUB_CATEGORIES);
+
+                if (!empty($category)) {
+                    $db->where('lang_key',$lang_key)->delete(T_LANGS);
+                    $db->where('id',$category->id)->delete(T_SUB_CATEGORIES);
+
+                    if ($_GET['type'] == 'page') {
+                        $db->where('sub_category',$category->id)->update(T_PAGES,array('sub_category' => ''));
+                    }
+                    if ($_GET['type'] == 'group') {
+                        $db->where('sub_category',$category->id)->update(T_GROUPS,array('sub_category' => ''));
+                    }
+                    if ($_GET['type'] == 'product') {
+                        $db->where('sub_category',$category->id)->update(T_PRODUCTS,array('sub_category' => ''));
+                    }
+                    $data['status'] = 200;
+                }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+
+    if ($s == 'add_custom_field_form') {
+        $placement_array = array('page','group','product');
+        $types_array = array('textbox','textarea','selectbox');
+        if (Wo_CheckSession($hash_id) === true && !empty($_POST['name']) && !empty($_POST['type']) && !empty($_POST['description']) && !empty($_POST['placement']) && in_array($_POST['type'], $types_array)) {
+            $type              = Wo_Secure($_POST['type']);
+            $name              = Wo_Secure($_POST['name']);
+            $description       = Wo_Secure($_POST['description']);
+            $placement = Wo_Secure($_POST['placement']);
+            
+            $length = 32;
+            if (!empty($_POST['length'])) {
+                if (is_numeric($_POST['length']) && $_POST['length'] < 1001) {
+                    $length = Wo_Secure($_POST['length']);
+                }
+            }
+            $required = 'on';
+            if (!empty($_POST['required']) && in_array($_POST['required'], array('on','off'))) {
+                $required = Wo_Secure($_POST['required']);
+            }
+
+            $data_ = array(
+                'name' => $name,
+                'description' => $description,
+                'length' => $length,
+                'placement' => $placement,
+                'required' => $required,
+                'type' => $type,
+                'active' => 1
+            );
+            if (!empty($_POST['options'])) {
+                $options              = @explode("\n", $_POST['options']);
+                $data_['options']     = Wo_Secure(implode($options, ','));
+            }
+
+            $add           = Wo_RegisterNewCustomField($data_);
+            if ($add) {
+                $data['status'] = 200;
+            }
+        } else {
+            $data = array(
+                'status' => 400,
+                'message' => 'Please fill all the required fields'
+            );
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_custom_field') {
+        $placement_array = array('page','group','product');
+        if (Wo_CheckMainSession($hash_id) === true && !empty($_GET['id']) && !empty($_GET['type']) && in_array($_GET['type'], $placement_array)) {
+            $delete = Wo_DeleteCustomField($_GET['id'],$_GET['type']);
+            if ($delete) {
+                $data = array(
+                    'status' => 200
+                );
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'get_custom_field_info') {
+        $placement_array = array('page','group','product');
+        if (Wo_CheckMainSession($hash_id) === true && !empty($_POST['id']) && !empty($_POST['type']) && in_array($_POST['type'], $placement_array)) {
+            $field = $db->where('id',Wo_Secure($_POST['id']))->where('placement',Wo_Secure($_POST['type']))->getOne(T_CUSTOM_FIELDS);
+            $html = '';
+            if (!empty($field)) {
+                $wo['field'] = $field;
+                $html = Wo_LoadAdminPage('pages-fields/form');
+            }
+
+            $data = array(
+                'status' => 200,
+                'html' => $html
+            );
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+    if ($s == 'edit_custom_field_form') {
+        $placement_array = array('page','group','product');
+        $types_array = array('textbox','textarea','selectbox');
+        if (Wo_CheckSession($hash_id) === true && !empty($_POST['name']) && !empty($_POST['description']) && !empty($_POST['id']) && !empty($_POST['type']) && !empty($_POST['placement']) && in_array($_POST['type'], $types_array)) {
+            $field = $db->where('id',Wo_Secure($_POST['id']))->where('placement',Wo_Secure($_POST['placement']))->getOne(T_CUSTOM_FIELDS);
+            if (!empty($field)) {
+                $name              = Wo_Secure($_POST['name']);
+                $description       = Wo_Secure($_POST['description']);
+                $type              = Wo_Secure($_POST['type']);
+                $placement         = Wo_Secure($_POST['placement']);
+
+                $length = 32;
+                if (!empty($_POST['length'])) {
+                    if (is_numeric($_POST['length']) && $_POST['length'] < 1001) {
+                        $length = Wo_Secure($_POST['length']);
+                    }
+                }
+                $required = 'on';
+                if (!empty($_POST['required']) && in_array($_POST['required'], array('on','off'))) {
+                    $required = Wo_Secure($_POST['required']);
+                }
+
+                $data_ = array(
+                    'name' => $name,
+                    'description' => $description,
+                    'length' => $length,
+                    'placement' => $placement,
+                    'required' => $required,
+                    'type' => $type,
+                    'active' => 1
+                );
+                if (!empty($_POST['options'])) {
+                    $options              = @explode("\n", $_POST['options']);
+                    $data_['options']     = Wo_Secure(implode($options, ','));
+                }
+
+                $add           = Wo_UpdateCustomField(Wo_Secure($_POST['id']),$data_);
+                if ($add) {
+                    $data['status'] = 200;
+                }
+                else{
+                    $data = array(
+                        'status' => 400,
+                        'message' => 'Please fill all the required fields'
+                    );
+                }
+            }
+            else{
+                $data = array(
+                    'status' => 400,
+                    'message' => 'Please fill all the required fields'
+                );
+            }
+        } else {
+            $data = array(
+                'status' => 400,
+                'message' => 'Please fill all the required fields'
+            );
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'approve_blog') {
+        if (!empty($_POST['blog_id'])) {
+            $post = $db->where('id',Wo_Secure($_POST['blog_id']))->getOne(T_BLOG);
+            if (!empty($post)) {
+                $db->where('id',Wo_Secure($_POST['blog_id']))->update(T_BLOG,array('active' => '1'));
+                $db->where('blog_id',Wo_Secure($_POST['blog_id']))->update(T_POSTS,array('active' => 1));
+                $notification_data_array = array(
+                    'recipient_id' => $post->user,
+                    'type' => 'admin_notification',
+                    'url' => 'index.php?link1=read-blog&id='.$post->id,
+                    'text' => $wo['lang']['approve_blog'],
+                    'type2' => 'approve_blog'
+                );
+                Wo_RegisterNotification($notification_data_array);
+
+            }
+        }
+        $data['status'] = 200;
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_refund') {
+        if (!empty($_GET['id'])) {
+            $request = $db->where('id',Wo_Secure($_GET['id']))->getOne(T_REFUND);
+            $db->where('id',Wo_Secure($_GET['id']))->delete(T_REFUND);
+            $data = array(
+                'status' => 200
+            );
+            $notification_data_array = array(
+                'recipient_id' => $request->user_id,
+                'type' => 'admin_notification',
+                'url' => 'index.php?link1=home',
+                'text' => $wo['lang']['refund_decline'],
+                'type2' => 'refund_decline'
+            );
+            Wo_RegisterNotification($notification_data_array);
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'approve_refund') {
+        if (!empty($_GET['id'])) {
+            $request = $db->where('id',Wo_Secure($_GET['id']))->getOne(T_REFUND);
+            if (!empty($request)) {
+                $price = $wo['pro_packages'][$request->pro_type]['price'];
+                $db->where('user_id',$request->user_id)->update(T_USERS,array('balance' => $db->inc($price),
+                                                                              'is_pro' => 0));
+                $db->where('id',Wo_Secure($_GET['id']))->delete(T_REFUND);
+                $notification_data_array = array(
+                    'recipient_id' => $request->user_id,
+                    'type' => 'admin_notification',
+                    'url' => 'index.php?link1=setting&page=payments',
+                    'text' => $wo['lang']['refund_approve'],
+                    'type2' => 'refund_approve'
+                );
+                Wo_RegisterNotification($notification_data_array);
+            }
+            
+            $data = array(
+                'status' => 200
+            );
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'test_cloud') {
+        if ($wo['config']['cloud_upload'] == 0 || empty($wo['config']['cloud_file_path']) || empty($wo['config']['cloud_bucket_name'])) {
+            $data['message'] = 'Please enable Google Cloud Storage and fill all fields.';
+        }
+        elseif (!file_exists($wo['config']['cloud_file_path'])) {
+            $data['message'] = 'Google Cloud File not found on your server Please upload it to your server.';
+        }
+        else{
+            require_once 'assets/libraries/cloud/vendor/autoload.php';
+
+
+            try {
+                $storage = new StorageClient([
+                   'keyFilePath' => $wo['config']['cloud_file_path'] 
+                ]);
+                // set which bucket to work in
+                $bucket = $storage->bucket($wo['config']['cloud_bucket_name']);
+                if ($bucket) {
+
+                    $array          = array(
+                        'upload/photos/d-avatar.jpg',
+                        'upload/photos/d-cover.jpg',
+                        'upload/photos/d-group.jpg',
+                        'upload/photos/d-page.jpg',
+                        'upload/photos/d-blog.jpg',
+                        'upload/photos/game-icon.png',
+                        'upload/photos/d-film.jpg',
+                        'upload/photos/incognito.png',
+                        'upload/photos/app-default-icon.png'
+                    );
+                    foreach ($array as $key => $value) {
+                        $fileContent = file_get_contents($value);
+
+                        // upload/replace file 
+                        $storageObject = $bucket->upload(
+                                                $fileContent,
+                                                ['name' => $value]
+                                        );
+                    }
+
+                    $data['status'] = 200;
+                }
+                else{
+                    $data['message'] = 'Error in connection';
+                }
+            } catch (Exception $e) {
+                $data['message'] = $e;
+                // maybe invalid private key ?
+                // print $e;
+                // exit();
+            }
+        }
+            
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+
+
+
+
+
 }
+

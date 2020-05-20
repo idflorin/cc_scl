@@ -123,6 +123,11 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 							<span class="user-follow-button">
 								<?php echo Wo_GetFollowButton($wo['user_profile']['user_id']);?>
 							</span>
+							<?php if ($wo['config']['notify_new_post'] == 1) { ?>
+	                        	<span class="user-follow-button">
+		                        <?php echo Wo_GetNotifyButton($wo['user_profile']['user_id']);?>
+		                        </span>
+	                        <?php } ?>
 							<span class="profile-message-btn">
 								<?php echo Wo_GetMessageButton($wo['user_profile']['user_id']);?>
 							</span>
@@ -671,7 +676,11 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 							?>
 						</div>
 						<?php
-							$stories = Wo_GetPosts(array('filter_by' => 'all','publisher_id' => $wo['user_profile']['user_id'],'placement' => 'multi_image_post')); 
+						$array = array('filter_by' => 'all','publisher_id' => $wo['user_profile']['user_id'],'placement' => 'multi_image_post');
+					    if ($wo['loggedin'] && $wo['user_profile']['user_id'] == $wo['user']['id']) {
+					    	$array['anonymous'] = true;
+					    }
+							$stories = Wo_GetPosts($array); 
 							if (count($stories) == 0 && count($pinedstory) == 0) {
 								echo Wo_LoadPage('story/profile-no-stories');
 							} else {

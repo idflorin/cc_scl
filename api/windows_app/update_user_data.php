@@ -115,7 +115,7 @@ if ($type == 'update_user_data' || $type == 'u_user_data') {
                             }
                         } else if ($_POST['type'] == 'password_settings') {
                             $user_data = $json_decode;
-                            if (md5($user_data['current_password']) != $Userdata['password']) {
+                            if (Wo_HashPassword($user_data['current_password'], $Userdata['password']) == false) {
                                 $errors[] = $wo['lang']['current_password_mismatch'];
                             }
                             if ($user_data['new_password'] != $user_data['repeat_new_password']) {

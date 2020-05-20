@@ -89,7 +89,20 @@ $pages = array(
     'manage-fund',
     'manage-jobs',
     'auto-like',
-    'auto-join'
+    'auto-join',
+    'manage-reactions',
+    'pages-sub-categories',
+    'groups-sub-categories',
+    'products-sub-categories',
+    'pages-fields',
+    'groups-fields',
+    'products-fields',
+    'pro-features',
+    'pro-refund',
+    'manage-offers',
+    'manage-invitation',
+    'send_email',
+    'live',
 );
 $mod_pages = array('dashboard', 'post-settings', 'manage-stickers', 'manage-gifts', 'manage-users', 'online-users', 'manage-stories', 'manage-pages', 'manage-groups', 'manage-posts', 'manage-articles', 'manage-events', 'manage-forum-threads', 'manage-forum-messages', 'manage-movies', 'manage-games', 'add-new-game', 'manage-user-ads', 'manage-reports', 'manage-third-psites', 'edit-movie','bank-receipts','job-categories','manage-jobs');
 
@@ -232,7 +245,7 @@ if (empty($page_loaded)) {
                         </a>
                     </li>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'general-settings' || $page == 'post-settings' || $page == 'site-settings' || $page == 'email-settings' || $page == 'social-login' || $page == 'site-features' || $page == 'amazon-settings' ||  $page == 'video-settings' || $page == 'payment-settings' || $page == 'manage-currencies' || $page == 'manage-colored-posts') ? 'class="active"' : ''; ?>>
+                    <li <?php echo ($page == 'general-settings' || $page == 'post-settings' || $page == 'site-settings' || $page == 'email-settings' || $page == 'social-login' || $page == 'site-features' || $page == 'amazon-settings' ||  $page == 'video-settings' || $page == 'payment-settings' || $page == 'manage-currencies' || $page == 'manage-colored-posts' || $page == 'live' || $page == 'manage-reactions') ? 'class="active"' : ''; ?>>
                         <a href="javascript:void(0);" class="menu-toggle">
                             <i class="material-icons">settings</i>
                             <span>Settings</span>
@@ -265,8 +278,31 @@ if (empty($page_loaded)) {
                             <li <?php echo ($page == 'amazon-settings') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('amazon-settings'); ?>">Storage Settings</a>
                             </li>
-                            <li <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts') ? 'class="active"' : ''; ?>>
+                            <li <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts' || $page == 'manage-reactions') ? 'class="active"' : ''; ?>>
+                                <a href="javascript:void(0);" class="menu-toggle">Posts</a>
+                                <ul class="ml-menu">
+                                    <li <?php echo ($page == 'post-settings') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('post-settings'); ?>">
+                                            <span>Post Settings</span>
+                                        </a>
+                                    </li>
+                                    <li <?php echo ($page == 'manage-colored-posts') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>">
+                                            <span>Manage Colored Posts</span>
+                                        </a>
+                                    </li>
+                                    <li <?php echo ($page == 'manage-reactions') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-reactions'); ?>">
+                                            <span>Post Reactions</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <!-- <li <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts' || $page == 'manage-reactions') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('post-settings'); ?>">Post Settings</a>
+                            </li> -->
+                            <li <?php echo ($page == 'live') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('live'); ?>">Live Settings</a>
                             </li>
                         </ul>
                     </li>
@@ -337,7 +373,7 @@ if (empty($page_loaded)) {
                         </ul>
                     </li>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'pro-settings' || $page == 'pro-memebers' || $page == 'pro-payments') ? 'class="active"' : ''; ?>>
+                    <li <?php echo ($page == 'pro-settings' || $page == 'pro-memebers' || $page == 'pro-payments' || $page == 'pro-features' || $page == 'pro-refund') ? 'class="active"' : ''; ?>>
                         <a href="javascript:void(0);" class="menu-toggle">
                             <i class="material-icons">stars</i>
                             <span>Pro System</span>
@@ -346,16 +382,22 @@ if (empty($page_loaded)) {
                             <li <?php echo ($page == 'pro-settings') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('pro-settings'); ?>">Pro System Settings</a>
                             </li>
+                            <li <?php echo ($page == 'pro-features') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('pro-features'); ?>">Pro Features</a>
+                            </li>
                             <li <?php echo ($page == 'pro-payments') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>">Manage Payments</a>
                             </li>
                             <li <?php echo ($page == 'pro-memebers') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('pro-memebers'); ?>">Manage Pro Members</a>
                             </li>
+                            <li <?php echo ($page == 'pro-refund') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('pro-refund'); ?>">Manage Pro Refund</a>
+                            </li>
                         </ul>
                     </li>
                     <?php } ?>
-                     <li <?php echo ($page == 'manage-apps' || $page == 'manage-pages' || $page == 'manage-stickers' || $page == 'add-new-sticker' || $page == 'manage-gifts' || $page == 'add-new-gift' || $page == 'manage-groups' || $page == 'manage-posts' || $page == 'manage-articles' || $page == 'manage-events'||  $page == 'manage-forum-sections' || $page == 'manage-forum-forums' || $page == 'manage-forum-threads' || $page == 'manage-forum-messages' || $page == 'create-new-forum' || $page == 'create-new-section' || $page == 'manage-movies' || $page == 'add-new-movies' || $page == 'manage-games' || $page == 'add-new-game' || $page == 'edit-movie' || $page == 'pages-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories' || $page == 'manage-fund' || $page == 'manage-jobs') ? 'class="active"' : ''; ?>>
+                     <li <?php echo ($page == 'manage-apps' || $page == 'manage-pages' || $page == 'manage-stickers' || $page == 'add-new-sticker' || $page == 'manage-gifts' || $page == 'add-new-gift' || $page == 'manage-groups' || $page == 'manage-posts' || $page == 'manage-articles' || $page == 'manage-events'||  $page == 'manage-forum-sections' || $page == 'manage-forum-forums' || $page == 'manage-forum-threads' || $page == 'manage-forum-messages' || $page == 'create-new-forum' || $page == 'create-new-section' || $page == 'manage-movies' || $page == 'add-new-movies' || $page == 'manage-games' || $page == 'add-new-game' || $page == 'edit-movie' || $page == 'pages-categories' || $page == 'pages-sub-categories' || $page == 'groups-sub-categories' || $page == 'products-sub-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories' || $page == 'manage-fund' || $page == 'manage-jobs' || $page == 'manage-offers' || $page == 'pages-fields' || $page == 'groups-fields' || $page == 'products-fields') ? 'class="active"' : ''; ?>>
                         <a href="javascript:void(0);" class="menu-toggle">
                             <i class="material-icons">view_agenda</i>
                             <span>Manage Features</span>
@@ -363,6 +405,9 @@ if (empty($page_loaded)) {
                         <ul class="ml-menu">
                             <!-- <li <?php echo ($page == 'manage-colored-posts') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>">Manage Colored Posts</a>
+                            </li> -->
+                            <!-- <li <?php echo ($page == 'manage-reactions') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-reactions'); ?>">Reactions</a>
                             </li> -->
                             <li <?php echo ($page == 'manage-apps') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps'); ?>">Apps</a>
@@ -381,6 +426,9 @@ if (empty($page_loaded)) {
                             </li>
                             <li <?php echo ($page == 'manage-jobs') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('manage-jobs'); ?>">Jobs</a>
+                            </li>
+                            <li <?php echo ($page == 'manage-offers') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-offers'); ?>">Offers</a>
                             </li>
                             <li <?php echo ($page == 'manage-articles') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('manage-articles'); ?>">Articles (Blog)</a>
@@ -465,7 +513,7 @@ if (empty($page_loaded)) {
                                     </li>
                                 </ul>
                             </li>
-                            <li <?php echo ($page == 'pages-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories') ? 'class="active"' : ''; ?>>
+                            <li <?php echo ($page == 'pages-categories' || $page == 'pages-sub-categories' || $page == 'groups-sub-categories' || $page == 'products-sub-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories') ? 'class="active"' : ''; ?>>
                                 <a href="javascript:void(0);" class="menu-toggle">Categories</a>
                                 <ul class="ml-menu">
                                     <li <?php echo ($page == 'pages-categories') ? 'class="active"' : ''; ?>>
@@ -473,9 +521,19 @@ if (empty($page_loaded)) {
                                             <span>Pages Categories</span>
                                         </a>
                                     </li>
+                                    <li <?php echo ($page == 'pages-sub-categories') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('pages-sub-categories'); ?>">
+                                            <span>Pages Sub Categories</span>
+                                        </a>
+                                    </li>
                                     <li <?php echo ($page == 'groups-categories') ? 'class="active"' : ''; ?>>
                                         <a href="<?php echo Wo_LoadAdminLinkSettings('groups-categories'); ?>">
                                             <span>Groups Categories</span>
+                                        </a>
+                                    </li>
+                                    <li <?php echo ($page == 'groups-sub-categories') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('groups-sub-categories'); ?>">
+                                            <span>Groups Sub Categories</span>
                                         </a>
                                     </li>
                                     <li <?php echo ($page == 'blogs-categories') ? 'class="active"' : ''; ?>>
@@ -488,9 +546,34 @@ if (empty($page_loaded)) {
                                             <span>Products Categories</span>
                                         </a>
                                     </li> 
+                                    <li <?php echo ($page == 'products-sub-categories') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('products-sub-categories'); ?>">
+                                            <span>Products Sub Categories</span>
+                                        </a>
+                                    </li>
                                     <li <?php echo ($page == 'job-categories') ? 'class="active"' : ''; ?>>
                                         <a href="<?php echo Wo_LoadAdminLinkSettings('job-categories'); ?>">
                                             <span>Job Categories</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li <?php echo ($page == 'pages-fields' || $page == 'groups-fields' || $page == 'products-fields') ? 'class="active"' : ''; ?>>
+                                <a href="javascript:void(0);" class="menu-toggle">Custom Fields</a>
+                                <ul class="ml-menu">
+                                    <li <?php echo ($page == 'pages-fields') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('pages-fields'); ?>">
+                                            <span>Pages Fields</span>
+                                        </a>
+                                    </li>
+                                    <li <?php echo ($page == 'groups-fields') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('groups-fields'); ?>">
+                                            <span>Groups Fields</span>
+                                        </a>
+                                    </li>
+                                    <li <?php echo ($page == 'products-fields') ? 'class="active"' : ''; ?>>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('products-fields'); ?>">
+                                            <span>Products Fields</span>
                                         </a>
                                     </li>
                                 </ul>
@@ -581,12 +664,18 @@ if (empty($page_loaded)) {
                     </li>
                     <?php } ?>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'manage-announcements' || $page == 'mailing-list' || $page == 'mass-notifications' || $page == 'ban-users' || $page == 'generate-sitemap' || $page == 'manage-invitation-keys' || $page == 'backups' || $page == 'auto-delete' || $page == 'auto-friend' || $page == 'fake-users' || $page == 'auto-like' || $page == 'auto-join') ? 'class="active"' : ''; ?>>
+                    <li <?php echo ($page == 'manage-announcements' || $page == 'mailing-list' || $page == 'mass-notifications' || $page == 'ban-users' || $page == 'generate-sitemap' || $page == 'manage-invitation-keys' || $page == 'backups' || $page == 'auto-delete' || $page == 'auto-friend' || $page == 'fake-users' || $page == 'auto-like' || $page == 'auto-join' || $page == 'send_email' || $page == 'manage-invitation') ? 'class="active"' : ''; ?>>
                         <a href="javascript:void(0);" class="menu-toggle">
                             <i class="material-icons">build</i>
                             <span>Tools</span>
                         </a>
                         <ul class="ml-menu">
+                            <li <?php echo ($page == 'manage-invitation') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation'); ?>">Users Invitation</a>
+                            </li>
+                            <li <?php echo ($page == 'send_email') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('send_email'); ?>">Send E-mail</a>
+                            </li>
                             <li <?php echo ($page == 'manage-announcements') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('manage-announcements'); ?>">Announcements</a>
                             </li>

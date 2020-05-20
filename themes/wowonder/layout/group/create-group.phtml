@@ -40,13 +40,35 @@
 						<div class="col-md-6">
 							<div class="wow_form_fields">
 								<label for="category"><?php echo $wo['lang']['category']; ?></label>
-								<select name="category" id="category">
+								<select name="category" id="category" onchange="GetGroupSubCategory(this)">
 									<?php foreach ($wo['group_categories'] as $category_id => $category_name) {?>
 									<option value="<?php echo $category_id?>"><?php echo $category_name; ?></option>
 									<?php } ?>
 								</select>
 							</div>
 						</div>
+						<?php if (!empty($wo['group_sub_categories'])) { ?>
+						<div class="col-md-6">
+							<div class="wow_form_fields">
+								<label for="group_sub_category"><?php echo $wo['lang']['sub_category']; ?></label>
+								<select name="group_sub_category" id="group_sub_category">
+									<?php
+									if (!empty($wo['group_sub_categories'][array_keys($wo['group_categories'])[0]])) {
+									foreach ($wo['group_sub_categories'][array_keys($wo['group_categories'])[0]] as $id => $sub_category) { ?>
+										<option value="<?php echo $sub_category['id']?>"><?php echo $sub_category['lang']; ?></option>
+									<?php } } ?>
+								</select>
+							</div>
+						</div>
+					    <?php } ?>
+						<div class="clear"></div>
+						<?php $fields = Wo_GetCustomFields('group'); 
+						if (!empty($fields)) {
+							foreach ($fields as $key => $wo['field']) {
+								echo Wo_LoadPage('group/fields');
+							}
+						}
+						?>
 					</div>
 					<div class="app-general-alert setting-update-alert"></div>
 					<div class="text-center">
@@ -66,6 +88,23 @@
 </div>
 <!-- .page-margin -->
 <script type="text/javascript">
+	<?php 
+$js_array = json_encode($wo['group_sub_categories']);
+echo "var sub_categories_array = ". $js_array . ";\n";
+?>
+	function GetGroupSubCategory(self) {
+		id = $(self).val();
+		var text = "";
+		if (typeof(sub_categories_array[id]) == 'undefined') {
+		    $('#group_sub_category').html('');
+		}
+		else{
+		   	sub_categories_array[id].forEach(function(entry) {
+				text = text + "<option value='"+entry.id+"'>"+entry.lang+"</option>";
+			});
+		    $('#group_sub_category').html(text);
+		}
+	}
    $(function() {
      $('form.create-group-form').ajaxForm({
        url: Wo_Ajax_Requests_File() + '?f=groups&s=create_group',

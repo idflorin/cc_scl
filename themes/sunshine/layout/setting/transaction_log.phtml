@@ -1,5 +1,5 @@
 <?php 
-$wo['trans'] = Wo_GetMytransactions();
+$wo['trans'] = Wo_GetMytransactions(array('user_id' => $wo['setting']['user_id']));
 ?>
 <div class="wo_settings_page sun_sett_page">
 	<h3><?php echo $wo['lang']['transaction_log']; ?></h3>

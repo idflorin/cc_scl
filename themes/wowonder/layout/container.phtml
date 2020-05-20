@@ -401,9 +401,15 @@
     <?php if ($_COOKIE['mode'] == 'night') { ?>
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/dark.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>" id="night-mode-css">
     <?php } ?>
+    <?php if($wo['config']['googleLogin'] != 0): ?>
+    <meta name="google-signin-scope" content="profile email">
+    <meta name="google-signin-client_id" content="<?php echo $wo['config']['googleAppId']?>">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <?php endif; ?>
    </head>
    
    <body <?php if ($wo['config']['chatSystem'] == 0) { ?> chat-off="true" <?php } ?>>
+    <?php $loadPage = Wo_LoadPage('thirdparty/theme-changer'); echo (!empty($loadPage)) ? $loadPage : '';?>
     <div id="focus-overlay"></div>
       <input type="hidden" class="seen_stories_users_ids" value="">
       <input type="hidden" class="main_session" value="<?php echo Wo_CreateMainSession();?>">
@@ -744,6 +750,14 @@
       <!-- // NEW STORY -->
 	  
 	  <?php } ?>
+    <?php
+    if ($wo['loggedin'] == true) {
+    $wo['user']['notification_settings'] = (Array) json_decode(html_entity_decode($wo['user']['notification_settings']));
+     if ($wo['loggedin'] == true && $wo['config']['memories_system'] != 0 && $wo['user']['notification_settings']['e_memory'] == 1 && empty($_COOKIE['memory'])) { ?>
+      <script type="text/javascript">
+        $.post(Wo_Ajax_Requests_File() + '?f=notify_memories', function(data, textStatus, xhr) {});
+      </script>
+    <?php } } ?>
     <div class="modal fade sun_modal" id="apply-job-modal" role="dialog">
     </div>
    </body>

@@ -309,7 +309,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_code    = 7;
             $error_message = 'id must be numeric and greater than 0';
         }
-        if (empty($_FILES['file']) && empty($_POST['text']) && empty($_POST['image_url']) && empty($_POST['gif'])) {
+        if (empty($_FILES['file']) && empty($_POST['text']) && empty($_POST['image_url']) && empty($_POST['gif']) && empty($_POST['lng']) && empty($_POST['lat'])) {
             $error_code    = 12;
             $error_message = 'text and file and image_url and gif can not be empty';
         }
@@ -336,7 +336,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 );
                 $media         = Wo_ShareFile($fileInfo);
                 $mediaFilename = $media['filename'];
-                $mediaName     = $media['name'];
+                $mediaName     = $_FILES['file']['name'];
             }
             if (!empty($_POST['image_url'])) {
                 $fileend = '_url_image';
@@ -351,6 +351,12 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     $gif = Wo_Secure($_POST['gif']);
                 }
             }
+            $lng = 0;
+            $lat = 0;
+            if (!empty($_POST['lng']) && !empty($_POST['lat'])) {
+                $lng = Wo_Secure($_POST['lng']);
+                $lat = Wo_Secure($_POST['lat']);
+            }
             $message_data = array(
                 'from_id' => Wo_Secure($wo['user']['user_id']),
                 'group_id' => Wo_Secure($group_id),
@@ -360,6 +366,8 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 'type_two' => (!empty($_POST['contact'])) ? 'contact' : '',
                 'text' => '',
                 'stickers' => $gif,
+                'lng' => $lng,
+                'lat' => $lat,
             );
             if (!empty($_POST['text'])) {
                 $message_data['text'] = Wo_Secure($_POST['text']);
@@ -392,6 +400,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     $message['type']     = Wo_GetFilePosition($message['media']);
                     if ($message['type_two'] == 'contact') {
                         $message['type']   = 'contact';
+                    }
+                    if (!empty($message['lng']) && !empty($message['lat'])) {
+                        $message['type']   = 'map';
                     }
                     $message['type']     = $message_po . '_' . $message['type'];
                     $message['file_size'] = 0;
@@ -499,6 +510,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 $message['type']      = Wo_GetFilePosition($message['media']);
                 if ($message['type_two'] == 'contact') {
                     $message['type']   = 'contact';
+                }
+                if (!empty($message['lng']) && !empty($message['lat'])) {
+                    $message['type']   = 'map';
                 }
                 $message['type']     = $message_po . '_' . $message['type'];
                 $message['file_size'] = 0;

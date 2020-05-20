@@ -113,15 +113,6 @@
                         </select>
                         <div class="clearfix"></div>
                         <br><br>
-                        <label for="second_post_button">Second Post Reaction</label>
-                        <select class="form-control show-tick" id="second_post_button" name="second_post_button">
-                          <option value="wonder" <?php echo ($wo['config']['second_post_button'] == 'wonder')   ? ' selected' : '';?> >Wonder</option>
-                          <option value="dislike" <?php echo ($wo['config']['second_post_button'] == 'dislike')   ? ' selected' : '';?> >Dislike</option>
-                          <option value="reaction" <?php echo ($wo['config']['second_post_button'] == 'reaction')   ? ' selected' : '';?> >Reaction System</option>
-                          <option value="disabled" <?php echo ($wo['config']['second_post_button'] == 'disabled')   ? ' selected' : '';?> >Disable Button (just Like)</option>
-                        </select>
-                        <div class="clearfix"></div>
-                        <br><br>
                         <label for="date_style">Date Style</label>
                         <select class="form-control show-tick" id="date_style" name="date_style">
                           <option value="m-d-y" <?php if($wo['config']['date_style'] == 'm-d-y'){echo 'selected';};?> >mm-dd-yy</option>

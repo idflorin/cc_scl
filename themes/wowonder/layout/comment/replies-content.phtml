@@ -1,3 +1,11 @@
+<?php
+ if ($wo['config']['shout_box_system'] == 1 && Wo_CheckAnonymous($wo['reply']['id'],'reply')) {
+   $wo['reply']['publisher']['username'] = 'anonymous';
+   $wo['reply']['publisher']['name'] = $wo['lang']['anonymous'];
+   $wo['reply']['publisher']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
+   $wo['reply']['publisher']['verified'] = 0;
+   $wo['reply']['publisher']['type'] = '';
+} ?>
 <div class="reply reply-container" id="comment_reply_<?php echo $wo['reply']['id'];?>" data-reply-id="<?php echo $wo['reply']['id'];?>">
    <a class="<?php echo Wo_RightToLeft('pull-left'); ?>" href="<?php echo $wo['reply']['publisher']['url']?>" onclick="InjectAPI('{&quot;profile_id&quot; : &quot;<?php echo $wo['reply']['publisher']['id']?>&quot;, &quot;type&quot;:&quot;<?php echo $wo['reply']['publisher']['type']?>&quot;}', event);">
    <img class="avatar <?php echo Wo_RightToLeft('pull-left'); ?>" src="<?php echo $wo['reply']['publisher']['avatar']?>" alt="avatar">
@@ -67,7 +75,27 @@
                     ?>
                 </span>
                 <ul class="reactions-box reactions-box-comment-replay-container-<?php echo $wo['reply']['id']; ?>" data-id="<?php echo $wo['reply']['id']; ?>" style="<?php if ($wo['language_type'] == 'rtl') {?> left: auto; <?php }else{ ?> right: auto; <?php }?>">
-                    <li class="reaction reaction-like animated_2" data-reaction="Like" onclick="Wo_RegisterReplyReaction(<?php echo $wo['reply']['user_id']; ?>,<?php echo $wo['reply']['id']; ?>,'Like');">
+
+                  <?php if (!empty($wo['reactions_types'])) {
+                      foreach ($wo['reactions_types'] as $key => $value) {
+                        if ($value['status'] == 1) {
+                          
+                       ?>
+                    <li class="reaction reaction-<?php echo $value['id'];?>" data-reaction="<?php echo $value['name'];?>" data-reaction-id="<?php echo $value['id'];?>" data-reaction-lang="<?php echo $value['name'];?>" data-post-id="<?php echo $wo['story']['id']; ?>" onclick="Wo_RegisterReplyReaction(<?php echo $wo['reply']['user_id']; ?>,<?php echo $wo['reply']['id']; ?>,<?php echo $value['id'];?>);">
+                      <?php if (preg_match("/<[^<]+>/",$value['wowonder_icon'],$m)) {
+                            echo($value['wowonder_icon']);
+                         }
+                         else{ ?>
+                          <img src="<?php echo($value['wowonder_icon']) ?>">
+                        <?php } ?>
+                    </li>
+                  <?php } } } ?>
+
+
+
+
+
+                    <!-- <li class="reaction reaction-like animated_2" data-reaction="Like" onclick="Wo_RegisterReplyReaction(<?php echo $wo['reply']['user_id']; ?>,<?php echo $wo['reply']['id']; ?>,'Like');">
 						<div class="emoji emoji--like">
 							<div class="emoji__hand"><div class="emoji__thumb"></div></div>
 						</div>
@@ -113,7 +141,7 @@
 								<div class="emoji__mouth"></div>
 							</div>
 						</div>
-					</li>
+					</li> -->
                 </ul>
             </div>
 				<?php } else { ?>

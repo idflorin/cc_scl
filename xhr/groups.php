@@ -28,17 +28,42 @@ if ($f == 'groups') {
             }
         }
         if (empty($errors)) {
+            $sub_category = '';
+            if (!empty($_POST['group_sub_category']) && !empty($wo['group_sub_categories'][$_POST['category']])) {
+                foreach ($wo['group_sub_categories'][$_POST['category']] as $key => $value) {
+                    if ($value['id'] == $_POST['group_sub_category']) {
+                        $sub_category = $value['id'];
+                    }
+                }
+            }
             $re_group_data = array(
                 'group_name' => Wo_Secure($_POST['group_name']),
                 'user_id' => Wo_Secure($wo['user']['user_id']),
                 'group_title' => Wo_Secure($_POST['group_title']),
                 'about' => Wo_Secure($_POST['about']),
                 'category' => Wo_Secure($_POST['category']),
+                'sub_category' => $sub_category,
                 'privacy' => Wo_Secure($privacy),
                 'active' => '1'
             );
             if ($privacy == 2) {
                 $re_group_data['join_privacy'] = 2;
+            }
+            $fields = Wo_GetCustomFields('group'); 
+            if (!empty($fields)) {
+                foreach ($fields as $key => $field) {
+                    if ($field['required'] == 'on' && empty($_POST['fid_'.$field['id']])) {
+                        $errors[] = $error_icon . $wo['lang']['please_check_details'];
+                        header("Content-type: application/json");
+                        echo json_encode(array(
+                            'errors' => $errors
+                        ));
+                        exit();
+                    }
+                    elseif (!empty($_POST['fid_'.$field['id']])) {
+                        $re_group_data['fid_'.$field['id']] = Wo_Secure($_POST['fid_'.$field['id']]);
+                    }
+                }
             }
 
             $register_group = Wo_RegisterGroup($re_group_data);
@@ -102,7 +127,7 @@ if ($f == 'groups') {
     }
     if ($s == 'update_privacy_setting') {
         if (!empty($_POST['group_id']) && Wo_CheckSession($hash_id) === true) {
-            $PageData     = Wo_PageData($_POST['group_id']);
+            $group_data     = Wo_GroupData($_POST['group_id']);
             $privacy      = 1;
             $join_privacy = 1;
             $array        = array(
@@ -119,17 +144,22 @@ if ($f == 'groups') {
                     $join_privacy = $_POST['join_privacy'];
                 }
             }
-            if (empty($errors)) {
-                $Update_data = array(
-                    'privacy' => $privacy,
-                    'join_privacy' => $join_privacy
-                );
-                if (Wo_UpdateGroupData($_POST['group_id'], $Update_data)) {
-                    $data = array(
-                        'status' => 200,
-                        'message' => $success_icon . $wo['lang']['setting_updated']
+            if ($group_data['user_id'] == $wo['user']['id'] || Wo_IsCanGroupUpdate($_POST['group_id'],'privacy')) {
+                if (empty($errors)) {
+                    $Update_data = array(
+                        'privacy' => $privacy,
+                        'join_privacy' => $join_privacy
                     );
+                    if (Wo_UpdateGroupData($_POST['group_id'], $Update_data)) {
+                        $data = array(
+                            'status' => 200,
+                            'message' => $success_icon . $wo['lang']['setting_updated']
+                        );
+                    }
                 }
+            }
+            else{
+                $errors[] = $error_icon . $wo['lang']['please_check_details'];
             }
         }
         header("Content-type: application/json");
@@ -150,19 +180,24 @@ if ($f == 'groups') {
                         $page_data = Wo_GroupData($_POST['group_id']);
                     }
                 }
-                if (empty($errors)) {
-                    $Update_data = array(
-                        'active' => '1'
-                    );
-                    if (Wo_UpdateGroupData($_POST['group_id'], $Update_data)) {
-                        $userdata2 = Wo_GroupData($_POST['group_id']);
-                        $data      = array(
-                            'status' => 200,
-                            'message' => $success_icon . $wo['lang']['setting_updated'],
-                            'cover' => $userdata2['cover'],
-                            'avatar' => $userdata2['avatar']
+                if ($Userdata['user_id'] == $wo['user']['id'] || Wo_IsCanGroupUpdate($_POST['group_id'],'avatar')) {
+                    if (empty($errors)) {
+                        $Update_data = array(
+                            'active' => '1'
                         );
+                        if (Wo_UpdateGroupData($_POST['group_id'], $Update_data)) {
+                            $userdata2 = Wo_GroupData($_POST['group_id']);
+                            $data      = array(
+                                'status' => 200,
+                                'message' => $success_icon . $wo['lang']['setting_updated'],
+                                'cover' => $userdata2['cover'],
+                                'avatar' => $userdata2['avatar']
+                            );
+                        }
                     }
+                }
+                else{
+                    $errors[] = $error_icon . $wo['lang']['please_check_details'];
                 }
             }
         }
@@ -199,19 +234,51 @@ if ($f == 'groups') {
                 if (empty($_POST['group_category'])) {
                     $_POST['group_category'] = 1;
                 }
-                if (empty($errors)) {
-                    $Update_data = array(
-                        'group_name' => $_POST['group_name'],
-                        'group_title' => $_POST['group_title'],
-                        'category' => $_POST['group_category'],
-                        'about' => $_POST['about']
-                    );
-                    if (Wo_UpdateGroupData($_POST['group_id'], $Update_data)) {
-                        $data = array(
-                            'status' => 200,
-                            'message' => $success_icon . $wo['lang']['setting_updated']
+                if ($group_data['user_id'] == $wo['user']['id'] || Wo_IsCanGroupUpdate($_POST['group_id'],'general')) {
+                    if (empty($errors)) {
+                        $sub_category = '';
+                        if (!empty($_POST['group_sub_category']) && !empty($wo['group_sub_categories'][$_POST['group_category']])) {
+                            foreach ($wo['group_sub_categories'][$_POST['group_category']] as $key => $value) {
+                                if ($value['id'] == $_POST['group_sub_category']) {
+                                    $sub_category = $value['id'];
+                                }
+                            }
+                        }
+                        $Update_data = array(
+                            'group_name' => $_POST['group_name'],
+                            'group_title' => $_POST['group_title'],
+                            'category' => $_POST['group_category'],
+                            'sub_category' => $sub_category,
+                            'about' => $_POST['about']
                         );
+
+                        $fields = Wo_GetCustomFields('group'); 
+                        if (!empty($fields)) {
+                            foreach ($fields as $key => $field) {
+                                if ($field['required'] == 'on' && empty($_POST['fid_'.$field['id']])) {
+                                    $errors[] = $error_icon . $wo['lang']['please_check_details'];
+                                    header("Content-type: application/json");
+                                    echo json_encode(array(
+                                        'errors' => $errors
+                                    ));
+                                    exit();
+                                }
+                                elseif (!empty($_POST['fid_'.$field['id']])) {
+                                    $Update_data['fid_'.$field['id']] = Wo_Secure($_POST['fid_'.$field['id']]);
+                                }
+                            }
+                        }
+
+                        if (Wo_UpdateGroupData($_POST['group_id'], $Update_data)) {
+                            $data = array(
+                                'status' => 200,
+                                'message' => $success_icon . $wo['lang']['setting_updated']
+                            );
+                        }
                     }
+                }
+                else{
+                    $errors[] = $error_icon . $wo['lang']['please_check_details'];
                 }
             }
         }
@@ -230,14 +297,21 @@ if ($f == 'groups') {
             if (!Wo_HashPassword($_POST['password'], $wo['user']['password']) && !Wo_CheckGroupAdminPassword($_POST['password'], $_POST['group_id'])) {
                 $errors[] = $error_icon . $wo['lang']['current_password_mismatch'];
             }
-            if (empty($errors)) {
-                if (Wo_DeleteGroup($_POST['group_id']) === true) {
-                    $data = array(
-                        'status' => 200,
-                        'message' => $success_icon . $wo['lang']['group_deleted'],
-                        'location' => Wo_SeoLink('index.php?link1=groups')
-                    );
+            $group_data = Wo_GroupData($_POST['group_id']);
+            if ($group_data['user_id'] == $wo['user']['id'] || Wo_IsCanGroupUpdate($_POST['group_id'],'delete_group')) {
+
+                if (empty($errors)) {
+                    if (Wo_DeleteGroup($_POST['group_id']) === true) {
+                        $data = array(
+                            'status' => 200,
+                            'message' => $success_icon . $wo['lang']['group_deleted'],
+                            'location' => Wo_SeoLink('index.php?link1=groups')
+                        );
+                    }
                 }
+            }
+            else{
+                $errors[] = $error_icon . $wo['lang']['please_check_details'];
             }
         }
         header("Content-type: application/json");
@@ -276,10 +350,13 @@ if ($f == 'groups') {
     }
     if ($s == 'delete_joined_user') {
         if (isset($_GET['user_id']) && !empty($_GET['group_id'])) {
-            if (Wo_LeaveGroup($_GET['group_id'], $_GET['user_id']) === true) {
-                $data = array(
-                    'status' => 200
-                );
+            $group_data = Wo_GroupData($_GET['group_id']);
+            if ($group_data['user_id'] == $wo['user']['id'] || Wo_IsCanGroupUpdate($_GET['group_id'],'members')) {
+                if (Wo_LeaveGroup($_GET['group_id'], $_GET['user_id']) === true) {
+                    $data = array(
+                        'status' => 200
+                    );
+                }
             }
         }
         header("Content-type: application/json");
@@ -288,19 +365,66 @@ if ($f == 'groups') {
     }
     if ($s == 'add_admin') {
         if (isset($_GET['user_id']) && isset($_GET['group_id'])) {
-            $member = Wo_Secure($_GET['user_id']);
-            $group  = Wo_Secure($_GET['group_id']);
-            $data   = array(
-                'status' => 304
-            );
-            $code   = Wo_AddGroupAdmin($member, $group);
-            if ($code === 1) {
-                $data['status'] = 200;
-                $data['code']   = 1;
-            } elseif ($code === 0) {
-                $data['status'] = 200;
-                $data['code']   = 0;
+            $group_data = Wo_GroupData($_GET['group_id']);
+            if ($group_data['user_id'] == $wo['user']['id'] || Wo_IsCanGroupUpdate($_GET['group_id'],'members')) {
+
+                $member = Wo_Secure($_GET['user_id']);
+                $group  = Wo_Secure($_GET['group_id']);
+                $data   = array(
+                    'status' => 304
+                );
+                $code   = Wo_AddGroupAdmin($member, $group);
+                if ($code === 1) {
+                    $data['status'] = 200;
+                    $data['code']   = 1;
+                } elseif ($code === 0) {
+                    $data['status'] = 200;
+                    $data['code']   = 0;
+                }
             }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'privileges') {
+        if (!empty($_POST['group_id']) && is_numeric($_POST['group_id']) && $_POST['group_id'] > 0 && !empty($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0) {
+            $group_data = Wo_GroupData($_POST['group_id']);
+            if ($group_data['user_id'] == $wo['user']['id'] || Wo_IsCanGroupUpdate($_POST['group_id'],'members')) {
+
+                $update_array = array('general' => 0 , 'privacy' => 0 , 'avatar' => 0 , 'members' => 0 , 'analytics' => 0 ,'delete_group' => 0);
+                if (!empty($_POST['general']) && $_POST['general'] == 1) {
+                    $update_array['general'] = 1;
+                }
+                if (!empty($_POST['privacy']) && $_POST['privacy'] == 1) {
+                    $update_array['privacy'] = 1;
+                }
+                if (!empty($_POST['avatar']) && $_POST['avatar'] == 1) {
+                    $update_array['avatar'] = 1;
+                }
+                if (!empty($_POST['members']) && $_POST['members'] == 1) {
+                    $update_array['members'] = 1;
+                }
+                if (!empty($_POST['analytics']) && $_POST['analytics'] == 1) {
+                    $update_array['analytics'] = 1;
+                }
+                if (!empty($_POST['delete_group']) && $_POST['delete_group'] == 1) {
+                    $update_array['delete_group'] = 1;
+                }
+
+                if (Wo_UpdateGroupAdminData($_POST['group_id'], $update_array,$_POST['user_id'])) {
+                    $data = array(
+                        'status' => 200,
+                        'message' => $success_icon . $wo['lang']['setting_updated']
+                    );
+                }
+            }
+            else{
+                $errors[] = $error_icon . $wo['lang']['please_check_details'];
+            }
+        }
+        else{
+            $errors[] = $error_icon . $wo['lang']['please_check_details'];
         }
         header("Content-type: application/json");
         echo json_encode($data);

@@ -137,7 +137,7 @@
 				<?php echo Wo_LoadPage('blog/sidebar') ?>
 			</div>
 				
-			<?php if ($wo['loggedin'] == true): ?>           
+			<?php //if ($wo['loggedin'] == true): ?>           
 			<div class="blog-com-wrapper" id="respond">
 				<div class="blog-com-top">
 					<h4 class="pull-left">   
@@ -150,7 +150,9 @@
                 <div class="blog-com-box">
                   <form  class="form">
                     <div class="w100 wo_blogcomm_combo">
+                    	<?php if ($wo['loggedin'] == true): ?>  
 						<img class="avatar" src="<?php echo $wo['user']['avatar'];?>"/>
+					    <?php endif; ?>  
                       <textarea id="blog-comment" name="text" class="form-control" placeholder="<?php echo $wo['lang']['write_comment'];?>"></textarea>
 
                         <button id="add-art-comment" class="btn pull-right btn-main" type="button" data-toggle="tooltip" title="<?php echo $wo['lang']['post']; ?>">
@@ -181,7 +183,7 @@
                    <?php endif ?>
                 </div>
               </div>
-            <?php endif;?>
+            <?php //endif;?>
       </div>
       <div class="col-md-4 custom-fixed-element">
         <?php echo Wo_LoadPage('blog/main-sidebar') ?>
@@ -291,6 +293,9 @@ jQuery(document).ready(function($) {
   });
 
   $("#add-art-comment").click(function(event) {
+  	<?php if ($wo['loggedin'] != true) { ?>
+  		document.location = "<?php echo($wo['config']['site_url']) ?>";
+    <?php } ?>
     $.ajax({
       url: Wo_Ajax_Requests_File() + '?f=add-blog-comm',
       type: 'POST',
@@ -411,6 +416,9 @@ function Wo_AddBlogCommReplyDisLike(id){
 }
 
 function Wo_RegisterBlogCommReply(id,event,self){
+	<?php if ($wo['loggedin'] != true) { ?>
+  		document.location = "<?php echo($wo['config']['site_url']) ?>";
+    <?php } ?>
   if (event.keyCode==13&&event.shiftKey==0&&event&&id&&self) {
     var text = self.value;
     if (text.length >= 2) {

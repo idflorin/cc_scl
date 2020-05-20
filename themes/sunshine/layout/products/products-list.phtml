@@ -25,6 +25,11 @@
 				    $product_by_ = str_replace('{product_category_name}', $wo['products_categories'][$wo['product']['category']], $product_by_);
 				?>
 				<a href="<?php echo Wo_SeoLink('index.php?link1=products&c_id=' . $wo['product']['category']);?>"><?php echo $wo['products_categories'][$wo['product']['category']];?></a>
+				<?php if (!empty($wo['product']['product_sub_category'])) { ?>
+				<div>
+					<a href="<?php echo Wo_SeoLink('index.php?link1=products&c_id=' . $wo['product']['category']);?>"><?php echo $wo['product']['product_sub_category'];?></a>
+				</div>
+				<?php } ?>
 			</div>
 			<!--<div class="product-desc"><?php echo mb_substr($wo['product']['description'], 0, 150, "UTF-8") . '...';?></div>-->
 		</div>

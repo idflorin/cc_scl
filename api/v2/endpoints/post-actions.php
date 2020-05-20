@@ -91,7 +91,7 @@ if (empty($error_code)) {
                 'post_id' => $_POST['post_id'],
                 'text' => $_POST['text']
             );
-            if (in_array($_POST['privacy_type'],array('0','1','2','3'))) {
+            if (in_array($_POST['privacy_type'],array('0','1','2','3','4'))) {
             	Wo_UpdatePostPrivacy(array(
 	                'post_id' => Wo_Secure($_POST['post_id']),
 	                'privacy_type' => Wo_Secure($_POST['privacy_type'])
@@ -161,7 +161,7 @@ if (empty($error_code)) {
 		    $error_message = 'You are not the post owner';
 		}
 	}  else if ($_POST['action'] == 'reaction') {
-		$reactions_types = array('Like','Love','HaHa','Wow','Sad','Angry');
+		$reactions_types = array_keys($wo['reactions_types']);
 		$post_id = Wo_Secure($_POST['post_id']);
 		if (Wo_IsReacted($post_id, $wo['user']['user_id']) == true) {
 			Wo_DeleteReactions($post_id);

@@ -75,6 +75,13 @@
                             <input type="radio" name="can_blogs" id="can_blogs-disabled" value="1" <?php echo ($wo['config']['can_blogs'] == 1) ? 'checked': '';?>>
                             <label for="can_blogs-disabled" class="m-l-20">Users</label>
                         </div>
+                        <label for="blog_approval">Blog Approval System</label>
+                        <div class="form-group">
+                            <input type="radio" name="blog_approval" id="blog_approval-enabled" value="1" <?php echo ($wo['config']['blog_approval'] == 1) ? 'checked': '';?>>
+                            <label for="blog_approval-enabled">Enabled</label>
+                            <input type="radio" name="blog_approval" id="blog_approval-disabled" value="0" <?php echo ($wo['config']['blog_approval'] == 0) ? 'checked': '';?>>
+                            <label for="blog_approval-disabled" class="m-l-20">Disabled</label>
+                        </div>
 
                         <label for="events">Events System <span class="black" data-toggle="popover" data-trigger="hover" data-content="Allow Events System."><i class="fa fa-question-circle fa-fw"></i></span></label>
                         <div class="form-group">
@@ -185,6 +192,22 @@
                             <label for="job_system-disabled" class="m-l-20">Disabled</label>
                         </div>
 
+                        <label for="offer_system">Offer System</label>
+                        <div class="form-group">
+                            <input type="radio" name="offer_system" id="offer_system-enabled" value="1" <?php echo ($wo['config']['offer_system'] == 1) ? 'checked': '';?>>
+                            <label for="offer_system-enabled">Enabled</label>
+                            <input type="radio" name="offer_system" id="offer_system-disabled" value="0" <?php echo ($wo['config']['offer_system'] == 0) ? 'checked': '';?>>
+                            <label for="offer_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+
+                        <label for="memories_system">Memories System</label>
+                        <div class="form-group">
+                            <input type="radio" name="memories_system" id="memories_system-enabled" value="1" <?php echo ($wo['config']['memories_system'] == 1) ? 'checked': '';?>>
+                            <label for="memories_system-enabled">Enabled</label>
+                            <input type="radio" name="memories_system" id="memories_system-disabled" value="0" <?php echo ($wo['config']['memories_system'] == 0) ? 'checked': '';?>>
+                            <label for="memories_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+
                         
 
                         <label for="common_things">Common Things System</label>
@@ -194,12 +217,67 @@
                             <input type="radio" name="common_things" id="common_things-disabled" value="0" <?php echo ($wo['config']['common_things'] == 0) ? 'checked': '';?>>
                             <label for="common_things-disabled" class="m-l-20">Disabled</label>
                         </div>
+                        
+
+                        <label for="membership_system">Membership On Sign Up System</label>
+                        <div class="form-group">
+                            <input type="radio" name="membership_system" id="membership_system-enabled" value="1" <?php echo ($wo['config']['membership_system'] == 1) ? 'checked': '';?>>
+                            <label for="membership_system-enabled">Enabled</label>
+                            <input type="radio" name="membership_system" id="membership_system-disabled" value="0" <?php echo ($wo['config']['membership_system'] == 0) ? 'checked': '';?>>
+                            <label for="membership_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        
+
+                        <label for="nearby_shop_system">Nearby Shops System</label>
+                        <div class="form-group">
+                            <input type="radio" name="nearby_shop_system" id="nearby_shop_system-enabled" value="1" <?php echo ($wo['config']['nearby_shop_system'] == 1) ? 'checked': '';?>>
+                            <label for="nearby_shop_system-enabled">Enabled</label>
+                            <input type="radio" name="nearby_shop_system" id="nearby_shop_system-disabled" value="0" <?php echo ($wo['config']['nearby_shop_system'] == 0) ? 'checked': '';?>>
+                            <label for="nearby_shop_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+
+                        <label for="nearby_business_system">Nearby Businesses System</label>
+                        <div class="form-group">
+                            <input type="radio" name="nearby_business_system" id="nearby_business_system-enabled" value="1" <?php echo ($wo['config']['nearby_business_system'] == 1) ? 'checked': '';?>>
+                            <label for="nearby_business_system-enabled">Enabled</label>
+                            <input type="radio" name="nearby_business_system" id="nearby_business_system-disabled" value="0" <?php echo ($wo['config']['nearby_business_system'] == 0) ? 'checked': '';?>>
+                            <label for="nearby_business_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <label for="password_complexity_system">Password Complexity System</label>
+                        <div class="form-group">
+                            <input type="radio" name="password_complexity_system" id="password_complexity_system-enabled" value="1" <?php echo ($wo['config']['password_complexity_system'] == 1) ? 'checked': '';?>>
+                            <label for="password_complexity_system-enabled">Enabled</label>
+                            <input type="radio" name="password_complexity_system" id="password_complexity_system-disabled" value="0" <?php echo ($wo['config']['password_complexity_system'] == 0) ? 'checked': '';?>>
+                            <label for="password_complexity_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <label for="shout_box_system">Shout Box System</label>
+                        <div class="form-group">
+                            <input type="radio" name="shout_box_system" id="shout_box_system-enabled" value="1" <?php echo ($wo['config']['shout_box_system'] == 1) ? 'checked': '';?>>
+                            <label for="shout_box_system-enabled">Enabled</label>
+                            <input type="radio" name="shout_box_system" id="shout_box_system-disabled" value="0" <?php echo ($wo['config']['shout_box_system'] == 0) ? 'checked': '';?>>
+                            <label for="shout_box_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <label for="bank_withdrawal_system">Bank Account Withdrawal System</label>
+                        <div class="form-group">
+                            <input type="radio" name="bank_withdrawal_system" id="bank_withdrawal_system-enabled" value="1" <?php echo ($wo['config']['bank_withdrawal_system'] == 1) ? 'checked': '';?>>
+                            <label for="bank_withdrawal_system-enabled">Enabled</label>
+                            <input type="radio" name="bank_withdrawal_system" id="bank_withdrawal_system-disabled" value="0" <?php echo ($wo['config']['bank_withdrawal_system'] == 0) ? 'checked': '';?>>
+                            <label for="bank_withdrawal_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
                         <label for="weather_widget">Weather Widget</label>
                         <div class="form-group">
                             <input type="radio" name="weather_widget" id="weather_widget-enabled" value="1" <?php echo ($wo['config']['weather_widget'] == 1) ? 'checked': '';?>>
                             <label for="weather_widget-enabled">Enabled</label>
                             <input type="radio" name="weather_widget" id="weather_widget-disabled" value="0" <?php echo ($wo['config']['weather_widget'] == 0) ? 'checked': '';?>>
                             <label for="weather_widget-disabled" class="m-l-20">Disabled</label>
+                        </div>
+
+                        <label for="notify_new_post">Notification When User Create New Post</label>
+                        <div class="form-group">
+                            <input type="radio" name="notify_new_post" id="notify_new_post-enabled" value="1" <?php echo ($wo['config']['notify_new_post'] == 1) ? 'checked': '';?>>
+                            <label for="notify_new_post-enabled">Enabled</label>
+                            <input type="radio" name="notify_new_post" id="notify_new_post-disabled" value="0" <?php echo ($wo['config']['notify_new_post'] == 0) ? 'checked': '';?>>
+                            <label for="notify_new_post-disabled" class="m-l-20">Disabled</label>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">

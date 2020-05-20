@@ -121,20 +121,29 @@ if ($type == 'get_user_messages') {
                         }
                     }
                 }
+                if (empty($message['stickers'])) {
+                    $message['stickers'] = '';
+                }
                 $message['time_text'] = Wo_Time_Elapsed_String($message['time']);
                 $message_po  = 'left';
                 if ($message['from_id'] == $user_id) {
-                	$message_po  = 'right';
+                    $message_po  = 'right';
                 }
+                
                 $message['position']  = $message_po;
                 $message['type']      = Wo_GetFilePosition($message['media']);
-                if (!empty($message['stickers'])) {
-                    $message['type']   = 'gif';
+                if (!empty($message['stickers']) && strpos($message['stickers'], '.gif') !== false) {
+                    $message['type'] = 'gif';
                 }
                 if ($message['type_two'] == 'contact') {
                     $message['type']   = 'contact';
                 }
-                $message['type']      = $message_po . '_' . $message['type'];
+                $message['type']     = $message_po . '_' . $message['type'];
+                $message['product']     = null;
+                if (!empty($message['product_id'])) {
+                    $message['type']     = $message_po . '_product';
+                    $message['product'] = Wo_GetProduct($message['product_id']);
+                }
                 $message['file_size'] = 0;
                 if (!empty($message['media'])) {
                     $message['file_size'] = '0MB';

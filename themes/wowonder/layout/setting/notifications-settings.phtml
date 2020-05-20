@@ -147,6 +147,17 @@
 						<label for="e_profile_wall_post"><?php echo $wo['lang']['e_profile_wall_post']; ?></label>
 					</div>
 				</div>
+				<?php if ($wo['config']['memories_system'] != 0) { ?>
+				<div class="form-group">
+					<?php 
+						$selected_e_memory = ($wo['setting']['notification_settings']['e_memory'] == 1)   ? ' checked' : '';
+					?>
+					<div class="col-md-12 round-check">
+						<input type="checkbox" name="e_memory" id="e_memory" value="1" <?php echo $selected_e_memory; ?>> 
+						<label for="e_memory"><?php echo $wo['lang']['memory_this_day']; ?></label>
+					</div>
+				</div>
+			    <?php } ?>
 			</div>
          </div>
 		

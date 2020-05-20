@@ -1,3 +1,11 @@
+<?php 
+if ($wo['WondredLikedusers']['anonymous'] == true) {
+   $wo['WondredLikedusers']['username'] = 'anonymous';
+   $wo['WondredLikedusers']['name'] = $wo['lang']['anonymous'];
+   $wo['WondredLikedusers']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
+   $wo['WondredLikedusers']['verified'] = 0;
+   $wo['WondredLikedusers']['type'] = '';
+ } ?>
 <div class="who_react_to_this_user">
 	<div class="who_react_to_this_user_info">
 		<div class="avatar <?php echo Wo_RightToLeft('pull-left');?>" id="inline_emo_react">
@@ -39,6 +47,8 @@
 		</div>
 	</div>
 	<div class="user-follow-button">
-		<?php echo Wo_GetFollowButton($wo['WondredLikedusers']['user_id']);?>
+		<?php if ($wo['WondredLikedusers']['anonymous'] != true) {
+		echo Wo_GetFollowButton($wo['WondredLikedusers']['user_id']);
+	} ?>
 	</div>
 </div>

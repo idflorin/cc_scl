@@ -448,181 +448,120 @@ if ($f == 'chat') {
         }
     }
     if ($s == 'send_message') {
-        if ($wo['user']['message_privacy'] != 2) {
-            if (!empty($_POST['user_id']) && Wo_CheckMainSession($hash_id) === true) {
-                $html          = '';
-                $media         = '';
-                $mediaFilename = '';
-                $mediaName     = '';
-                $invalid_file  = 0;
-                if (isset($_FILES['sendMessageFile']['name'])) {
-                    if ($_FILES['sendMessageFile']['size'] > $wo['config']['maxUpload']) {
-                        $invalid_file = 1;
-                    } else if (Wo_IsFileAllowed($_FILES['sendMessageFile']['name']) == false) {
-                        $invalid_file = 2;
-                    } else {
-                        $fileInfo      = array(
-                            'file' => $_FILES["sendMessageFile"]["tmp_name"],
-                            'name' => $_FILES['sendMessageFile']['name'],
-                            'size' => $_FILES["sendMessageFile"]["size"],
-                            'type' => $_FILES["sendMessageFile"]["type"]
-                        );
-                        $media         = Wo_ShareFile($fileInfo);
-                        $mediaFilename = $media['filename'];
-                        $mediaName     = $media['name'];
-                    }
-                } else if (!empty($_POST['message-record']) && !empty($_POST['media-name'])) {
-                    $mediaFilename = Wo_Secure($_POST['message-record']);
-                    $mediaName     = Wo_Secure($_POST['media-name']);
-                }
-                $message_text = '';
-                if (!empty($_POST['textSendMessage'])) {
-                    $message_text = $_POST['textSendMessage'];
-                }
-                $user_data    = Wo_UserData($_POST['user_id']);
-                if (!empty($user_data) && $user_data['message_privacy'] == 2) {
-                    exit();
-                }
-                if (!empty($user_data) && $user_data['message_privacy'] == 1 && Wo_IsFollowing($wo['user']['user_id'], $_POST['user_id']) === false) {
-                    exit();
-                }
-                if (!empty($_POST['chatSticker']) && !strpos($_POST['chatSticker'], '.gif')) {
-                    $fileend =  '_sticker_' . rand(111111,999999);
-                    $mediaFilename = Wo_ImportImageFromUrl($_POST['chatSticker'], $fileend);
-                }
-                
-                $messages = Wo_RegisterMessage(array(
-                    'from_id' => Wo_Secure($wo['user']['user_id']),
-                    'to_id' => Wo_Secure($_POST['user_id']),
-                    'text' => Wo_Secure($message_text),
-                    'media' => Wo_Secure($mediaFilename),
-                    'mediaFileName' => Wo_Secure($mediaName),
-                    'time' => time(),
-                    'stickers' => (isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && strpos($_POST['chatSticker'], '.gif') !== false && !$mediaFilename && !$mediaName) ? $_POST['chatSticker'] : ''
-                ));
-                if ($messages > 0) {
-                    $messages            = Wo_GetMessages(array(
-                        'message_id' => $messages,
-                        'user_id' => $_POST['user_id']
-                    ));
-                    $wo['chat']['color'] = Wo_GetChatColor($wo['user']['user_id'], $_POST['user_id']);
-                    foreach ($messages as $wo['chatMessage']) {
-                        $html .= Wo_LoadPage('chat/chat-list');
-                    }
-                    $file = false;
-                    if (isset($_FILES['sendMessageFile']['name']) && $_FILES['sendMessageFile']['size'] <= $wo['config']['maxUpload']) {
-                        $file = true;
-                    }
-                    $data = array(
-                        'status' => 200,
-                        'html' => $html,
-                        'file' => $file,
-                        'stickers' => ((isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && strpos($_POST['chatSticker'], '.gif') !== false && !$mediaFilename && !$mediaName) ? true : false),
-                        'invalid_file' => $invalid_file
-                    );
-                    if ($wo['config']['emailNotification'] == 1) {
-                        $to_id        = $_POST['user_id'];
-                        $recipient    = Wo_UserData($to_id);
-                        $send_notif   = array();
-                        $send_notif[] = (!empty($recipient) && ($recipient['lastseen'] < (time() - 120)));
-                        $send_notif[] = ($recipient['e_last_notif'] < time() && $recipient['e_sentme_msg'] == 1);
-                        if (!in_array(false, $send_notif)) {
-                            $db->where("user_id", $to_id)->update(T_USERS, array(
-                                'e_last_notif' => (time() + 3600)
-                            ));
-                            $wo['emailNotification']['notifier'] = $wo['user'];
-                            $wo['emailNotification']['type']     = 'sent_message';
-                            $wo['emailNotification']['url']      = $recipient['url'];
-                            $wo['emailNotification']['msg_text'] = Wo_Secure($message_text);
-                            $send_message_data                   = array(
-                                'from_email' => $wo['config']['siteEmail'],
-                                'from_name' => $wo['config']['siteName'],
-                                'to_email' => $recipient['email'],
-                                'to_name' => $recipient['name'],
-                                'subject' => 'New notification',
-                                'charSet' => 'utf-8',
-                                'message_body' => Wo_LoadPage('emails/notifiction-email'),
-                                'is_html' => true
+        if ($wo['config']['who_upload'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin() && (!empty($_FILES['sendMessageFile']) || !empty($_POST['message-record']))) {
+            $data['status']       = 500;
+            $data['invalid_file'] = 3;
+        }
+        else{
+
+            if ($wo['user']['message_privacy'] != 2) {
+                if (!empty($_POST['user_id']) && Wo_CheckMainSession($hash_id) === true) {
+                    $html          = '';
+                    $media         = '';
+                    $mediaFilename = '';
+                    $mediaName     = '';
+                    $invalid_file  = 0;
+                    if (isset($_FILES['sendMessageFile']['name'])) {
+                        if ($_FILES['sendMessageFile']['size'] > $wo['config']['maxUpload']) {
+                            $invalid_file = 1;
+                        } else if (Wo_IsFileAllowed($_FILES['sendMessageFile']['name']) == false) {
+                            $invalid_file = 2;
+                        } else {
+                            $fileInfo      = array(
+                                'file' => $_FILES["sendMessageFile"]["tmp_name"],
+                                'name' => $_FILES['sendMessageFile']['name'],
+                                'size' => $_FILES["sendMessageFile"]["size"],
+                                'type' => $_FILES["sendMessageFile"]["type"]
                             );
-                            if ($wo['config']['smtp_or_mail'] == 'smtp') {
-                                $send_message_data['insert_database'] = 1;
+                            $media         = Wo_ShareFile($fileInfo);
+                            $mediaFilename = $media['filename'];
+                            $mediaName     = $media['name'];
+                        }
+                    } else if (!empty($_POST['message-record']) && !empty($_POST['media-name'])) {
+                        $mediaFilename = Wo_Secure($_POST['message-record']);
+                        $mediaName     = Wo_Secure($_POST['media-name']);
+                    }
+                    $message_text = '';
+                    if (!empty($_POST['textSendMessage'])) {
+                        $message_text = $_POST['textSendMessage'];
+                    }
+                    $user_data    = Wo_UserData($_POST['user_id']);
+                    if (!empty($user_data) && $user_data['message_privacy'] == 2) {
+                        exit();
+                    }
+                    if (!empty($user_data) && $user_data['message_privacy'] == 1 && Wo_IsFollowing($wo['user']['user_id'], $_POST['user_id']) === false) {
+                        exit();
+                    }
+                    if (!empty($_POST['chatSticker']) && !strpos($_POST['chatSticker'], '.gif')) {
+                        $fileend =  '_sticker_' . rand(111111,999999);
+                        $mediaFilename = Wo_ImportImageFromUrl($_POST['chatSticker'], $fileend);
+                    }
+                    
+                    $messages = Wo_RegisterMessage(array(
+                        'from_id' => Wo_Secure($wo['user']['user_id']),
+                        'to_id' => Wo_Secure($_POST['user_id']),
+                        'text' => Wo_Secure($message_text),
+                        'media' => Wo_Secure($mediaFilename),
+                        'mediaFileName' => Wo_Secure($mediaName),
+                        'time' => time(),
+                        'stickers' => (isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && strpos($_POST['chatSticker'], '.gif') !== false && !$mediaFilename && !$mediaName) ? $_POST['chatSticker'] : ''
+                    ));
+                    if ($messages > 0) {
+                        $messages            = Wo_GetMessages(array(
+                            'message_id' => $messages,
+                            'user_id' => $_POST['user_id']
+                        ));
+                        $wo['chat']['color'] = Wo_GetChatColor($wo['user']['user_id'], $_POST['user_id']);
+                        foreach ($messages as $wo['chatMessage']) {
+                            $html .= Wo_LoadPage('chat/chat-list');
+                        }
+                        $file = false;
+                        if (isset($_FILES['sendMessageFile']['name']) && $_FILES['sendMessageFile']['size'] <= $wo['config']['maxUpload']) {
+                            $file = true;
+                        }
+                        $data = array(
+                            'status' => 200,
+                            'html' => $html,
+                            'file' => $file,
+                            'stickers' => ((isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && strpos($_POST['chatSticker'], '.gif') !== false && !$mediaFilename && !$mediaName) ? true : false),
+                            'invalid_file' => $invalid_file
+                        );
+                        if ($wo['config']['emailNotification'] == 1) {
+                            $to_id        = $_POST['user_id'];
+                            $recipient    = Wo_UserData($to_id);
+                            $send_notif   = array();
+                            $send_notif[] = (!empty($recipient) && ($recipient['lastseen'] < (time() - 120)));
+                            $send_notif[] = ($recipient['e_last_notif'] < time() && $recipient['e_sentme_msg'] == 1);
+                            if (!in_array(false, $send_notif)) {
+                                $db->where("user_id", $to_id)->update(T_USERS, array(
+                                    'e_last_notif' => (time() + 3600)
+                                ));
+                                $wo['emailNotification']['notifier'] = $wo['user'];
+                                $wo['emailNotification']['type']     = 'sent_message';
+                                $wo['emailNotification']['url']      = $recipient['url'];
+                                $wo['emailNotification']['msg_text'] = Wo_Secure($message_text);
+                                $send_message_data                   = array(
+                                    'from_email' => $wo['config']['siteEmail'],
+                                    'from_name' => $wo['config']['siteName'],
+                                    'to_email' => $recipient['email'],
+                                    'to_name' => $recipient['name'],
+                                    'subject' => 'New notification',
+                                    'charSet' => 'utf-8',
+                                    'message_body' => Wo_LoadPage('emails/notifiction-email'),
+                                    'is_html' => true
+                                );
+                                if ($wo['config']['smtp_or_mail'] == 'smtp') {
+                                    $send_message_data['insert_database'] = 1;
+                                }
+                                Wo_SendMessage($send_message_data);
                             }
-                            Wo_SendMessage($send_message_data);
                         }
                     }
-                }
-                if ($invalid_file > 0 && empty($messages)) {
-                    $data['status']       = 500;
-                    $data['invalid_file'] = $invalid_file;
-                }
-            } else if (isset($_GET['group_id']) && is_numeric($_GET['group_id']) && Wo_CheckMainSession($hash_id) === true) {
-                $html          = '';
-                $media         = '';
-                $mediaFilename = '';
-                $mediaName     = '';
-                $invalid_file  = 0;
-                if (isset($_FILES['sendMessageFile']['name'])) {
-                    if ($_FILES['sendMessageFile']['size'] > $wo['config']['maxUpload']) {
-                        $invalid_file = 1;
-                    } else if (Wo_IsFileAllowed($_FILES['sendMessageFile']['name']) == false) {
-                        $invalid_file = 2;
-                    } else {
-                        $fileInfo      = array(
-                            'file' => $_FILES["sendMessageFile"]["tmp_name"],
-                            'name' => $_FILES['sendMessageFile']['name'],
-                            'size' => $_FILES["sendMessageFile"]["size"],
-                            'type' => $_FILES["sendMessageFile"]["type"]
-                        );
-                        $media         = Wo_ShareFile($fileInfo);
-                        $mediaFilename = $media['filename'];
-                        $mediaName     = $media['name'];
+                    if ($invalid_file > 0 && empty($messages)) {
+                        $data['status']       = 500;
+                        $data['invalid_file'] = $invalid_file;
                     }
-                }
-                $message_text = '';
-                if (!empty($_POST['textSendMessage'])) {
-                    $message_text = $_POST['textSendMessage'];
-                }
-                $last_id = Wo_RegisterGroupMessage(array(
-                    'from_id' => Wo_Secure($wo['user']['user_id']),
-                    'group_id' => Wo_Secure($_GET['group_id']),
-                    'text' => Wo_Secure($_POST['textSendMessage']),
-                    'media' => Wo_Secure($mediaFilename),
-                    'mediaFileName' => Wo_Secure($mediaName),
-                    'time' => time()
-                ));
-                if ($last_id && $last_id > 0) {
-                    @Wo_UpdateGChat(Wo_Secure($_GET['group_id']), array(
-                        "time" => time()
-                        ));
-                    $messages = Wo_GetGroupMessages(array(
-                        'id' => $last_id,
-                        'group_id' => $_GET['group_id']
-                    ));
-                    foreach ($messages as $wo['chatMessage']) {
-                        $html .= Wo_LoadPage('chat/group-chat-list');
-                    }
-                    $file = false;
-                    if (isset($_FILES['sendMessageFile']['name'])) {
-                        $file = true;
-                    }
-                    $data = array(
-                        'status' => 200,
-                        'html' => $html,
-                        'file' => $file,
-                        'invalid_file' => $invalid_file
-                    );
-                }
-                if ($invalid_file > 0 && empty($last_id)) {
-                    $data['status']       = 500;
-                    $data['invalid_file'] = $invalid_file;
-                }
-            }
-
-
-            else if (isset($_GET['page_id']) && is_numeric($_GET['page_id']) && Wo_CheckMainSession($hash_id) === true) {
-                $page_data = Wo_PageData($_GET['page_id']);
-                $invalid_file = 1;
-                if (!empty($page_data)) {
+                } else if (isset($_GET['group_id']) && is_numeric($_GET['group_id']) && Wo_CheckMainSession($hash_id) === true) {
                     $html          = '';
                     $media         = '';
                     $mediaFilename = '';
@@ -645,44 +584,28 @@ if ($f == 'chat') {
                             $mediaName     = $media['name'];
                         }
                     }
-                    else if (!empty($_POST['message-record']) && !empty($_POST['media-name'])) {
-                        $mediaFilename = Wo_Secure($_POST['message-record']);
-                        $mediaName     = Wo_Secure($_POST['media-name']);
-                    }
                     $message_text = '';
                     if (!empty($_POST['textSendMessage'])) {
                         $message_text = $_POST['textSendMessage'];
                     }
-                    $to_id = $page_data['user_id'];
-                    if ($page_data['user_id'] == $wo['user']['user_id']) {
-                        if ($page_data['user_id'] == $_GET['to_id']) {
-                            $to_id = Wo_Secure($_GET['from_id']);
-                        }
-                        else{
-                            $to_id = Wo_Secure($_GET['to_id']);
-                        }
-                    }
-                    $last_id = Wo_RegisterPageMessage(array(
+                    $last_id = Wo_RegisterGroupMessage(array(
                         'from_id' => Wo_Secure($wo['user']['user_id']),
-                        'page_id' => Wo_Secure($_GET['page_id']),
-                        'to_id' => $to_id,
+                        'group_id' => Wo_Secure($_GET['group_id']),
                         'text' => Wo_Secure($_POST['textSendMessage']),
                         'media' => Wo_Secure($mediaFilename),
                         'mediaFileName' => Wo_Secure($mediaName),
-                        'time' => time(),
-                        'stickers' => (isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && !$mediaFilename && !$mediaName) ? $_POST['chatSticker'] : ''
+                        'time' => time()
                     ));
                     if ($last_id && $last_id > 0) {
-                        // @Wo_UpdateGChat(Wo_Secure($_GET['page_id']), array(
-                        //     "time" => time()
-                        //     ));
-                        $messages = Wo_GetPageMessages(array(
+                        @Wo_UpdateGChat(Wo_Secure($_GET['group_id']), array(
+                            "time" => time()
+                            ));
+                        $messages = Wo_GetGroupMessages(array(
                             'id' => $last_id,
-                            'page_id' => $_GET['page_id']
+                            'group_id' => $_GET['group_id']
                         ));
                         foreach ($messages as $wo['chatMessage']) {
-                            $wo['chat']['color']     = Wo_GetChatColor($wo['user']['user_id'],$to_id,Wo_Secure($_GET['page_id']));
-                            $html .= Wo_LoadPage('chat/page-chat-list');
+                            $html .= Wo_LoadPage('chat/group-chat-list');
                         }
                         $file = false;
                         if (isset($_FILES['sendMessageFile']['name'])) {
@@ -695,18 +618,102 @@ if ($f == 'chat') {
                             'invalid_file' => $invalid_file
                         );
                     }
+                    if ($invalid_file > 0 && empty($last_id)) {
+                        $data['status']       = 500;
+                        $data['invalid_file'] = $invalid_file;
+                    }
                 }
-                if ($invalid_file > 0 && empty($last_id)) {
-                    $data['status']       = 500;
-                    $data['invalid_file'] = $invalid_file;
+
+
+                else if (isset($_GET['page_id']) && is_numeric($_GET['page_id']) && Wo_CheckMainSession($hash_id) === true) {
+                    $page_data = Wo_PageData($_GET['page_id']);
+                    $invalid_file = 1;
+                    if (!empty($page_data)) {
+                        $html          = '';
+                        $media         = '';
+                        $mediaFilename = '';
+                        $mediaName     = '';
+                        $invalid_file  = 0;
+                        if (isset($_FILES['sendMessageFile']['name'])) {
+                            if ($_FILES['sendMessageFile']['size'] > $wo['config']['maxUpload']) {
+                                $invalid_file = 1;
+                            } else if (Wo_IsFileAllowed($_FILES['sendMessageFile']['name']) == false) {
+                                $invalid_file = 2;
+                            } else {
+                                $fileInfo      = array(
+                                    'file' => $_FILES["sendMessageFile"]["tmp_name"],
+                                    'name' => $_FILES['sendMessageFile']['name'],
+                                    'size' => $_FILES["sendMessageFile"]["size"],
+                                    'type' => $_FILES["sendMessageFile"]["type"]
+                                );
+                                $media         = Wo_ShareFile($fileInfo);
+                                $mediaFilename = $media['filename'];
+                                $mediaName     = $media['name'];
+                            }
+                        }
+                        else if (!empty($_POST['message-record']) && !empty($_POST['media-name'])) {
+                            $mediaFilename = Wo_Secure($_POST['message-record']);
+                            $mediaName     = Wo_Secure($_POST['media-name']);
+                        }
+                        $message_text = '';
+                        if (!empty($_POST['textSendMessage'])) {
+                            $message_text = $_POST['textSendMessage'];
+                        }
+                        $to_id = $page_data['user_id'];
+                        if ($page_data['user_id'] == $wo['user']['user_id']) {
+                            if ($page_data['user_id'] == $_GET['to_id']) {
+                                $to_id = Wo_Secure($_GET['from_id']);
+                            }
+                            else{
+                                $to_id = Wo_Secure($_GET['to_id']);
+                            }
+                        }
+                        $last_id = Wo_RegisterPageMessage(array(
+                            'from_id' => Wo_Secure($wo['user']['user_id']),
+                            'page_id' => Wo_Secure($_GET['page_id']),
+                            'to_id' => $to_id,
+                            'text' => Wo_Secure($_POST['textSendMessage']),
+                            'media' => Wo_Secure($mediaFilename),
+                            'mediaFileName' => Wo_Secure($mediaName),
+                            'time' => time(),
+                            'stickers' => (isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && !$mediaFilename && !$mediaName) ? $_POST['chatSticker'] : ''
+                        ));
+                        if ($last_id && $last_id > 0) {
+                            // @Wo_UpdateGChat(Wo_Secure($_GET['page_id']), array(
+                            //     "time" => time()
+                            //     ));
+                            $messages = Wo_GetPageMessages(array(
+                                'id' => $last_id,
+                                'page_id' => $_GET['page_id']
+                            ));
+                            foreach ($messages as $wo['chatMessage']) {
+                                $wo['chat']['color']     = Wo_GetChatColor($wo['user']['user_id'],$to_id,Wo_Secure($_GET['page_id']));
+                                $html .= Wo_LoadPage('chat/page-chat-list');
+                            }
+                            $file = false;
+                            if (isset($_FILES['sendMessageFile']['name'])) {
+                                $file = true;
+                            }
+                            $data = array(
+                                'status' => 200,
+                                'html' => $html,
+                                'file' => $file,
+                                'invalid_file' => $invalid_file
+                            );
+                        }
+                    }
+                    if ($invalid_file > 0 && empty($last_id)) {
+                        $data['status']       = 500;
+                        $data['invalid_file'] = $invalid_file;
+                    }
                 }
             }
-        }
-        else{
-            $data = array(
-                        'status' => 400
-                    );
+            else{
+                $data = array(
+                            'status' => 400
+                        );
 
+            }
         }
 
 

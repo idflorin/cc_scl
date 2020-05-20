@@ -626,7 +626,21 @@ background-color: #6f6449;}
 #add_to_family .family_mbr_name {
     color: #e2e2e2;
 }
-
+.wow_memories_friends .panel  {
+	border-color: #464646;
+}
+.wow_memories_cover, .wow_memories_posts .wow_memories_cover {
+    background-color: #9b93ff;color: black;
+}
+.wo_post_fetch_offer {
+	background: #363636;
+}
+.wow_main_offer_list .wo_jlist_info_main {
+    background-color: #212121;
+}
+.wow_main_offer_list .wo_jlist_info_head h2 a {
+    color: #eeeeee;
+}
 
 
 

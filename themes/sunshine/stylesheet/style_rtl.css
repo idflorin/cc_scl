@@ -810,9 +810,6 @@ body .wo_page_profile .page-info-cont .last_row {
 body .wo_sidebar_pages .page_middle .avatar {
     margin-right: 0;margin-left: 9px;
 }
-body .wo_poke_users .poke_info {
-    margin-right: 0;margin-left: 130px;
-}
 body .wo_poke_users .poke_info .avatar {
     margin-right: 0;margin-left: 9px;
 }
@@ -1047,6 +1044,27 @@ body .comment-reply .wo_commreply_combo .textarea {
 }
 body .comment-reply .wo_commreply_combo .image-comment {
 	    left: 13px;
+}
+body .wow_memories_cover, body .wow_memories_posts .wow_memories_cover {
+	padding-left: 5px;padding-right: 230px;background-position: right center;
+}
+body .wow_memories_friends h3 {
+    padding-left: 20px;padding-right: 75px;
+}
+body .wow_memories_friends h3 svg {
+    left: auto;right: 15px;
+}
+body .greetalert .small-texts, body .greetalert p {
+    padding-right: 0px;padding-left: 50px;
+}
+body .greetalert img {
+    right: auto;left: 14px;
+}
+body .invite-user-form button {
+    right: auto;left: 4px;
+}
+body .invite-user-form input {
+    padding: 3px 10px 3px 45px;
 }
 
 

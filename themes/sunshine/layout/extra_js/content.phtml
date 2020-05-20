@@ -1,4 +1,49 @@
 <script>
+    var create_bar = $('.create-product-bar');
+  var create_percent = $('.create-product-percent');
+  $(document).ready(function() {
+
+    $('form.edit-offer-form').ajaxForm({
+          url: Wo_Ajax_Requests_File() + '?f=offer&s=edit_offer',
+          beforeSend: function() {
+           var percentVal = '0%';
+           create_bar.width(percentVal);
+           create_percent.html(percentVal);
+           
+           
+            $('.edit-offer-form').find('.last-sett-btn .ball-pulse').fadeIn(100);
+          },
+          uploadProgress: function (event, position, total, percentComplete) {
+             var percentVal = percentComplete + '%';
+             create_bar.width(percentVal);
+             $('.edit-offer-form').find('.create-product-progress').slideDown(200);
+             create_percent.html(percentVal);
+          },
+          success: function(data) {
+           if (data.status == 200) {
+             $('.edit-offer-form').find('.app-general-alert').html("<div class='alert alert-success'><?php echo($wo['lang']['offer_successfully_edited']) ?></div>");
+               $('.edit-offer-form').find('.alert-success').fadeIn(300);
+               setTimeout(function (argument) {
+                $('.edit-offer-form').find('.alert-success').fadeOut(300);
+                window.location.reload(true);
+
+               },3000);
+           } else {
+            $('.edit-offer-form').animate({
+              scrollTop: $('html, body').offset().top //#DIV_ID is an example. Use the id of your destination on the page
+          });
+               $('.edit-offer-form').find('.app-general-alert').html('<div class="alert alert-danger">' + data.error + '</div>');
+               $('.edit-offer-form').find('.alert-danger').fadeIn(300);
+               setTimeout(function (argument) {
+                $('.edit-offer-form').find('.alert-danger').fadeOut(300);
+
+               },3000);
+           }
+           $('.edit-offer-form').find('.last-sett-btn .ball-pulse').fadeOut(100);
+          }
+      });
+    
+  });
   function Wo_GetNewActivities() {
       var before_activity_id = $('#activities-wrapper > .activity').attr('data-activity-id');
       if (typeof before_activity_id === 'undefined') {
@@ -33,8 +78,8 @@
       });
     };
 
-function Wo_RegisterReactionLike(element){
-    var reaction = $(element).attr('data-reaction');
+function Wo_RegisterReactionLike(element,reaction_icon){
+    var reaction = $(element).attr('data-reaction-id');
     var post_id = $(element).attr('data-post-id');
     if ($('#react_'+post_id).attr('data_react') == 1) {
       return false;
@@ -47,37 +92,37 @@ function Wo_RegisterReactionLike(element){
 
     $('.reactions-box-container-'+post_id).fadeOut(1);
 
-    var reaction_icon = '';
     var reaction_color = '';
 
-    switch (reaction) {
-      case 'Like':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/like-sm.png" alt="<?php echo $wo['lang']['like'];?>"></div>';
-          reaction_color = '#1da1f2';
-          break;
-      case 'Love':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/love-sm.png" alt="<?php echo $wo['lang']['love'];?>"></div>';
-          reaction_color = '#f25268';
-          break;
-      case 'HaHa':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/haha-sm.png" alt="<?php echo $wo['lang']['haha'];?>"></div>';
-          reaction_color = '#f3b715';
-          break;
-      case 'Wow':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/wow-sm.png" alt="<?php echo $wo['lang']['wow'];?>"></div>';
-          reaction_color = '#f3b715';
-          break;
-      case 'Sad':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/sad-sm.png" alt="<?php echo $wo['lang']['sad'];?>"></div>';
-          reaction_color = '#f3b715';
-          break;
-      case 'Angry':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/angry-sm.png" alt="<?php echo $wo['lang']['angry'];?>"></div>';
-          reaction_color = '#f7806c';
-          break;
-  }
+  //   switch (reaction) {
+  //     case 'Like':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/like-sm.png" alt="<?php echo $wo['lang']['like'];?>"></div>';
+  //         reaction_color = '#1da1f2';
+  //         break;
+  //     case 'Love':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/love-sm.png" alt="<?php echo $wo['lang']['love'];?>"></div>';
+  //         reaction_color = '#f25268';
+  //         break;
+  //     case 'HaHa':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/haha-sm.png" alt="<?php echo $wo['lang']['haha'];?>"></div>';
+  //         reaction_color = '#f3b715';
+  //         break;
+  //     case 'Wow':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/wow-sm.png" alt="<?php echo $wo['lang']['wow'];?>"></div>';
+  //         reaction_color = '#f3b715';
+  //         break;
+  //     case 'Sad':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/sad-sm.png" alt="<?php echo $wo['lang']['sad'];?>"></div>';
+  //         reaction_color = '#f3b715';
+  //         break;
+  //     case 'Angry':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/angry-sm.png" alt="<?php echo $wo['lang']['angry'];?>"></div>';
+  //         reaction_color = '#f7806c';
+  //         break;
+  // }
+  reaction_icon = '<div class="inline_post_emoji"><img class="" src="'+reaction_icon+'"></div>';
 
-    $('.status-reaction-'+post_id).html(''+reaction_icon+'' + lang).css({"color": reaction_color});
+    $('.status-reaction-'+post_id).html(reaction_icon+lang).css({"color": reaction_color});
     $('.status-reaction-'+post_id).addClass("active-like");
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_reaction', post_id: post_id, reaction: reaction}, function (data) {
       if(data.status == 200) {
@@ -92,8 +137,8 @@ function Wo_RegisterReactionLike(element){
 }
 
 
-function Wo_RegisterReaction(element){
-    var reaction = $(element).attr('data-reaction');
+function Wo_RegisterReaction(element,reaction_icon){
+    var reaction = $(element).attr('data-reaction-id');
     var post_id = $(element).attr('data-post-id');
     var path = "<?php echo $wo['config']['theme_url']?>";
     var lang = $(element).attr('data-reaction-lang');
@@ -103,37 +148,37 @@ function Wo_RegisterReaction(element){
 
     $('.reactions-box-container-'+post_id).fadeOut(1);
 
-    var reaction_icon = '';
     var reaction_color = '';
+    reaction_icon = '<div class="inline_post_emoji"><img class="" src="'+reaction_icon+'"></div>';
 
-    switch (reaction) {
-      case 'Like':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/like-sm.png" alt="<?php echo $wo['lang']['like'];?>"></div>';
-          reaction_color = '#1da1f2';
-          break;
-      case 'Love':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/love-sm.png" alt="<?php echo $wo['lang']['love'];?>"></div>';
-          reaction_color = '#f25268';
-          break;
-      case 'HaHa':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/haha-sm.png" alt="<?php echo $wo['lang']['haha'];?>"></div>';
-          reaction_color = '#f3b715';
-          break;
-      case 'Wow':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/wow-sm.png" alt="<?php echo $wo['lang']['wow'];?>"></div>';
-          reaction_color = '#f3b715';
-          break;
-      case 'Sad':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/sad-sm.png" alt="<?php echo $wo['lang']['sad'];?>"></div>';
-          reaction_color = '#f3b715';
-          break;
-      case 'Angry':
-          reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/angry-sm.png" alt="<?php echo $wo['lang']['angry'];?>"></div>';
-          reaction_color = '#f7806c';
-          break;
-  }
+  //   switch (reaction) {
+  //     case 'Like':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/like-sm.png" alt="<?php echo $wo['lang']['like'];?>"></div>';
+  //         reaction_color = '#1da1f2';
+  //         break;
+  //     case 'Love':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/love-sm.png" alt="<?php echo $wo['lang']['love'];?>"></div>';
+  //         reaction_color = '#f25268';
+  //         break;
+  //     case 'HaHa':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/haha-sm.png" alt="<?php echo $wo['lang']['haha'];?>"></div>';
+  //         reaction_color = '#f3b715';
+  //         break;
+  //     case 'Wow':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/wow-sm.png" alt="<?php echo $wo['lang']['wow'];?>"></div>';
+  //         reaction_color = '#f3b715';
+  //         break;
+  //     case 'Sad':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/sad-sm.png" alt="<?php echo $wo['lang']['sad'];?>"></div>';
+  //         reaction_color = '#f3b715';
+  //         break;
+  //     case 'Angry':
+  //         reaction_icon = '<div class="inline_post_emoji"><img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/angry-sm.png" alt="<?php echo $wo['lang']['angry'];?>"></div>';
+  //         reaction_color = '#f7806c';
+  //         break;
+  // }
 
-    $('.status-reaction-'+post_id).html(''+reaction_icon+'' + lang).css({"color": reaction_color});
+    $('.status-reaction-'+post_id).html(reaction_icon+lang).css({"color": reaction_color});
     $('.status-reaction-'+post_id).addClass("active-like");
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_reaction', post_id: post_id, reaction: reaction}, function (data) {
       if(data.status == 200) {
@@ -147,7 +192,23 @@ function Wo_RegisterReaction(element){
     });
 }
 
+function Wo_RegisterFollowNotify(id, type) {
+  var _follow_con = $('[id=Notify-' + id + ']');
+  data_next = $('[id=Notify-' + id + ']').attr('title');
+  title = $('[id=Notify-' + id + ']').attr('data_next');
+  html_ = '<span id="Notify-'+id+'" title="'+title+'" data_next="'+data_next+'"><button type="button" onclick="Wo_RegisterFollowNotify('+id+',0)" class="btn-active btn btn-default btn-sm wo_following_btn wo_user_folw_empty_btns"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell-off"><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"></path><path d="M18 8a6 6 0 0 0-9.33-5"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg></button></span>';
+  if (type == 0) {
+    html_ = '<span id="Notify-'+id+'" title="'+title+'" data_next="'+data_next+'"><button type="button" onclick="Wo_RegisterFollowNotify('+id+',1)" class="btn btn-default btn-sm wo_user_folw_empty_btns"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></button></span>';
+  }
+
+  _follow_con.replaceWith(html_);
+
+  $.get(Wo_Ajax_Requests_File(), {f: 'notify_user', following_id: id}, function(data) {});
+
+}
+
 function Wo_RegisterFollow(id, is_confirm,show_modal= false) {
+
   var _follow_con = $('[id=Follow-' + id + ']');
   is_confirm_f    = 0;
 
@@ -155,6 +216,7 @@ function Wo_RegisterFollow(id, is_confirm,show_modal= false) {
     is_confirm_f = 1;
   }
   if (show_modal == true) {
+    $('#unfriend_btn').attr('onclick', 'Wo_RegisterFollow('+id+')');
     $('#un_friend_modal').modal('show');
     return false;
   }
@@ -278,7 +340,7 @@ function Wo_RegisterLike(post_id) {
   var post = $('[id=post-' + post_id + ']');
   html_like = '<span class="active-like"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg><span class="like-btn-mobile"> <?php echo $wo["lang"]["liked"];?></span></span>';
   if (post.find("[id^=like-button]").parent().find('.active-like').length > 0) {
-  	html_like = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> <span class="like-btn-mobile"> <?php echo $wo["lang"]["like"];?></span>';
+  	html_like = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"> <path fill="currentColor" d="M23,10C23,8.89 22.1,8 21,8H14.68L15.64,3.43C15.66,3.33 15.67,3.22 15.67,3.11C15.67,2.7 15.5,2.32 15.23,2.05L14.17,1L7.59,7.58C7.22,7.95 7,8.45 7,9V19A2,2 0 0,0 9,21H18C18.83,21 19.54,20.5 19.84,19.78L22.86,12.73C22.95,12.5 23,12.26 23,12V10M1,21H5V9H1V21Z"></path> </svg> <span class="like-btn-mobile"> <?php echo $wo["lang"]["like"];?></span>';
   } 
   <?php if ($wo['config']['second_post_button'] == 'dislike') { ?>
    post.find("[id^=wonder-button]").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg> <span class="like-btn-mobile"> <?php echo $wo["lang"]["dislike"];?></span>');
@@ -748,4 +810,16 @@ function openInNewTab(url, id) {
    var myWindow = window.open(url, "", "width=600,height=700");
    return false;
 }
+
+function Wo_LiveComment(text,event,post_id,insert = 0) {
+  text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
+  if (text && (event.keyCode == 13 || insert == 1)) {
+    if ($('#live_post_comments_'+post_id+' .live_comments').length >= 4) {
+      $('#live_post_comments_'+post_id+' .live_comments').first().remove();
+    }
+      $('#live_post_comments_'+post_id).append('<div class="live_comments" live_comment_id=""><a class="pull-left" href="<?php echo($wo['user']['url']) ?>"><img class="live_avatar pull-left" src="<?php echo($wo['user']['avatar']) ?>" alt="avatar"></a><div class="comment-body" style="float: left;"><div class="comment-heading"><span><a href="<?php echo($wo['user']['url']) ?>" data-ajax="?link1=timeline&amp;u=<?php echo($wo['user']['username']) ?>" ><h4 class="live_user_h"> <?php echo($wo['user']['name']) ?> </h4></a></span><?php if ($wo['user']['verified'] == 1) { ?><span class="verified-color" data-toggle="tooltip" title="Verified User"><i class="fa fa-check-circle"></i></span><?php } ?><div class="comment-text">'+text+'</div></div></div><div class="clear"></div></div>');
+
+  }
+}
+
 </script>

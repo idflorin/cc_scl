@@ -37,4 +37,15 @@ if ($f == 'admincp') {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'rm-user-invitation' && isset($_GET['id']) && is_numeric($_GET['id'])) {
+        $data = array(
+            'status' => 304
+        );
+        if (Wo_DeleteUserInvitation('id', $_GET['id'])) {
+            $data['status'] = 200;
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
 }

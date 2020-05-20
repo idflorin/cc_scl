@@ -40,6 +40,9 @@ if ($_GET['link1'] == 'showthread') {
 					<li class="<?php if ($_GET['link1'] == 'mythreads') echo 'active'; ?>"><a href="<?php echo Wo_SeoLink('index.php?link1=mythreads');?>" data-ajax="?link1=mythreads"><?php echo $wo['lang']['my_threads']; ?></a></li>
 					<li class="<?php if ($_GET['link1'] == 'mymessages') echo 'active'; ?>"><a href="<?php echo Wo_SeoLink('index.php?link1=mymessages');?>" data-ajax="?link1=mymessages"><?php echo $wo['lang']['my_messages']; ?></a></li>
 				</ul>
+				<?php if (empty($wo['forums'])) {
+					$wo['forums']        = Wo_GetForums();
+				} ?>
 				<?php if ($wo['forums'] && count($wo['forums']) > 0): ?>
 					<div class="btn-group dropdown wow_forum_jump_btn">
 						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><?php echo $wo['lang']['jump_to']; ?>&nbsp;&nbsp;<span class="caret"></span></button>

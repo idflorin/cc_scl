@@ -335,6 +335,34 @@ if (empty($error_code)) {
                     $wo['notification']['type_text'] = $wo['lang']['bank_decline'];
                     $wo['notification']['icon'] .= 'bank_decline';
                 }
+                if ($wo['notification']['type'] == 'live_video') {
+                    $wo['notification']['type_text'] = $wo['lang']['started_live_video'];
+                    $wo['notification']['icon'] .= 'live_video';
+                }
+                if ($wo['notification']['type'] == 'forum_reply') {
+                    $wo['notification']['type_text'] = $wo['lang']['replied_to_topic'];
+                    $wo['notification']['icon'] .= 'forum_reply';
+                }
+                if ($wo['notification']['type'] == 'memory') {
+                    $wo['notification']['type_text'] = $wo['lang']['memory_this_day'];
+                    $wo['notification']['icon'] .= 'memory';
+                }
+                if ($wo['notification']['type'] == 'thread_reply') {
+                    $wo['notification']['type_text'] = $wo['lang']['thread_reply'];
+                    $wo['notification']['icon'] .= 'thread_reply';
+                }
+                if ($wo['notification']['type'] == 'remaining') {
+                    $wo['notification']['type_text'] = $wo['notification']['text'];
+                    $wo['notification']['icon'] .= 'remaining';
+                }
+                if ($wo['notification']['type'] == 'new_post') {
+                    $wo['notification']['type_text'] = $wo['lang']['created_new_post'];
+                    $wo['notification']['icon'] .= 'new_post';
+                }
+                if ($wo['notification']['type2'] == 'anonymous') {
+                    $wo['notification']['notifier']['name']   = $wo['lang']['anonymous']; 
+                    $wo['notification']['notifier']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
+                }
                 // ************************ 
             }
             $wo['notification']['time_text_string'] = Wo_Time_Elapsed_String($wo['notification']['time']);

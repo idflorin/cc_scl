@@ -291,8 +291,15 @@ body, .navbar-default, .wo_about_wrapper_parent{padding-left: 250px;padding-righ
 .ui-widget-header .ui-state-default, .wo_adv_search_filter_side .ui-slider .ui-slider-range, .wo_adv_search_filter_side .ui-slider .ui-slider-handle {
     background-color: <?php echo $wo['config']['btn_background_color'];?>;
 }
-
-.reaction-like::before {
+<?php
+if (!empty($wo['reactions_types'])) {
+    foreach ($wo['reactions_types'] as $key => $value) {
+?>
+.reaction-<?php echo $value['id'];?>::before {
+    content: "<?php echo $value['name'];?>";
+}
+<?php } } ?>
+/*.reaction-like::before {
     content: "<?php echo $wo['lang']['like'];?>";
 }
 .reaction-love::before {
@@ -309,7 +316,7 @@ body, .navbar-default, .wo_about_wrapper_parent{padding-left: 250px;padding-righ
 }
 .reaction-angry::before {
     content: "<?php echo $wo['lang']['angry'];?>";
-}
+}*/
 
 .navbar-default .dropdown-menu.ani-acc-menu >li>a:hover {
     color: <?php echo $wo['config']['btn_color'];?>;background-color: <?php echo $wo['config']['btn_background_color'];?>;
@@ -319,7 +326,6 @@ body, .navbar-default, .wo_about_wrapper_parent{padding-left: 250px;padding-righ
 }
 .text-sender-container .outgoing .message-model .message {background-color: <?php echo $wo['config']['btn_background_color'];?>;color: <?php echo $wo['config']['btn_color'];?>;}
 .text-sender-container .outgoing .message-model .message p, .text-sender-container .outgoing .message-model .message a {color: <?php echo $wo['config']['btn_color'];?>;}
-
 
 <?php if ($wo['config']['google_map'] == 0) { ?>
 #filterby-post li {

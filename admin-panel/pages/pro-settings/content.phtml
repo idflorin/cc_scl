@@ -19,6 +19,20 @@
                             <input type="radio" name="pro" id="pro-disabled" value="0" <?php echo ($wo['config']['pro'] == 0) ? 'checked': '';?>>
                             <label for="pro-disabled" class="m-l-20">Disabled</label>
                         </div>
+                        <label for="recurring_payment">Recurring Payment</label>
+                        <div class="form-group">
+                            <input type="radio" name="recurring_payment" id="recurring_payment-enabled" value="on" <?php echo ($wo['config']['recurring_payment'] == 'on') ? 'checked': '';?>>
+                            <label for="recurring_payment-enabled">Enabled</label>
+                            <input type="radio" name="recurring_payment" id="recurring_payment-disabled" value="off" <?php echo ($wo['config']['recurring_payment'] == 'off') ? 'checked': '';?>>
+                            <label for="recurring_payment-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <label for="refund_system">Refund System</label>
+                        <div class="form-group">
+                            <input type="radio" name="refund_system" id="refund_system-enabled" value="on" <?php echo ($wo['config']['refund_system'] == 'on') ? 'checked': '';?>>
+                            <label for="refund_system-enabled">Enabled</label>
+                            <input type="radio" name="refund_system" id="refund_system-disabled" value="off" <?php echo ($wo['config']['refund_system'] == 'off') ? 'checked': '';?>>
+                            <label for="refund_system-disabled" class="m-l-20">Disabled</label>
+                        </div>
                         <!-- <div class="form-group form-float">
                             <div class="form-line">
                                 <input type="text" id="weekly_price" name="weekly_price" class="form-control" value="<?php echo $wo['config']['weekly_price'];?>">

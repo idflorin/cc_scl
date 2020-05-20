@@ -234,7 +234,7 @@
             </div>
         </div>
 
-        <div class="col-lg-6 col-md-6">
+        <div class="col-lg-6 col-md-6 pull-right">
             <div class="card">
                 <div class="header">
                     <h2>2Checkout payment</h2>
@@ -385,11 +385,210 @@
                 </div>
             </div>
         </div>
-        <div class="clearfix"></div>
+
+        <div class="col-lg-6 col-md-6 pull-left">
+            <div class="card">
+                <div class="header">
+                    <h2>Paystack payment</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success paystack-settings-alert"></div>
+                    <form class="paystack-settings" method="POST">
+                        <label for="paystack_payment">Paystack Payment Method </label>
+                        <div class="form-group">
+                            <input type="radio" name="paystack_payment" id="paystack_payment-enabled" value="yes" <?php echo ($wo['config']['paystack_payment'] == 'yes') ? 'checked': '';?>>
+                            <label for="paystack_payment-enabled">Enabled</label>
+                            <input type="radio" name="paystack_payment" id="paystack_payment-disabled" value="no" <?php echo ($wo['config']['paystack_payment'] == 'no') ? 'checked': '';?>>
+                            <label for="paystack_payment-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                        <br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="paystack_secret_key" name="paystack_secret_key" class="form-control" value="<?php echo $wo['config']['paystack_secret_key'];?>">
+                                <label class="form-label">Secret Key</label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 pull-left">
+            <div class="card">
+                <div class="header">
+                    <h2>Cashfree payment</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success cashfree-settings-alert"></div>
+                    <form class="cashfree-settings" method="POST">
+                        <label for="cashfree_payment">Cashfree Payment Method </label>
+                        <div class="form-group">
+                            <input type="radio" name="cashfree_payment" id="cashfree_payment-enabled" value="yes" <?php echo ($wo['config']['cashfree_payment'] == 'yes') ? 'checked': '';?>>
+                            <label for="cashfree_payment-enabled">Enabled</label>
+                            <input type="radio" name="cashfree_payment" id="cashfree_payment-disabled" value="no" <?php echo ($wo['config']['cashfree_payment'] == 'no') ? 'checked': '';?>>
+                            <label for="cashfree_payment-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                        <br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="cashfree_client_key" name="cashfree_client_key" class="form-control" value="<?php echo $wo['config']['cashfree_client_key'];?>">
+                                <label class="form-label">Client Id</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="cashfree_secret_key" name="cashfree_secret_key" class="form-control" value="<?php echo $wo['config']['cashfree_secret_key'];?>">
+                                <label class="form-label">Client Secret</label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 pull-right">
+            <div class="card">
+                <div class="header">
+                    <h2>Razorpay payment</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success razorpay-settings-alert"></div>
+                    <form class="razorpay-settings" method="POST">
+                        <label for="razorpay_payment">Razorpay Payment Method </label>
+                        <div class="form-group">
+                            <input type="radio" name="razorpay_payment" id="razorpay_payment-enabled" value="yes" <?php echo ($wo['config']['razorpay_payment'] == 'yes') ? 'checked': '';?>>
+                            <label for="razorpay_payment-enabled">Enabled</label>
+                            <input type="radio" name="razorpay_payment" id="razorpay_payment-disabled" value="no" <?php echo ($wo['config']['razorpay_payment'] == 'no') ? 'checked': '';?>>
+                            <label for="razorpay_payment-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <br>
+                        <br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="razorpay_key_id" name="razorpay_key_id" class="form-control" value="<?php echo $wo['config']['razorpay_key_id'];?>">
+                                <label class="form-label">Key Id</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="razorpay_key_secret" name="razorpay_key_secret" class="form-control" value="<?php echo $wo['config']['razorpay_key_secret'];?>">
+                                <label class="form-label">Key Secret</label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-6 pull-left">
+            <div class="card">
+                <div class="header">
+                    <h2>Paysera payment</h2>
+                </div>
+                <div class="body">
+                    <div class="alert alert-success paysera-settings-alert"></div>
+                    <form class="paysera-settings" method="POST">
+                        <label for="paysera_payment">Paysera Payment Method </label>
+                        <div class="form-group">
+                            <input type="radio" name="paysera_payment" id="paysera_payment-enabled" value="yes" <?php echo ($wo['config']['paysera_payment'] == 'yes') ? 'checked': '';?>>
+                            <label for="paysera_payment-enabled">Enabled</label>
+                            <input type="radio" name="paysera_payment" id="paysera_payment-disabled" value="no" <?php echo ($wo['config']['paysera_payment'] == 'no') ? 'checked': '';?>>
+                            <label for="paysera_payment-disabled" class="m-l-20">Disabled</label>
+                        </div>
+                        <label for="paysera_mode">Paysera Mode</label>
+                        <div class="form-group">
+                            <input type="radio" name="paysera_mode" id="paysera_mode-enabled" value="0" <?php echo ($wo['config']['paysera_mode'] == '0') ? 'checked': '';?>>
+                            <label for="paysera_mode-enabled">Live</label>
+                            <input type="radio" name="paysera_mode" id="paysera_mode-disabled" value="1" <?php echo ($wo['config']['paysera_mode'] == '1') ? 'checked': '';?>>
+                            <label for="paysera_mode-disabled" class="m-l-20">SandBox</label>
+                        </div> 
+                        <div class="clearfix"></div>
+                        <br>
+                        <br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="paysera_project_id" name="paysera_project_id" class="form-control" value="<?php echo $wo['config']['paysera_project_id'];?>">
+                                <label class="form-label">Project Id</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="paysera_sign_password" name="paysera_sign_password" class="form-control" value="<?php echo $wo['config']['paysera_sign_password'];?>">
+                                <label class="form-label">Sign Password</label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- #END# Vertical Layout -->
 <script>
 $(function() {
+    var form_paysera_settings = $('form.paysera-settings');
+    form_paysera_settings.ajaxForm({
+        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
+        beforeSend: function() {
+            form_paysera_settings.find('.waves-effect').text('Please wait..');
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_paysera_settings.find('.waves-effect').text('Save');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                $('.paysera-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                setTimeout(function () {
+                    $('.paysera-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+
+    var form_razorpay_settings = $('form.razorpay-settings');
+    form_razorpay_settings.ajaxForm({
+        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
+        beforeSend: function() {
+            form_razorpay_settings.find('.waves-effect').text('Please wait..');
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_razorpay_settings.find('.waves-effect').text('Save');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                $('.razorpay-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                setTimeout(function () {
+                    $('.razorpay-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+    
+    var form_cashfree_settings = $('form.cashfree-settings');
+    form_cashfree_settings.ajaxForm({
+        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
+        beforeSend: function() {
+            form_cashfree_settings.find('.waves-effect').text('Please wait..');
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_cashfree_settings.find('.waves-effect').text('Save');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                $('.cashfree-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                setTimeout(function () {
+                    $('.cashfree-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+    
     var form_bitcoin_settings = $('form.bitcoin-settings');
     form_bitcoin_settings.ajaxForm({
         url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
@@ -442,6 +641,24 @@ var form_paypal_settings = $('form.paypal-settings');
                 $('.checkout-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
                 setTimeout(function () {
                     $('.checkout-settings-alert').empty();
+                }, 2000);
+            }
+        }
+    });
+
+    var form_checkout_settings = $('form.paystack-settings');
+    form_checkout_settings.ajaxForm({
+        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
+        beforeSend: function() {
+            form_checkout_settings.find('.waves-effect').text('Please wait..');
+        },
+        success: function(data) {
+            if (data.status == 200) {
+                form_checkout_settings.find('.waves-effect').text('Save');
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+                $('.paystack-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                setTimeout(function () {
+                    $('.paystack-settings-alert').empty();
                 }, 2000);
             }
         }

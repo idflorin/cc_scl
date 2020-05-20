@@ -501,8 +501,10 @@ function Wo_SeoLink($query = '') {
             '/^index\.php\?link1=([^\/]+)&type=([^\/]+)$/i',
             '/^index\.php\?link1=([^\/]+)&p=([^\/]+)$/i',
             '/^index\.php\?link1=([^\/]+)&g=([^\/]+)$/i',
+            '/^index\.php\?link1=page-setting&page=([A-Za-z0-9_]+)&link3=([A-Za-z0-9_-]+)&name=([A-Za-z0-9_-]+)$/i',
             '/^index\.php\?link1=page-setting&page=([A-Za-z0-9_]+)&link3=([A-Za-z0-9_-]+)$/i',
             '/^index\.php\?link1=page-setting&page=([^\/]+)$/i',
+            '/^index\.php\?link1=group-setting&group=([A-Za-z0-9_]+)&link3=([A-Za-z0-9_-]+)&name=([A-Za-z0-9_-]+)$/i',
             '/^index\.php\?link1=group-setting&group=([A-Za-z0-9_]+)&link3=([A-Za-z0-9_-]+)$/i',
             '/^index\.php\?link1=group-setting&group=([^\/]+)$/i',
             '/^index\.php\?link1=admincp&page=([^\/]+)$/i',
@@ -511,6 +513,7 @@ function Wo_SeoLink($query = '') {
             '/^index\.php\?link1=create-album&album=([A-Za-z0-9_]+)$/i',
             '/^index\.php\?link1=edit-product&id=([A-Za-z0-9_]+)$/i',
             '/^index\.php\?link1=products&c_id=([A-Za-z0-9_]+)$/i',
+            '/^index\.php\?link1=products&c_id=([A-Za-z0-9_]+)&sub_id=([A-Za-z0-9_]+)$/i',
             '/^index\.php\?link1=site-pages&page_name=(.*)$/i',
             '/^index\.php\?link1=create-blog$/i',
             '/^index\.php\?link1=my-blogs$/i',
@@ -579,8 +582,10 @@ function Wo_SeoLink($query = '') {
             $config['site_url'] . '/$1/$2',
             $config['site_url'] . '/p/$2',
             $config['site_url'] . '/g/$2',
+            $config['site_url'] . '/page-setting/$1/$2?name=$3',
             $config['site_url'] . '/page-setting/$1/$2',
             $config['site_url'] . '/page-setting/$1',
+            $config['site_url'] . '/group-setting/$1/$2?name=$3',
             $config['site_url'] . '/group-setting/$1/$2',
             $config['site_url'] . '/group-setting/$1',
             $config['site_url'] . '/admincp/$1',
@@ -589,6 +594,7 @@ function Wo_SeoLink($query = '') {
             $config['site_url'] . '/create-album/$1',
             $config['site_url'] . '/edit-product/$1',
             $config['site_url'] . '/products/$1',
+            $config['site_url'] . '/products/$1/$2',
             $config['site_url'] . '/site-pages/$1',
             $config['site_url'] . '/create-blog/',
             $config['site_url'] . '/my-blogs/',
@@ -624,7 +630,7 @@ function Wo_SeoLink($query = '') {
             $config['site_url'] . '/movies/genre/$1/',
             $config['site_url'] . '/movies/country/$1/',
             $config['site_url'] . '/movies/watch/$1/',
-            $config['site_url'] . '/advertise/',
+            $config['site_url'] . '/advertise',
             $config['site_url'] . '/wallet/',
             $config['site_url'] . '/ads/create/',
             $config['site_url'] . '/ads/edit/$1/',
@@ -1304,10 +1310,11 @@ use Aws\S3\S3Client;
 function makeFTPdir($ftp, $dir) {
     
 }
+use Google\Cloud\Storage\StorageClient;
 function Wo_UploadToS3($filename, $config = array()) {
     global $wo;
     
-    if ($wo['config']['amazone_s3'] == 0 && $wo['config']['ftp_upload'] == 0 && $wo['config']['spaces'] == 0) {
+    if ($wo['config']['amazone_s3'] == 0 && $wo['config']['ftp_upload'] == 0 && $wo['config']['spaces'] == 0 && $wo['config']['cloud_upload'] == 0) {
         return false;
     }
 
@@ -1403,13 +1410,45 @@ function Wo_UploadToS3($filename, $config = array()) {
             return true;
         }
     }
+    elseif ($wo['config']['cloud_upload'] == 1) {
+        require_once 'assets/libraries/cloud/vendor/autoload.php';
+
+        try {
+            $storage = new StorageClient([
+               'keyFilePath' => $wo['config']['cloud_file_path'] 
+            ]);
+            // set which bucket to work in
+            $bucket = $storage->bucket($wo['config']['cloud_bucket_name']);
+            $fileContent = file_get_contents($filename);
+
+            // upload/replace file 
+            $storageObject = $bucket->upload(
+                                    $fileContent,
+                                    ['name' => $filename]
+                            );
+            if (!empty($storageObject)) {
+                if (empty($config['delete'])) {
+                    if (empty($config['amazon'])) {
+                        @unlink($filename);
+                    }
+                }
+                return true;
+            }
+        } catch (Exception $e) {
+            // maybe invalid private key ?
+            // print $e;
+            // exit();
+            return false;
+        }
+    }
+    return false;
 }
 function Wo_DeleteFromToS3($filename, $config = array()) {
     global $wo;
     
     
     
-    if ($wo['config']['amazone_s3'] == 0 && $wo['config']['ftp_upload'] == 0 && $wo['config']['spaces'] == 0) {
+    if ($wo['config']['amazone_s3'] == 0 && $wo['config']['ftp_upload'] == 0 && $wo['config']['spaces'] == 0 && $wo['config']['cloud_upload'] == 0) {
         return false;
     }
     if ($wo['config']['ftp_upload'] == 1) {
@@ -1467,6 +1506,26 @@ function Wo_DeleteFromToS3($filename, $config = array()) {
         $delete = $space->DeleteObject($filename);
         if (!$space->DoesObjectExist($filename)) {
             return true;
+        }
+    } else if ($wo['config']['cloud_upload'] == 1) {
+        require_once 'assets/libraries/cloud/vendor/autoload.php';
+
+        try {
+            $storage = new StorageClient([
+               'keyFilePath' => $wo['config']['cloud_file_path'] 
+            ]);
+            // set which bucket to work in
+            $bucket = $storage->bucket($wo['config']['cloud_bucket_name']);
+            $object = $bucket->object($filename);
+            $delete = $object->delete();
+            if ($delete) {
+                return true;
+            }
+        } catch (Exception $e) {
+            // maybe invalid private key ?
+            // print $e;
+            // exit();
+            return false;
         }
     }
 }

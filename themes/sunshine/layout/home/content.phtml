@@ -147,47 +147,47 @@ document.addEventListener("msfullscreenchange", function() {
   $('video').toggleClass('active-player');
 });
 function loadposts() {
-  $.get(Wo_Ajax_Requests_File() + '?f=load_posts', function(data) {
-    document.getElementById('posts-laoded').innerHTML = data;
-    Wo_FinishBar();
-    $('.video-js').each(function(index, el) {
-        fluidPlayer($(this).attr('id'), {
-            layoutControls: {
-                primaryColor:           "<?php echo $wo['config']['btn_background_color'];?>",
-                fillToContainer: true,
-                playbackRateEnabled: true,
-            }
+
+    $("#posts-laoded").load(Wo_Ajax_Requests_File() + '?f=load_posts', function enter() {
+        Wo_FinishBar();
+        $('.video-js').each(function(index, el) {
+            fluidPlayer($(this).attr('id'), {
+                layoutControls: {
+                    primaryColor:           "<?php echo $wo['config']['btn_background_color'];?>",
+                    fillToContainer: true,
+                    playbackRateEnabled: true,
+                }
+            });
+        });
+        $(".post-description p, .product-description").each(function(index, el) {
+            $(this).readmore({
+              speed: 75,
+              moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
+              lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
+            });
+        });
+        $(".post-commet-textarea .textarea").triggeredAutocomplete({
+           hidden: '#hidden_inputbox_comment',
+           source: Wo_Ajax_Requests_File() + "?f=mention",
+           trigger: "@" 
+        });
+        $(".comment-reply textarea").triggeredAutocomplete({
+           hidden: '#hidden_inputbox_comment_reply',
+           source: Wo_Ajax_Requests_File() + "?f=mention",
+           trigger: "@"
+        });
+        $('#load-more-posts').show();
+        $('.sun_comm_addmore .dropdown-toggle').on('click', function (event) {
+            $(this).parent().toggleClass('open');
+        });
+        $(document).ready(function(){
+          $('.sun_comm_addmore > .dropdown-menu .dropdown-toggle').on("click", function(e){
+            $(this).next('ul').toggle();
+            e.stopPropagation();
+            e.preventDefault();
+          });
         });
     });
-    $(".post-description p, .product-description").each(function(index, el) {
-        $(this).readmore({
-          speed: 75,
-          moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
-          lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
-        });
-    });
-    $(".post-commet-textarea .textarea").triggeredAutocomplete({
-       hidden: '#hidden_inputbox_comment',
-       source: Wo_Ajax_Requests_File() + "?f=mention",
-       trigger: "@" 
-    });
-    $(".comment-reply textarea").triggeredAutocomplete({
-       hidden: '#hidden_inputbox_comment_reply',
-       source: Wo_Ajax_Requests_File() + "?f=mention",
-       trigger: "@"
-    });
-    $('#load-more-posts').show();
-    $('.sun_comm_addmore .dropdown-toggle').on('click', function (event) {
-        $(this).parent().toggleClass('open');
-    });
-    $(document).ready(function(){
-  $('.sun_comm_addmore > .dropdown-menu .dropdown-toggle').on("click", function(e){
-    $(this).next('ul').toggle();
-    e.stopPropagation();
-    e.preventDefault();
-  });
-});
-  });
 }
   <?php if ($wo['user']['social_login'] == 1) { ?>
   $(window).on("load", function (e) {

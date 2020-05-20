@@ -594,7 +594,9 @@ $wo['footer_pages']                  = array(
     'setting',
     'contact-us',
     'advertise',
-    'jobs'
+    'jobs',
+    'friends_nearby',
+    'common_things'
 );
 
 $wo['update_cache']                  = '';
@@ -746,7 +748,7 @@ if (!empty($_GET['mode'])) {
     }
 }
 
-//include_once('assets/includes/onesignal_config.php');
+include_once('assets/includes/onesignal_config.php');
 
 
 if (!empty($_GET['access']) || empty($_COOKIE['access'])) {
@@ -782,6 +784,7 @@ try {
     $wo['blog_categories']   = Wo_GetCategories(T_BLOGS_CATEGORY);
     $wo['products_categories']   = Wo_GetCategories(T_PRODUCTS_CATEGORY);
     $wo['job_categories']   = Wo_GetCategories(T_JOB_CATEGORY);
+    $wo['reactions_types']   = Wo_GetReactionsTypes();
 } catch (Exception $e) {
     $wo['genders']           = [];
     $wo['page_categories']   = [];
@@ -789,7 +792,9 @@ try {
     $wo['blog_categories']   = [];
     $wo['products_categories']   = [];
     $wo['job_categories']   = [];
+    $wo['reactions_types']   = [];
 }
+Wo_GetSubCategories();
 
 $wo['config']['currency_array'] = (Array) json_decode($wo['config']['currency_array']);
 $wo['config']['currency_symbol_array'] = (Array) json_decode($wo['config']['currency_symbol_array']);
@@ -808,6 +813,112 @@ $wo['post_colors'] = array();
 if ($wo['config']['colored_posts_system'] == 1) {
     $wo['post_colors'] = Wo_GetAllColors();
 }
+
+if ($wo['loggedin'] == true && $wo['user']['is_pro']) {
+    $notify = false;
+    $remove = false;
+    switch ($wo['user']['pro_type']) {
+        case '1':
+            if ($wo['pro_packages']['star']['time'] > 0) {
+                $end_time = $wo['user']['pro_time'] + $star_package_duration;
+                if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
+                    $notify = true;
+                }
+                elseif ($end_time <= time()) {
+                    $remove = true;
+                }
+            }
+            break;
+        case '2':
+            if ($wo['pro_packages']['hot']['time'] > 0) {
+                $end_time = $wo['user']['pro_time'] + $hot_package_duration;
+                if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
+                    $notify = true;
+                }
+                elseif ($end_time <= time()) {
+                    $remove = true;
+                }
+            }
+            break;
+        case '3':
+            if ($wo['pro_packages']['ultima']['time'] > 0) {
+                $end_time = $wo['user']['pro_time'] + $ultima_package_duration;
+                if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
+                    $notify = true;
+                }
+                elseif ($end_time <= time()) {
+                    $remove = true;
+                }
+            }
+            break;
+        case '4':
+            if ($wo['pro_packages']['vip']['time'] > 0) {
+                $end_time = $wo['user']['pro_time'] + $vip_package_duration;
+                if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
+                    $notify = true;
+                }
+                elseif ($end_time <= time()) {
+                    $remove = true;
+                }
+            }
+            break;
+    }
+
+    if ($notify == true) {
+        $start = date_create(date('Y-m-d H:i:s',time()));
+        $end = date_create(date('Y-m-d H:i:s',$end_time));
+        $diff = date_diff($end,$start);
+        $left_time = '';
+        if (!empty($diff->d)) {
+            $left_time = $diff->d.' '.$wo['lang']['day'];
+        }
+        elseif (!empty($diff->h)) {
+            $left_time = $diff->h.' '.$wo['lang']['hour'];
+        }
+        elseif (!empty($diff->i)) {
+            $left_time = $diff->i.' '.$wo['lang']['minute'];
+        }
+
+
+        $day = date('d');
+        $month = date('n');
+        $year = date('Y');
+        $query_one = " SELECT COUNT(*) AS count FROM " . T_NOTIFICATION . " WHERE `recipient_id` = " . $wo['user']['id'] . " AND DAY(FROM_UNIXTIME(time)) = '{$day}' AND MONTH(FROM_UNIXTIME(time)) = '{$month}' AND YEAR(FROM_UNIXTIME(time)) = '{$year}' AND `type` = 'remaining'";
+        $query          = mysqli_query($sqlConnect, $query_one);
+        $fetched_data = mysqli_fetch_assoc($query);
+
+        if ($fetched_data['count'] < 1) {
+            $db->insert(T_NOTIFICATION,array('recipient_id' => $wo['user']['id'],
+                                             'type' => 'remaining',
+                                             'text' => str_replace('{{time}}', $left_time, $wo['lang']['remaining_text']),
+                                             'url'  => 'index.php?link1=home',
+                                             'time' => time()));
+
+        }
+    }
+    if ($remove == true) {
+        $update      = Wo_UpdateUserData($wo['user']['id'], array(
+            'is_pro' => 0
+        ));
+        $user_id     = $wo['user']['id'];
+        $mysql_query = mysqli_query($sqlConnect, "UPDATE " . T_PAGES . " SET `boosted` = '0' WHERE `user_id` = {$user_id}");
+        $mysql_query = mysqli_query($sqlConnect, "UPDATE " . T_POSTS . " SET `boosted` = '0' WHERE `user_id` = {$user_id}");
+        $mysql_query = mysqli_query($sqlConnect, "UPDATE " . T_POSTS . " SET `boosted` = '0' WHERE `page_id` IN (SELECT `page_id` FROM " . T_PAGES . " WHERE `user_id` = {$user_id})");
+    }
+}
+if ($wo['config']['live_video_save'] == 0) {
+    try {
+        $posts = $db->where('live_time','0','!=')->where('live_time',time() - 11,'<=')->get(T_POSTS);
+        foreach ($posts as $key => $post) {
+            $db->where('post_id',$post->id)->delete(T_POSTS);
+            $db->where('parent_id',$post->id)->delete(T_POSTS);
+        }
+    } catch (Exception $e) {
+        
+    }
+    
+}
+
 $wo['stripe_currency'] = array('USD','EUR','AUD','BRL','CAD','CZK','DKK','HKD','HUF','ILS','JPY','MYR','MXN','TWD','NZD','NOK','PHP','PLN','RUB','SGD','SEK','CHF','THB','GBP');
 $wo['paypal_currency'] = array('USD','EUR','AUD','BRL','CAD','CZK','DKK','HKD','HUF','INR','ILS','JPY','MYR','MXN','TWD','NZD','NOK','PHP','PLN','GBP','RUB','SGD','SEK','CHF','THB');
 $wo['2checkout_currency'] = array('USD','EUR','AED','AFN','ALL','ARS','AUD','AZN','BBD','BDT','BGN','BMD','BND','BOB','BRL','BSD','BWP','BYN','BZD','CAD','CHF','CLP','CNY','COP','CRC','CZK','DKK','DOP','DZD','EGP','FJD','GBP','GTQ','HKD','HNL','HRK','HUF','IDR','ILS','INR','JMD','JOD','JPY','KES','KRW','KWD','KZT','LAK','LBP','LKR','LRD','MAD','MDL','MMK','MOP','MRO','MUR','MVR','MXN','MYR','NAD','NGN','NIO','NOK','NPR','NZD','OMR','PEN','PGK','PHP','PKR','PLN','PYG','QAR','RON','RSD','RUB','SAR','SBD','SCR','SEK','SGD','SYP','THB','TND','TOP','TRY','TTD','TWD','UAH','UYU','VND','VUV','WST','XCD','XOF','YER','ZAR');

@@ -20,6 +20,7 @@ if ($f == 'pay_with_bitcoin') {
             }
             $CP->setFormElement('item_name', $desc);
             //OPTIONAL
+            $CP->setFormElement('want_shipping', 0);
             $CP->setFormElement('user_id', $wo['user']['user_id']);
             $CP->setFormElement('ipn_url', $wo['config']['site_url'] . '/requests.php?f=coinpayments_callback');
             $data = array(

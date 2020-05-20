@@ -18,7 +18,6 @@ $options['gender'] = (!empty($_POST['gender'])) ? Wo_Secure($_POST['gender']) : 
 $options['status'] = (!empty($_POST['status'])) ?  Wo_Secure($_POST['status']) : '';
 $options['image'] = (!empty($_POST['image'])) ?  Wo_Secure($_POST['image']) : '';
 $options['country'] = (!empty($_POST['country'])) ?  Wo_Secure($_POST['country']) : '';
-$options['status'] = (!empty($_POST['status'])) ?  Wo_Secure($_POST['status']) : '';
 $options['verified'] = (!empty($_POST['verified'])) ?  Wo_Secure($_POST['verified']) : '';
 $options['filterbyage'] = (!empty($_POST['filterbyage'])) ?  Wo_Secure($_POST['filterbyage']) : '';
 $options['age_from'] = (!empty($_POST['age_from'])) ?  Wo_Secure($_POST['age_from']) : '';

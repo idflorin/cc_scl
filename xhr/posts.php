@@ -146,6 +146,18 @@ if ($f == 'posts') {
             return false;
             die();
         }
+        if ($wo['config']['who_upload'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin() && (!empty($_FILES['postFile']) || !empty($_FILES['postVideo']) || !empty($_FILES['postMusic']) || !empty($_FILES['postPhotos']) || !empty($_POST['postRecord']))) {
+
+            header("Content-type: application/json");
+            echo json_encode(array(
+                'status' => 400,
+                'errors' => $errors,
+                'invalid_file' => 4
+            ));
+            exit();
+        }
+
+
         if (isset($_POST['recipient_id']) && !empty($_POST['recipient_id'])) {
             $recipient_id = Wo_Secure($_POST['recipient_id']);
         } else if (isset($_POST['event_id']) && !empty($_POST['event_id'])) {
@@ -289,12 +301,16 @@ if ($f == 'posts') {
             '0',
             '1',
             '2',
-            '3'
+            '3',
+            '4'
         );
         if (isset($_POST['postPrivacy'])) {
             if (in_array($_POST['postPrivacy'], $privacy_array)) {
                 $post_privacy = $_POST['postPrivacy'];
             }
+        }
+        if ($wo['config']['shout_box_system'] != 1 && $post_privacy == 4) {
+            $post_privacy = 0;
         }
         if (empty($page_id)) {
             setcookie("post_privacy", $post_privacy, time() + (10 * 365 * 24 * 60 * 60));
@@ -505,6 +521,24 @@ if ($f == 'posts') {
                         'invalid_file' => $invalid_file,
                         'post_count' => (!empty($wo['story']['publisher']['details']) ? $wo['story']['publisher']['details']['post_count'] : 0)
                     );
+                    Wo_RunInBackground($data);
+                    if ($wo['config']['notify_new_post'] == 1) {
+                        if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && empty($wo['story']['event_id']) && $wo['story']['postPrivacy'] < 3) {
+                            $post_id = $wo['story']['id'];
+                            $users = Wo_GetFollowNotifyUsers($wo['user']['user_id']);
+                            if (!empty($users)) {
+                                foreach ($users as $key => $value) {
+                                    $notification_data_array = array(
+                                        'recipient_id' => $value,
+                                        'type' => 'new_post',
+                                        'post_id' => $post_id,
+                                        'url' => 'index.php?link1=post&id=' . $post_id
+                                    );
+                                    Wo_RegisterNotification($notification_data_array);
+                                }
+                            }
+                        }
+                    }
                 } 
             } else {
                 $data = array(
@@ -1448,12 +1482,12 @@ if ($f == 'posts') {
                 'html' => '',
                 'title' => $wo['lang']['users_reacted_post']
             );
-            $react_array = array('like' => 'Like','love' => 'Love' ,'haha' => 'HaHa' ,'wow' => 'WoW' ,'sad' => 'Sad' ,'angry' => 'Angry' );
-            if (!empty($_GET['type']) && in_array($_GET['type'],array_keys($react_array)) && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
-                $reactedUsers = Wo_GetPostReactionUsers($_GET['post_id'], $react_array[$_GET['type']] ,20,Wo_Secure($_GET['offset']),Wo_Secure($_GET['col']));
+
+            if (!empty($_GET['type']) && !empty($wo['reactions_types'][$_GET['type']]) && !empty($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) {
+                $reactedUsers = Wo_GetPostReactionUsers($_GET['post_id'], $_GET['type'] ,20,Wo_Secure($_GET['offset']),Wo_Secure($_GET['col']));
             }
             else{
-                $reactedUsers = Wo_GetPostReactionUsers($_GET['post_id'], $react_array[$_GET['type']],20,0,Wo_Secure($_GET['col']));
+                $reactedUsers = Wo_GetPostReactionUsers($_GET['post_id'], $_GET['type'],20,0,Wo_Secure($_GET['col']));
             }
 
             $post_info = array();
@@ -1489,6 +1523,10 @@ if ($f == 'posts') {
                         $data['html'] .= Wo_LoadPage('story/page-post-likes');
                     }
                     else{
+                        $wo['WondredLikedusers']['anonymous'] = false;
+                        if ($wo['config']['shout_box_system'] == 1 && !empty($post_info) && $post_info->postPrivacy == 4 && $wo['WondredLikedusers']['user_id'] == $post_info->user_id) {
+                            $wo['WondredLikedusers']['anonymous'] = true;
+                        }
                         $data['html'] .= Wo_LoadPage('story/post-likes-wonders');
                     }
                     

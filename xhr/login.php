@@ -13,11 +13,24 @@ if ($f == 'login') {
     $data_ = array();
     $phone = 0;
     if (isset($_POST['username']) && isset($_POST['password'])) {
+        if ($wo['config']['prevent_system'] == 1) {
+            if (!WoCanLogin()) {
+                $errors[] = $error_icon . $wo['lang']['login_attempts'];
+                header("Content-type: application/json");
+                echo json_encode(array(
+                    'errors' => $errors
+                ));
+                exit();
+            }
+        }
         $username = Wo_Secure($_POST['username']);
         $password = $_POST['password'];
         $result   = Wo_Login($username, $password);
         if ($result === false) {
             $errors[] = $error_icon . $wo['lang']['incorrect_username_or_password_label'];
+            if ($wo['config']['prevent_system'] == 1) {
+                WoAddBadLoginLog();
+            }
         } else if (Wo_UserInactive($_POST['username']) === true) {
             $errors[] = $error_icon . $wo['lang']['account_disbaled_contanct_admin_label'];
         } else if (Wo_VerfiyIP($_POST['username']) === false) {
@@ -60,6 +73,10 @@ if ($f == 'login') {
                 $data['location'] = $_POST['last_url'];
             } else {
                 $data['location'] = $wo['config']['site_url'];
+            }
+            $user_data = Wo_UserData($userid);
+            if ($wo['config']['membership_system'] == 1 && $user_data['is_pro'] == 0) {
+                $data['location'] = Wo_SeoLink('index.php?link1=go-pro');
             }
         }
     }

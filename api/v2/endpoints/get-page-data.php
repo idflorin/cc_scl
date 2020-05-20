@@ -40,6 +40,10 @@ if (empty($error_code)) {
         if (Wo_IsPageRatingExists($page_id, $wo['user']['id'])) {
             $page_data['is_rated'] = true;
         }
+        $page_data['admin_info'] = array();
+        if ($wo['user']['id'] != $page_data['user_id'] && Wo_IsPageAdminExists($wo['user']['id'],$page_id)) {
+            $page_data['admin_info'] = Wo_GetPageAdminInfo($wo['user']['id'],$page_id);
+        }
 
         $response_data['page_data'] = $page_data;
     }

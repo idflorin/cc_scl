@@ -35,7 +35,15 @@ if (!empty($wo['post_colors'])) {
 $get_config['fields'] = Wo_GetUserCustomFields();
 $get_config['movie_category'] = $wo['film-genres'];
 $get_config['post_colors'] = $wo['post_colors'];
-$get_config['post_reactions_types'] = array('Like','Love','HaHa','Wow','Sad','Angry');
+$get_config['page_sub_categories'] = $wo['page_sub_categories'];
+$get_config['group_sub_categories'] = $wo['group_sub_categories'];
+$get_config['products_sub_categories'] = $wo['products_sub_categories'];
+
+$get_config['page_custom_fields'] = Wo_GetCustomFields('page');
+$get_config['group_custom_fields'] = Wo_GetCustomFields('group');
+$get_config['product_custom_fields'] = Wo_GetCustomFields('product');
+
+$get_config['post_reactions_types'] = $wo['reactions_types'];
 $response_data      = array(
     'api_status' => 200,
     'config' => $get_config

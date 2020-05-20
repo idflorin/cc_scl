@@ -1,4 +1,14 @@
-<?php $replies = Wo_CountCommentReplies($wo['comment']['id']);?>
+<?php $replies = Wo_CountCommentReplies($wo['comment']['id']);
+
+if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 && $wo['comment']['publisher']['id'] == $wo['story']['user_id']) {
+   $wo['comment']['publisher']['username'] = 'anonymous';
+   $wo['comment']['publisher']['name'] = $wo['lang']['anonymous'];
+   $wo['comment']['publisher']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
+   $wo['comment']['publisher']['verified'] = 0;
+   $wo['comment']['publisher']['type'] = '';
+}
+
+?>
 <div class="comment comment-container" id="comment_<?php echo $wo['comment']['id'];?>" data-comment-id ="<?php echo $wo['comment']['id'];?>">
 	<a onclick="InjectAPI('{&quot;profile_id&quot; : &quot;<?php echo $wo['comment']['publisher']['id']?>&quot;, &quot;type&quot;:&quot;<?php echo $wo['comment']['publisher']['type']?>&quot;}', event);" class="<?php echo Wo_RightToLeft('pull-left'); ?>" href="<?php echo $wo['comment']['publisher']['url']?>">
 		<img class="avatar <?php echo Wo_RightToLeft('pull-left'); ?>" src="<?php echo $wo['comment']['publisher']['avatar']?>" alt="avatar">
@@ -74,7 +84,18 @@
 						?>
 					</span>
 					<ul class="reactions-box reactions-comment-container-<?php echo $wo['comment']['id']; ?>" data-id="<?php echo $wo['comment']['id']; ?>">
-						<li class="reaction reaction-like animated_2" data-reaction="Like" onclick="Wo_RegisterCommentReaction(<?php echo $wo['comment']['id']; ?>,'Like');">
+
+						<?php if (!empty($wo['reactions_types'])) {
+						    foreach ($wo['reactions_types'] as $key => $value) {
+						    	if ($value['status'] == 1) {
+						     ?>
+						    <li class="reaction reaction-<?php echo $value['id'];?> animated_2" data-reaction="<?php echo $value['name'];?>" onclick="Wo_RegisterCommentReaction(<?php echo $wo['comment']['id']; ?>,<?php echo $value['id'];?>);">
+								<img class="" src="<?php echo $value['sunshine_icon'];?>" alt="<?php echo $value['name'];?>">
+							</li>
+						<?php } } } ?>
+
+
+						<!-- <li class="reaction reaction-like animated_2" data-reaction="Like" onclick="Wo_RegisterCommentReaction(<?php echo $wo['comment']['id']; ?>,'Like');">
 							<img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/like.gif" alt="<?php echo $wo['lang']['like'];?>">
 						</li>
 						<li class="reaction reaction-love animated_4" data-reaction="Love" onclick="Wo_RegisterCommentReaction(<?php echo $wo['comment']['id']; ?>,'Love');">
@@ -91,7 +112,7 @@
 						</li>
 						<li class="reaction reaction-angry animated_12" data-reaction="Angry" onclick="Wo_RegisterCommentReaction(<?php echo $wo['comment']['id']; ?>,'Angry');">
 							<img class="" src="<?php echo $wo['config']['theme_url'];?>/reaction/angry.gif" alt="<?php echo $wo['lang']['angry'];?>">
-						</li>
+						</li> -->
 					</ul>
 				</div>
 			<?php }else{ ?>

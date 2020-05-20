@@ -6,7 +6,6 @@ if ($f == "update_socialinks_setting") {
             if (empty($errors)) {
                 $Update_data = array(
                     'facebook' => $_POST['facebook'],
-                    'google' => $_POST['google'],
                     'linkedin' => $_POST['linkedin'],
                     'vk' => $_POST['vk'],
                     'instagram' => $_POST['instagram'],

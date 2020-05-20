@@ -170,6 +170,9 @@ if ($f == 'register') {
                     Wo_AutoGroupJoin(Wo_UserIdFromUsername($_POST['username']));
                 }
                 $data['location'] = Wo_SeoLink('index.php?link1=start-up');
+                if ($wo['config']['membership_system'] == 1) {
+                    $data['location'] = Wo_SeoLink('index.php?link1=go-pro');
+                }
             } else if ($wo['config']['sms_or_email'] == 'mail') {
                 $wo['user']        = $_POST;
                 $wo['code']        = $code;
@@ -186,6 +189,11 @@ if ($f == 'register') {
                 );
                 $send              = Wo_SendMessage($send_message_data);
                 $errors            = $success_icon . $wo['lang']['successfully_joined_verify_label'];
+                if ($wo['config']['membership_system'] == 1) {
+                    $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
+                    $_SESSION['user_id'] = $session;
+                    setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
+                }
             } else if ($wo['config']['sms_or_email'] == 'sms' && !empty($_POST['phone_num'])) {
                 $random_activation = Wo_Secure(rand(11111, 99999));
                 $message           = "Your confirmation code is: {$random_activation}";
@@ -199,6 +207,11 @@ if ($f == 'register') {
                             'status' => 300,
                             'location' => Wo_SeoLink('index.php?link1=confirm-sms?code=' . $code)
                         );
+                        if ($wo['config']['membership_system'] == 1) {
+                            $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
+                            $_SESSION['user_id'] = $session;
+                            setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
+                        }
                     } else {
                         $errors = $error_icon . $wo['lang']['failed_to_send_code_email'];
                     }

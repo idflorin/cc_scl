@@ -1,5 +1,5 @@
 <?php 
-if ($f == 'delete_user_account') {
+if ($f == 'delete_user_account' && $wo['config']['deleteAccount'] == 1) {
     if (isset($_POST['password'])) {
         if (Wo_HashPassword($_POST['password'], $wo['user']['password']) == false) {
             $errors[] = $error_icon . $wo['lang']['current_password_mismatch'];

@@ -403,8 +403,11 @@ function Wo_RegisterMessage(dataForm){
 }
 
 function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
-  text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
-  console.log(text);
+  if (!text) {
+    text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
+  }
+  
+  
   if(event.keyCode == 13 && event.shiftKey == 0 && recording_node == "comm") {
     Wo_stopRecording(); 
     if (recorder) { 

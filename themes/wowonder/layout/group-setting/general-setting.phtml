@@ -16,13 +16,27 @@
 			<div class="col-md-5">
 				<div class="wow_form_fields">
 					<label for="group_category"><?php echo $wo['lang']['category'] ?></label>
-					<select id="group_category" name="group_category">
+					<select id="group_category" name="group_category" onchange="GetGroupSubCategory(this)">
 						<?php 
 							foreach ($wo['group_categories'] as $categorie_id => $category) {
 							$selected_contry = ($categorie_id == $wo['setting']['category_id']) ? ' selected' : '' ;
 						?>
 						<option value="<?php echo $categorie_id;?>" <?php echo $selected_contry;?> ><?php echo $category;?></option>
 						<?php } ?>
+					</select>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<div class="wow_form_fields">
+					<label for="group_sub_category"><?php echo $wo['lang']['sub_category'] ?></label>
+					<select id="group_sub_category" name="group_sub_category">
+						<?php
+						if (!empty($wo['group_sub_categories'][array_keys($wo['group_categories'])[0]])) {
+						foreach ($wo['group_sub_categories'][array_keys($wo['group_categories'])[0]] as $id => $sub_category) { 
+							$sub_selected = ($sub_category['id'] == $wo['setting']['sub_category']) ? ' selected' : '' ;
+							?>
+							<option value="<?php echo $sub_category['id']?>" <?php echo $sub_selected; ?>><?php echo $sub_category['lang']; ?></option>
+						<?php } } ?>
 					</select>
 				</div>
 			</div>
@@ -42,6 +56,13 @@
 			?>  
 			<textarea id="about" name="about" rows="4"><?php echo $text;?></textarea>
 		</div>
+		<?php $fields = Wo_GetCustomFields('group'); 
+		if (!empty($fields)) {
+			foreach ($fields as $key => $wo['field']) {
+				echo Wo_LoadPage('group-setting/fields');
+			}
+		}
+		?>
 		<div class="text-center">
 			<button class="btn btn-main btn-mat btn-mat-raised add_wow_loader" type="submit"><?php echo $wo['lang']['save']; ?></button>
 		</div>
@@ -51,6 +72,23 @@
 </div>
 
 <script type="text/javascript">
+	<?php 
+$js_array = json_encode($wo['group_sub_categories']);
+echo "var sub_categories_array = ". $js_array . ";\n";
+?>
+	function GetGroupSubCategory(self) {
+		id = $(self).val();
+		var text = "";
+		if (typeof(sub_categories_array[id]) == 'undefined') {
+		    $('#group_sub_category').html('');
+		}
+		else{
+		   	sub_categories_array[id].forEach(function(entry) {
+				text = text + "<option value='"+entry.id+"'>"+entry.lang+"</option>";
+			});
+		    $('#group_sub_category').html(text);
+		}
+	}
 $(function() {
   $('form.setting-general-form').ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=groups&s=update_general_settings',

@@ -16,6 +16,12 @@
 	
 	<div class="row">
 		<div class="col-md-3">
+			<?php if ($wo['loggedin'] == true) { ?>
+			<?php if ($wo['config']['nearby_business_system'] == 1) { ?>
+				<a href="<?php echo($wo['config']['site_url'].'/nearby_business') ?>" data-ajax="?link1=nearby_business" class="btn btn-success btn-block side_mkt_btn btn-mat btn-mat-raised"><?php echo $wo['lang']['nearby_business'] ?></a>
+				<br>
+			<?php } ?>
+			<?php } ?>
 			<div class="wo_job_main_widget">
 				<div class="m_widget_head"><?php echo $wo['lang']['location_dist'];?></div>
 				<div class="select-nearby-users-distance wo_select_job_dist">

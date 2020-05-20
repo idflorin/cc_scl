@@ -37,6 +37,10 @@ if ($f == 'confirm_user_unusal_login') {
             } else {
                 $data['location'] = $wo['config']['site_url'];
             }
+            $user_data = Wo_UserData($user_id);
+            if ($wo['config']['membership_system'] == 1 && $user_data['is_pro'] == 0) {
+                $data['location'] = Wo_SeoLink('index.php?link1=go-pro');
+            }
         }
     }
     header("Content-type: application/json");

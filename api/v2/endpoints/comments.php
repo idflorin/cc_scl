@@ -34,12 +34,13 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 
     if ($_POST['type'] == 'create') {
         if (!empty($_POST['post_id']) && is_numeric($_POST['post_id']) && $_POST['post_id'] > 0) {
-            if (!empty($_FILES['image']) || !empty($_POST['text'])) {
+            if (!empty($_FILES['image']) || !empty($_POST['text']) || !empty($_FILES['audio'])) {
                 $page_id = '';
                 if (!empty($_POST['page_id'])) {
                     $page_id = $_POST['page_id'];
                 }
                 $comment_image = '';
+                $record = '';
 
                 if (isset($_FILES['image']['name'])) {
                     $fileInfo = array(
@@ -53,7 +54,18 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                         $comment_image    = $media['filename'];
                     }
                 }
-                if (empty($comment_image) && empty($_POST['text'])) {
+                if (!empty($_FILES["audio"])) {
+                    $fileInfo         = array(
+                        'file' => $_FILES["audio"]["tmp_name"],
+                        'name' => $_FILES['audio']['name'],
+                        'size' => $_FILES["audio"]["size"],
+                        'type' => $_FILES["audio"]["type"],
+                        'types' => 'mp3,wav'
+                    );
+                    $media            = Wo_ShareFile($fileInfo);
+                    $record = $media['filename'];
+                }
+                if (empty($comment_image) && empty($_POST['text']) && empty($record)) {
                     header("Content-type: application/json");
                     echo json_encode($data);
                     exit();
@@ -62,14 +74,19 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 if (!empty($_POST['text']) && !ctype_space($_POST['text'])) {
                     $text_comment = $_POST['text'];
                 }
+                
                 $C_Data = array(
                     'user_id' => Wo_Secure($wo['user']['user_id']),
                     'page_id' => Wo_Secure($page_id),
                     'post_id' => Wo_Secure($_POST['post_id']),
-                    'text' => Wo_Secure($_POST['text']),
+                    'text' => Wo_Secure($text_comment),
                     'c_file' => Wo_Secure($comment_image),
                     'time' => time()
                 );
+                if (!empty($record)) {
+                    $C_Data['record'] = $record;
+                }
+                
                 $R_Comment     = Wo_RegisterPostComment($C_Data);
                 $comment       = Wo_GetPostComment($R_Comment);
                 if (!empty($comment['publisher'])) {
@@ -79,6 +96,12 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 }
                 if (!empty($text_comment)) {
                     //$comment['text'] = $text_comment;
+                }
+                if (!empty($comment['c_file'])) {
+                    $comment['c_file'] = Wo_GetMedia($comment['c_file']);
+                }
+                if (!empty($comment['record'])) {
+                    $comment['record'] = Wo_GetMedia($comment['record']);
                 }
 
                 $response_data = array(
@@ -136,16 +159,37 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
     }
 
     if ($_POST['type'] == 'create_reply') {
-        if (!empty($_POST['comment_id']) && !empty($_POST['text'])) {
+        if (!empty($_POST['comment_id']) && (!empty($_POST['text']) || !empty($_FILES['image']))) {
             $page_id = '';
             if (!empty($_POST['page_id'])) {
                 $page_id = $_POST['page_id'];
             }
+            $comment_image = '';
+
+            if (isset($_FILES['image']['name'])) {
+                $fileInfo = array(
+                    'file' => $_FILES["image"]["tmp_name"],
+                    'name' => $_FILES['image']['name'],
+                    'size' => $_FILES["image"]["size"],
+                    'type' => $_FILES["image"]["type"]
+                );
+                $media    = Wo_ShareFile($fileInfo);
+                if (!empty($media)) {
+                    $comment_image    = $media['filename'];
+                }
+            }
+            if (empty($comment_image) && empty($_POST['text'])) {
+                header("Content-type: application/json");
+                echo json_encode($data);
+                exit();
+            }
+
             $C_Data      = array(
                 'user_id' => Wo_Secure($wo['user']['user_id']),
                 'page_id' => Wo_Secure($page_id),
                 'comment_id' => Wo_Secure($_POST['comment_id']),
                 'text' => Wo_Secure($_POST['text']),
+                'c_file' => Wo_Secure($comment_image),
                 'time' => time()
             );
             $R_Comment   = Wo_RegisterCommentReply($C_Data);
@@ -155,6 +199,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     foreach ($non_allowed as $key4 => $value4) {
                       unset($comment['publisher'][$value4]);
                     }
+                }
+                if (!empty($comment['c_file'])) {
+                    $comment['c_file'] = Wo_GetMedia($comment['c_file']);
                 }
                 $comment['text'] = strip_tags($comment['text']);
                 $response_data = array(
@@ -221,6 +268,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     }
                     $comments[$key]['text'] = strip_tags($comments[$key]['text']);
                     $comments[$key]['replies'] = Wo_CountCommentReplies($comments[$key]['id']);
+                    if (!empty($comments[$key]['record'])) {
+                        $comments[$key]['record'] = Wo_GetMedia($comments[$key]['record']);
+                    }
                 }
 
                 $response_data = array(
@@ -270,7 +320,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $comment = Wo_GetPostComment($comment_id);
             if (!empty($comment)) {
 
-                $reactions_types = array('Like','Love','HaHa','Wow','Sad','Angry');
+                $reactions_types = array_keys($wo['reactions_types']);
                 if (!empty($_POST['reaction']) && in_array($_POST['reaction'], $reactions_types)) {
                     $reaction = Wo_Secure($_POST['reaction']);
                     Wo_AddCommentReactions($comment_id, $reaction);
@@ -309,7 +359,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $reply = Wo_GetCommentReply($reply_id);
             if (!empty($reply)) {
 
-                $reactions_types = array('Like','Love','HaHa','Wow','Sad','Angry');
+                $reactions_types = array_keys($wo['reactions_types']);
                 if (!empty($_POST['reaction']) && in_array($_POST['reaction'], $reactions_types)) {
                     $reaction = Wo_Secure($_POST['reaction']);
                     Wo_AddReplayReactions($wo['user']['id'],$reply_id, $reaction);

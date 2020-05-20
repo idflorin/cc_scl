@@ -5,6 +5,15 @@ if (strpos($wo['story']['postFile'],',') !== false) {
     $explode = @explode(',', $wo['story']['postFile']);
     $image = Wo_GetMedia($explode[0]);
 }
+if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4) {
+      $anonymous = true;
+      $wo['story']['publisher']['username'] = 'anonymous';
+      $wo['story']['publisher']['name'] = $wo['lang']['anonymous'];
+      $wo['story']['publisher']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
+      $wo['story']['publisher']['verified'] = 0;
+      $wo['story']['publisher']['type'] = '';
+	  $wo['story']['publisher']['url'] = 'javascript:void(0)';
+   }
 ?>
 <div class="lightbox-backgrond" onclick="Wo_CloseLightbox();"></div>
 <div class="lightbox-content post wo_imagecombo_lbox lightpost-<?php echo $wo['story']['id'];?>" id="post-<?php echo $wo['story']['id'];?>" data-post-id="<?php echo $wo['story']['id'];?>">

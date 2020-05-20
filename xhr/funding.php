@@ -13,50 +13,55 @@ use PayPal\Api\PaymentExecution;
 if ($f == 'funding' && $wo['config']['funding_system'] == 1) {
 	$data['status'] = 400;
     if ($s == 'insert_funding') {
+    	if ($wo['config']['who_upload'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin() && !empty($_FILES['image'])) {
+            $data['message'] = $error_icon . $wo['lang']['free_plan_upload_pro'];
+        }
+        else{
 
-    	if (!empty($_POST['title']) && !empty($_POST['description']) && !empty($_FILES['image']) && !empty($_POST['amount']) && is_numeric($_POST['amount']) && $_POST['amount'] > 0) {
+	    	if (!empty($_POST['title']) && !empty($_POST['description']) && !empty($_FILES['image']) && !empty($_POST['amount']) && is_numeric($_POST['amount']) && $_POST['amount'] > 0) {
 
-    		$insert_array = array();
+	    		$insert_array = array();
 
-    		$fileInfo      = array(
-                'file' => $_FILES["image"]["tmp_name"],
-                'name' => $_FILES['image']['name'],
-                'size' => $_FILES["image"]["size"],
-                'type' => $_FILES["image"]["type"],
-                'types' => 'jpeg,jpg,png,bmp'
-            );
-            $media         = Wo_ShareFile($fileInfo);
-
-            if (!empty($media) && !empty($media['filename'])) {
-            	$insert_array = array('title' => Wo_Secure($_POST['title']),
-			                          'description'   => Wo_Secure($_POST['description']),
-			                          'amount'   => Wo_Secure($_POST['amount']),
-			                          'time'   => time(),
-			                          'user_id'  => $wo['user']['id'],
-			                          'image' => $media['filename'],
-			                          'hashed_id' => Wo_GenerateKey(15,15));
-            	$fund_id = $db->insert(T_FUNDING,$insert_array);
-
-            	$post_data = array(
-	                'user_id' => Wo_Secure($wo['user']['user_id']),
-	                'fund_id' => $fund_id,
-	                'time' => time(),
-	                'multi_image_post' => 0,
-	                'postPrivacy' => 0,
+	    		$fileInfo      = array(
+	                'file' => $_FILES["image"]["tmp_name"],
+	                'name' => $_FILES['image']['name'],
+	                'size' => $_FILES["image"]["size"],
+	                'type' => $_FILES["image"]["type"],
+	                'types' => 'jpeg,jpg,png,bmp'
 	            );
+	            $media         = Wo_ShareFile($fileInfo);
 
-	            $id = Wo_RegisterPost($post_data);
+	            if (!empty($media) && !empty($media['filename'])) {
+	            	$insert_array = array('title' => Wo_Secure($_POST['title']),
+				                          'description'   => Wo_Secure($_POST['description']),
+				                          'amount'   => Wo_Secure($_POST['amount']),
+				                          'time'   => time(),
+				                          'user_id'  => $wo['user']['id'],
+				                          'image' => $media['filename'],
+				                          'hashed_id' => Wo_GenerateKey(15,15));
+	            	$fund_id = $db->insert(T_FUNDING,$insert_array);
 
-				$data['status'] = 200;
-				$data['message'] = $wo['lang']['funding_created'];
-				$data['url'] = Wo_SeoLink('index.php?link1=my_funding');
-            }
-            else{
-            	$data['message'] = $error_icon . $wo['lang']['file_not_supported'];
-            }
-		}
-		else{
-			$data['message'] = $error_icon . $wo['lang']['please_check_details'];
+	            	$post_data = array(
+		                'user_id' => Wo_Secure($wo['user']['user_id']),
+		                'fund_id' => $fund_id,
+		                'time' => time(),
+		                'multi_image_post' => 0,
+		                'postPrivacy' => 0,
+		            );
+
+		            $id = Wo_RegisterPost($post_data);
+
+					$data['status'] = 200;
+					$data['message'] = $wo['lang']['funding_created'];
+					$data['url'] = Wo_SeoLink('index.php?link1=my_funding');
+	            }
+	            else{
+	            	$data['message'] = $error_icon . $wo['lang']['file_not_supported'];
+	            }
+			}
+			else{
+				$data['message'] = $error_icon . $wo['lang']['please_check_details'];
+			}
 		}
     }
 

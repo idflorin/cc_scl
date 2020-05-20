@@ -6,6 +6,9 @@ if ($f == 'album') {
         } else if (empty($_FILES['postPhotos']['name'])) {
             $errors[] = $error_icon . $wo['lang']['please_check_details'];
         }
+        if ($wo['config']['who_upload'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin() && !empty($_FILES['postPhotos'])) {
+            $errors[] = $error_icon . $wo['lang']['free_plan_upload_pro'];
+        }
         if (isset($_FILES['postPhotos']['name'])) {
             $allowed = array(
                 'gif',

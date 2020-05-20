@@ -14,8 +14,14 @@ $response_data = array(
 
 $required_fields =  array(
                         'edit',
-                        'delete'
+                        'delete',
+                        'interested',
+                        'going'
                     );
+
+$offset = (!empty($_POST['offset']) && is_numeric($_POST['offset']) && $_POST['offset'] > 0 ? Wo_Secure($_POST['offset']) : 0);
+$limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);
+
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
     $required_event_fields = array(
         'event_name',
@@ -94,6 +100,50 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 $error_code    = 5;
                 $error_message = 'You are not the event owner';
             }
+        }
+    }
+    if ($_POST['type'] == 'interested') {
+        if (!empty($_POST['event_id']) && is_numeric($_POST['event_id']) && $_POST['event_id'] > 0) {
+            $event_id = Wo_Secure($_POST['event_id']);
+            $interested = Wo_GetInterestedEventsUsers($event_id,$offset,$limit);
+            if (!empty($interested)) {
+                foreach ($interested as $key => $value) {
+                    foreach ($non_allowed as $key4 => $value4) {
+                      unset($interested[$key][$value4]);
+                    }
+                }
+                
+            }
+            $response_data = array(
+                                'api_status' => 200,
+                                'data' => $interested
+                            );
+        }
+        else{
+            $error_code    = 5;
+            $error_message = 'event_id can not be empty';
+        }
+    }
+    if ($_POST['type'] == 'going') {
+        if (!empty($_POST['event_id']) && is_numeric($_POST['event_id']) && $_POST['event_id'] > 0) {
+            $event_id = Wo_Secure($_POST['event_id']);
+            $going = Wo_GetGoingEventsUsers($event_id,$offset,$limit);
+            if (!empty($going)) {
+                foreach ($going as $key => $value) {
+                    foreach ($non_allowed as $key4 => $value4) {
+                      unset($going[$key][$value4]);
+                    }
+                }
+                
+            }
+            $response_data = array(
+                                'api_status' => 200,
+                                'data' => $going
+                            );
+        }
+        else{
+            $error_code    = 5;
+            $error_message = 'event_id can not be empty';
         }
     }
 }

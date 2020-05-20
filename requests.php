@@ -21,6 +21,8 @@ if (!empty($_POST['hash_id'])) {
 $data            = array();
 $allow_array     = array(
     'upgrade',
+    'paystack',
+    'cashfree',
     'payment',
     'pay_with_bitcoin',
     'coinpayments_callback',
@@ -48,6 +50,7 @@ $non_login_array = array(
     'resned_code_ac',
     'resned_ac_email',
     'contact_us',
+    'google_login',
     'login',
     'register',
     'recover',
@@ -69,6 +72,18 @@ $non_login_array = array(
     'load-recent-blogs',
     'get_no_posts_name'
 );
+if ($wo['config']['membership_system'] == 1) {
+    $non_login_array[] = 'pro_register';
+    $non_login_array[] = 'get_payment_method';
+    $non_login_array[] = 'cashfree';
+    $non_login_array[] = 'paystack';
+    $non_login_array[] = 'pay_using_wallet';
+    $non_login_array[] = 'get_paypal_url';
+    $non_login_array[] = 'stripe_payment';
+    $non_login_array[] = 'paypro_with_bitcoin';
+    $non_login_array[] = '2checkout_pro';
+    $non_login_array[] = 'bank_transfer';
+}
 if (!in_array($f, $allow_array)) {
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
         if (strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) != 'xmlhttprequest') {
