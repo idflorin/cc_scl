@@ -1,6 +1,6 @@
 <?php 
 if ($f == 'update_user_information_startup' && Wo_CheckSession($hash_id) === true) {
-    if (isset($_POST['user_id'])) {
+    if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0) {
         $Userdata = Wo_UserData($_POST['user_id']);
         if (!empty($Userdata['user_id'])) {
             $age_data = '00-00-0000';

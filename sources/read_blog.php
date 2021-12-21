@@ -9,6 +9,10 @@ if (empty($_GET['id'])) {
   exit();
 }
 $_GET['id'] = Wo_GetPostIdFromUrl($_GET['id']);
+if (empty($_GET['id']) || !is_numeric($_GET['id'])) {
+	header("Location: " . $wo['config']['site_url']);
+	exit();
+}
 $article = Wo_GetArticle($_GET['id']);
 
 $id = Wo_Secure($_GET['id']);

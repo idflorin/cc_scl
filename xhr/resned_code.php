@@ -1,6 +1,6 @@
 <?php 
 if ($f == 'resned_code') {
-    if (isset($_POST['user_id'])) {
+    if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0) {
         $user = Wo_UserData($_POST['user_id']);
         if (empty($user) || empty($_POST['user_id']) || empty($_POST['phone_number'])) {
             $errors = $wo['lang']['failed_to_send_code'];

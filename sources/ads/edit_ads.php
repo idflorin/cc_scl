@@ -3,7 +3,7 @@ if ($wo['loggedin'] == false || $wo['config']['user_ads'] == 0) {
   header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
   exit();
 }
-if (isset($_GET['id'])) {
+if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
 	$ad_data = Wo_GetUserAdData($_GET['id']);
 	if (!empty($ad_data) && Wo_IsAdsOwner($ad_data['id'])) {
 		$wo['description'] = $wo['config']['siteDesc'];

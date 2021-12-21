@@ -212,6 +212,7 @@ $wo['VkontakteLoginUrl']  = $config['site_url'] . '/login-with.php?provider=Vkon
 $wo['instagramLoginUrl']  = $config['site_url'] . '/login-with.php?provider=Instagram';
 // Defualt User Pictures 
 $wo['userDefaultAvatar']  = 'upload/photos/d-avatar.jpg';
+$wo['userDefaultFAvatar']  = 'upload/photos/f-avatar.jpg';
 $wo['userDefaultCover']   = 'upload/photos/d-cover.jpg';
 $wo['pageDefaultAvatar']  = 'upload/photos/d-page.jpg';
 $wo['groupDefaultAvatar'] = 'upload/photos/d-group.jpg';

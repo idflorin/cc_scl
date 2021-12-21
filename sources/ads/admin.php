@@ -3,7 +3,7 @@ if ($wo['loggedin'] == false || $wo['config']['user_ads'] == 0 || $wo['user']['a
   header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
   exit();
 }
-if (isset($_GET['id'])) {
+if (isset($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
 	$ad_data = Wo_GetUserAdData($_GET['id']);
 	$wo['countries_name'][0] = $wo['lang']['select'].' '.$wo['lang']['all'];
 	if (!empty($ad_data) && Wo_IsAdsOwner($ad_data['id'])) {

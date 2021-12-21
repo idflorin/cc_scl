@@ -1,7 +1,7 @@
 <?php 
 if ($f == 'get_more_hashtag_posts') {
     $html = '';
-    if (isset($_POST['after_post_id'])) {
+    if (isset($_POST['after_post_id']) && is_numeric($_POST['after_post_id']) && $_POST['after_post_id'] > 0) {
         $is_api = false;
         if (!empty($_POST['is_api'])) {
             $is_api = true;

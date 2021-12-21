@@ -92,7 +92,7 @@ if ($f == 'groups') {
         exit();
     }
     if ($s == 'update_information_setting') {
-        if (!empty($_POST['page_id'])) {
+        if (!empty($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0) {
             $PageData = Wo_PageData($_POST['page_id']);
             if (!empty($_POST['website'])) {
                 if (!filter_var($_POST['website'], FILTER_VALIDATE_URL)) {
@@ -126,7 +126,7 @@ if ($f == 'groups') {
         exit();
     }
     if ($s == 'update_privacy_setting') {
-        if (!empty($_POST['group_id']) && Wo_CheckSession($hash_id) === true) {
+        if (!empty($_POST['group_id']) && is_numeric($_POST['group_id']) && $_POST['group_id'] > 0 && Wo_CheckSession($hash_id) === true) {
             $group_data     = Wo_GroupData($_POST['group_id']);
             $privacy      = 1;
             $join_privacy = 1;
@@ -167,7 +167,7 @@ if ($f == 'groups') {
         exit();
     }
     if ($s == 'update_images_setting') {
-        if (isset($_POST['group_id']) && Wo_CheckSession($hash_id) === true) {
+        if (isset($_POST['group_id']) && is_numeric($_POST['group_id']) && $_POST['group_id'] > 0 && Wo_CheckSession($hash_id) === true) {
             $Userdata = Wo_GroupData($_POST['group_id']);
             if (!empty($Userdata['id'])) {
                 if (!empty($_FILES['avatar']['name'])) {
@@ -211,7 +211,7 @@ if ($f == 'groups') {
         }
     }
     if ($s == 'update_general_settings') {
-        if (!empty($_POST['group_id']) && Wo_CheckSession($hash_id) === true) {
+        if (!empty($_POST['group_id']) && is_numeric($_POST['group_id']) && $_POST['group_id'] > 0 && Wo_CheckSession($hash_id) === true) {
             $group_data = Wo_GroupData($_POST['group_id']);
             if (empty($_POST['group_name']) OR empty($_POST['group_category']) OR empty($_POST['group_title']) OR empty(Wo_Secure($_POST['group_title']))) {
                 $errors[] = $error_icon . $wo['lang']['please_check_details'];
@@ -293,7 +293,7 @@ if ($f == 'groups') {
         exit();
     }
     if ($s == 'delete_group') {
-        if (!empty($_POST['group_id']) && Wo_CheckSession($hash_id) === true) {
+        if (!empty($_POST['group_id']) && is_numeric($_POST['group_id']) && $_POST['group_id'] > 0 && Wo_CheckSession($hash_id) === true) {
             if (!Wo_HashPassword($_POST['password'], $wo['user']['password']) && !Wo_CheckGroupAdminPassword($_POST['password'], $_POST['group_id'])) {
                 $errors[] = $error_icon . $wo['lang']['current_password_mismatch'];
             }
@@ -325,7 +325,7 @@ if ($f == 'groups') {
         exit();
     }
     if ($s == 'accept_request') {
-        if (isset($_GET['user_id']) && !empty($_GET['group_id'])) {
+        if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && $_GET['user_id'] > 0 && !empty($_GET['group_id']) && is_numeric($_GET['group_id']) && $_GET['group_id'] > 0) {
             if (Wo_AcceptJoinRequest($_GET['user_id'], $_GET['group_id']) === true) {
                 $data = array(
                     'status' => 200
@@ -337,7 +337,7 @@ if ($f == 'groups') {
         exit();
     }
     if ($s == 'delete_request') {
-        if (isset($_GET['user_id']) && !empty($_GET['group_id'])) {
+        if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && $_GET['user_id'] > 0 && !empty($_GET['group_id']) && is_numeric($_GET['group_id']) && $_GET['group_id'] > 0) {
             if (Wo_DeleteJoinRequest($_GET['user_id'], $_GET['group_id']) === true) {
                 $data = array(
                     'status' => 200
@@ -349,7 +349,7 @@ if ($f == 'groups') {
         exit();
     }
     if ($s == 'delete_joined_user') {
-        if (isset($_GET['user_id']) && !empty($_GET['group_id'])) {
+        if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && $_GET['user_id'] > 0 && !empty($_GET['group_id']) && is_numeric($_GET['group_id']) && $_GET['group_id'] > 0) {
             $group_data = Wo_GroupData($_GET['group_id']);
             if ($group_data['user_id'] == $wo['user']['id'] || Wo_IsCanGroupUpdate($_GET['group_id'],'members')) {
                 if (Wo_LeaveGroup($_GET['group_id'], $_GET['user_id']) === true) {
@@ -364,7 +364,7 @@ if ($f == 'groups') {
         exit();
     }
     if ($s == 'add_admin') {
-        if (isset($_GET['user_id']) && isset($_GET['group_id'])) {
+        if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && $_GET['user_id'] > 0 && !empty($_GET['group_id']) && is_numeric($_GET['group_id']) && $_GET['group_id'] > 0) {
             $group_data = Wo_GroupData($_GET['group_id']);
             if ($group_data['user_id'] == $wo['user']['id'] || Wo_IsCanGroupUpdate($_GET['group_id'],'members')) {
 

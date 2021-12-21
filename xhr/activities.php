@@ -1,7 +1,7 @@
 <?php 
 if ($f == 'activities') {
     if ($s == 'get_new_activities') {
-        if (!empty($_POST['before_activity_id'])) {
+        if (!empty($_POST['before_activity_id']) && is_numeric($_POST['before_activity_id']) && $_POST['before_activity_id'] > 0) {
             $html     = '';
             $activity = Wo_GetActivities(array(
                 'before_activity_id' => Wo_Secure($_POST['before_activity_id'])
@@ -20,7 +20,7 @@ if ($f == 'activities') {
         exit();
     }
     if ($s == 'get_more_activities') {
-        if (!empty($_POST['after_activity_id'])) {
+        if (!empty($_POST['after_activity_id']) && is_numeric($_POST['after_activity_id']) && $_POST['after_activity_id'] > 0) {
             $html = '';
             $me = false;
             if (!empty($_POST['user_id'])) {

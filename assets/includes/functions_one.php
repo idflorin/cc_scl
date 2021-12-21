@@ -499,7 +499,7 @@ function Wo_UserData($user_id, $password = true) {
     }
     $explode2                   = @end(explode('.', $fetched_data['avatar']));
     $explode3                   = @explode('.', $fetched_data['avatar']);
-    if ($fetched_data['avatar'] != $wo['userDefaultAvatar']) {
+    if ($fetched_data['avatar'] != $wo['userDefaultAvatar'] && $fetched_data['avatar'] != $wo['userDefaultFAvatar']) {
         @$fetched_data['avatar_full'] = $explode3[0] . '_full.' . $explode2;
     }
     $fetched_data['avatar'] = Wo_GetMedia($fetched_data['avatar']) . '?cache=' . $fetched_data['last_avatar_mod'];
@@ -822,7 +822,7 @@ function Wo_DeleteUser($user_id) {
     $user_data = Wo_UserData($user_id);
     $query_one_delete_photos = mysqli_query($sqlConnect, " SELECT `avatar`,`cover` FROM " . T_USERS . " WHERE `user_id` = {$user_id}");
     $fetched_data            = mysqli_fetch_assoc($query_one_delete_photos);
-    if (isset($fetched_data['avatar']) && !empty($fetched_data['avatar']) && $fetched_data['avatar'] != $wo['userDefaultAvatar']) {
+    if (isset($fetched_data['avatar']) && !empty($fetched_data['avatar']) && $fetched_data['avatar'] != $wo['userDefaultAvatar'] && $fetched_data['avatar'] != $wo['userDefaultFAvatar']) {
         $explode2 = @end(explode('.', $fetched_data['avatar']));
         $explode3 = @explode('.', $fetched_data['avatar']);
         $media_2  = $explode3[0] . '_avatar_full.' . $explode2;

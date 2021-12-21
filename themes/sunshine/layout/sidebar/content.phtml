@@ -38,11 +38,12 @@
 		<?php } ?>
 			
 		<!-- Trending -->
+		<?php $hashtags = Wa_GetTrendingHashs('popular');
+                if (count($hashtags) > 0) {
+                 ?>
         <ul class="list-group trending">
             <li class="sidebar-title-back" contenteditable="false"><?php echo $wo['lang']['trending']; ?></li>
             <?php 
-                $hashtags = Wa_GetTrendingHashs('popular');
-                if (count($hashtags) > 0) {
                    foreach ($hashtags as $wo['hashtag']) { 
 			?>
 				<li class="list-group-item sun_htag" dir="auto">
@@ -51,9 +52,10 @@
 						<span class="htag_bottom"><?php echo $wo['hashtag']['trend_use_num']; ?> <?php echo $wo['lang']['posts'];?></span>
 					</a>
 				</li>
-            <?php } } ?>
+            <?php }  ?>
             <div class="clear"></div>
         </ul>
+    <?php } ?>
 		
 		<!-- Pro Users -->
 		<?php if ($wo['config']['pro'] == 1) { ?>

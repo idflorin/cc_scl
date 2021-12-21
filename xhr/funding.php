@@ -337,7 +337,7 @@ if ($f == 'funding' && $wo['config']['funding_system'] == 1) {
     	}
     }
 
-    if ($s == 'stripe' && $wo['config']['credit_card'] != 'no' && !empty($_POST['fund_id']) && !empty($_POST['amount']) && is_numeric($_POST['amount']) && $_POST['amount'] > 0) {
+    if ($s == 'stripe' && $wo['config']['credit_card'] != 'no' && !empty($_POST['fund_id']) && is_numeric($_POST['fund_id']) && $_POST['fund_id'] > 0 && !empty($_POST['amount']) && is_numeric($_POST['amount']) && $_POST['amount'] > 0) {
 
     	include_once('assets/includes/stripe_config.php');
 

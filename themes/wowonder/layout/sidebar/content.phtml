@@ -79,12 +79,14 @@ if (!empty($user_stories)) {
             </div>
 			<?php } ?>
 		</div>
+        <?php $hashtags = Wa_GetTrendingHashs('popular');
+                if (count($hashtags) > 0) {
+                 ?>
 		
 		<ul class="list-group trending">
             <li class="list-group-item sidebar-title-back" contenteditable="false"><?php echo $wo['lang']['trending']; ?></li>
             <?php 
-                $hashtags = Wa_GetTrendingHashs('popular');
-                if (count($hashtags) > 0) {
+                
                    foreach ($hashtags as $wo['hashtag']) { 
 			?>
 				<li class="list-group-item wow_htag" dir="auto">
@@ -93,9 +95,10 @@ if (!empty($user_stories)) {
 						<span class="htag_bottom"><?php echo $wo['hashtag']['trend_use_num']; ?> <?php echo $wo['lang']['posts'];?></span>
 					</a>
 				</li>
-            <?php } } ?>
+            <?php } ?>
             <li><div class="clear"></div></li>
         </ul>
+    <?php } ?>
 
 		<?php if ($wo['config']['pro'] == 1) { ?>
 		<div class="featured-users">

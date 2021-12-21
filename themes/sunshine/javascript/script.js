@@ -41,7 +41,7 @@ $(function () {
     },
     cache: false 
   });
-  },1000)
+  },100)
   
   $(document).on("click",".mfp-arrow",function(event) {
     Wo_StoryProgress();

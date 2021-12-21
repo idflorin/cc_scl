@@ -79,7 +79,7 @@ if ($f == 'pages') {
         exit();
     }
     if ($s == 'update_information_setting') {
-        if (!empty($_POST['page_id']) && Wo_CheckSession($hash_id) === true) {
+        if (!empty($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0 && Wo_CheckSession($hash_id) === true) {
             $PageData = Wo_PageData($_POST['page_id']);
             if (!empty($_POST['website'])) {
                 if (!filter_var($_POST['website'], FILTER_VALIDATE_URL)) {
@@ -115,7 +115,7 @@ if ($f == 'pages') {
         exit();
     }
     if ($s == 'update_sociallink_setting') {
-        if (!empty($_POST['page_id']) && Wo_CheckSession($hash_id) === true) {
+        if (!empty($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0 && Wo_CheckSession($hash_id) === true) {
             $PageData = Wo_PageData($_POST['page_id']);
             if ($PageData['user_id'] == $wo['user']['id'] || Wo_IsCanPageUpdate($_POST['page_id'],'social')) {
                 if (empty($errors)) {
@@ -141,7 +141,7 @@ if ($f == 'pages') {
         exit();
     }
     if ($s == 'update_images_setting') {
-        if (isset($_POST['page_id']) && Wo_CheckSession($hash_id) === true) {
+        if (isset($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0 && Wo_CheckSession($hash_id) === true) {
             $Userdata = Wo_PageData($_POST['page_id']);
             if (!empty($Userdata['page_id'])) {
                 if ($Userdata['user_id'] == $wo['user']['id'] || Wo_IsCanPageUpdate($_POST['page_id'],'avatar')) {
@@ -186,7 +186,7 @@ if ($f == 'pages') {
         if (!empty($_POST['page_name']) && ($_POST['page_name'] == 'wowonder' || $_POST['page_name'] == 'sunshine' || $_POST['page_name'] == $wo['config']['theme']) ) {
             $_POST['page_name'] = "";
         }
-        if (!empty($_POST['page_id']) && Wo_CheckSession($hash_id) === true) {
+        if (!empty($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0 && Wo_CheckSession($hash_id) === true) {
             $PageData = Wo_PageData($_POST['page_id']);
             if (empty($_POST['page_name']) OR empty($_POST['page_category']) OR empty($_POST['page_title']) OR empty(Wo_Secure($_POST['page_title']))) {
                 $errors[] = $error_icon . $wo['lang']['please_check_details'];
@@ -296,7 +296,7 @@ if ($f == 'pages') {
         exit();
     }
     if ($s == 'delete_page') {
-        if (!empty($_POST['page_id']) && Wo_CheckSession($hash_id) === true) {
+        if (!empty($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0 && Wo_CheckSession($hash_id) === true) {
             if (!Wo_HashPassword($_POST['password'], $wo['user']['password']) && !Wo_CheckPageAdminPassword($_POST['password'], $_POST['page_id'])) {
                 $errors[] = $error_icon . $wo['lang']['current_password_mismatch'];
             }
@@ -415,7 +415,7 @@ if ($f == 'pages') {
         echo json_encode($data);
         exit();
     }
-    if ($s == 'rate_page' && isset($_POST['page_id']) && isset($_POST['val'])) {
+    if ($s == 'rate_page' && isset($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0 && isset($_POST['val'])) {
         $val  = Wo_Secure($_POST['val']);
         $id   = Wo_Secure($_POST['page_id']);
         $text = Wo_Secure($_POST['text']);

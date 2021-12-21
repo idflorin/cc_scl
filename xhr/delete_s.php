@@ -1,6 +1,6 @@
 <?php 
 if ($f == 'delete_s') {
-    if (!empty($_POST['id'])) {
+    if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
         $id = Wo_Secure($_POST['id']);
     }
     $check_session = $db->where('id', $id)->getOne(T_APP_SESSIONS);

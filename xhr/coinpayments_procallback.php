@@ -3,7 +3,7 @@ if ($f == 'coinpayments_procallback') {
     global $sqlConnect, $wo;
     $data  = array();
     $error = "";
-    if (!isset($_POST['user_id']) || empty($_POST['user_id']) || !isset($_POST['user_type']) || empty($_POST['user_type']) || !isset($_POST['amount1']) || !is_numeric($_POST['amount1']) || $_POST['amount1'] < 1) {
+    if (!isset($_POST['user_id']) || empty($_POST['user_id']) || !is_numeric($_POST['user_id']) || !isset($_POST['user_type']) || empty($_POST['user_type']) || !isset($_POST['amount1']) || !is_numeric($_POST['amount1']) || $_POST['amount1'] < 1) {
         $error = $error_icon . $wo['lang']['please_check_details'];
     }
     if (empty($error)) {

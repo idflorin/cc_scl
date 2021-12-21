@@ -6,7 +6,7 @@ $question_type = array('free_text_question','yes_no_question','multiple_choice_q
 if ($f == 'offer' && $wo['config']['offer_system'] == 1) {
 	$data['status'] = 400;
     if ($s == 'create_offer') {
-    	if (!empty($_POST['discount_type']) && in_array($_POST['discount_type'], $discount_type) && in_array($_POST['currency'], array_keys($wo['currencies'])) && !empty($_FILES["thumbnail"]) && !empty($_POST['page_id'])) {
+    	if (!empty($_POST['discount_type']) && in_array($_POST['discount_type'], $discount_type) && in_array($_POST['currency'], array_keys($wo['currencies'])) && !empty($_FILES["thumbnail"]) && !empty($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0) {
 
     		$page_data = $db->where('page_id',Wo_Secure($_POST['page_id']))->getOne(T_PAGES);
 
@@ -169,6 +169,8 @@ if ($f == 'offer' && $wo['config']['offer_system'] == 1) {
     	$html = '';
     	$data['status'] = 400;
     	if (!empty($wo['offer'])) {
+    		$wo['offer']['description']  = Wo_EditMarkup($wo['offer']['description'],true,true,true);
+		    $wo['offer']['description']  = str_replace('<br>', "\n", $wo['offer']['description']);
     		$html = Wo_LoadPage('modals/edit_offer');
     		$data['status'] = 200;
     		$data['html'] = $html;

@@ -1,6 +1,6 @@
 <?php 
 if ($f == "update_user_password") {
-    if (isset($_POST['user_id']) && Wo_CheckSession($hash_id) === true) {
+    if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0 && Wo_CheckSession($hash_id) === true) {
         $Userdata = Wo_UserData($_POST['user_id']);
         if (!empty($Userdata['user_id'])) {
             if ($_POST['user_id'] != $wo['user']['user_id']) {

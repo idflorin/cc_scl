@@ -1,6 +1,6 @@
 <?php
 $limit  = 20;
-if (isset($_GET['limit']) && !empty($_GET['limit'])) {
+if (isset($_GET['limit']) && !empty($_GET['limit']) && is_numeric($_GET['limit']) && $_GET['limit'] > 0) {
     $limit = Wo_Secure($_GET['limit']);
 }
 if (!is_numeric($limit)) {

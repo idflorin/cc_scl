@@ -3,7 +3,7 @@ if ($f == 'coinpayments_callback_donate') {
     global $sqlConnect, $wo;
     $data  = array();
     $error = "";
-    if (!isset($_POST['user_id']) || empty($_POST['user_id']) || !isset($_POST['amountf']) || !is_numeric($_POST['amountf']) || $_POST['amountf'] < 1) {
+    if (!isset($_POST['user_id']) || empty($_POST['user_id']) || !is_numeric($_POST['user_id']) || !isset($_POST['amountf']) || !is_numeric($_POST['amountf']) || $_POST['amountf'] < 1) {
         $error = $error_icon . $wo['lang']['please_check_details'];
     }
     if (empty($error)) {

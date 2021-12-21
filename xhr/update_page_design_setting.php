@@ -1,6 +1,6 @@
 <?php 
 if ($f == 'update_page_design_setting') {
-    if (isset($_POST['page_id']) && Wo_CheckSession($hash_id) === true) {
+    if (isset($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0 && Wo_CheckSession($hash_id) === true) {
         $Userdata = Wo_PageData($_POST['page_id']);
         if (!empty($Userdata['id'])) {
             $background_image_status = 0;

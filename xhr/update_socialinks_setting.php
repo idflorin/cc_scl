@@ -1,6 +1,6 @@
 <?php 
 if ($f == "update_socialinks_setting") {
-    if (isset($_POST['user_id']) && Wo_CheckSession($hash_id) === true) {
+    if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0 && Wo_CheckSession($hash_id) === true) {
         $Userdata = Wo_UserData($_POST['user_id']);
         if (!empty($Userdata['user_id'])) {
             if (empty($errors)) {

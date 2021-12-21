@@ -37,7 +37,77 @@ if ($f == 'posts') {
                 echo json_encode($output);
                 exit();
             }
-        } else if (isset($_POST["url"])) {
+        }
+        elseif (preg_match("/(http|https):\/\/twitter\.com\/[a-zA-Z0-9_]+\/status\/[0-9]+/", $_POST['url'])) {
+            $tweet_url = Wo_Secure($_POST['url']);
+            $tweeturl  = 'https://publish.twitter.com/oembed?url=' . $tweet_url;
+            $api_request = @file_get_contents($tweeturl);
+            $thumbnail     = '';
+            if (!empty($api_request)) {
+                $json_decode = json_decode($api_request);
+                $title       = $json_decode->author_name;
+                $description = $json_decode->html;
+                $output = array(
+                    'title' => $title,
+                    'images' => array(
+                        $thumbnail
+                    ),
+                    'content' => $description,
+                    'url' => $_POST["url"],
+                    'tweet' => 'yes'
+                );
+                echo json_encode($output);
+                exit();
+            }
+
+        } 
+        elseif (preg_match("/(http|https):\/\/www.tiktok\.com\/(.*)\/video\/(.*)+/", $_POST['url'])) {
+            $tiktok_url = Wo_Secure($_POST['url']);
+            $tiktok_url  = 'https://www.tiktok.com/oembed?url=' . $tiktok_url;
+            $api_request = @file_get_contents($tiktok_url);
+            $thumbnail     = '';
+            if (!empty($api_request)) {
+                $json_decode = json_decode($api_request);
+                $title       = $json_decode->author_name;
+                $description = $json_decode->html;
+                $output = array(
+                    'title' => $title,
+                    'images' => array(
+                        $thumbnail
+                    ),
+                    'content' => $description,
+                    'url' => $_POST["url"],
+                    'tweet' => 'yes'
+                );
+                echo json_encode($output);
+                exit();
+            }
+
+        }
+        elseif (preg_match("/^(http:\/\/|https:\/\/|www\.).*(\.mp4)$/", $_POST['url'])) {
+            $thumbnail     = '';
+            $title       = '';
+            $description = '';
+            $wo['media'] = array('storyId' => 0,
+                                 'filename' => $_POST["url"],
+                                 'video_thumb' => '');
+            $wo['wo_ad_id'] = '';
+            $wo['rvad_con'] = '';
+            $description  = Wo_LoadPage('players/video');
+            $output = array(
+                'title' => $title,
+                'images' => array(
+                    $thumbnail
+                ),
+                'content' => $description,
+                'url' => $_POST["url"],
+                'mp4' => 'yes'
+            );
+            echo json_encode($output);
+            exit();
+
+        }
+        else if (isset($_POST["url"])) {
             $page_title = '';
             $image_urls = array();
             $page_body  = '';
@@ -328,6 +398,32 @@ if ($f == 'posts') {
             if (!empty($_POST['url_image'])) {
                 $import_url_image = @Wo_ImportImageFromUrl($_POST['url_image']);
             }
+            if (preg_match("/(http|https):\/\/twitter\.com\/[a-zA-Z0-9_]+\/status\/[0-9]+/", $_POST['url_link'])) {
+                $url_content = '';
+                $import_url_image = '';
+                $url_title = '';
+                $tweet_url = Wo_Secure($_POST['url_link']);
+                $tweeturl  = 'https://publish.twitter.com/oembed?url=' . $tweet_url;
+                $api_request = @file_get_contents($tweeturl);
+                if (!empty($api_request)) {
+                    $json_decode = json_decode($api_request);
+                    $url_title       = $json_decode->author_name;
+                    $url_content = $json_decode->html;
+                }
+            }
+            elseif (preg_match("/(http|https):\/\/www.tiktok\.com\/(.*)\/video\/(.*)+/", $_POST['url_link'])) {
+                $tiktok_url = Wo_Secure($_POST['url_link']);
+                $tiktok_url  = 'https://www.tiktok.com/oembed?url=' . $tiktok_url;
+                $api_request = @file_get_contents($tiktok_url);
+                $url_content = '';
+                $import_url_image = '';
+                $url_title = '';
+                if (!empty($api_request)) {
+                    $json_decode = json_decode($api_request);
+                    $url_title       = $json_decode->author_name;
+                    $url_content = $json_decode->html;
+                }
+            }
         }
         $post_text = '';
         $post_map  = '';
@@ -447,6 +543,12 @@ if ($f == 'posts') {
                 'multi_image_post' => 0,
                 'active' => $post_active
             );
+            $post_data['send_notify'] = '';
+            if ($wo['config']['notify_new_post'] == 1) {
+                if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && empty($wo['story']['event_id']) && $wo['story']['postPrivacy'] < 3) {
+                    $post_data['send_notify'] = time();
+                }
+            }
             if (isset($_POST['postSticker']) && Wo_IsUrl($_POST['postSticker']) && empty($_FILES) && empty($_POST['postRecord'])) {
                 $headers = get_headers($_POST['postSticker'], 1);
                 if (strpos($headers['Content-Type'], 'image/') !== false) {
@@ -526,24 +628,32 @@ if ($f == 'posts') {
                         'invalid_file' => $invalid_file,
                         'post_count' => (!empty($wo['story']['publisher']['details']) ? $wo['story']['publisher']['details']['post_count'] : 0)
                     );
-                    Wo_RunInBackground($data);
+                    $data['send_notify'] = 'no';
+                    $data['post_id'] = $wo['story']['id'];
                     if ($wo['config']['notify_new_post'] == 1) {
                         if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && empty($wo['story']['event_id']) && $wo['story']['postPrivacy'] < 3) {
-                            $post_id = $wo['story']['id'];
-                            $users = Wo_GetFollowNotifyUsers($wo['user']['user_id']);
-                            if (!empty($users)) {
-                                foreach ($users as $key => $value) {
-                                    $notification_data_array = array(
-                                        'recipient_id' => $value,
-                                        'type' => 'new_post',
-                                        'post_id' => $post_id,
-                                        'url' => 'index.php?link1=post&id=' . $post_id
-                                    );
-                                    Wo_RegisterNotification($notification_data_array);
-                                }
-                            }
+                            $data['send_notify'] = 'yes';
                         }
                     }
+
+                    Wo_RunInBackground($data);
+                    // if ($wo['config']['notify_new_post'] == 1) {
+                    //     if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && empty($wo['story']['event_id']) && $wo['story']['postPrivacy'] < 3) {
+                    //         $post_id = $wo['story']['id'];
+                    //         $users = Wo_GetFollowNotifyUsers($wo['user']['user_id']);
+                    //         if (!empty($users)) {
+                    //             foreach ($users as $key => $value) {
+                    //                 $notification_data_array = array(
+                    //                     'recipient_id' => $value,
+                    //                     'type' => 'new_post',
+                    //                     'post_id' => $post_id,
+                    //                     'url' => 'index.php?link1=post&id=' . $post_id
+                    //                 );
+                    //                 Wo_RegisterNotification($notification_data_array);
+                    //             }
+                    //         }
+                    //     }
+                    // }
                 } 
             } else {
                 $data = array(
@@ -560,6 +670,36 @@ if ($f == 'posts') {
             ));
             exit();
         }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'send_notify' && Wo_CheckMainSession($hash_id) === true) {
+        if (!empty($_POST['post_id']) && is_numeric($_POST['post_id']) && $_POST['post_id'] > 0) {
+            Wo_RunInBackground(array('status' => 200));
+            $wo['story'] = $db->where('id',Wo_Secure($_POST['post_id']))->where('user_id',$wo['user']['id'])->getOne(T_POSTS);
+            if ($wo['config']['notify_new_post'] == 1 && !empty($wo['story']->send_notify)) {
+                if (empty($wo['story']->page_id) && empty($wo['story']->group_id) && empty($wo['story']->event_id) && $wo['story']->postPrivacy < 3) {
+                    $post_id = $wo['story']->id;
+                    $db->where('id',$post_id)->update(T_POSTS,array('send_notify' => ''));
+                    $users = Wo_GetFollowNotifyUsers($wo['user']['user_id']);
+                    if (!empty($users)) {
+                        foreach ($users as $key => $value) {
+                            $notification_data_array = array(
+                                'recipient_id' => $value,
+                                'type' => 'new_post',
+                                'post_id' => $post_id,
+                                'url' => 'index.php?link1=post&id=' . $post_id
+                            );
+                            Wo_RegisterNotification($notification_data_array);
+                        }
+                    }
+                }
+            }
+        }
+        $data = array(
+            'status' => 200
+        );
         header("Content-type: application/json");
         echo json_encode($data);
         exit();

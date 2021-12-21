@@ -1,6 +1,6 @@
 <?php 
 if ($f == "update_notifications_settings") {
-    if (isset($_POST['user_id']) && Wo_CheckSession($hash_id) === true) {
+    if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0 && Wo_CheckSession($hash_id) === true) {
         $e_liked             = 0;
         $e_shared            = 0;
         $e_wondered          = 0;

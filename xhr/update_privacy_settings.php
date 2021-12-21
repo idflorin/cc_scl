@@ -1,6 +1,6 @@
 <?php 
 if ($f == "update_privacy_settings") {
-    if (isset($_POST['user_id']) && Wo_CheckSession($hash_id) === true) {
+    if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0 && Wo_CheckSession($hash_id) === true) {
         $message_privacy         = 0;
         $follow_privacy          = 0;
         $post_privacy            = 'ifollow';

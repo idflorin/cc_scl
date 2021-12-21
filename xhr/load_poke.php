@@ -2,7 +2,7 @@
 if ($f == 'load_poke') {
     $data['status'] = 400;
     $data['html'] = '';
-    if (!empty($_POST['id'])) {
+    if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
         $user_id       = Wo_Secure($wo['user']['user_id']);
         $id            = Wo_Secure($_POST['id']);
         $html = '';

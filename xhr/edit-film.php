@@ -1,7 +1,7 @@
 <?php 
 if ($f == "edit-film") {
     if (Wo_IsAdmin() || Wo_IsModerator()) {
-        if (empty($_POST['name']) || empty($_POST['description']) || empty($_POST['id'])) {
+        if (empty($_POST['name']) || empty($_POST['description']) || empty($_POST['id']) || !is_numeric($_POST['id'])) {
             $error = $error_icon . $wo['lang']['please_check_details'];
         } else {
             if (strlen($_POST['name']) < 3) {

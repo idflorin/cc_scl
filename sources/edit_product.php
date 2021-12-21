@@ -7,7 +7,7 @@ if ($wo['config']['classified'] == 0) {
   header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
   exit();
 }
-if (empty($_GET['id'])) {
+if (empty($_GET['id']) || !is_numeric($_GET['id'])) {
 	header("Location: " . Wo_SeoLink('index.php?link1=home'));
     exit();
 }

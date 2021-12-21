@@ -1,7 +1,7 @@
 <?php 
 if ($f == "add-blog-commreply") {
     $html = "";
-    if (isset($_POST['text']) && isset($_POST['c_id']) && is_numeric(($_POST['c_id'])) && strlen($_POST['text']) > 2 && isset($_POST['b_id']) && is_numeric($_POST['b_id'])) {
+    if (isset($_POST['text']) && isset($_POST['c_id']) && is_numeric(($_POST['c_id'])) && strlen($_POST['text']) > 2 && isset($_POST['b_id']) && is_numeric($_POST['b_id']) && $_POST['b_id'] > 0) {
         $registration_data = array(
             'comm_id' => Wo_Secure($_POST['c_id']),
             'blog_id' => Wo_Secure($_POST['b_id']),

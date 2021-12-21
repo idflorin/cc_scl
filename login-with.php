@@ -141,7 +141,7 @@ if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
                     if (!empty($wo['config']['auto_group_join'])) {
                         Wo_AutoGroupJoin($user_id);
                     }
-                    if (!empty($user_profile->photoURL) && $imported_image != $wo['userDefaultAvatar']) {
+                    if (!empty($user_profile->photoURL) && $imported_image != $wo['userDefaultAvatar'] && $imported_image != $wo['userDefaultFAvatar']) {
                         $explode2  = @end(explode('.', $imported_image));
                         $explode3  = @explode('.', $imported_image);
                         $last_file = $explode3[0] . '_full.' . $explode2;

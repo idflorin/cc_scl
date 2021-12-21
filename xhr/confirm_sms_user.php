@@ -1,6 +1,6 @@
 <?php 
 if ($f == 'confirm_sms_user') {
-    if (!empty($_POST['confirm_code']) && !empty($_POST['user_id'])) {
+    if (!empty($_POST['confirm_code']) && !empty($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0) {
         $confirm_code = $_POST['confirm_code'];
         $user_id      = $_POST['user_id'];
         if (empty($_POST['confirm_code'])) {

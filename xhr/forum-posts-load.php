@@ -1,8 +1,8 @@
 <?php 
 if ($f == "forum-posts-load" && Wo_CheckMainSession($hash_id) === true) {
     $html    = '';
-    $fid     = (isset($_GET['forum'])) ? $_GET['forum'] : false;
-    $offset  = (isset($_GET['offset'])) ? $_GET['offset'] : false;
+    $fid     = (isset($_GET['forum']) && is_numeric($_GET['forum']) && $_GET['forum'] > 0) ? $_GET['forum'] : false;
+    $offset  = (isset($_GET['offset']) && is_numeric($_GET['offset']) && $_GET['offset'] > 0) ? $_GET['offset'] : false;
     $threads = Wo_GetForumThreads(array(
         "forum" => $fid,
         "offset" => $offset

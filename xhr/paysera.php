@@ -42,7 +42,7 @@ if ($f == 'paysera') {
 		    	}
 		    }
 		    if ($type == 'fund') {
-		    	if (!empty($_POST['amount']) && is_numeric($_POST['amount']) && $_POST['amount'] > 0 && !empty($_POST['fund_id'])) {
+		    	if (!empty($_POST['amount']) && is_numeric($_POST['amount']) && $_POST['amount'] > 0 && !empty($_POST['fund_id']) && is_numeric($_POST['fund_id']) && $_POST['fund_id'] > 0) {
 		    		$fund_id = Wo_Secure($_POST['fund_id']);
 					$fund = $db->where('id',$fund_id)->getOne(T_FUNDING);
 					if (!empty($fund)) {

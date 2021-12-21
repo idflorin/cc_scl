@@ -878,6 +878,9 @@ $(function () {
           $('#posts, #posts_hashtag').find('.posts-container').remove();
         }
         $('#posts, #posts_hashtag').prepend(data.html);
+        if (data.send_notify && data.send_notify == 'yes' && data.post_id) {
+        	$.post(Wo_Ajax_Requests_File() + '?f=posts&s=send_notify', {post_id: data.post_id}, function(data, textStatus, xhr) {});
+        }
         $('#video-form, #emo-form, #music-form, #map-form, #file-form, #photo-form, #album-form, .feeling-type, #poll-form, #gif-form').slideUp(200);
         $(".video-poster-image").hide(10, function() {
           $(this).find('.preview').show(10);
@@ -1054,6 +1057,12 @@ $(function () {
             }
 
             var content = '<div class="extracted_url"><span class="remove-fetched-url" onclick="Wo_RemoveFetchedUrl();"><i class="fa fa-remove"></i></span>'+ inc_image +'<div class="extracted_content"><input class="form-control url-input" type="text" name="url_title" value="'+data.title+'" dir="auto"><br><textarea onkeyup="textAreaAdjust(this, 70)" class="form-control url-input-textarea url-input" name="url_content" placeholder="<?php echo $wo['lang']['description']?>" dir="auto">' + data.content + '</textarea><input type="hidden" id="url_image" name="url_image" value="'+ input_image +'"><input type="hidden" id="url_link" name="url_link" value="'+data.url+'"><div class="clear"></div>' + img_content;
+            if (data.tweet && data.tweet == 'yes') {
+            	var content = '<div class="extracted_url"><span class="remove-fetched-url" onclick="Wo_RemoveFetchedUrl();"><i class="fa fa-remove"></i></span>'+ inc_image +'<div class="extracted_content"><input class="form-control url-input hidden" type="text" name="url_title" value="'+data.title+'" dir="auto"><br><textarea onkeyup="textAreaAdjust(this, 70)" class="form-control url-input-textarea url-input hidden" name="url_content" placeholder="<?php echo $wo['lang']['description']?>" dir="auto">' + data.content + '</textarea><input type="hidden" id="url_image" name="url_image" value="'+ input_image +'"><input type="hidden" id="url_link" name="url_link" value="'+data.url+'"><div class="clear"></div>' + img_content+data.content;
+            }
+            if (data.mp4 && data.mp4 == 'yes') {
+            	var content = '<div class="extracted_url"><span class="remove-fetched-url" onclick="Wo_RemoveFetchedUrl();"><i class="fa fa-remove"></i></span>'+data.content+'<div class="clear"><input type="hidden" id="url_link" name="url_link" value="'+data.url+'"><input class="form-control url-input hidden" type="text" name="url_title" value="mp4" dir="auto"></div>';
+            }
 
             $("#results").html(content); 
             $("#results").fadeIn(); 

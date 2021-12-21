@@ -7,7 +7,7 @@ if ($wo['loggedin'] == false) {
 	  header("Location: " . $wo['config']['site_url']);
 	  exit();
 }
-if (empty($_GET['id'])) {
+if (empty($_GET['id']) || !is_numeric($_GET['id'])) {
 	  header("Location: " . $wo['config']['site_url']);
 	  exit();
 }
