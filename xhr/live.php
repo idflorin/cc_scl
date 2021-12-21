@@ -219,4 +219,33 @@ if ($f == 'live') {
             }
         }
     }
+    if ($s == 'create_thumb') {
+        if (!empty($_POST['post_id']) && is_numeric($_POST['post_id']) && $_POST['post_id'] > 0 && !empty($_FILES['thumb'])) {
+            $is_post = $db->where('post_id',Wo_Secure($_POST['post_id']))->where('user_id',$wo['user']['id'])->getValue(T_POSTS,'COUNT(*)');
+            if ($is_post > 0) {
+                $fileInfo = array(
+                    'file' => $_FILES["thumb"]["tmp_name"],
+                    'name' => $_FILES['thumb']['name'],
+                    'size' => $_FILES["thumb"]["size"],
+                    'type' => $_FILES["thumb"]["type"],
+                    'types' => 'jpeg,png,jpg,gif',
+                    'crop' => array(
+                        'width' => 525,
+                        'height' => 295
+                    )
+                );
+                $media    = Wo_ShareFile($fileInfo);
+                if (!empty($media)) {
+                    $thumb = $media['filename'];
+                    if (!empty($thumb)) {
+                        $db->where('post_id',Wo_Secure($_POST['post_id']))->where('user_id',$wo['user']['id'])->update(T_POSTS,array('postFileThumb' => $thumb));
+                        $data['status'] = 200;
+                        header("Content-type: application/json");
+                        echo json_encode($data);
+                        exit();
+                    }
+                }
+            }
+        }
+    }
 }

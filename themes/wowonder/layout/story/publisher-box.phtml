@@ -921,6 +921,15 @@ $(function () {
             $("#approve_post").modal('hide');
           },3000);
         }
+        else{
+        	if (data.errors && data.errors != '') {
+        		$("#error_post").modal('show');
+        		$('#error_post_text').text(data.errors);
+		        Wo_Delay(function(){
+		            $("#error_post").modal('hide');
+		        },3000);
+        	}
+        }
       } 
       else if (data.status == 400) {
         if (data.invalid_file == 1) {
@@ -948,6 +957,13 @@ $(function () {
           },3000);
         }
         else{
+        	if (data.errors && data.errors != '') {
+        		$("#error_post").modal('show');
+        		$('#error_post_text').text(data.errors);
+		        Wo_Delay(function(){
+		            $("#error_post").modal('hide');
+		        },3000);
+        	}
          // alert('Foramt is not supported, please try again later');
         }
       } 
@@ -1188,6 +1204,7 @@ $(document).on('focus', '#publisher-box-focus',function(){
 $('#focus-overlay').on('click',function (){
     $("body").removeClass('pub-focus');
 	Wo_HidePosInfo();
+	$('#video-form, #emo-form, #music-form, #map-form, #file-form, #photo-form, #album-form, .feeling-type, #poll-form, #gif-form').slideUp(200);
 	$('.all_colors').hide();
 	$('.wo_pub_txtara_combo').css("cssText", "");
 	$('.postText').css("cssText", "");

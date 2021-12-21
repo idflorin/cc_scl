@@ -156,6 +156,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 
 		    		if (!empty($post_id)) {
 		    			$post = Wo_PostData($post_id);
+		    			if (!empty($post['job']) && !empty($post['job']['image'])) {
+		    				$post['job']['image'] = Wo_GetMedia($post['job']['image']);
+		    			}
 		    			$response_data = array(
                                     'api_status' => 200,
                                     'data' => $post
@@ -432,6 +435,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 	        	foreach ($non_allowed as $key4 => $value4) {
                   unset($page_jobs[$key]['user_data'][$value4]);
                 }
+                $page_jobs[$key]['job']['image'] = Wo_GetMedia($page_jobs[$key]['job']['image']);
 	        }
 
 	        $response_data = array(

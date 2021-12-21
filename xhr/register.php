@@ -117,6 +117,9 @@ if ($f == 'register') {
             'active' => Wo_Secure($activate),
             'birthday' => '0000-00-00'
         );
+        if ($gender == 'female') {
+            $re_data['avatar'] = "upload/photos/f-avatar.jpg";
+        }
         if (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 0) {
             $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
             if (!empty($ref_user_id) && is_numeric($ref_user_id)) {

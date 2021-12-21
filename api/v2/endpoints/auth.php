@@ -29,11 +29,17 @@ if (empty($error_code)) {
     if (empty($recipient_data)) {
         $error_code    = 4;
         $error_message = 'Username not found';
+    }elseif ($wo['config']['prevent_system'] == 1 && !WoCanLogin()) {
+        $error_code    = 6;
+        $error_message = 'Too many login attempts please try again later';
     } else {
         $login = Wo_Login($username, $password);
         if (!$login) {
             $error_code    = 5;
             $error_message = 'Password is incorrect';
+            if ($wo['config']['prevent_system'] == 1) {
+                WoAddBadLoginLog();
+            }
         } else {
             if (Wo_TwoFactor($_POST['username']) != false) {
                 $time           = time();
@@ -80,6 +86,13 @@ if (empty($error_code)) {
                                     'message' => 'Please enter your confirmation code',
                                     'user_id' => $user_id
                                 );
+            }
+
+            if (!empty($response_data)) {
+                $response_data['membership'] = false;
+                if ($wo['config']['membership_system'] == 1 && $recipient_data['is_pro'] == 0) {
+                    $response_data['membership'] = true;
+                }
             }
         }
     }

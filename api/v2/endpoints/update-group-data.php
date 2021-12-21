@@ -87,6 +87,38 @@ if (empty($error_code)) {
                     $group_data['join_privacy'] = $_POST['join_privacy'];
                 }
             }
+
+            $group_data['sub_category'] = '';
+	        if (!empty($_POST['group_sub_category']) && !empty($wo['group_sub_categories'][$_POST['category']])) {
+	            foreach ($wo['group_sub_categories'][$_POST['category']] as $key => $value) {
+	                if ($value['id'] == $_POST['group_sub_category']) {
+	                    $group_data['sub_category'] = $value['id'];
+	                }
+	            }
+	        }
+	        unset($group_data['group_sub_category']);
+
+	        $fields = Wo_GetCustomFields('group'); 
+	        if (!empty($fields)) {
+	            foreach ($fields as $key => $field) {
+	                if ($field['required'] == 'on' && empty($_POST['fid_'.$field['id']])) {
+	                    $response_data       = array(
+	                        'api_status'     => '404',
+	                        'errors'         => array(
+	                            'error_id'   => 7,
+	                            'error_text' => 'please check details required field'
+	                        )
+	                    );
+	                    echo json_encode($response_data, JSON_PRETTY_PRINT);
+	                    exit();
+	                }
+	                elseif (!empty($_POST['fid_'.$field['id']])) {
+	                    $group_data['fid_'.$field['id']] = Wo_Secure($_POST['fid_'.$field['id']]);
+	                }
+	            }
+	        }
+
+
 			$update = Wo_UpdateGroupData($group['id'], $group_data);
 			if ($update) {
 				$response_data['api_status'] = 200;

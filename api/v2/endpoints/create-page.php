@@ -46,14 +46,45 @@ if (empty($error_code)) {
     }
     
     if (empty($error_code)) {
+        $sub_category = '';
+        if (!empty($_POST['page_sub_category']) && !empty($wo['page_sub_categories'][$_POST['page_category']])) {
+            foreach ($wo['page_sub_categories'][$_POST['page_category']] as $key => $value) {
+                if ($value['id'] == $_POST['page_sub_category']) {
+                    $sub_category = $value['id'];
+                }
+            }
+        }
+
     	$group_data  = array(
             'page_name' => $page_name,
             'user_id' => $wo['user']['user_id'],
             'page_title' => $page_title,
             'page_description' => $page_description,
             'page_category' => $page_category,
-            'active' => 1
+            'active' => 1,
+            'sub_category' => $sub_category
         );
+
+        $fields = Wo_GetCustomFields('page'); 
+        if (!empty($fields)) {
+            foreach ($fields as $key => $field) {
+                if ($field['required'] == 'on' && empty($_POST['fid_'.$field['id']])) {
+                    $response_data       = array(
+                        'api_status'     => '404',
+                        'errors'         => array(
+                            'error_id'   => 7,
+                            'error_text' => 'please check details required field'
+                        )
+                    );
+                    echo json_encode($response_data, JSON_PRETTY_PRINT);
+                    exit();
+                }
+                elseif (!empty($_POST['fid_'.$field['id']])) {
+                    $group_data['fid_'.$field['id']] = Wo_Secure($_POST['fid_'.$field['id']]);
+                }
+            }
+        }
+
         $register_group    = Wo_RegisterPage($group_data);
         if ($register_group) {
             $response_data = array(

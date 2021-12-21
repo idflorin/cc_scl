@@ -34,6 +34,7 @@ foreach ($get_all_stories as $key => $one_story) {
             $story['thumbnail'] = $story['user_data']['avatar'];
         }
         $story['time_text'] = Wo_Time_Elapsed_String($story['posted']);
+        $story['view_count'] = $db->where('story_id',$story['id'])->where('user_id',$story['user_id'],'!=')->getValue(T_STORY_SEEN,'COUNT(*)');
         $user_data['stories'][] = $story;
     }
     $data_array[] = $user_data;

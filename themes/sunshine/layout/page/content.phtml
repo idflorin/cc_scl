@@ -77,33 +77,35 @@
 				</div>
 			</div>
 
-			<div class="col-sm-5 col-md-5 last_row">
+			<div class="col-sm-5 col-md-5 last_row wow_sun_page_info">
 				<div class="row sun_simp_info">
-					<div class="col-md-3 col-sm-4">
+					<div class="<?php if (!empty($wo['page_profile']['page_sub_category'])) { ?>col-md-4<?php } else { ?>col-md-3<?php } ?> col-sm-4">
 						<span class="p-mata-tag"><?php echo $wo['lang']['category']; ?></span>
 					</div>
-					<div class="col-md-9 col-sm-8"><span><?php echo $wo['page_profile']['category']; ?></span></div>
-					<?php if (!empty($wo['page_profile']['page_sub_category'])) { ?>
-					<div class="col-md-4 col-sm-4">
-						<span class="p-mata-tag"><?php echo $wo['lang']['sub_category']; ?></span>
-					</div>
-					<div class="col-md-8 col-sm-8"><span><?php echo $wo['page_profile']['page_sub_category']; ?></span></div>
-					<?php } ?>
+					<div class="<?php if (!empty($wo['page_profile']['page_sub_category'])) { ?>col-md-8<?php } else { ?>col-md-9<?php } ?> col-sm-8"><span><?php echo $wo['page_profile']['category']; ?></span></div>
 				</div>
+				<?php if (!empty($wo['page_profile']['page_sub_category'])) { ?>
+					<div class="row sun_simp_info">
+						<div class="col-md-4 col-sm-4">
+							<span class="p-mata-tag"><?php echo $wo['lang']['sub_category']; ?></span>
+						</div>
+						<div class="col-md-8 col-sm-8"><span><?php echo $wo['page_profile']['page_sub_category']; ?></span></div>
+					</div>
+				<?php } ?>
 				<?php  if(!empty($wo['page_profile']['phone'])) {  ?>
 					<div class="row sun_simp_info">
-						<div class="col-md-3 col-sm-4">
+						<div class="<?php if (!empty($wo['page_profile']['page_sub_category'])) { ?>col-md-4<?php } else { ?>col-md-3<?php } ?> col-sm-4">
 							<span class="p-mata-tag"><?php echo $wo['lang']['phone_number']; ?></span>
 						</div>
-						<div class="col-md-9 col-sm-8"><span><?php echo $wo['page_profile']['phone']; ?></span></div>
+						<div class="<?php if (!empty($wo['page_profile']['page_sub_category'])) { ?>col-md-8<?php } else { ?>col-md-9<?php } ?> col-sm-8"><span><?php echo $wo['page_profile']['phone']; ?></span></div>
 					</div>
 				<?php  }  ?>
 				<?php if(!empty($wo['page_profile']['website'])) {  ?>
 					<div class="row sun_simp_info">
-						<div class="col-md-3 col-sm-4">
+						<div class="<?php if (!empty($wo['page_profile']['page_sub_category'])) { ?>col-md-4<?php } else { ?>col-md-3<?php } ?> col-sm-4">
 							<span class="p-mata-tag"><?php echo $wo['lang']['website']; ?></span>
 						</div>
-						<div class="col-md-9 col-sm-8">
+						<div class="<?php if (!empty($wo['page_profile']['page_sub_category'])) { ?>col-md-8<?php } else { ?>col-md-9<?php } ?> col-sm-8">
 							<span><a href="<?php echo $wo['page_profile']['website']?>" target="_blank"><?php echo $wo['page_profile']['website']?></a></span>
 						</div>
 					</div>

@@ -6,5 +6,10 @@
 	</video>
 </div>  
 <script>
-	videojs(document.getElementById('video--<?php echo $wo['media']['storyId'];?>'), {}, function() {});
+fluidPlayer('video--<?php echo $wo['media']['storyId'];?>', {
+    layoutControls: {
+        primaryColor:           "<?php echo $wo['config']['btn_background_color'];?>",
+        fillToContainer: true,
+    }
+});
 </script>

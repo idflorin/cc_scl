@@ -53,6 +53,23 @@
 					echo Wo_LoadPage('story/publisher-box');
 				} 
 			?>
+			
+			<?php if (Wo_IsMobile() == true) { ?>
+			<?php if ($wo['config']['order_posts_by'] == 0) { ?>
+				<div class="order-by"> 
+					<div class="dropdown">
+						<?php echo $wo['lang']['store_posts_by'] ?>: <a class="dropdown-toggle" type="button" data-toggle="dropdown">
+						<span class="order-text"><?php echo ($wo['user']['order_posts_by'] == 0) ? $wo['lang']['all'] : $wo['lang']['people_i_follow']; ?></span>
+						<span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="#" onclick="Wo_StorePosts(0);"><?php echo $wo['lang']['all'] ?></a></li>
+							<li><a href="#" onclick="Wo_StorePosts(1);"><?php echo $wo['lang']['people_i_follow'] ?></a></li>
+						</ul>
+					</div>
+				</div>
+			<?php } ?>
+			<?php } ?>
+			
 			<?php if ($wo['config']['afternoon_system'] == 1) { ?>
 			<div class="alert alert-dismissible greetalert hidden" role="alert">
 				<button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="setCookie('day_status', '1', 3);"><span aria-hidden="true">&times;</span></button>
@@ -212,6 +229,25 @@ function loadposts() {
     });
   });
 
+<?php } ?>
+
+<?php if (Wo_IsMobile() == true) { ?>
+function Wo_StorePosts(type) {
+  if (type > 1) {
+     return false;
+  }
+  if (type == 0) {
+    $('.order-text').text('<?php echo $wo['lang']['all'] ?>');
+  } else {
+    $('.order-text').text('<?php echo $wo['lang']['people_i_follow'] ?>');
+  }
+  $('#posts-laoded').html('<div class="wo_loading_post"><div class="wo_loading_post_child"></div></div>');
+  $.get(Wo_Ajax_Requests_File() + '?f=update_order_by', {type:type}, function (data) {
+    if (data.status == 200) {
+      loadposts();
+    }
+  });
+}
 <?php } ?>
 
 function Wo_ViewAnnouncement(id) {

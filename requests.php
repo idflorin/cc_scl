@@ -70,7 +70,9 @@ $non_login_array = array(
     'get_previous_image',
     'load-blogs',
     'load-recent-blogs',
-    'get_no_posts_name'
+    'get_no_posts_name',
+    'search-blog-read',
+    'search-blog'
 );
 if ($wo['config']['membership_system'] == 1) {
     $non_login_array[] = 'pro_register';

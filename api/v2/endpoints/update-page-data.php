@@ -158,6 +158,36 @@ if (empty($error_code)) {
                 }
             }
 
+            $page_data['sub_category'] = '';
+            if (!empty($_POST['page_sub_category']) && !empty($wo['page_sub_categories'][$_POST['page_category']])) {
+                foreach ($wo['page_sub_categories'][$_POST['page_category']] as $key => $value) {
+                    if ($value['id'] == $_POST['page_sub_category']) {
+                        $page_data['sub_category'] = $value['id'];
+                    }
+                }
+            }
+            unset($page_data['page_sub_category']);
+            
+            $fields = Wo_GetCustomFields('page'); 
+            if (!empty($fields)) {
+                foreach ($fields as $key => $field) {
+                    if ($field['required'] == 'on' && empty($_POST['fid_'.$field['id']])) {
+                        $response_data       = array(
+                            'api_status'     => '404',
+                            'errors'         => array(
+                                'error_id'   => 7,
+                                'error_text' => 'please check details required field'
+                            )
+                        );
+                        echo json_encode($response_data, JSON_PRETTY_PRINT);
+                        exit();
+                    }
+                    elseif (!empty($_POST['fid_'.$field['id']])) {
+                        $page_data['fid_'.$field['id']] = Wo_Secure($_POST['fid_'.$field['id']]);
+                    }
+                }
+            }
+
 
 			$update = Wo_UpdatePageData($page['page_id'], $page_data);
 			if ($update) {

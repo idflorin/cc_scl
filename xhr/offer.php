@@ -114,6 +114,7 @@ if ($f == 'offer' && $wo['config']['offer_system'] == 1) {
 	    		                                          'page_id' => $page_data->page_id,
 	    		                                          'user_id' => $wo['user']['id'],
 	    		                                          'image' => $media['filename'],
+	    		                                          'currency' => Wo_Secure($_POST['currency']),
 	    		                                          'time' => time()));
                     $description = mb_substr(Wo_Secure($_POST['description']),0,175,"UTF-8") . "...";
 	    			$post_id = $db->insert(T_POSTS,array('page_id' => $page_data->page_id,

@@ -208,6 +208,15 @@ function Wo_GetProduct($id = 0) {
             }
         }
     }
+    $fetched_data['fields'] = array();
+    $fields = Wo_GetCustomFields('product'); 
+    if (!empty($fields)) {
+        foreach ($fields as $key => $field) {
+            if (in_array($field['fid'], array_keys($fetched_data)) ) {
+                $fetched_data['fields'][$field['fid']] = $fetched_data[$field['fid']];
+            }
+        }
+    }
     return $fetched_data;
 }
 function Wo_DeleteProductImage($id)
@@ -3481,7 +3490,7 @@ function Wo_GetMovieComments($args = array()) {
     $query_one = '';
     $data      = array();
     if ($offset > 0) {
-        $query_one .= " AND `id` > {$offset} AND `id` <> {$offset} ";
+        $query_one .= " AND `id` < {$offset} AND `id` <> {$offset} ";
     }
     if ($id && $id > 0 && is_numeric($id)) {
         $query_one .= " AND `id` = '$id' ";
@@ -3494,7 +3503,7 @@ function Wo_GetMovieComments($args = array()) {
         $limit = Wo_Secure($args['limit']);
         $limit = " LIMIT $limit ";
     }
-    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_MOVIE_COMMS . " WHERE `id` > 0 {$query_one} ORDER BY `id` ASC $limit");
+    $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_MOVIE_COMMS . " WHERE `id` > 0 {$query_one} ORDER BY `id` DESC $limit");
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $comment = Wo_GetMovieCommentData($fetched_data['id']);
         if ($comment && !empty($comment)) {
@@ -6978,6 +6987,7 @@ function Wo_GetOfferById($offer_id)
         $offer = (array) $offer;
         $offer['page'] = $page;
         $post = $db->where('offer_id',$offer_id)->getOne(T_POSTS);
+        $offer['post_id'] = $post->id;
         $offer['url'] = Wo_SeoLink('index.php?link1=post&id=' . $post->id);
     }
     return $offer;
@@ -7531,7 +7541,7 @@ function StartCloudRecording($vendor,$region,$bucket,$accessKey,$secretKey,$cnam
             "maxIdleTime":120,
             "transcodingConfig":{
                 "width":480,
-                "height":720,
+                "height":480,
                 "fps":24,
                 "bitrate":800,
                 "maxResolutionUid":"1",
@@ -7611,4 +7621,33 @@ function StopCloudRecording($data)
         $db->where('id',$post_id)->update(T_POSTS,array('postFile' => $data->serverResponse->fileList));
     }
     return true;
+}
+function GetVideoTime($first,$second)
+{
+    $first_date = new DateTime();
+    $first_date->setTimestamp($first);
+    $second_date = new DateTime();
+    $second_date->setTimestamp($second);
+    $difference = $first_date->diff($second_date);
+    $time = '00:';
+    $minuts = floor($difference->h * 60) + $difference->i;
+    $current_time = ($minuts*60)+$difference->s;
+
+    if ($minuts > 0) {
+        if ($minuts < 10) {
+            $time = '0'.$minuts.':';
+        }
+        else{
+            $time = $minuts.':';
+        }
+    }
+    $seconds_time = '00';
+    if ($difference->s < 10) {
+        $seconds_time = '0'.$difference->s;
+    }
+    else{
+        $seconds_time = $difference->s;
+    }
+    return array('time' => $time.$seconds_time,
+                 'current_time' => $current_time);
 }

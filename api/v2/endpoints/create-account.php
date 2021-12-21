@@ -83,6 +83,7 @@ if (empty($error_code)) {
         }
         $register     = Wo_RegisterUser($account_data);
         if ($register === true) {
+            
             if ($activate == 1) {
                 $access_token        = sha1(rand(111111111, 999999999)) . md5(microtime()) . rand(11111111, 99999999) . md5(rand(5555, 9999));
                 $time                = time();
@@ -142,6 +143,12 @@ if (empty($error_code)) {
             elseif ($wo['config']['sms_or_email'] == 'sms' && empty($_POST['phone_num'])) {
                 $error_code    = 12;
                 $error_message = 'phone_num can not be empty.';
+            }
+            if (!empty($response_data)) {
+                $response_data['membership'] = false;
+                if ($wo['config']['membership_system'] == 1) {
+                    $response_data['membership'] = true;
+                }
             }
         }
     }

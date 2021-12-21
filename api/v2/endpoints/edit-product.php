@@ -73,6 +73,16 @@ if (empty($error_code)) {
                 $currency = Wo_Secure($_POST['currency']);
             }
         }
+
+        $sub_category = '';
+        if (!empty($_POST['product_sub_category']) && !empty($wo['products_sub_categories'][$_POST['product_category']])) {
+            foreach ($wo['products_sub_categories'][$_POST['product_category']] as $key => $value) {
+                if ($value['id'] == $_POST['product_sub_category']) {
+                    $sub_category = $value['id'];
+                }
+            }
+        }
+
         $product_data_array = array(
             'name' => $product_title,
             'category' => $product_category,
@@ -81,9 +91,31 @@ if (empty($error_code)) {
             'location' => $product_location,
             'type' => $product_type,
             'currency' => $currency,
+            'sub_category' => $sub_category,
             'lat' => $lat,
             'lng' => $lng
         );
+
+        $fields = Wo_GetCustomFields('product'); 
+        if (!empty($fields)) {
+            foreach ($fields as $key => $field) {
+                if ($field['required'] == 'on' && empty($_POST['fid_'.$field['id']])) {
+                    $response_data       = array(
+                        'api_status'     => '404',
+                        'errors'         => array(
+                            'error_id'   => 7,
+                            'error_text' => 'please check details required field'
+                        )
+                    );
+                    echo json_encode($response_data, JSON_PRETTY_PRINT);
+                    exit();
+                }
+                elseif (!empty($_POST['fid_'.$field['id']])) {
+                    $product_data_array['fid_'.$field['id']] = Wo_Secure($_POST['fid_'.$field['id']]);
+                }
+            }
+        }
+
         $product_data       = Wo_UpdateProductData($_POST['product_id'], $product_data_array);
         $product_id         = $_POST['product_id'];
         $id = Wo_GetPostIDFromProdcutID($product_id);

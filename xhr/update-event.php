@@ -22,6 +22,36 @@ if ($f == "update-event") {
             if (empty($_POST['event-end-time'])) {
                 $error = $error_icon . $wo['lang']['please_check_details'];
             }
+            if (empty($error)) {
+                $date_start = explode('-', $_POST['event-start-date']);
+                $date_end = explode('-', $_POST['event-end-date']);
+                if ($date_start[0] < $date_end[0]) {
+                }
+                else{
+                    if ($date_start[0] > $date_end[0]) {
+                        $error = $error_icon . $wo['lang']['please_check_details'];
+                    }
+                    else{
+                        if ($date_start[1] < $date_end[1]) {
+                        }
+                        else{
+                            if ($date_start[1] > $date_end[1]) {
+                                $error = $error_icon . $wo['lang']['please_check_details'];
+                            }
+                            else{
+                                if ($date_start[2] < $date_end[2]) {
+
+                                }
+                                else{
+                                    if ($date_start[2] > $date_end[2]) {
+                                        $error = $error_icon . $wo['lang']['please_check_details'];
+                                    }
+                                }
+                            }
+                        }
+                    } 
+                }
+            }
         }
         if (empty($error) && isset($_GET['eid']) && is_numeric($_GET['eid'])) {
             $registration_data = array(

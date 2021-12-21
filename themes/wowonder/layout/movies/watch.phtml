@@ -338,7 +338,7 @@ $(document).ready(function(){
     .done(function(data) {
       if (data.status == 200) {
         $("#movies-comment").val('');
-        $(".movies-comlist-container").append(data.html);
+        $(".movies-comlist-container").prepend(data.html);
         $(".movies-com-top h4 span").text(data.comments);
       }
     })

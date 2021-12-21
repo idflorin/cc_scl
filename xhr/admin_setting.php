@@ -1548,6 +1548,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         try {
             $array = array(
                 'upload/photos/d-avatar.jpg',
+                'upload/photos/f-avatar.jpg',
                 'upload/photos/d-cover.jpg',
                 'upload/photos/d-group.jpg',
                 'upload/photos/d-page.jpg',
@@ -1653,7 +1654,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 'last_name' => $faker->lastName
             );
             if ($avatar == 1) {
-                $re_data['avatar'] = Wo_ImportImageFromFile($faker->imageUrl($wo['profile_picture_width_crop'], $wo['profile_picture_height_crop']));
+                $re_data['avatar'] = Wo_ImportImageFromFile($faker->imageUrl($wo['profile_picture_width_crop'], $wo['profile_picture_height_crop']),'_url_image','avatar');
             }
             $add_user = Wo_RegisterUser($re_data);
         }
@@ -1719,6 +1720,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                     $data['status'] = 200;
                     $array          = array(
                         'upload/photos/d-avatar.jpg',
+                        'upload/photos/f-avatar.jpg',
                         'upload/photos/d-cover.jpg',
                         'upload/photos/d-group.jpg',
                         'upload/photos/d-page.jpg',
@@ -1829,6 +1831,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                     $data['status'] = 200;
                     $array          = array(
                         'upload/photos/d-avatar.jpg',
+                        'upload/photos/f-avatar.jpg',
                         'upload/photos/d-cover.jpg',
                         'upload/photos/d-group.jpg',
                         'upload/photos/d-page.jpg',
@@ -3209,6 +3212,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
 
                     $array          = array(
                         'upload/photos/d-avatar.jpg',
+                        'upload/photos/f-avatar.jpg',
                         'upload/photos/d-cover.jpg',
                         'upload/photos/d-group.jpg',
                         'upload/photos/d-page.jpg',

@@ -15,7 +15,8 @@ $response_data = array(
 $required_fields =  array(
                         'create',
                         'fetch',
-                        'add'
+                        'add',
+                        'delete_album_image'
                     );
 
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
@@ -146,6 +147,24 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_message = 'id and postPhotos can not be empty';
         }
 
+    }
+    if ($_POST['type'] == 'delete_album_image') {
+        if (!empty($_POST['post_id']) && !empty($_POST['id'])) {
+            if (Wo_DeleteImageFromAlbum($_POST['post_id'], $_POST['id']) === true) {
+                $response_data = array(
+                                'api_status' => 200,
+                                'message' => 'image deleted'
+                            );
+            }
+            else{
+                $error_code    = 6;
+                $error_message = 'you can not delete image';
+            }
+        }
+        else{
+            $error_code    = 5;
+            $error_message = 'post_id and id can not be empty';
+        }
     }
 }
 else{

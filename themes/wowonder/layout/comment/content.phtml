@@ -51,7 +51,18 @@ if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 &
             </span>
             <?php } ?>
          </div>
-         <span class="time ajax-time" title="<?php echo date('c',$wo['comment']['time']);?>"><?php echo $wo['comment']['time']?></span>
+         <?php if (!empty($wo['story']['stream_name']) && $wo['comment']['time'] <= $wo['story']['live_time']) {
+          $video_time = GetVideoTime($wo['story']['time'],$wo['comment']['time']);
+          $time = $video_time['time'];
+          $current_time = $video_time['current_time'];
+           ?>
+           <span class="time pointer" title="<?php echo date('c',$wo['comment']['time']);?>" onclick="go_to_duration(<?php echo($wo['story']['id']) ?>,<?php echo $current_time; ?>)"><a href="javascript:void(0)"></a> <?php echo $time ?></span>
+
+        <?php  }else{ ?>
+          <span class="time ajax-time" title="<?php echo date('c',$wo['comment']['time']);?>"><?php echo $wo['comment']['time']?></span>
+
+         <?php } ?>
+         
          <div class="comment-text"><?php echo $wo['comment']['text']?></div>
          <div class="comment-image">
             <?php if (!empty($wo['comment']['c_file'])): ?>

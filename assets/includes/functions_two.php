@@ -1508,19 +1508,29 @@ function Wo_RegisterPage($registration_data = array()) {
         return false;
     }
 }
-function Wo_GetMyPages($user_id = false) {
+function Wo_GetMyPages($user_id = false,$limit = 0,$offset = 0) {
     global $sqlConnect, $wo;
     if ($wo['loggedin'] == false) {
         return false;
+    }
+    $limit_text = '';
+    if (!empty($limit) && is_numeric($limit) && $limit > 0) {
+        $limit = Wo_Secure($limit);
+        $limit_text = ' LIMIT '.$limit;
     }
     $data       = array();
     $user_id    = Wo_Secure($user_id);
     if (!$user_id || !is_numeric($user_id) || $user_id < 1) {
         $user_id  = Wo_Secure($wo['user']['user_id']);
-    }  
+    }
+    $offset_text = '';
+    if (!empty($offset) && is_numeric($offset) && $offset > 0) {
+        $offset = Wo_Secure($offset);
+        $offset_text = ' AND `page_id` > '.$offset;
+    }
     $query_text = "SELECT `page_id` FROM " . T_PAGES . " 
-                   WHERE `user_id` = {$user_id} OR `page_id` IN (SELECT `page_id` FROM ".T_PAGE_ADMINS."
-                   WHERE `user_id` = {$user_id})";
+                   WHERE (`user_id` = {$user_id} OR `page_id` IN (SELECT `page_id` FROM ".T_PAGE_ADMINS."
+                   WHERE `user_id` = {$user_id})) {$offset_text} {$limit_text}";
     $query_one  = mysqli_query($sqlConnect, $query_text);
     while ($fetched_data = mysqli_fetch_assoc($query_one)) {
         if (is_array($fetched_data)) {
@@ -1586,6 +1596,9 @@ function Wo_IsCanGroupUpdate($group_id,$page)
     }
     if (empty($group_id) || !is_numeric($group_id) || $group_id < 0 || empty($page) || !in_array($page, $array)) {
         return false;
+    }
+    if (Wo_IsAdmin() || Wo_IsModerator()) {
+        return true;
     }
     $user_id = $wo['user']['id'];
     $page = Wo_Secure($page);
@@ -1750,6 +1763,16 @@ function Wo_PageData($page_id = 0) {
     if ($wo['loggedin'] == true) {
         $fetched_data['is_page_onwer'] = (Wo_IsPageOnwer($fetched_data['page_id'])) ? true : false;
     }
+    $fetched_data['fields'] = array();
+    $fields = Wo_GetCustomFields('page'); 
+    if (!empty($fields)) {
+        foreach ($fields as $key => $field) {
+            if (in_array($field['fid'], array_keys($fetched_data)) ) {
+                $fetched_data['fields'][$field['fid']] = $fetched_data[$field['fid']];
+            }
+        }
+    }
+
     return $fetched_data;
 }
 function Wo_PageActive($page_name) {
@@ -1804,10 +1827,16 @@ function Wo_GetLikeButton($page_id = 0) {
     if (empty($page_id) || !is_numeric($page_id) or $page_id < 0) {
         return false;
     }
-    if (Wo_IsPageOnwer($page_id)) {
-        return false;
-    }
     $page = $wo['like'] = Wo_PageData($page_id);
+    if (Wo_IsPageOnwer($page_id)) {
+        if ($page['user_id'] != $wo['user']['id'] && !Wo_IsAdmin() && !Wo_IsModerator() && Wo_IsPageAdminExists($wo['user']['id'],$page_id)) {
+            return false;
+        }
+        elseif ($page['user_id'] == $wo['user']['id'] || Wo_IsPageAdminExists($wo['user']['id'],$page_id)) {
+            return false;
+        }
+    }
+    //$page = $wo['like'] = Wo_PageData($page_id);
     if (!isset($wo['like']['page_id'])) {
         return false;
     }
@@ -2451,6 +2480,15 @@ function Wo_GroupData($group_id = 0) {
             }
         }
     }
+    $fetched_data['fields'] = array();
+    $fields = Wo_GetCustomFields('group'); 
+    if (!empty($fields)) {
+        foreach ($fields as $key => $field) {
+            if (in_array($field['fid'], array_keys($fetched_data) ) ) {
+                $fetched_data['fields'][$field['fid']] = $fetched_data[$field['fid']];
+            }
+        }
+    }
 
     
     return $fetched_data;
@@ -2886,14 +2924,19 @@ function Wo_GetGroupMembers($group_id = 0) {
     }
     return $data;
 }
-function Wo_GetUsersGroups($user_id = 0, $limit = 12, $placement = array()) {
+function Wo_GetUsersGroups($user_id = 0, $limit = 12, $placement = array(), $offset = 0) {
     global $wo, $sqlConnect;
     $data = array();
     if (empty($user_id) or !is_numeric($user_id) or $user_id < 1) {
         return false;
     }
+    $offset_text = '';
+    if (!empty($offset) && is_numeric($offset) && $offset > 0) {
+        $offset = Wo_Secure($offset);
+        $offset_text = ' AND `group_id` > '.$offset;
+    }
     $user_id   = Wo_Secure($user_id);
-    $query     = " SELECT `group_id` FROM " . T_GROUP_MEMBERS . " WHERE `user_id` = {$user_id} AND `active` = '1' ORDER BY `id` LIMIT {$limit}";
+    $query     = " SELECT `group_id` FROM " . T_GROUP_MEMBERS . " WHERE `user_id` = {$user_id} AND `active` = '1' {$offset_text} ORDER BY `id` LIMIT {$limit}";
     if (!empty($placement)) {
         if ($placement['in'] == 'profile_sidebar' && is_array($placement['groups_data'])) {
             foreach ($placement['groups_data'] as $key => $id) {
@@ -3706,6 +3749,10 @@ function Wo_GetCommentReply($reply_id = 0) {
     if (!empty($fetched_data['page_id'])) {
         $fetched_data['publisher'] = Wo_PageData($fetched_data['page_id']);
         $fetched_data['url']       = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['publisher']['page_name']);
+        if ($fetched_data['publisher']['user_id'] != $fetched_data['user_id'] && !Wo_IsPageAdminExists($fetched_data['user_id'],$fetched_data['page_id'])) {
+            $fetched_data['publisher'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['url']       = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['publisher']['username']);
+        }
     } else {
         $fetched_data['publisher'] = Wo_UserData($fetched_data['user_id']);
         $fetched_data['url']       = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['publisher']['username']);

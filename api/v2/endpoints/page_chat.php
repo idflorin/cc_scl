@@ -15,7 +15,8 @@ $response_data = array(
 $required_fields =  array(
                         'send',
                         'fetch',
-                        'get_list'
+                        'get_list',
+                        'delete_chat'
                     );
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 
@@ -300,6 +301,25 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     'api_status' => 200,
                     'data' => $pages
                 );
+    }
+
+    if ($_POST['type'] == 'delete_chat') {
+        if (!empty($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0 && !empty($_POST['recipient_id']) && is_numeric($_POST['recipient_id']) && $_POST['recipient_id'] > 0) {
+            if (Wo_DeletePageConversation($_POST['recipient_id'],$_POST['page_id'])) {
+                $response_data = array(
+                    'api_status' => 200,
+                    'message' => 'chat deleted'
+                );
+            }
+            else{
+                $error_code    = 6;
+                $error_message = 'Something went wrong';
+            }
+        }
+        else{
+            $error_code    = 5;
+            $error_message = 'page_id And recipient_id can not be empty';
+        }
     }
 }
 else{

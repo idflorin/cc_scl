@@ -29,6 +29,9 @@ if (empty($error_code)) {
         $error_message = 'Post not found';
     } else {
         $response_data = array('api_status' => 200);
+        if (!empty($_POST['add_view']) && $_POST['add_view'] == 1) {
+            Wo_AddPostVideoView($post_id);
+        }
         
         $post_comments = $post_data['get_post_comments'];
         unset($post_data['get_post_comments']);

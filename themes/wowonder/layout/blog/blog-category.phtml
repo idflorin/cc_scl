@@ -80,7 +80,7 @@ jQuery(document).ready(function($) {
          url: Wo_Ajax_Requests_File(),
          type: 'GET',
          dataType: 'json',
-         data: {f:"load-blogs",offset:($(".view-blog").length > 0) ? $(".view-blog:last").attr('id') : 0,id:<?php echo $_GET['id'] ?>},
+         data: {f:"load-blogs",offset:($(".wow_main_blogs").length > 0) ? $(".wow_main_blogs:last").attr('id') : 0,id:<?php echo $_GET['id'] ?>},
          success:function(data){
             if (data['status'] == 200) {
             	$(".latest-blogs h5.search-filter-center-text").remove();

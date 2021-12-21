@@ -7,6 +7,7 @@
       <meta name="description" content="<?php echo $wo['description'];?>">
       <meta name="keywords" content="<?php echo $wo['keywords'];?>">
       <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <meta name="pinterest-rich-pin" content="false" />
       <?php if ($wo['page'] == 'maintenance') { ?>
       <meta name="robots" content="noindex">
       <meta name="googlebot" content="noindex">
@@ -151,7 +152,8 @@
       <meta name="twitter:image" content="<?php echo $wo['article']['thumbnail']; ?>" />
       <?php } ?>
       <?php if (!empty($_SERVER) && !empty($_SERVER['REQUEST_URI'])) {
-        $link_text = substr($wo['config']['site_url'], 0,strpos($wo['config']['site_url'], '://') + 2).parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $link_text = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        //$link_text = substr($wo['config']['site_url'], 0,strpos($wo['config']['site_url'], '://') + 2).parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
          ?>
          <link rel="canonical" href="<?php echo($link_text) ?>" />
       <?php } ?>
@@ -445,12 +447,8 @@
     <?php if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id'])) { ?>
       <script src="<?php echo $wo['config']['theme_url'];?>/javascript/agora.js"></script>
     <?php } ?>
-    <?php if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['config']['agora_customer_id']) && !empty($wo['config']['agora_customer_certificate'])) { ?>
-      <link href="<?php echo $wo['config']['theme_url'];?>/player/Video/video-js.css" rel="stylesheet" />
-
-      <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
-      <script src="<?php echo $wo['config']['theme_url'];?>/player/Video/videojs-ie8.min.js"></script>
-      <script src="<?php echo $wo['config']['theme_url'];?>/player/Video/video.js"></script>
+    <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['config']['agora_customer_id']) && !empty($wo['config']['agora_customer_certificate'])) { ?>
+      <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <?php } ?>
     <script crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
     
@@ -500,11 +498,11 @@
               }
              ?>
          </footer>
-         <div class="second-footer">
+         <div class="second-footer" style="<?php echo (in_array($wo['page'], $wo['footer_pages']) ? '' : 'display: none;' ); ?> ">
             <?php
-               if (in_array($wo['page'], $wo['footer_pages']) && $wo['page'] != 'messages' && $wo['page'] != 'jobs') {
+               //if (in_array($wo['page'], $wo['footer_pages']) && $wo['page'] != 'messages' && $wo['page'] != 'jobs') {
                   echo Wo_LoadPage('footer/content');
-               }
+               //}
             ?>
          </div>
          <div class="extra">

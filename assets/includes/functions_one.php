@@ -957,6 +957,7 @@ function Wo_DeleteUser($user_id) {
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_STORY_SEEN . " WHERE `user_id` = '{$user_id}'");
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_REFUND . " WHERE `user_id` = '{$user_id}'");
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_INVITAION_LINKS . " WHERE `user_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_EMAILS . " WHERE `email_to` = '".$user_data['email']."'");
     if ($query_one) {
         $send_message_data       = array(
             'from_email' => $wo['config']['siteEmail'],
@@ -1090,7 +1091,7 @@ function Wo_GetMedia($media) {
     } else if ($wo['config']['ftp_upload'] == 1) {
         return addhttp($wo['config']['ftp_endpoint']) . '/' . $media;
     } else if ($wo['config']['cloud_upload'] == 1) {
-        return 'https://storage.cloud.google.com/'. $wo['config']['cloud_bucket_name'] . '/' . $media;
+        return 'https://storage.googleapis.com/'. $wo['config']['cloud_bucket_name'] . '/' . $media;
     }
     return $wo['config']['site_url'] . '/' . $media;
 }
@@ -1580,7 +1581,39 @@ function Wo_ImportImageFromLogin($media, $amazon = 0) {
         return false;
     }
 }
-function Wo_ImportImageFromFile($media, $custom_name = '_url_image') {
+// function Wo_ImportImageFromFile($media, $custom_name = '_url_image') {
+//     global $wo;
+//     if (empty($media)) {
+//         return false;
+//     }
+//     if (!file_exists('upload/photos/' . date('Y'))) {
+//         mkdir('upload/photos/' . date('Y'), 0777, true);
+//     }
+//     if (!file_exists('upload/photos/' . date('Y') . '/' . date('m'))) {
+//         mkdir('upload/photos/' . date('Y') . '/' . date('m'), 0777, true);
+//     }
+//     $extension = 0; //image_type_to_extension($size[2]);
+//     if (empty($extension)) {
+//         $extension = '.jpg';
+//     }
+//     $dir               = 'upload/photos/' . date('Y') . '/' . date('m');
+//     $file_dir          = $dir . '/' . Wo_GenerateKey() . $custom_name . $extension;
+//     $fileget           = file_get_contents($media);
+//     if (!empty($fileget)) {
+//         $importImage = @file_put_contents($file_dir, $fileget);
+//     }
+//     if (file_exists($file_dir)) {
+//         $upload_s3 = Wo_UploadToS3($file_dir);
+//         $check_image = getimagesize($file_dir);
+//         if (!$check_image) {
+//             unlink($file_dir);
+//         }
+//         return $file_dir;
+//     } else {
+//         return false;
+//     }
+// }
+function Wo_ImportImageFromFile($media, $custom_name = '_url_image',$type = '') {
     global $wo;
     if (empty($media)) {
         return false;
@@ -1602,6 +1635,19 @@ function Wo_ImportImageFromFile($media, $custom_name = '_url_image') {
         $importImage = @file_put_contents($file_dir, $fileget);
     }
     if (file_exists($file_dir)) {
+        if ($type == 'avatar' || $type == 'cover') {
+            $filename = $file_dir;
+            $explode2  = @end(explode('.', $filename));
+            $explode3  = @explode('.', $filename);
+            $last_file = $explode3[0] . '_full.' . $explode2;
+            $compress  = Wo_CompressImage($filename, $last_file, 50);
+            if ($compress) {
+                Wo_UploadToS3($last_file);
+                if ($type == 'avatar') {
+                    Wo_Resize_Crop_Image($wo['profile_picture_width_crop'], $wo['profile_picture_height_crop'], $filename, $filename, $wo['profile_picture_image_quality']);
+                }
+            }
+        }
         $upload_s3 = Wo_UploadToS3($file_dir);
         $check_image = getimagesize($file_dir);
         if (!$check_image) {
@@ -3712,6 +3758,35 @@ function Wo_DeleteConversation($user_id = 0) {
         return true;
     }
 }
+function Wo_DeletePageConversation($user_id = 0,$page_id = 0) {
+    global $wo, $sqlConnect;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($user_id) || !is_numeric($user_id) || $user_id < 0 || empty($page_id) || !is_numeric($page_id) || $page_id < 0) {
+        return false;
+    }
+    $user_id   = Wo_Secure($user_id);
+    $user_data = Wo_UserData($user_id);
+    if (empty($user_data)) {
+        return false;
+    }
+    $page_id   = Wo_Secure($page_id);
+    $page_data = Wo_PageData($page_id);
+    if (empty($page_data)) {
+        return false;
+    }
+    $my_id         = $wo['user']['user_id'];
+    $query_one     = "SELECT id FROM " . T_MESSAGES . " WHERE (`from_id` = {$user_id} AND `page_id` = '{$page_id}' AND `to_id` = '{$my_id}') OR (`from_id` = {$my_id} AND `page_id` = '{$page_id}' AND `to_id` = '{$user_id}')";
+    $sql_query_one = mysqli_query($sqlConnect, $query_one);
+    while ($sql_fetch_one = mysqli_fetch_assoc($sql_query_one)) {
+        $deleteMessage = Wo_DeleteMessage($sql_fetch_one['id'], '', $my_id);
+    }
+    $query_one = mysqli_query($sqlConnect, "DELETE FROM " . T_U_CHATS . " WHERE `conversation_user_id` = '$user_id' AND `page_id` = '{$page_id}' AND `user_id` = '$my_id'");
+    if ($query_one) {
+        return true;
+    }
+}
 function Wo_DeleteGroupConversation($id = 0) {
     global $wo, $sqlConnect;
     if ($wo['loggedin'] == false) {
@@ -4292,10 +4367,13 @@ function Wo_ShareFile($data = array(), $type = 0, $crop = true) {
         return $last_data;
     }
 }
-function Wo_DisplaySharedFile($media, $placement = '', $cache = false) {
+function Wo_DisplaySharedFile($media, $placement = '', $cache = false,$is_video = false) {
     global $wo, $sqlConnect, $db;
     $orginal = $media['filename'];
-    $wo['media']['filename']    = Wo_GetMedia($media['filename']);
+    if (!$is_video) {
+        $wo['media']['filename']    = Wo_GetMedia($media['filename']);
+    }
+    
     $wo['media']['video_thumb'] = ((!empty($media['postFileThumb'])) ? Wo_GetMedia($media['postFileThumb']) : '');
     $wo['media']['name']        = Wo_Secure($media['name']);
     $wo['media']['type']        = $media['type'];
@@ -4363,7 +4441,7 @@ function Wo_DisplaySharedFile($media, $placement = '', $cache = false) {
         if (empty($file)) {
             $file .= '<i class="fa ' . $icon_size . ' fa-file-o"></i> ' . $wo['media']['name'];
         }
-        if ($file_extension == 'mp4' || $file_extension == 'mkv' || $file_extension == 'avi' || $file_extension == 'webm' || $file_extension == 'mov' || $file_extension == 'm3u8') {
+        if ($file_extension == 'mp4' || $file_extension == 'mkv' || $file_extension == 'avi' || $file_extension == 'webm' || $file_extension == 'mov' || $file_extension == 'm3u8' || $is_video) {
             if ($placement == 'message' || $placement == 'chat') {
                 $media_file .= Wo_LoadPage('players/chat-video');
             } 
@@ -4544,7 +4622,8 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $re_data['postPlaytube']    = '';
         if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $re_data['postText'], $match)) {
             $re_data['postYoutube'] = Wo_Secure($match[1]);
-            $re_data['postText'] = preg_replace('/((?:https?:\/\/)?www\.youtube\.com\/watch\?v=\w+)/', "", $re_data['postText']);
+            //$re_data['postText'] = preg_replace('/((?:https?:\/\/)?www\.youtube\.com\/watch\?v=\w+)/', "", $re_data['postText']);
+            $re_data['postText'] = preg_replace($match[0], "", $re_data['postText']);
             $is_there_video         = true;
         }
         if (Wo_IsUrl($wo['config']['playtube_url']) && preg_match('#'.$playtube_root.'\/(?:watch|embed)\/(.*)#i', $re_data['postText'], $match)) {
@@ -5695,6 +5774,19 @@ function Wo_DeletePost($post_id = 0,$type = '') {
                 $delete_from_s3 = Wo_DeleteFromToS3($fetched_delete_data['image']);
             }
         }
+        if (!empty($fetched_data['multi_image_post'])) {
+            $query_two_2 = mysqli_query($sqlConnect, "SELECT * FROM " . T_ALBUMS_MEDIA . " WHERE `image` = '".$fetched_data['postFile']."' ");
+            while ($fetched_data_s = mysqli_fetch_assoc($query_two_2)) {
+                $explode2 = @end(explode('.', $fetched_data_s['image']));
+                $explode3 = @explode('.', $fetched_data_s['image']);
+                $media_2  = $explode3[0] . '_small.' . $explode2;
+                @unlink(trim($media_2));
+                @unlink($fetched_data_s['image']);
+                $delete_from_s3 = Wo_DeleteFromToS3($media_2);
+                $delete_from_s3 = Wo_DeleteFromToS3($fetched_data_s['image']);
+                mysqli_query($sqlConnect, "DELETE FROM " . T_ALBUMS_MEDIA . " WHERE `image` = '".$fetched_data['postFile']."' ");
+            }
+        }
         
 
         $query_two_2 = mysqli_query($sqlConnect, "SELECT `id` FROM " . T_COMMENTS . " WHERE `post_id` = {$post_id}");
@@ -6676,7 +6768,7 @@ function Wo_GetPostReactionsTypes($object_id, $col = "post") {
        return false;
    }
    $reactions_html = "";
-   $reactions     = array('Like' => 0,'Love' => 0,'HaHa' => 0,'Wow' => 0,'Sad' => 0,'Angry' => 0);
+   $reactions     = array();
    $reactions_count = 0;
    $object_id     = Wo_Secure($object_id);
    $query_one     = "SELECT * FROM " . T_REACTIONS . " WHERE `{$col}_id` = {$object_id}";
@@ -7618,6 +7710,10 @@ function Wo_GetPostComment($comment_id = 0) {
     if (!empty($fetched_data['page_id'])) {
         $fetched_data['publisher'] = Wo_PageData($fetched_data['page_id']);
         $fetched_data['url']       = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['publisher']['page_name']);
+        if ($fetched_data['publisher']['user_id'] != $fetched_data['user_id'] && !Wo_IsPageAdminExists($fetched_data['user_id'],$fetched_data['page_id'])) {
+            $fetched_data['publisher'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['url']       = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['publisher']['username']);
+        }
     } else {
         $fetched_data['publisher'] = Wo_UserData($fetched_data['user_id']);
         $fetched_data['url']       = Wo_SeoLink('index.php?link1=timeline&u=' . $fetched_data['publisher']['username']);
@@ -8315,4 +8411,72 @@ function WoCanLogin() {
     }
     $db->where('time',time()-(60 * $wo['config']['lock_time'] * 2),'<')->delete(T_BAD_LOGIN);
     return true;
+}
+function Wo_GetMessagesAPPN($data = array(), $limit = 50) {
+    global $wo, $sqlConnect;
+    $message_data   = array();
+    $user_id        = Wo_Secure($data['recipient_id']);
+    $logged_user_id = Wo_Secure($data['user_id']);
+    if (empty($user_id) || !is_numeric($user_id) || $user_id < 0) {
+        return false;
+    }
+    $query_one = " SELECT * FROM " . T_MESSAGES;
+    if (isset($data['new']) && $data['new'] == true) {
+        $query_one .= " WHERE `seen` = 0 AND `from_id` = {$user_id} AND `to_id` = {$logged_user_id} AND `deleted_two` = '0'";
+    } else {
+        $query_one .= " WHERE ((`from_id` = {$user_id} AND `to_id` = {$logged_user_id} AND `deleted_two` = '0') OR (`from_id` = {$logged_user_id} AND `to_id` = {$user_id} AND `deleted_one` = '0'))";
+    }
+    if (!empty($data['message_id'])) {
+        $data['message_id'] = Wo_Secure($data['message_id']);
+        $query_one .= " AND `id` = " . $data['message_id'];
+    } else if (!empty($data['before_message_id']) && is_numeric($data['before_message_id']) && $data['before_message_id'] > 0) {
+        $data['before_message_id'] = Wo_Secure($data['before_message_id']);
+        $query_one .= " AND `id` < " . $data['before_message_id'] . " AND `id` <> " . $data['before_message_id'];
+    } else if (!empty($data['after_message_id']) && is_numeric($data['after_message_id']) && $data['after_message_id'] > 0) {
+        $data['after_message_id'] = Wo_Secure($data['after_message_id']);
+        $query_one .= " AND `id` > " . $data['after_message_id'] . " AND `id` <> " . $data['after_message_id'];
+    }
+    $query_one .= " AND `page_id` = '0' ";
+    $sql_query_one    = mysqli_query($sqlConnect, $query_one);
+    $query_limit_from = mysqli_num_rows($sql_query_one) - 50;
+    if ($query_limit_from < 1) {
+        $query_limit_from = 0;
+    }
+    if (isset($limit)) {
+        // if (!empty($data['before_message_id']) && is_numeric($data['before_message_id']) && $data['before_message_id'] > 0) {
+        //     $query_one .= " ORDER BY `id` DESC LIMIT {$query_limit_from}, 50";
+        // } else {
+        //     $query_one .= " ORDER BY `id` ASC LIMIT {$query_limit_from}, 50";
+        // }
+        if (!empty($data['before_message_id']) && is_numeric($data['before_message_id']) && $data['before_message_id'] > 0) {
+            $query_one .= " ORDER BY `id` DESC LIMIT {$limit}";
+        } else {
+            $query_one .= " ORDER BY `id` DESC LIMIT {$limit}";
+        }
+    }
+    $query = mysqli_query($sqlConnect, $query_one);
+    while ($fetched_data = mysqli_fetch_assoc($query)) {
+        $fetched_data['messageUser'] = Wo_UserData($fetched_data['from_id']);
+        $fetched_data['messageUser'] = array(
+            'user_id' => $fetched_data['messageUser']['user_id'],
+            'avatar' => $fetched_data['messageUser']['avatar']
+        );
+        $fetched_data['text']        = Wo_EditMarkup($fetched_data['text']);
+        $message_data[]              = $fetched_data;
+        if ($fetched_data['messageUser']['user_id'] == $user_id && $fetched_data['seen'] == 0) {
+            mysqli_query($sqlConnect, " UPDATE " . T_MESSAGES . " SET `seen` = " . time() . " WHERE `id` = " . $fetched_data['id']);
+        }
+    }
+    return $message_data;
+}
+function nofollow($html, $skip = null) {
+    return preg_replace_callback(
+        "#(<a[^>]+?)>#is", function ($mach) use ($skip) {
+            return (
+                !($skip && strpos($mach[1], $skip) !== false) &&
+                strpos($mach[1], 'rel=') === false
+            ) ? $mach[1] . ' rel="nofollow">' : $mach[0];
+        },
+        $html
+    );
 }

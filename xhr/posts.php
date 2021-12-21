@@ -448,7 +448,12 @@ if ($f == 'posts') {
                 'active' => $post_active
             );
             if (isset($_POST['postSticker']) && Wo_IsUrl($_POST['postSticker']) && empty($_FILES) && empty($_POST['postRecord'])) {
-                $post_data['postSticker'] = $_POST['postSticker'];
+                $headers = get_headers($_POST['postSticker'], 1);
+                if (strpos($headers['Content-Type'], 'image/') !== false) {
+                    $post_data['postSticker'] = $_POST['postSticker'];
+                } else {
+                    $invalid_file = 2;
+                } 
             } else if (empty($_FILES['postPhotos']) && preg_match_all('/https?:\/\/(?:[^\s]+)\.(?:png|jpg|gif|jpeg)/', $post_data['postText'], $matches)) {
                 if (!empty($matches[0][0]) && Wo_IsUrl($matches[0][0])) {
                     $post_data['postPhoto'] = @Wo_ImportImageFromUrl($matches[0][0]);

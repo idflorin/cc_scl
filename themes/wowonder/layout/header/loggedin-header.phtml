@@ -112,11 +112,12 @@ if ($followers_alert == 0) {
 					<a href="<?php echo Wo_SeoLink('index.php?link1=search');?>" data-ajax="?link1=search"><?php echo $wo['lang']['search']; ?></a>
 			</li>
 			
-			<li><hr></li>
+			
 			<?php if ($wo['config']['pro'] == 1) { 
 				// print_r($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['posts_promotion']);
 				// exit();
 				?>
+				<li><hr></li>
 			<?php if ($wo['user']['is_pro'] == 1 && in_array($wo['user']['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['posts_promotion'] > 0) { ?>
 				<li>
 					<a href="<?php echo Wo_SeoLink('index.php?link1=boosted-posts');?>" data-ajax="?link1=boosted-posts"><?php echo $wo['lang']['boosted_posts']; ?></a>

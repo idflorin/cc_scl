@@ -604,7 +604,16 @@ $wo['footer_pages']                  = array(
     'advertise',
     'jobs',
     'friends_nearby',
-    'common_things'
+    'common_things',
+    'events',
+    'my_groups',
+    'suggested_groups',
+    'joined_groups',
+    'my_albums',
+    'my_products',
+    'game',
+    'funding',
+    'jobs',
 );
 
 $wo['update_cache']                  = '';

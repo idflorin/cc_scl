@@ -37,12 +37,20 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 
 	if (empty($error_code)) {
 		if ($_POST['type'] == 'get_news_feed') {
+			$type = 0;
+	        if ($_POST['filter'] == 1) {
+	            $type = 1;
+	        }
+	        $update = Wo_UpdateUserData($wo['user']['user_id'], array(
+	            'order_posts_by' => $type
+	        ));
 
 			$postsData = array(
                 'limit' => $limit,
                 'publisher_id' => 0,
                 'after_post_id' => $after_post_id,
-                'placement' => 'multi_image_post'
+                'placement' => 'multi_image_post',
+                'anonymous' => true
             );
 			$posts = Wo_GetPosts($postsData);
 			foreach ($posts as $key => $value) {

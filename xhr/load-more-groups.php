@@ -11,12 +11,13 @@ if ($f == 'load-more-groups') {
         $groups = Wo_GetSearchAdv($query, 'groups', $offset);
         if (count($groups) > 0) {
             foreach ($groups as $wo['result']) {
-                if ($wo['config']['theme'] == 'sunshine') {
-                    $html .= Wo_LoadPage('search/group-result');
-                }
-                else{
-                    $html .= Wo_LoadPage('search/result');
-                }
+                // if ($wo['config']['theme'] == 'sunshine') {
+                //     $html .= Wo_LoadPage('search/group-result');
+                // }
+                // else{
+                //     $html .= Wo_LoadPage('search/result');
+                // }
+                $html .= Wo_LoadPage('search/group-result');
             }
             $data['status'] = 200;
             $data['html']   = $html;
