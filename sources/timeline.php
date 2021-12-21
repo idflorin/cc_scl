@@ -108,6 +108,7 @@ if ($type == 'timeline' && $wo['loggedin'] == true) {
 }
 
 $can_ = 0;
+$wo['nodejs_send_notification'] = false;
 if ($wo['loggedin'] == true && $wo['config']['profileVisit'] == 1 && $type == 'timeline' && $con2 == 1) {
     if ($wo['user_profile']['user_id'] != $wo['user']['user_id'] && $wo['user']['visit_privacy'] == 0) {
         if ($wo['config']['pro'] == 1) {
@@ -123,6 +124,7 @@ if ($wo['loggedin'] == true && $wo['config']['profileVisit'] == 1 && $type == 't
                 'type' => 'visited_profile',
                 'url' => 'index.php?link1=timeline&u=' . $wo['user']['username']
             );
+            $wo['nodejs_send_notification'] = true;
             Wo_RegisterNotification($notification_data_array);
         }
     }

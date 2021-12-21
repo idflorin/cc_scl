@@ -1043,6 +1043,11 @@ $(function(){
                 $(this).addClass('menuactive');
             }
         });
+    <?php if ($wo['nodejs_send_notification'] == true) { ?>
+    	if (node_socket_flow == "1") {
+    		socket.emit("user_notification", { to_id: $('.wo_user_profile').attr('data-id'), user_id: _getCookie("user_id")});
+    	}
+    <?php } ?>
 });
 
 function Wo_open_send_gift(){
@@ -1068,6 +1073,9 @@ function Wo_SendGiftToUser(from, to){
     })
     .done(function(data) {
         if (data.status == 200) {
+        	if (node_socket_flow == "1") {
+        		socket.emit("user_notification", { to_id: to, user_id: _getCookie("user_id")});
+        	}
             $('#send-gift-button').html('<?php echo $wo['lang']['gift_sent_succesfully']; ?>');
 			$('#send_gift').find('.ball-pulse').fadeOut(100);
             Wo_Delay(function(){
@@ -1094,6 +1102,9 @@ function Wo_RegisterPoke(received_user_id , send_user_id){
     })
     .done(function(data) {
         if (data.status == 200) {
+        	if (node_socket_flow == "1") {
+        		socket.emit("user_notification", { to_id: received_user_id, user_id: _getCookie("user_id")});
+        	}
             $("#poke_modal").modal('show');
             $("#pokebutton").remove();
             Wo_Delay(function(){

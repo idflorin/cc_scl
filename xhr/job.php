@@ -269,6 +269,7 @@ if ($f == 'job' && $wo['config']['job_system'] == 1) {
 
 
     			$data['status'] = 200;
+                $data['user_id'] = $job['page']['user_id'];
     		}
     		else{
     			if ($job['apply'] == true) {

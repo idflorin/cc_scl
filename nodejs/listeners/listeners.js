@@ -166,6 +166,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         else {
             await socketEvents.unseen(ctx, socket)
         }
+        let user_id = ctx.userHashUserId[data.user_id]
+        let unseenmessages = await funcs.Wo_CountUnseenMessages(ctx, user_id);
+        await io.to(user_id).emit("messages_count", { count: unseenmessages })
        // await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.user_id])
         //await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.user_id])
     })
@@ -529,7 +532,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 receiver: ctx.userHashUserId[data.from_id],
                 sender: ctx.userHashUserId[data.from_id],
                 status: 200,
-                color: data.color
+                color: data.color,
+                mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+                time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
             });
         }
         let msg;
@@ -601,7 +606,10 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     status: 200,
-                    color: data.color
+                    color: data.color,
+                    message: data.msg,
+                    message_html: sendable_message,
+                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
                 });
                 await userSocket.emit('private_message_page', {
                     html: await compiledTemplates.messageListOwnerTrue(ctx, data, fromUser, nextId, hasHTML, sendable_message, data.color),
@@ -609,7 +617,10 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     status: 200,
-                    color: data.color
+                    color: data.color,
+                    message: data.msg,
+                    message_html: sendable_message,
+                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
                 });
             }
 
@@ -662,7 +673,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     status: 200,
-                    color: data.color
+                    color: data.color,
+                    mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
                 });
                 await userSocket.emit('private_message_page', {
                     html: await compiledTemplates.messageListOwnerTrueWithMedia(ctx, data, fromUser, nextId, data.color),
@@ -670,7 +683,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     status: 200,
-                    color: data.color
+                    color: data.color,
+                    mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
                 });
             }
             await socketEvents.privateMessagePageToPersonOwnerFalseWithMedia(ctx, io, data, fromUser, data.isSticker)
@@ -837,7 +852,6 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 mediaFileName: data.mediaName,
                 seen: Math.floor(Date.now() / 1000),
                 time: Math.floor(Date.now() / 1000),
-                isRecord: true
             })
             data.mediaId = ret.id;
             await socket.emit('private_message', {
@@ -847,7 +861,10 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 sender: ctx.userHashUserId[data.from_id],
                 status: 200,
                 color: data.color,
-                isMedia: true
+                isMedia: true,
+                isRecord: true,
+                mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+                time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
             });
         }
         ({ msg, hasHTML } = funcs.Wo_Emo(data.msg))
@@ -907,8 +924,11 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 html: await compiledTemplates.chatListOwnerTrue(ctx, data, fromUser, nextId, hasHTML, sendable_message, data.color),
                 receiver: data.to_id,
                 sender: ctx.userHashUserId[data.from_id],
-                message: sendable_message,
-                time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
+                message: data.msg,
+                message_html: sendable_message,
+                time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
+                isMedia: false,
+                isRecord: false,
             })
             // send same message to all tabs
             for (userSocket of remainingSameUserSockets) {
@@ -920,8 +940,11 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     sender: ctx.userHashUserId[data.from_id],
                     color: data.color,
                     self: true,
-                    message: sendable_message,
-                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>' 
+                    message: data.msg,
+                    message_html: sendable_message,
+                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
+                    isMedia: false,
+                    isRecord: false,
                 });
                 await userSocket.emit('private_message_page', {
                     html: await compiledTemplates.messageListOwnerTrue(ctx, data, fromUser, nextId, hasHTML, sendable_message, data.color),
@@ -931,7 +954,10 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     sender: ctx.userHashUserId[data.from_id],
                     color: data.color,
                     self: true,
-                    message: sendable_message,
+                    isMedia: false,
+                    isRecord: false,
+                    message: data.msg,
+                    message_html: sendable_message,
                     time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
                 });
             }
@@ -985,7 +1011,12 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     status: 200,
-                    color: data.color
+                    color: data.color,
+                    message: data.msg,
+                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
+                    mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+                    isMedia: true,
+                    isRecord: true,
                 });
                 await userSocket.emit('private_message_page', {
                     html: await compiledTemplates.messageListOwnerTrueWithMedia(ctx, data, fromUser, nextId, hasHTML, data.color, data.isSticker),
@@ -993,7 +1024,12 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     status: 200,
-                    color: data.color
+                    color: data.color,
+                    message: data.msg,
+                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
+                    mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+                    isMedia: true,
+                    isRecord: true,
                 });
             }
             await socketEvents.privateMessagePageToPersonOwnerFalseWithMedia(ctx, io, data, fromUser, nextId, hasHTML, data.isSticker)
@@ -1574,6 +1610,222 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         })
         for (let follow of followers) {
             await io.to(follow.following_id).emit("on_user_loggedin", { user_id: user_id })
+        }
+    })
+
+    socket.on("event_notification", async (data) => {
+        let user_id = ctx.userHashUserId[data.user_id]
+        if (!data.to_id) {
+            return;
+        }
+        let to_id = data.to_id;
+        let eventData = await ctx.wo_events.findOne({
+            attributes: ["poster_id"],
+            where: {
+                id: to_id
+            },
+            raw: true
+        });
+        if (eventData.poster_id > 0) {
+            let notification_type = "new_notification";
+            if (data.type == 'removed') {
+                notification_type = "new_notification_removed";
+            }
+            if (eventData.poster_id !== user_id) {
+                await io.to(eventData.poster_id).emit(notification_type, { user_id: user_id });
+            }
+        }
+    })
+
+    socket.on("group_notification", async (data) => {
+        let user_id = ctx.userHashUserId[data.user_id]
+        if (!data.to_id) {
+            return;
+        }
+        let to_id = data.to_id;
+        let groupData = await ctx.wo_groups.findOne({
+            attributes: ["user_id"],
+            where: {
+                id: to_id
+            },
+            raw: true
+        });
+        if (groupData.user_id > 0) {
+            let notification_type = "new_notification";
+            if (data.type == 'removed') {
+                notification_type = "new_notification_removed";
+            }
+            if (groupData.user_id !== user_id) {
+                await io.to(groupData.user_id).emit(notification_type, { user_id: user_id });
+            }
+        }
+    })
+
+    socket.on("page_notification", async (data) => {
+        let user_id = ctx.userHashUserId[data.user_id]
+        if (!data.to_id) {
+            return;
+        }
+        let to_id = data.to_id;
+        let pageData = await ctx.wo_pages.findOne({
+            attributes: ["user_id"],
+            where: {
+                page_id: to_id
+            },
+            raw: true
+        });
+        if (pageData.user_id > 0) {
+            let notification_type = "new_notification";
+            if (data.type == 'removed') {
+                notification_type = "new_notification_removed";
+            }
+            if (pageData.user_id !== user_id) {
+                await io.to(pageData.user_id).emit(notification_type, { user_id: user_id });
+            }
+        }
+    })
+
+    socket.on("user_followers_notification", async (data) => {
+        let user_id = ctx.userHashUserId[data.user_id]
+        let followers = await ctx.wo_followers.findAll({
+            attributes: ["following_id"],
+            where: {
+                follower_id: user_id,
+                following_id: {
+                    [Op.not]: user_id
+                }
+            },
+            raw: true
+        })
+        for (let follow of followers) {
+            await io.to(follow.following_id).emit("new_notification", { user_id: user_id })
+        }
+    })
+
+    socket.on("comment_typing", async (data) => {
+        
+    })
+
+
+    socket.on("user_notification", async (data) => {
+        let user_id = ctx.userHashUserId[data.user_id]
+        if (!data.to_id) {
+            return;
+        }
+        let to_id = data.to_id;
+        let userData = await ctx.wo_users.findOne({
+            attributes: ["user_id"],
+            where: {
+                user_id: to_id
+            },
+            raw: true
+        });
+        if (userData.user_id > 0) {
+            let notification_type = "new_notification";
+            if (data.type == 'removed') {
+                notification_type = "new_notification_removed";
+            } else if (data.type == 'request') {
+                 notification_type = "new_request";
+            } else if (data.type == 'request_removed') {
+                notification_type = "new_request_removed";
+            } else if (data.type == 'create_video') {
+                notification_type = "new_video_call";
+            }
+            if (userData.user_id !== user_id) {
+                await io.to(userData.user_id).emit(notification_type, { notification_data: data });
+            }
+        }
+    })
+
+    socket.on("post_notification", async (data) => {
+        let user_id = ctx.userHashUserId[data.user_id]
+        if (!data.post_id) {
+            return;
+        }
+        let post_id = data.post_id;
+        let postData = await ctx.wo_posts.findOne({
+            attributes: ["user_id"],
+            where: {
+                id: post_id
+            },
+            raw: true
+        });
+        let notification_type = "new_notification";
+        if (data.type == 'removed') {
+            notification_type = "new_notification_removed";
+        }
+        if (postData.user_id !== user_id) {
+            await io.to(postData.user_id).emit(notification_type, { post_id: post_id });
+        }
+    })
+
+    socket.on("comment_notification", async (data) => {
+        let user_id = ctx.userHashUserId[data.user_id]
+        if (!data.comment_id) {
+            return;
+        }
+        let comment_id = data.comment_id;
+        let commentData = await ctx.wo_comments.findOne({
+            attributes: ["user_id"],
+            where: {
+                id: comment_id
+            },
+            raw: true
+        });
+        let notification_type = "new_notification";
+
+        if (data.type == 'removed') {
+            notification_type = "new_notification_removed";
+        }
+        if (typeof data.for !== 'undefined') {
+            let replyData = await ctx.wo_comment_replies.findAll({
+                attributes: ["user_id"],
+                where: {
+                    comment_id: comment_id,
+                },
+                raw: true
+            })
+            let sentUsers = [];
+            if (replyData.length > 0) {
+                for (let userReply of replyData) {
+                    if (userReply.user_id > 0) {
+                        if (userReply.user_id !== user_id && !sentUsers.includes(userReply.user_id)) {
+                            await io.to(userReply.user_id).emit("new_notification", { comment_id: comment_id });
+                            await io.to(userReply.user_id).emit("load_comment_replies", { comment_id: comment_id });
+                            sentUsers.push(userReply.user_id);
+                        }
+                    }
+                }
+            } 
+            if (commentData.user_id !== user_id && !sentUsers.includes(commentData.user_id)) {
+                await io.to(commentData.user_id).emit(notification_type, { comment_id: comment_id });
+            }
+        } else {
+            if (commentData.user_id !== user_id) {
+                await io.to(commentData.user_id).emit(notification_type, { comment_id: comment_id });
+            }
+        }
+    })
+
+    socket.on("reply_notification", async (data) => {
+        let user_id = ctx.userHashUserId[data.user_id]
+        if (!data.reply_id) {
+            return;
+        }
+        let reply_id = data.reply_id;
+        let replyData = await ctx.wo_comment_replies.findOne({
+            attributes: ["user_id"],
+            where: {
+                id: reply_id
+            },
+            raw: true
+        });
+        let notification_type = "new_notification";
+        if (data.type == 'removed') {
+            notification_type = "new_notification_removed";
+        }
+        if (replyData.user_id !== user_id) {
+            await io.to(replyData.user_id).emit(notification_type, { reply_id: reply_id });
         }
     })
 

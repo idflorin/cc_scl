@@ -345,6 +345,9 @@ $(function () {
 				data: {f: 'register_event_invite',event_id:<?php echo $_GET['eid']; ?>,user_id:user_id},
 				success:function(data){
 					if (data['status'] == 200) {
+						if (node_socket_flow == "1") {
+					        socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "added" });
+					    }
 						$("[data-hide-invited-user=" + user_id + "]").slideUp("fast")
 					}else{
 						$("[data-hide-invited-user=" + user_id + "]").find('button').remove();

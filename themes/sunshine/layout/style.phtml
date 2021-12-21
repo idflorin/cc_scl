@@ -346,4 +346,33 @@ if (!empty($wo['reactions_types'])) {
 }
 }
 <?php } ?>
+#notification-popup {
+     position: fixed;
+     left: 20px;
+     width: 300px;
+     bottom: 20px;
+     z-index: 10000;
+}
+#notification-popup .notifications-popup-list:empty {
+      padding: 0;
+}
+#notification-popup .notifications-popup-list {
+    position: relative;
+    background:  <?php echo $wo['config']['header_hover_border'];?> !important;
+    border-radius: 10px;
+    padding: 6px;
+    width: 100%;
+    margin-bottom: 10px;
+    z-index: 10000;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+#notification-popup .notifications-popup-list, #notification-popup .notifications-popup-list a, #notification-popup .notifications-popup-list .main-color, #notification-popup .notifications-popup-list svg, #notification-popup .notifications-popup-list .notification-text, #notification-popup .notifications-popup-list .notification-time {
+    color: <?php echo $wo['config']['header_color'];?> !important;
+}
+#notification-popup .notifications-popup-list .notification-list {
+    border-radius: 10px;
+}
+#notification-popup .notifications-popup-list .notification-list:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
 </style>

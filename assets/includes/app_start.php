@@ -5,6 +5,8 @@ error_reporting(0);
 header('Cache-Control: max-age=846000');
 
 @ini_set('max_execution_time', 0);
+@ini_set("memory_limit", "-1");
+@set_time_limit(0);
 require_once('config.php');
 
 require_once('assets/libraries/DB/vendor/autoload.php');

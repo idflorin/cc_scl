@@ -168,13 +168,17 @@ function Wo_GetLangDetails($lang_key = '') {
 function Wo_LangsFromDB($lang = 'english') {
     global $sqlConnect, $wo;
     $data  = array();
-    $query = mysqli_query($sqlConnect, "SELECT `lang_key`, `$lang` FROM " . T_LANGS);
-    if (mysqli_num_rows($query)) {
-        while ($fetched_data = mysqli_fetch_assoc($query)) {
-            $data[$fetched_data['lang_key']] = htmlspecialchars_decode($fetched_data[$lang]);
-        }
+    if (empty($lang)) {
+        $lang = 'english';
     }
-        
+    $query = mysqli_query($sqlConnect, "SELECT `lang_key`, `$lang` FROM " . T_LANGS);
+    if ($query) {
+        if (mysqli_num_rows($query)) {
+            while ($fetched_data = mysqli_fetch_assoc($query)) {
+                $data[$fetched_data['lang_key']] = htmlspecialchars_decode($fetched_data[$lang]);
+            }
+        }
+    } 
     return $data;
 }
 function Wo_LangsNamesFromDB($lang = 'english') {
@@ -1313,7 +1317,7 @@ function Wo_UploadImage($file, $name, $type, $type_file, $user_id = 0, $placemen
                     
             }
             if ($update_data == true) {
-                Wo_Resize_Crop_Image(918, 300, $filename, $filename, 80);
+                Wo_Resize_Crop_Image(918, 332, $filename, $filename, 80);
                 $upload_s3 = Wo_UploadToS3($filename);
                 return true;
             }
@@ -2217,7 +2221,7 @@ function Wo_SearchFollowers($user_id, $filter = '', $limit = 10, $event_id = 0) 
     }
     $user_id = Wo_Secure($user_id);
     $filter  = Wo_Secure($filter);
-    ;
+    $event_id = Wo_Secure($event_id);
     $query = " SELECT `user_id` FROM " . T_USERS . " WHERE `user_id` IN (SELECT `follower_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` <> {$user_id} AND `following_id` = {$user_id} AND `active` = '1') AND `active` = '1'";
     if (!empty($filter)) {
         $query .= " AND (`username` LIKE '%$filter%' OR `first_name` LIKE '%$filter%' OR `last_name` LIKE '%$filter%')";
@@ -2521,6 +2525,7 @@ function Wo_RegisterNotification($data = array()) {
             return false;
         }
     }
+
     if (!isset($data['comment_id']) or empty($data['comment_id'])) {
         $data['comment_id'] = 0;
     }else{
@@ -2620,6 +2625,7 @@ function Wo_RegisterNotification($data = array()) {
     if ($send_notification == false) {
         return false;
     }
+
     if (!empty($data['page_id']) && $data['page_id'] > 0) {
         $page = Wo_PageData($data['page_id']);
         if (!isset($page['page_id'])) {
@@ -2841,6 +2847,9 @@ function Wo_GetNotifications($data = array()) {
             }
         }
         $query_one = " SELECT * FROM " . T_NOTIFICATION . " WHERE `recipient_id` = " . $account['user_id'] . " AND `seen` = 0 {$query_4} ORDER BY `id` DESC";
+        if (!empty($data['delete_fromDB'])) {
+            $query_one .= " LIMIT 1";
+        }
     } else {
         $query_one = " SELECT * FROM " . T_NOTIFICATION . " WHERE `recipient_id` = " . $account['user_id'];
         if (isset($data['unread']) && $data['unread'] == true) {
@@ -2898,8 +2907,9 @@ function Wo_GetNotifications($data = array()) {
             }
         }
     }
-        
-    mysqli_multi_query($sqlConnect, " DELETE FROM " . T_NOTIFICATION . " WHERE `time` < " . (time() - (60 * 60 * 24 * 5)) . " AND `seen` <> 0");
+    if (empty($data['delete_fromDB'])) {
+        mysqli_multi_query($sqlConnect, " DELETE FROM " . T_NOTIFICATION . " WHERE `time` < " . (time() - (60 * 60 * 24 * 5)) . " AND `seen` <> 0");
+    }
     return $get;
 }
 function Wo_CountNotifications($data = array()) {
@@ -3091,7 +3101,7 @@ function Wo_GetSearchFilter($result, $limit = 30, $offset = 0) {
 
     if (!empty($result['filterbyage']) && $result['filterbyage'] == 'yes') {
         if (!empty($result['age_from']) && $result['age_from'] > 0 ) {
-            $query .= " AND TIMESTAMPDIFF(YEAR, `birthday`, CURDATE()) > ". $result['age_from'] ." AND TIMESTAMPDIFF(YEAR, `birthday`, CURDATE()) < ". $result['age_to']." ";
+            $query .= " AND TIMESTAMPDIFF(YEAR, `birthday`, CURDATE()) > '". $result['age_from'] ."' AND TIMESTAMPDIFF(YEAR, `birthday`, CURDATE()) < '". $result['age_to']."' ";
         }
     }
 
@@ -3110,7 +3120,7 @@ function Wo_GetSearchFilter($result, $limit = 30, $offset = 0) {
         } else {
             $user_id = Wo_Secure($wo['user']['user_id']);
         }
-        $query .= " AND `user_id` <> {$user_id}";
+        $query .= " AND `user_id` <> '{$user_id}'";
     }
     $query .= " AND `active` = '1' ";
 
@@ -4182,7 +4192,7 @@ function Wo_CountMessages($data = array(), $type = '') {
 function Wo_SeenMessage($message_id) {
     global $sqlConnect;
     $message_id   = Wo_Secure($message_id);
-    $query        = mysqli_query($sqlConnect, " SELECT `seen` FROM " . T_MESSAGES . " WHERE `id` = {$message_id}");
+    $query        = mysqli_query($sqlConnect, " SELECT `seen` FROM " . T_MESSAGES . " WHERE `id` = '{$message_id}'");
     if (mysqli_num_rows($query)) {
         $fetched_data = mysqli_fetch_assoc($query);
         if ($fetched_data['seen'] > 0) {
@@ -6695,6 +6705,7 @@ function Wo_DeleteReactions($post_id) {
         Wo_RegisterPoint($post_id, "reaction", '-');
         $query_one        = "DELETE FROM " . T_REACTIONS . " WHERE `post_id` = {$post_id} AND `user_id` = {$logged_user_id}";
         $sql_query_one    = mysqli_query($sqlConnect, $query_one);
+        $query_delete_one = mysqli_query($sqlConnect, "DELETE FROM " . T_NOTIFICATION . " WHERE `post_id` = {$post_id} AND `notifier_id` = {$logged_user_id} AND `type` = 'reaction'");
         return true;
     }
 }
@@ -6711,6 +6722,7 @@ function Wo_DeleteCommentReactions($comment_id) {
     if (Wo_IsReacted($comment_id, $wo['user']['user_id'], "comment") == true) {
         $query_one        = "DELETE FROM " . T_REACTIONS . " WHERE `comment_id` = {$comment_id} AND `user_id` = {$logged_user_id}";
         $sql_query_one    = mysqli_query($sqlConnect, $query_one);
+        $query_delete_one = mysqli_query($sqlConnect, "DELETE FROM " . T_NOTIFICATION . " WHERE `comment_id` = {$comment_id} AND `notifier_id` = {$logged_user_id} AND `type` = 'reaction'");
         return true;
     }
 }
@@ -6726,6 +6738,7 @@ function Wo_DeleteReplayReactions($replay_id) {
     $logged_user_id     = Wo_Secure($wo['user']['user_id']);
     if (Wo_IsReacted($replay_id, $wo['user']['user_id'], "replay") == true) {
         $query_one        = "DELETE FROM " . T_REACTIONS . " WHERE `replay_id` = {$replay_id} AND `user_id` = {$logged_user_id}";
+        $query_delete_one = mysqli_query($sqlConnect, "DELETE FROM " . T_NOTIFICATION . " WHERE `reply_id` = {$replay_id} AND `notifier_id` = {$logged_user_id} AND `type` = 'reaction'");
         $sql_query_one    = mysqli_query($sqlConnect, $query_one);
         return true;
     }
@@ -6744,7 +6757,7 @@ function Wo_AddReactions($post_id, $reaction) {
     $logged_user_id = Wo_Secure($wo['user']['user_id']);
     $post           = Wo_PostData($post_id);
     $text           = 'post';
-    $type2          = $reaction;
+    $type2          = Wo_Secure($reaction);
     if (empty($user_id)) {
         $user_id = Wo_GetUserIdFromPageId($post['page_id']);
         if (empty($user_id)) {
@@ -6752,15 +6765,15 @@ function Wo_AddReactions($post_id, $reaction) {
         }
     }
     if (Wo_IsReacted($post_id, $wo['user']['user_id']) == true) {
-        $query_one        = "DELETE FROM " . T_REACTIONS . " WHERE `post_id` = {$post_id} AND `user_id` = {$logged_user_id}";
-        $query_delete_one = mysqli_query($sqlConnect, "DELETE FROM " . T_NOTIFICATION . " WHERE `post_id` = {$post_id} AND `recipient_id` = {$user_id} AND `type` = 'reaction'");
+        $query_one        = "DELETE FROM " . T_REACTIONS . " WHERE `post_id` = '{$post_id}' AND `user_id` = '{$logged_user_id}'";
+        $query_delete_one = mysqli_query($sqlConnect, "DELETE FROM " . T_NOTIFICATION . " WHERE `post_id` = '{$post_id}' AND `recipient_id` = '{$user_id}' AND `type` = 'reaction'");
         $delete_activity  = Wo_DeleteActivity($post_id, $logged_user_id, 'reaction');
         $sql_query_one    = mysqli_query($sqlConnect, $query_one);
 
         //Register point level system for reaction
         Wo_RegisterPoint($post_id, "reaction" , "-");
     }
-        $query_two     = "INSERT INTO " . T_REACTIONS . " (`user_id`, `post_id`, `reaction`) VALUES ({$logged_user_id}, {$post_id},'{$reaction}')";
+        $query_two     = "INSERT INTO " . T_REACTIONS . " (`user_id`, `post_id`, `reaction`) VALUES ('{$logged_user_id}', '{$post_id}','{$reaction}')";
         $sql_query_two = mysqli_query($sqlConnect, $query_two);
         if ($sql_query_two) {
             $activity_data = array(

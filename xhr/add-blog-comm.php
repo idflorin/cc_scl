@@ -32,7 +32,8 @@ if ($f == "add-blog-comm") {
                 $data = array(
                     'status' => 200,
                     'html' => $html,
-                    'comments' => Wo_GetBlogCommentsCount($_POST['blog'])
+                    'comments' => Wo_GetBlogCommentsCount($_POST['blog']),
+                    'user_id' => $get_blog['user']
                 );
             }
         }

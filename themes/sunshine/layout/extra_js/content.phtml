@@ -125,7 +125,13 @@ function Wo_RegisterReactionLike(element,reaction_icon){
     $('.status-reaction-'+post_id).html(reaction_icon+lang).css({"color": reaction_color});
     $('.status-reaction-'+post_id).addClass("active-like");
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_reaction', post_id: post_id, reaction: reaction}, function (data) {
+
       if(data.status == 200) {
+         <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
+      if ($('#react_'+post_id).attr('data_react') == 0) {
+        socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "added" });
+      }
+      <?php } ?>
         $('.post-reactions-icons-'+post_id).html(data.reactions);
         
       }
@@ -180,10 +186,15 @@ function Wo_RegisterReaction(element,reaction_icon){
 
     $('.status-reaction-'+post_id).html(reaction_icon+lang).css({"color": reaction_color});
     $('.status-reaction-'+post_id).addClass("active-like");
-    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_reaction', post_id: post_id, reaction: reaction}, function (data) {
+     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_reaction', post_id: post_id, reaction: reaction}, function (data) {
       if(data.status == 200) {
+        <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
+    if ($('#react_'+post_id).attr('data_react') == 0) {
+      socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "added" });
+    }
+    <?php } ?>
         $('.post-reactions-icons-'+post_id).html(data.reactions);
-		    
+        
       }
       if (data.can_send == 1) {
         Wo_SendMessages();
@@ -247,6 +258,39 @@ function Wo_RegisterFollow(id, is_confirm,show_modal= false) {
   _follow_con.html(html_);
 
   $.get(Wo_Ajax_Requests_File(), {f: 'follow_user', following_id: id}, function(data) {
+
+    <?php if ($wo['config']['connectivitySystem'] == 0): ?>
+    
+    if (_follow_con.find('button').hasClass('btn-active') || _follow_con.find('button').hasClass('btn-requested')) {
+      if (node_socket_flow == "1") {
+        if (is_confirm_f == 1) {
+          socket.emit("user_notification", { to_id: id, user_id: _getCookie("user_id"), type: "request" });
+        } else {
+          socket.emit("user_notification", { to_id: id, user_id: _getCookie("user_id"), type: "added" });
+        }
+        
+      }
+    } else {
+      if (node_socket_flow == "1") {
+        if (is_confirm_f == 1) {
+         socket.emit("user_notification", { to_id: id, user_id: _getCookie("user_id"), type: "removed" });
+          } else {
+            socket.emit("user_notification", { to_id: id, user_id: _getCookie("user_id"), type: "request_removed" });
+          }
+      }
+    }
+  <?php else: ?>
+    if (_follow_con.find('button').hasClass('btn-requested') || _follow_con.find('button').hasClass('btn-active')) {
+      if (node_socket_flow == "1") {
+         socket.emit("user_notification", { to_id: id, user_id: _getCookie("user_id"), type: "request" });
+      }
+    } else {
+      if (node_socket_flow == "1") {
+         socket.emit("user_notification", { to_id: id, user_id: _getCookie("user_id"), type: "request_removed" });
+      }
+    }
+  <?php endif; ?>
+
     if (data.can_send == 1) {
       Wo_SendMessages();
     }
@@ -280,6 +324,13 @@ function Wo_RegisterGroupJoin(id, is_confirm) {
   }
   _join_con.html(html_join);
   $.get(Wo_Ajax_Requests_File(), {f: 'join_group', group_id: id}, function (data) {
+    if (node_socket_flow == "1") {
+      if (_join_con.find('button').hasClass('btn-active') || _join_con.find('button').hasClass('btn-requested')) {
+          socket.emit("group_notification", { to_id: id, user_id: _getCookie("user_id"), type: "added" });
+      } else {
+          socket.emit("group_notification", { to_id: id, user_id: _getCookie("user_id"), type: "removed" });
+      }
+    }
     if (data.can_send == 1) {
       Wo_SendMessages();
     }
@@ -294,6 +345,13 @@ function Wo_RegisterEventGoing(id) {
   }
   _join_con.html(html_join);
   $.get(Wo_Ajax_Requests_File(), {f: 'go_event', event_id: id}, function (data) {
+    if (node_socket_flow == "1") {
+      if (_join_con.find('button').hasClass('btn-main')) {
+          socket.emit("event_notification", { to_id: id, user_id: _getCookie("user_id"), type: "added" });
+      } else {
+          socket.emit("event_notification", { to_id: id, user_id: _getCookie("user_id"), type: "removed" });
+      }
+    }
     if (data.can_send == 1) {
       Wo_SendMessages();
     }
@@ -308,6 +366,13 @@ function Wo_RegisterEventInterested(id) {
   }
   _join_con.html(html_join);
   $.get(Wo_Ajax_Requests_File(), {f: 'interested_event', event_id: id}, function (data) {
+     if (node_socket_flow == "1") {
+      if (_join_con.find('button').hasClass('btn-main')) {
+          socket.emit("event_notification", { to_id: id, user_id: _getCookie("user_id"), type: "added" });
+      } else {
+          socket.emit("event_notification", { to_id: id, user_id: _getCookie("user_id"), type: "removed" });
+      }
+    }
     if (data.can_send == 1) {
       Wo_SendMessages();
     }
@@ -324,6 +389,13 @@ function Wo_RegisterPageLike(id) {
   element_like.html(html_like);
   $.get(Wo_Ajax_Requests_File(), {f: 'like_page', page_id: id}, function (data) {
     if(data.status == 200) {
+       if (node_socket_flow == "1") {
+        if (element_like.find('button').hasClass('btn-active')) {
+           socket.emit("page_notification", { to_id: id, user_id: _getCookie("user_id"), type: "added"});
+        } else {
+          socket.emit("page_notification", { to_id: id, user_id: _getCookie("user_id"), type: "removed"});
+        }
+      }
       if ($('.sidebar-listed-page-like').attr('data-type') == "sidebar") {
         setTimeout(function () {
           Wo_ReloadSideBarPages();
@@ -347,6 +419,11 @@ function Wo_RegisterLike(post_id) {
   <?php } ?>
   post.find("[id^=like-button]").html(html_like);
   $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_like', post_id: post_id}, function (data) {
+     if (post.find("[id^=like-button]").parent().find('.active-like').length > 0) {
+      if (node_socket_flow == "1") { socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "added" }); }
+    } else {
+      if (node_socket_flow == "1") { socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "removed" });}
+    }
     if(data.status == 200) {
       post.find("[id^=likes]").text(data.likes);
       post.find("[id^=wonders]").text(data.wonders);
@@ -378,6 +455,11 @@ function Wo_RegisterWonder(post_id) {
    post.find("[id^=like-button]").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> <span class="like-btn-mobile"> <?php echo $wo["lang"]["like"];?></span>');
   <?php } ?>
   $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_wonder', post_id: post_id}, function (data) {
+     if (post.find("[id^=wonder-button]").parent().find('.active-wonder').length > 0) {
+      if (node_socket_flow == "1") { socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "added" }); }
+    } else {
+      if (node_socket_flow == "1") { socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "removed" });}
+    }
     if(data.status == 200) {
       post.find("[id^=wonders]").text(data.wonders);
       post.find("[id^=likes]").text(data.likes);
@@ -465,6 +547,9 @@ $(document).on('click', '#share_post_on_btn', function(event) {
       data: {f: 'share_post_on',s:type,type_id:type_id,post_id:post_id,text:text},
     })
     .done(function(data) {
+       if (node_socket_flow == "1") {
+          socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id")});
+        }
       $(self).text('<?php echo($wo['lang']['share']) ?>');
       $(self).removeAttr('disabled');
       if (data.status == 200) {
@@ -784,4 +869,223 @@ function Wo_LiveComment(text,event,post_id,insert = 0) {
   }
 }
 
+$(window).on('load', function() {
+  //reactions
+  $('body').delegate('.wo-reaction-post','mouseenter', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+      if ($('#post-' + id + ' .wo-reaction-post:hover').length != 0) {
+          $('.reactions-box-container-'+id).fadeIn(50);
+      }
+    }, 300);
+  });
+
+  $('body').delegate('.wo-reaction-post','mouseleave', function() {
+    var id = $( this ).attr( 'data-id' );
+      setTimeout( function () {
+      if ($('.reactions-box-container-'+id + ':hover').length == 0 && $('#post-' + id + ' .wo-reaction-post:hover').length == 0) {
+          $('.reactions-box-container-'+id).fadeOut(50);
+      }
+    }, 500);
+  });
+
+  $('body').delegate('.like-btn-post','click', function() {
+    if ($( this ).attr( 'data_react' ) == 0) {
+      return false;
+    }
+    var self = this;
+    var post_id = $( this ).attr( 'data-id' );
+   
+    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_reaction', post_id: post_id}, function (data) {
+      if(data.status == 200) {
+        <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
+        socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "removed" });
+        <?php } ?>
+        $('.reactions-box-container-'+post_id).toggle();
+        $('.post-reactions-icons-'+post_id).html(data.reactions);
+        $('.status-reaction-'+post_id).removeClass("active-like");
+        $('.status-reaction-'+post_id).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> ' + data.like_lang).css({"color": "inherit"});
+      }
+      $(self).attr('data_react','0');
+    });
+  });
+  
+   $('body').delegate('.reactions-box','mouseleave', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+      if ($('.reactions-box-container-'+id + ':hover').length == 0 && $('#post-' + id + ' .wo-reaction-post:hover').length == 0) {
+          $('.reactions-box-container-'+id).fadeOut(50);
+      }
+    }, 500);
+  });
+
+  //reactions lightbox
+  $('body').delegate('.wo-reaction-lightbox','mouseenter', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+      if ($('#post-' + id + ' .wo-reaction-lightbox:hover').length != 0) {
+        $('.reactions-lightbox-container-'+id).fadeIn(50);
+      }
+    }, 500);
+  });
+
+  $('body').delegate('.wo-reaction-lightbox','mouseleave', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+      if ($('.reactions-lightbox-container-'+id + ':hover').length == 0 && $('#post-' + id + ' .wo-reaction-lightbox:hover').length == 0) {
+          $('.reactions-lightbox-container-'+id).fadeOut(50);
+      }
+    }, 500);
+  });
+
+  $('body').delegate('.like-btn-lightbox','click', function() {
+    var post_id = $( this ).attr( 'data-id' );
+   
+    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_reaction', post_id: post_id}, function (data) {
+      if(data.status == 200) {
+         <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
+        socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "removed" });
+        <?php } ?>
+        $('.reactions-lightbox-container-'+post_id).toggle();
+        $('.post-reactions-icons-'+post_id).html("");
+        $('.status-reaction-'+post_id).removeClass("active-like");
+        $('.status-reaction-'+post_id).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>' + data.like_lang).css({"color": "inherit"});
+      }
+    });
+  });
+
+  //reactions comment
+  $('body').delegate('.like-btn-comment','mouseenter', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+        $('.reactions-comment-container-'+id).fadeIn(50);
+    }, 500);
+  });
+
+  $('body').delegate('.like-btn-comment','mouseleave', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+      if( $('.reactions-comment-container-'+id+':hover').length == 0 && $('#comment-' + id + ' .wo-reaction-comment:hover').length == 0 ){
+        $('.reactions-comment-container-'+id).fadeOut(50);
+      }
+    }, 500);
+  });
+
+  $('body').delegate('.reactions-box','mouseleave', function() {
+    if( !$( this ).hasClass( 'reactions-comment-container-' + $( this ).attr( 'data-id' ) ) ){
+      return false;
+    }
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+        $('.reactions-comment-container-'+id).fadeOut(50);
+    }, 500);
+  });
+  
+  $('body').delegate('.like-btn-comment','click', function() {
+    var comment_id = $( this ).attr( 'data-id' );
+    
+    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_comment_reaction', comment_id: comment_id}, function (data) {
+      if(data.status == 200) {
+        <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
+        socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "removed" });
+        <?php } ?>
+        $('.reactions-comment-container-'+comment_id).toggle();
+        $('.comment-reactions-icons-'+comment_id).html(data.reactions);
+        $('.comment-status-reaction-'+comment_id).removeClass("active-like");
+      }
+    });
+  });
+  
+  //reactions replay
+  $('body').delegate('.like-btn-replay','mouseenter', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+        $('.reactions-box-comment-replay-container-'+id).fadeIn(50);
+    }, 500);
+  });
+  $('body').delegate('.reactions-box','mouseenter', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+        $('.reactions-box-comment-replay-container-'+id).fadeIn(50);
+    }, 500);
+  });
+
+  $('body').delegate('.like-btn-replay','mouseleave', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+      if( $('.reactions-comment-replay-container-'+id+':hover').length == 0 && $('#comment_reply_' + id + ' .wo-reaction-replay:hover').length == 0 ){
+        $('.reactions-box-comment-replay-container-'+id).fadeOut(50);
+      }
+    }, 500);
+  });
+
+  $('body').delegate('.reactions-box','mouseleave', function() {
+    if( !$( this ).hasClass( 'reactions-box-comment-replay-container-' + $( this ).attr( 'data-id' ) ) ){
+      return false;
+    }
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+        $('.reactions-box-comment-replay-container-'+id).fadeOut(50);
+    }, 500);
+  });
+
+  $('body').delegate('.like-btn-replay','click', function() {
+    var replay_id = $( this ).attr( 'data-id' );
+    
+    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_replay_reaction', replay_id: replay_id}, function (data) {
+      if(data.status == 200) {
+        if (node_socket_flow == "1") {
+          socket.emit("reply_notification", { reply_id: replay_id, user_id: _getCookie("user_id"), type: "removed" });
+        }
+        $('.reactions-box-comment-replay-container-'+replay_id).toggle();
+        $('.replay-reactions-icons-'+replay_id).html(data.reactions);
+        $('.replay-status-reaction-'+replay_id).removeClass("active-like");
+      }
+    });
+  });
+
+
+  //reactions comment lightbox
+  $('body').delegate('.like-btn-lightbox-comment','mouseenter', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+        $('.reactions-lightbox-comment-container-'+id).fadeIn(50);
+    }, 500);
+  });
+
+  $('body').delegate('.like-btn-lightbox-comment','mouseleave', function() {
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+      if( $('.reactions-lightbox-comment-container-'+id+':hover').length == 0 && $('#comment_' + id + ' .wo-reaction-lightbox-comment:hover').length == 0 ){
+        $('.reactions-lightbox-comment-container-'+id).fadeOut(50);
+      }
+    }, 500);
+  });
+  
+  $('body').delegate('.reactions-box','mouseleave', function() {
+    if( !$( this ).hasClass( 'reactions-lightbox-comment-container-' + $( this ).attr( 'data-id' ) ) ){
+      return false;
+    }
+    var id = $( this ).attr( 'data-id' );
+    setTimeout( function () {
+        $('.reactions-lightbox-comment-container-'+id).fadeOut(50);
+    }, 500);
+  });
+
+  $('body').delegate('.like-btn-lightbox-comment','click', function() {
+    var comment_id = $( this ).attr( 'data-id' );
+    
+    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_comment_reaction', comment_id: comment_id}, function (data) {
+      if(data.status == 200) {
+        <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
+    socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "removed" });
+    <?php } ?>
+        $('.reactions-box-comment-replay-container-'+comment_id).toggle();
+        $('.lightbox-comment-reactions-icons-'+comment_id).html(data.reactions);
+        $('.lightbox-comment-status-reaction-'+comment_id).removeClass("active-like");
+      }
+    });
+  });
+
+});
 </script>

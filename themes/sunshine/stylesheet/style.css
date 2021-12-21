@@ -1249,6 +1249,9 @@ article,div,h1,h2,h3,h4,h5,p,span{word-wrap:break-word}
 #publisher-box-stickers-cont{width:100%;overflow:auto;max-height:300px}
 #publisher-box-stickers-cont img,#publisher-box-stickers-cont video{width:50%;height:150px;display:inline;cursor:pointer}
 @media (max-width:900px) {
+#notification-popup {
+     width: 80% !important;
+}
 .post-youtube iframe{height:300px}
 }
 @media (max-width:400px) {

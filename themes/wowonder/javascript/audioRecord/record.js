@@ -534,7 +534,7 @@ function Wo_InsertComment(dataForm, post_id) {
   comment_list = post_wrapper.find('.comments-list');
   //event.preventDefault();
   textarea_wrapper.val('');
-
+  
   post_wrapper.find('#wo_comment_combo .ball-pulse').fadeIn(100);
   $.ajax({
     url: Wo_Ajax_Requests_File() + '?f=posts&s=register_comment&hash=' + $('.main_session').val(),
@@ -547,12 +547,20 @@ function Wo_InsertComment(dataForm, post_id) {
   }).done(function (data) {
     $('.wo_comment_combo_' + post_id).removeClass('comment-toggle');
     if (data.status == 200) {
+      if (node_socket_flow == "1") {
+        socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "added" });
+      }
       Wo_CleanRecordNodes();
       post_wrapper.find('.post-footer .comment-container:last-child').after(data.html);
       post_wrapper.find('.comments-list-lightbox .comment-container:first').before(data.html);
       post_wrapper.find('[id=comments]').html(data.comments_num);
       post_wrapper.find('.lightbox-no-comments').remove();
       Wo_StopLocalStream();
+      if (data.mention.length > 0 && node_socket_flow == "1") {
+        $.each(data.mention, function( index, value ) {
+          socket.emit("user_notification", { to_id: value, user_id: _getCookie("user_id")});
+        });
+      }
     }
     $('#post-' + post_id).find('.comment-image-con').empty().addClass('hidden');
     $('#post-' + post_id).find('#comment_src_image').val('');

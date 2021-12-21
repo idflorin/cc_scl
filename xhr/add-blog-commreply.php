@@ -38,7 +38,8 @@ if ($f == "add-blog-commreply") {
                 $data = array(
                     'status' => 200,
                     'html' => $html,
-                    'comments' => Wo_GetBlogCommentsCount($_POST['b_id'])
+                    'comments' => Wo_GetBlogCommentsCount($_POST['b_id']),
+                    'user_id' => $main_comment['user_id']
                 );
             }
         }

@@ -456,6 +456,7 @@
 
     <script src="<?php echo $wo['config']['theme_url'];?>/javascript/socket.io.js"></script>
       <script>
+      let nodejs_system = "<?php echo $wo['config']['node_socket_flow']; ?>";
       let socket = null
       let groupChatListener = {}
       $(()=>{
@@ -508,9 +509,6 @@
               }
             });
             socket.emit('join', {username: "<?php echo $wo['user']['username'];?>", user_id: _getCookie('user_id'), recipient_ids, recipient_group_ids }, ()=>{
-                // setInterval(() => {
-                //   socket.emit("get_user_status", {user_id: _getCookie("user_id")})
-                // }, 2000);
                 setInterval(() => {
                   socket.emit("ping_for_lastseen", {user_id: _getCookie("user_id")})
                 }, 2000);
@@ -535,6 +533,75 @@
             $("#online_" + data.user_id).find('#chat-tab-id').html(data.name);
             $("#messages-recipient-" + data.user_id).find('.messages-user-name').html(data.name);
           });
+          socket.on("new_notification", (data) => {
+             <?php if ($wo['config']['nodejs_live_notification'] == "1") {?>
+            Wo_GetLastNotification();
+             <?php } ?>
+            current_notifications = $('.notification-container').find('.new-update-alert').text();
+            $('.notification-container').find('.new-update-alert').removeClass('hidden');
+            $('.notification-container').find('.sixteen-font-size').addClass('unread-update');
+            $('.notification-container').find('.new-update-alert').text(Number(current_notifications) + 1).show();
+            document.getElementById('notification-sound').play();
+          });
+          socket.on("new_notification_removed", (data) => {
+            current_notifications = $('.notification-container').find('.new-update-alert').text();
+            $('.notification-container').find('.new-update-alert').removeClass('hidden');
+            if (Number(current_notifications) > 0) {
+               if ((Number(current_notifications) - 1) == 0) {
+                  $('.notification-container').find('.new-update-alert').addClass('hidden');
+                  $('.notification-container').find('.new-update-alert').addClass('hidden').text('0').hide();
+               } else {
+                  $('.notification-container').find('.sixteen-font-size').addClass('unread-update');
+                  $('.notification-container').find('.new-update-alert').text(Number(current_notifications) - 1).show();
+               }
+            } else if (Number(current_notifications) == 0) {
+               $('.notification-container').find('.new-update-alert').addClass('hidden');
+               $('.notification-container').find('.new-update-alert').addClass('hidden').text('0').hide();
+            } 
+          });
+
+          socket.on("new_request", (data) => {
+            current_requests= $('.requests-container').find('.new-update-alert').text();
+            $('.requests-container').find('.new-update-alert').removeClass('hidden');
+            $('.requests-container').find('.sixteen-font-size').addClass('unread-update');
+            $('.requests-container').find('.new-update-alert').text(Number(current_requests) + 1).show();
+            document.getElementById('notification-sound').play();
+          });
+          socket.on("new_request_removed", (data) => {
+            current_requests = $('.requests-container').find('.new-update-alert').text();
+            $('.requests-container').find('.new-update-alert').removeClass('hidden');
+            if (Number(current_requests) > 0) {
+               if ((Number(current_requests) - 1) == 0) {
+                  $('.requests-container').find('.new-update-alert').addClass('hidden');
+                  $('.requests-container').find('.new-update-alert').addClass('hidden').text('0').hide();
+               } else {
+                  $('.requests-container').find('.sixteen-font-size').addClass('unread-update');
+                  $('.requests-container').find('.new-update-alert').text(Number(current_requests) - 1).show();
+               }
+            } else if (Number(current_requests) == 0) {
+               $('.requests-container').find('.new-update-alert').addClass('hidden');
+               $('.requests-container').find('.new-update-alert').addClass('hidden').text('0').hide();
+            } 
+          });
+
+          socket.on("messages_count", (data) => {
+             current_messages_number = data.count;
+             if (current_messages_number > 0) {
+               $("[data_messsages_count]").text(current_messages_number).removeClass("hidden");
+               $("[data_messsages_count]").attr('data_messsages_count', current_messages_number);
+             } else {
+               $("[data_messsages_count]").text(current_messages_number).addClass("hidden");
+               $("[data_messsages_count]").attr('data_messsages_count', "0");
+             }
+          });
+          socket.on("new_video_call", (data) => {
+             Wo_intervalUpdates(1);
+          });
+          socket.on("load_comment_replies", (data) => {
+             Wo_ViewMoreReplies(data.comment_id);
+          });
+
+
         socket.on("color-change", (data)=>{
           if (data.sender == <?php echo $wo['user']['user_id'];?>) {
             $(".chat_" + data.id).find('.outgoing .message-text, .outgoing .message-media').css('background', data.color);
@@ -575,14 +642,17 @@
           } else {
             current_number = $('#online_' + data.id).find('.new-message-alert').text();
             $('#online_' + data.id).find('.new-message-alert').html(Number(current_number) + 1).show();
+
           }
-          if(data.sender != <?php echo $wo['user']['user_id'];?>){
-             document.getElementById('message-sound').play();
+          if (!chat_container.find("#sendMessage").is(":focus")) {
+            if(data.sender != <?php echo $wo['user']['user_id'];?>){
+                document.getElementById('message-sound').play();
+            }
           }
-          if (!$('#sendMessage').is(':focus') && chat_container.length == 0) {
+          if (!chat_container.find('#sendMessage').is(':focus') && chat_container.length == 0) {
              new_current_messages = new_current_messages + 1;
              current_messages_number = Number($("[data_messsages_count]").attr('data_messsages_count')) + 1;
-             $("[data_messsages_count]").text(current_messages_number);
+             $("[data_messsages_count]").text(current_messages_number).removeClass("hidden");
              $("[data_messsages_count]").attr('data_messsages_count', current_messages_number);
              document.title = 'New Message | ' + document_title;
           }
@@ -863,6 +933,9 @@
           user_id = $(this).attr('data_story_user_id');
           type = $(this).attr('data_story_type');
           $.post(Wo_Ajax_Requests_File() + '?f=view_all_stories', {user_id: user_id,type:type}, function(data, textStatus, xhr) {
+            if (node_socket_flow == "1") {
+               socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "added" });
+            }
             document.body.style.overflow = 'hidden';
             $('.lightbox-container').html(data.html);
             setTimeout(function(){
@@ -896,6 +969,10 @@
             Wo_CloseLightbox();
             $('#contnet').append('<div class="lightbox-container"><div class="lightbox-backgrond" onclick="Wo_CloseLightbox();"></div><div class="lb-preloader" style="display:block"><svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg></div></div>');
             $.post(Wo_Ajax_Requests_File() + '?f=view_story_by_id', {story_id: story_id,type:'previous',story_type:story_type}, function(data, textStatus, xhr) {
+               user_id = $(this).attr('data_story_user_id');
+               if (node_socket_flow == "1") {
+               socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "added" });
+            }
               if (data.status == 200) {
                 document.body.style.overflow = 'hidden';
                   $('.lightbox-container').html(data.html);
@@ -935,6 +1012,10 @@
             $('#contnet').append('<div class="lightbox-container"><div class="lightbox-backgrond" onclick="Wo_CloseLightbox();"></div><div class="lb-preloader" style="display:block"><svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg></div></div>');
             $.post(Wo_Ajax_Requests_File() + '?f=view_story_by_id', {story_id: story_id,type:'next',story_type:story_type}, function(data, textStatus, xhr) {
               if (data.status == 200) {
+               user_id = $(this).attr('data_story_user_id');
+               if (node_socket_flow == "1") {
+               socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "added" });
+            }
                 document.body.style.overflow = 'hidden';
                   $('.lightbox-container').html(data.html);
                   video_story = $('#video_story').attr('data-story-video');
@@ -987,5 +1068,8 @@
     <?php } } ?>
     <div class="modal fade sun_modal" id="apply-job-modal" role="dialog">
     </div>
+    <!-- HTML NOTIFICATION POPUP -->
+    <div id="notification-popup"></div>
+    <!-- HTML NOTIFICATION POPUP -->
    </body>
 </html>

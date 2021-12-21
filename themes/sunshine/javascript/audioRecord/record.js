@@ -548,6 +548,9 @@ function Wo_InsertComment(dataForm,post_id){
         contentType: false,
     }).done(function(data) {
       if(data.status == 200) {
+        if (node_socket_flow == "1") {
+          socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "added" });
+        }
         Wo_CleanRecordNodes();
         post_wrapper.find('.post-footer .comment-container:last-child').after(data.html);
         post_wrapper.find('.comments-list-lightbox .comment-container:first').before(data.html);
@@ -555,6 +558,11 @@ function Wo_InsertComment(dataForm,post_id){
 		post_wrapper.find('textarea').attr("style", "height:36px;");
         post_wrapper.find('.lightbox-no-comments').remove();
         Wo_StopLocalStream();
+        if (data.mention.length > 0 && node_socket_flow == "1") {
+          $.each(data.mention, function( index, value ) {
+            socket.emit("user_notification", { to_id: value, user_id: _getCookie("user_id")});
+          });
+        }
       }
       $('#post-'+ post_id).find('.comment-image-con').empty().addClass('hidden');
       $('#post-'+ post_id).find('#comment_src_image').val('');

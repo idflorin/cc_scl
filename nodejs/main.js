@@ -76,6 +76,12 @@ async function init() {
   ctx.wo_blocks = require("./models/wo_blocks")(sequelize, DataTypes)
   ctx.wo_followers = require("./models/wo_followers")(sequelize, DataTypes)
   ctx.wo_hashtags = require("./models/wo_hashtags")(sequelize, DataTypes)
+  ctx.wo_posts = require("./models/wo_posts")(sequelize, DataTypes)
+  ctx.wo_comments = require("./models/wo_comments")(sequelize, DataTypes)
+  ctx.wo_comment_replies = require("./models/wo_comment_replies")(sequelize, DataTypes)
+  ctx.wo_pages = require("./models/wo_pages")(sequelize, DataTypes)
+  ctx.wo_groups = require("./models/wo_groups")(sequelize, DataTypes)
+  ctx.wo_events = require("./models/wo_events")(sequelize, DataTypes)
 
   ctx.globalconfig = {}
   ctx.globallangs = {}

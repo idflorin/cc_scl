@@ -40,7 +40,8 @@ if ($f == "threadreply" && Wo_CheckMainSession($hash_id) === true) {
             $data = array(
                 'message' => $success_icon . $wo['lang']['reply_added'],
                 'status' => 200,
-                'url' => Wo_SeoLink('index.php?link1=showthread&tid=' . $_GET['tid'])
+                'url' => Wo_SeoLink('index.php?link1=showthread&tid=' . $_GET['tid']),
+                'user_id' => $thread['user']
             );
         }
     } else {

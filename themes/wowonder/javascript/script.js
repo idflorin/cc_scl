@@ -60,9 +60,12 @@ $(function () {
     $('body').scrollTop(0);
   });
   
-    intervalUpdates = setTimeout(Wo_intervalUpdates, 6000);
-    setTimeout(Wo_UpdateLastSeen, 40000);
-    setTimeout(Wo_IsLogged, 30000);
+    if (node_socket_flow == "0") {
+      intervalUpdates = setTimeout(Wo_intervalUpdates, 6000);
+      //setTimeout(Wo_UpdateLastSeen, 40000);
+      setTimeout(Wo_IsLogged, 30000);
+    }
+
 
   //  dropdown won't close on click
   $('.dropdown-menu.request-list, .dropdown-menu.post-recipient, .dropdown-menu.post-options').click(function (e) {
@@ -263,7 +266,7 @@ function Wo_ReloadSideBarPages() {
 function Wo_OpenNotificationsMenu() {
   notification_container = $('.notification-container');
   notification_list = $('#notification-list');
-  notification_container.find('.new-update-alert').addClass('hidden');
+  notification_container.find('.new-update-alert').addClass('hidden').text('0');
   Wo_progressIconLoader(notification_container.find('.notification-loading-progress'));
   $.get(Wo_Ajax_Requests_File(), {
     f: 'get_notifications'
@@ -308,6 +311,8 @@ function Wo_OpenRequestsMenu() {
     f: 'get_follow_requests'
   }, function (data) {
     if(data.status == 200) {
+      requests_container.find('.new-update-alert').addClass('hidden');
+      requests_container.find('.new-update-alert').addClass('hidden').text('0').hide();
       if(data.html.length == 0) {
         requests_List.html('<div class="empty_state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M14 14.252v2.09A6 6 0 0 0 6 22l-2-.001a8 8 0 0 1 10-7.748zM12 13c-3.315 0-6-2.685-6-6s2.685-6 6-6 6 2.685 6 6-2.685 6-6 6zm0-2c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm7 6.586l2.121-2.122 1.415 1.415L20.414 19l2.122 2.121-1.415 1.415L19 20.414l-2.121 2.122-1.415-1.415L17.586 19l-2.122-2.121 1.415-1.415L19 17.586z" fill="currentColor"/></svg>' + data.message + '</div>');
       } else {
@@ -320,165 +325,8 @@ function Wo_OpenRequestsMenu() {
 }
 
 // Notifications & follow requests updates
-function Wo_intervalUpdates() {
-  // if (node_socket_flow === "1"){
-  //   var check_posts = true;
-  //   var hash_posts = true;
-  //   if ($('.posts-hashtag-count').length == 0) {
-  //     hash_posts = false;
-  //   }
-  //   var api = $('#api').val();
-  //   if (api) {
-  //     return false;
-  //   }
-  //   if ($('.posts-count').length == 0 || hash_posts == true) {
-  //     check_posts = false;
-  //   }
-  //   if(typeof ($('#posts').attr('data-story-user')) == "string") {
-  //     user_id = $('#posts').attr('data-story-user');
-  //   } else {
-  //     user_id = 0;
-  //   }
-  //   before_post_id = 0;
-  //   if($('.post-container').length > 0) {
-  //     var before_post_id = $('.post-container  > .post:not(.boosted)').attr('data-post-id');
-  //   }
-  //   var notification_container = $('.notification-container');
-  //   var messages_notification_container = $('.messages-notification-container');
-  //   var follow_requests_container = $('.requests-container');
-  //   var ajax_request = {
-  //     f: 'update_data',
-  //     user_id: user_id,
-  //     before_post_id: before_post_id,
-  //     check_posts:check_posts,
-  //     hash_posts:hash_posts
-  //   };
-  //   if (hash_posts == true) {
-  //     ajax_request['hashtagName'] = $('#hashtagName').val();
-  //   }
-  //   socket.emit("update_data", {
-  //     userId: _getCookie("user_id"),
-  //   }, function (data) {
-  //     clearTimeout(intervalUpdates);
-  //     intervalUpdates = setTimeout(Wo_intervalUpdates, 5000);
-  //     if (hash_posts == true) {
-  //         if (data.count_num > 0) {
-  //           $('.posts-count').html(data.count);
-  //         }
-  //     } else {
-  //         if (data.count_num > 0 && $('.filter-by-more').attr('data-filter-by') == 'all') {
-  //           $('.posts-count').html(data.count);
-  //         }
-  //     }
-  //     if(typeof (data.notifications) != "undefined" && data.notifications > 0) {
-  //       notification_container.find('.new-update-alert').removeClass('hidden');
-  //       notification_container.find('.sixteen-font-size').addClass('unread-update');
-  //       notification_container.find('.new-update-alert').text(data.notifications).show();
-  //       if(current_width > 800 && data.pop == 200) {
-  //         Wo_NotifyMe(data.icon, decodeHtml(data.title), decodeHtml(data.notification_text), data.url);
-  //       }
-  //       if(data.notifications != current_notification_number) {
-  //         if (data.notifications_sound == 0) {
-  //           document.getElementById('notification-sound').play();
-  //         }
-  //         current_notification_number = data.notifications;
-  //       }
-  //     } else {
-  //       notification_container.find('.new-update-alert').hide();
-  //       notification_container.find('.sixteen-font-size').removeClass('unread-update');
-  //       current_notification_number = 0;
-  //     }
-  //     if(typeof (data.messages) != "undefined" && data.messages > 0) {
-  //       messages_notification_container.find('.new-update-alert').removeClass('hidden');
-  //       messages_notification_container.find('.sixteen-font-size').addClass('unread-update');
-  //       messages_notification_container.find('.new-update-alert').text(data.messages).show();
-  //       if(data.messages != current_messages_number) {
-  //         if (data.notifications_sound == 0) {
-  //           document.getElementById('message-sound').play();
-  //         }
-  //         current_messages_number = data.messages;
-  //       }
-  //     } else {
-  //       messages_notification_container.find('.new-update-alert').hide();
-  //       messages_notification_container.find('.sixteen-font-size').removeClass('unread-update');
-  //       current_messages_number = 0;
-  //     }
-  //     if(typeof (data.followRequests) != "undefined" && data.followRequests > 0) {
-  //       follow_requests_container.find('.new-update-alert').removeClass('hidden');
-  //       follow_requests_container.find('.sixteen-font-size').addClass('unread-update');
-  //       follow_requests_container.find('.new-update-alert').text(data.followRequests).show();
-  //       if(data.followRequests != current_follow_requests_number) {
-  //         current_follow_requests_number = data.followRequests;
-  //       }
-  //     } else {
-  //       follow_requests_container.find('.new-update-alert').hide();
-  //       follow_requests_container.find('.sixteen-font-size').removeClass('unread-update');
-  //       current_follow_requests_number = 0;
-  //     }
-
-  //     if(typeof (data.messages) != "undefined" && data.messages > 0 || typeof (data.notifications) != "undefined" && data.notifications > 0 || typeof (data.followRequests) != "undefined" && data.followRequests > 0) {
-  //       title = Number(data.notifications) + Number(data.messages) + Number(data.followRequests);
-  //       document.title = '(' + title + ') ' + document_title;
-  //     } else {
-  //       document.title = document_title;
-  //     }
-  //     if (data.calls == 200 && $('#re-calling-modal').length == 0 && $('#re-talking-modal').length == 0) {
-  //         if ($('#calling-modal').length == 0) {
-  //           $('body').append(data.calls_html);
-  //           if (!$('#re-calling-modal').hasClass('calling')) {
-  //             $('#re-calling-modal').modal({
-  //             show: true
-  //             });
-  //             Wo_PlayVideoCall('play');
-  //           }
-  //           document.title = 'New video call..';
-  //           setTimeout(function () {
-  //             Wo_CloseModels();
-  //             $('#re-calling-modal').addClass('calling');
-  //             Wo_PlayVideoCall('stop');
-  //             document.title = document_title;
-  //             setTimeout(function () {
-  //               $( '#re-calling-modal' ).remove();
-  //               $( '.modal-backdrop' ).remove();
-  //               $( 'body' ).removeClass( "modal-open" );
-  //             }, 3000);
-  //             $( '#re-calling-modal' ).remove();
-  //             $('.modal-backdrop.in').hide();
-  //           }, 40000);
-  //         } 
-  //     } else if (data.audio_calls == 200 && $('#re-calling-modal').length == 0 && $('#re-talking-modal').length == 0) {
-  //       if ($('#calling-modal').length == 0) {
-  //           $('body').append(data.audio_calls_html);
-  //           if (!$('#re-calling-modal').hasClass('calling')) {
-  //             $('#re-calling-modal').modal({
-  //             show: true
-  //             });
-  //             Wo_PlayVideoCall('play');
-  //           }
-  //           document.title = 'New audio call..';
-  //           setTimeout(function () {
-  //             if ($('#re-talking-modal').length == 0) {
-  //               Wo_CloseModels();
-  //               $('#re-calling-modal').addClass('calling');
-  //               Wo_PlayVideoCall('stop');
-  //               document.title = document_title;
-  //               setTimeout(function () {
-  //                 $( '#re-calling-modal' ).remove();
-  //                 $( '.modal-backdrop' ).remove();
-  //                 $( 'body' ).removeClass( "modal-open" );
-  //               }, 3000)
-  //             }
-  //           }, 40000);
-  //         } 
-  //     } else if (data.is_audio_call == 0 && data.is_call == 0 && ($('#re-calling-modal').length > 0 || $('#re-talking-modal').length > 0)) {
-  //         Wo_PlayVideoCall('stop');
-  //         $( '#re-calling-modal' ).remove();
-  //         $( '.modal-backdrop' ).remove();
-  //         $( 'body' ).removeClass( "modal-open" );
-  //     }
-  //   });
-  // }
-  // else{
+function Wo_intervalUpdates(force_update = 0) {
+    if (node_socket_flow == "0" || force_update == 1) {
     var check_posts = true;
     var hash_posts = true;
     if ($('.posts-hashtag-count').length == 0) {
@@ -514,8 +362,10 @@ function Wo_intervalUpdates() {
       ajax_request['hashtagName'] = $('#hashtagName').val();
     }
     $.get(Wo_Ajax_Requests_File(), ajax_request, function (data) {
-      clearTimeout(intervalUpdates);
-      intervalUpdates = setTimeout(Wo_intervalUpdates, 5000);
+      if (node_socket_flow == "0") {
+          clearTimeout(intervalUpdates);
+          intervalUpdates = setTimeout(Wo_intervalUpdates, 5000);
+      }
       if (hash_posts == true) {
           if (data.count_num > 0) {
             $('.posts-count').html(data.count);
@@ -634,7 +484,42 @@ function Wo_intervalUpdates() {
           $( 'body' ).removeClass( "modal-open" );
       }
     });
+    }
   // }
+}
+
+
+function RemoveNotification(obj) {
+  current_notifications = $('.notification-container').find('.new-update-alert').text();
+  $('.notification-container').find('.new-update-alert').removeClass('hidden');
+  if (Number(current_notifications) > 0) {
+     if ((Number(current_notifications) - 1) == 0) {
+        $('.notification-container').find('.new-update-alert').addClass('hidden');
+        $('.notification-container').find('.new-update-alert').addClass('hidden').text('0').hide();
+     } else {
+        $('.notification-container').find('.sixteen-font-size').addClass('unread-update');
+        $('.notification-container').find('.new-update-alert').text(Number(current_notifications) - 1).show();
+     }
+  } else if (Number(current_notifications) == 0) {
+     $('.notification-container').find('.new-update-alert').addClass('hidden');
+     $('.notification-container').find('.new-update-alert').addClass('hidden').text('0').hide();
+  } 
+  $(obj).fadeOut(1000, function () {
+    $(this).remove();
+  });
+}
+
+function Wo_GetLastNotification() {
+    if(current_width > 800) {
+      $.get(Wo_Ajax_Requests_File(), { f: 'get_last_notification', }, function (data) {
+          $('#notification-popup').append(data.html);
+          setTimeout(function () {
+            $('#notification-popup').find("[data-id='" + data.id + "']").fadeOut(2000, function () {
+              $(this).remove();
+            });
+          }, 3000)
+      });   
+    } 
 }
 function Wo_GetNewHashTagPosts() {
   before_post_id = 0;
@@ -1269,6 +1154,9 @@ function Wo_RegisterCommentLike(comment_id) {
     comment_text: comment_text
   }, function (data) {
     if(data.status == 200) {
+      if (node_socket_flow == "1") {
+        socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "added" });
+      }
       if (data.dislike == 1) {
           comment.find("#comment-wonders").text(data.wonders_c);
           comment.find("#WonderComment").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>');
@@ -1276,6 +1164,9 @@ function Wo_RegisterCommentLike(comment_id) {
       comment.find("#LikeComment").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up active-like"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>').fadeIn(150);
       comment.find("#comment-likes").text(data.likes);
     } else {
+      if (node_socket_flow == "1") {
+        socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "removed" });
+      }
       comment.find("#LikeComment").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>').fadeIn(150);
       comment.find("#comment-likes").text(data.likes);
     }
@@ -1292,6 +1183,9 @@ function Wo_RegisterCommentWonder(comment_id) {
     comment_text: comment_text
   }, function (data) {
     if(data.status == 200) {
+      if (node_socket_flow == "1") {
+        socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "added" });
+      }
       if (data.dislike == 1) {
           comment.find("#comment-likes").text(data.likes_c);
           comment.find("#LikeComment").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>');
@@ -1299,6 +1193,9 @@ function Wo_RegisterCommentWonder(comment_id) {
       comment.find("#WonderComment").html('<span class="active-wonder">' + data.icon + '</span>').fadeIn(150);
       comment.find("#comment-wonders").text(data.wonders);
     } else if (data.status == 300)  {
+      if (node_socket_flow == "1") {
+        socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "removed" });
+      }
       comment.find("#WonderComment").html('' + data.icon + '').fadeIn(150);
       comment.find("#comment-wonders").text(data.wonders);
     }
@@ -1315,6 +1212,9 @@ function Wo_RegisterCommentReplyWonder(reply_id) {
     comment_text: comment_text
   }, function (data) {
     if(data.status == 200) {
+      if (node_socket_flow == "1") {
+        socket.emit("reply_notification", { reply_id: reply_id, user_id: _getCookie("user_id"), type: "added" });
+      }
       if (data.dislike == 1) {
           comment.find("#comment-reply-likes").text(data.likes_r);
           comment.find("#LikeReplyComment").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>');
@@ -1322,6 +1222,9 @@ function Wo_RegisterCommentReplyWonder(reply_id) {
       comment.find("#WonderReplyComment").html('<span class="active-wonder">' + data.icon + '</span>').fadeIn(150);
       comment.find("#comment-reply-wonders").text(data.wonders);
     } else if (data.status == 300){
+      if (node_socket_flow == "1") {
+        socket.emit("reply_notification", { reply_id: reply_id, user_id: _getCookie("user_id"), type: "removed" });
+      }
       comment.find("#WonderReplyComment").html('' + data.icon + '').fadeIn(150);
       comment.find("#comment-reply-wonders").text(data.wonders);
     }
@@ -1337,6 +1240,9 @@ function Wo_RegisterCommentReplyLike(reply_id) {
     comment_text: comment_text
   }, function (data) {
     if(data.status == 200) {
+      if (node_socket_flow == "1") {
+        socket.emit("reply_notification", { reply_id: reply_id, user_id: _getCookie("user_id"), type: "added" });
+      }
       if (data.dislike == 1) {
           comment.find("#comment-reply-wonders").text(data.wonders_r);
           comment.find("#WonderReplyComment").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg>');
@@ -1344,6 +1250,9 @@ function Wo_RegisterCommentReplyLike(reply_id) {
       comment.find("#LikeReplyComment").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up active-like"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>').fadeIn(150);
       comment.find("#comment-reply-likes").text(data.likes);
     } else if (data.status == 300){
+      if (node_socket_flow == "1") {
+        socket.emit("reply_notification", { reply_id: reply_id, user_id: _getCookie("user_id"), type: "removed" });
+      }
       comment.find("#LikeReplyComment").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>').fadeIn(150);
       comment.find("#comment-reply-likes").text(data.likes);
     }
@@ -1996,6 +1905,9 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
 
             }, 1000);
           }
+          if (node_socket_flow == "1") {
+            socket.emit("count_unseen_messages", { user_id: _getCookie("user_id") });
+          }
         });
       }else if(group_id!==0){
         if (node_socket_flow === "1") {
@@ -2273,6 +2185,9 @@ function Wo_PreviousPicture(post_id) {
 function Wo_AcceptJoinGroup(user_id, group_id) {
   $.get(Wo_Ajax_Requests_File(), {f:'groups', s:'accept_request', user_id:user_id, group_id:group_id}, function(data) {
     if (data.status == 200) {
+      if (node_socket_flow == "1") {
+         socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "added" });
+      }
       $('#request-' + user_id).fadeOut(300, function () {
         $(this).remove();
       });
@@ -2283,6 +2198,9 @@ function Wo_AcceptJoinGroup(user_id, group_id) {
 function Wo_DeleteJoinGroup(user_id, group_id) {
   $.get(Wo_Ajax_Requests_File(), {f:'groups', s:'delete_request', user_id:user_id, group_id:group_id}, function(data) {
     if (data.status == 200) {
+      if (node_socket_flow == "1") {
+         socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "added" });
+      }
       $('#request-' + user_id).fadeOut(300, function () {
         $(this).remove();
       });
@@ -2322,6 +2240,7 @@ function Wo_RegisterReply(text, comment_id, user_id, event, page_id, type) {
     if(text == '' && comment_image == '') {
       return false;
     }
+    
     $.post(Wo_Ajax_Requests_File() + '?f=posts&s=register_reply', {
       comment_id: comment_id,
       text: text,
@@ -2331,6 +2250,14 @@ function Wo_RegisterReply(text, comment_id, user_id, event, page_id, type) {
     }, function (data) {
       textarea_wrapper.val('');
       if(data.status == 200) {
+        if (node_socket_flow == "1") {
+          socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "added", for: "replies" });
+        }
+        if (data.mention.length > 0 && node_socket_flow == "1") {
+          $.each(data.mention, function( index, value ) {
+            socket.emit("user_notification", { to_id: value, user_id: _getCookie("user_id")});
+          });
+        }
         $('.comment-image-con').empty();
         $('#comment_src_image_'+comment_id).val('');
         $('#comment_src_image_'+comment_id).val('');
@@ -2366,6 +2293,14 @@ function Wo_RegisterReply2(comment_id, user_id, page_id, type) {
       page_id: page_id,
       comment_image: comment_image
     }, function (data) {
+      if (node_socket_flow == "1") {
+          socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "added", for: "replies" });
+        }
+        if (data.mention.length > 0 && node_socket_flow == "1") {
+          $.each(data.mention, function( index, value ) {
+            socket.emit("user_notification", { to_id: value, user_id: _getCookie("user_id")});
+          });
+        }
       textarea_wrapper.val('');
       if(data.status == 200) {
         $('.comment-image-con').empty();
@@ -2435,6 +2370,9 @@ function Wo_RegisterInvite(user_id, page_id) {
     page_id: page_id
   }, function (data) {
     if(data.status == 200) {
+      if (node_socket_flow == "1") {
+         socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "added" });
+      }
       $('#invite-' + user_id).fadeOut(200, function () {
         $(this).remove();
       });
@@ -2450,6 +2388,9 @@ function Wo_RegisterAddGroup(user_id, group_id) {
     group_id: group_id
   }, function (data) {
     if(data.status == 200) {
+      if (node_socket_flow == "1") {
+         socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "added" });
+      }
       $('#add-' + user_id).fadeOut(200, function () {
         $(this).remove();
       });
@@ -2635,6 +2576,9 @@ function Wo_CancelCall() {
 function Wo_GenerateVideoCall(user_id1, user_id2) {
   $.get(Wo_Ajax_Requests_File(), {f:'create_new_video_call', 'new': 'true', user_id1: user_id1, user_id2:user_id2}, function(data) {
       if (data.status == 200) {
+          if (node_socket_flow == "1") { 
+            socket.emit("user_notification", { to_id: user_id2, user_id: _getCookie("user_id"), type: "create_video" });
+          }
           $('body').append(data.html);
            $('#calling-modal').modal({
              show: true
@@ -2656,6 +2600,9 @@ function Wo_GenerateVideoCall(user_id1, user_id2) {
 function Wo_GenerateVoiceCall(user_id1, user_id2) {
   $.get(Wo_Ajax_Requests_File(), {f:'create_new_audio_call', 'new': 'true', user_id1: user_id1, user_id2:user_id2}, function(data) {
       if (data.status == 200) {
+           if (node_socket_flow == "1") { 
+            socket.emit("user_notification", { to_id: user_id2, user_id: _getCookie("user_id"), type: "create_video" });
+          }
           $('body').append(data.html);
            $('#calling-modal').modal({
              show: true
@@ -3274,9 +3221,13 @@ function Wo_RegisterCommentReaction(comment_id,reaction){
   if (!comment_id && !reaction)
     return false;
 
+  
   $('.reactions-comment-container-' + comment_id).css('display', 'none');
   $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_comment_reaction', comment_id: comment_id, reaction: reaction}, function (data) {
     if(data.status == 200) {
+      if (node_socket_flow == "1") {
+        socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "added" });
+      }
         $('.comment-reactions-icons-'+comment_id).html(data.reactions);
         $('.comment-status-reaction-'+comment_id).addClass("active-like");
         //$('.c_likes-'+comment_id).html(data.like_lang);
@@ -3298,6 +3249,9 @@ function Wo_RegisterBlogCommentReaction(comment_id,reaction){
   $('.reactions-comment-container-' + comment_id).css('display', 'none');
   $.get(Wo_Ajax_Requests_File(), {f: 'blog', s: 'register_blog_comment_reaction', comment_id: comment_id, reaction: reaction}, function (data) {
     if(data.status == 200) {
+      if (node_socket_flow == "1") {
+            socket.emit("user_notification", { to_id: data.user_id, user_id: _getCookie("user_id"), type: "added" });
+        }
         $('.comment-reactions-icons-'+comment_id).html(data.reactions);
         $('.comment-status-reaction-'+comment_id).addClass("active-like");
         //$('.c_likes-'+comment_id).html(data.like_lang);
@@ -3320,6 +3274,9 @@ function Wo_RegisterBlogReplyReaction(user_id,reply_id,reaction){
   $('.reactions-box-comment-replay-container-' + reply_id).css('display', 'none');
   $.get(Wo_Ajax_Requests_File(), {f: 'blog', s: 'register_reply_reaction', user_id: user_id, reply_id: reply_id, reaction: reaction}, function (data) {
     if(data.status == 200) {
+        if (node_socket_flow == "1") {
+            socket.emit("user_notification", { to_id: data.user_id, user_id: _getCookie("user_id"), type: "added" });
+        }
         $('.replay-reactions-icons-'+reply_id).html(data.reactions);
         $('.replay-status-reaction-'+reply_id).addClass("active-like");
         //$('.r_likes-'+reply_id).html(data.like_lang);
@@ -3338,8 +3295,12 @@ function Wo_RegisterlightboxCommentReaction(comment_id,reaction){
   if (!comment_id && !reaction)
     return false;
 
+  
   $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_comment_reaction', comment_id: comment_id, reaction: reaction}, function (data) {
     if(data.status == 200) {
+        if (node_socket_flow == "1") {
+          socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "added" });
+        }
         $('.lightbox-comment-reactions-icons-'+comment_id).html(data.reactions);
         $('.lightbox-comment-status-reaction-'+comment_id).addClass("active-like");
         //$('.c_likes-'+comment_id).html(data.like_lang);
@@ -3360,8 +3321,12 @@ function Wo_RegisterReplyReaction(user_id,reply_id,reaction){
     return false;
 
   $('.reactions-box-comment-replay-container-' + reply_id).css('display', 'none');
+  
   $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_replay_reaction', user_id: user_id, reply_id: reply_id, reaction: reaction}, function (data) {
     if(data.status == 200) {
+      if (node_socket_flow == "1") {
+        socket.emit("reply_notification", { reply_id: reply_id, user_id: _getCookie("user_id"), type: "added" });
+      }
         $('.replay-reactions-icons-'+reply_id).html(data.reactions);
         $('.replay-status-reaction-'+reply_id).addClass("active-like");
         //$('.r_likes-'+reply_id).html(data.like_lang);
@@ -3497,205 +3462,7 @@ $(window).on('load', function() {
 
 
 
-$(window).on('load', function() {
-  //reactions
-  $('body').delegate('.wo-reaction-post','mouseenter', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-      if ($('#post-' + id + ' .wo-reaction-post:hover').length != 0) {
-          $('.reactions-box-container-'+id).fadeIn(50);
-      }
-    }, 300);
-  });
 
-  $('body').delegate('.wo-reaction-post','mouseleave', function() {
-    var id = $( this ).attr( 'data-id' );
-      setTimeout( function () {
-      if ($('.reactions-box-container-'+id + ':hover').length == 0 && $('#post-' + id + ' .wo-reaction-post:hover').length == 0) {
-          $('.reactions-box-container-'+id).fadeOut(50);
-      }
-    }, 500);
-  });
-
-  $('body').delegate('.like-btn-post','click', function() {
-    if ($( this ).attr( 'data_react' ) == 0) {
-      return false;
-    }
-    var self = this;
-    var post_id = $( this ).attr( 'data-id' );
-    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_reaction', post_id: post_id}, function (data) {
-      if(data.status == 200) {
-        $('.reactions-box-container-'+post_id).toggle();
-        $('.post-reactions-icons-'+post_id).html(data.reactions);
-        $('.status-reaction-'+post_id).removeClass("active-like");
-        $('.status-reaction-'+post_id).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> ' + data.like_lang).css({"color": "inherit"});
-      }
-      $(self).attr('data_react','0');
-    });
-  });
-  
-   $('body').delegate('.reactions-box','mouseleave', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-      if ($('.reactions-box-container-'+id + ':hover').length == 0 && $('#post-' + id + ' .wo-reaction-post:hover').length == 0) {
-          $('.reactions-box-container-'+id).fadeOut(50);
-      }
-    }, 500);
-  });
-
-  //reactions lightbox
-  $('body').delegate('.wo-reaction-lightbox','mouseenter', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-      if ($('#post-' + id + ' .wo-reaction-lightbox:hover').length != 0) {
-        $('.reactions-lightbox-container-'+id).fadeIn(50);
-      }
-    }, 500);
-  });
-
-  $('body').delegate('.wo-reaction-lightbox','mouseleave', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-      if ($('.reactions-lightbox-container-'+id + ':hover').length == 0 && $('#post-' + id + ' .wo-reaction-lightbox:hover').length == 0) {
-          $('.reactions-lightbox-container-'+id).fadeOut(50);
-      }
-    }, 500);
-  });
-
-  $('body').delegate('.like-btn-lightbox','click', function() {
-    var post_id = $( this ).attr( 'data-id' );
-    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_reaction', post_id: post_id}, function (data) {
-      if(data.status == 200) {
-        $('.reactions-lightbox-container-'+post_id).toggle();
-        $('.post-reactions-icons-'+post_id).html("");
-        $('.status-reaction-'+post_id).removeClass("active-like");
-        $('.status-reaction-'+post_id).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>' + data.like_lang).css({"color": "inherit"});
-      }
-    });
-  });
-
-  //reactions comment
-  $('body').delegate('.like-btn-comment','mouseenter', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-        $('.reactions-comment-container-'+id).fadeIn(50);
-    }, 500);
-  });
-
-  $('body').delegate('.like-btn-comment','mouseleave', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-      if( $('.reactions-comment-container-'+id+':hover').length == 0 && $('#comment-' + id + ' .wo-reaction-comment:hover').length == 0 ){
-        $('.reactions-comment-container-'+id).fadeOut(50);
-      }
-    }, 500);
-  });
-
-  $('body').delegate('.reactions-box','mouseleave', function() {
-    if( !$( this ).hasClass( 'reactions-comment-container-' + $( this ).attr( 'data-id' ) ) ){
-      return false;
-    }
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-        $('.reactions-comment-container-'+id).fadeOut(50);
-    }, 500);
-  });
-  
-  $('body').delegate('.like-btn-comment','click', function() {
-    var comment_id = $( this ).attr( 'data-id' );
-    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_comment_reaction', comment_id: comment_id}, function (data) {
-      if(data.status == 200) {
-        $('.reactions-comment-container-'+comment_id).toggle();
-        $('.comment-reactions-icons-'+comment_id).html(data.reactions);
-        $('.comment-status-reaction-'+comment_id).removeClass("active-like");
-      }
-    });
-  });
-  
-  //reactions replay
-  $('body').delegate('.like-btn-replay','mouseenter', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-        $('.reactions-box-comment-replay-container-'+id).fadeIn(50);
-    }, 500);
-  });
-  $('body').delegate('.reactions-box','mouseenter', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-        $('.reactions-box-comment-replay-container-'+id).fadeIn(50);
-    }, 500);
-  });
-
-  $('body').delegate('.like-btn-replay','mouseleave', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-      if( $('.reactions-comment-replay-container-'+id+':hover').length == 0 && $('#comment_reply_' + id + ' .wo-reaction-replay:hover').length == 0 ){
-        $('.reactions-box-comment-replay-container-'+id).fadeOut(50);
-      }
-    }, 500);
-  });
-
-  $('body').delegate('.reactions-box','mouseleave', function() {
-    if( !$( this ).hasClass( 'reactions-box-comment-replay-container-' + $( this ).attr( 'data-id' ) ) ){
-      return false;
-    }
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-        $('.reactions-box-comment-replay-container-'+id).fadeOut(50);
-    }, 500);
-  });
-
-  $('body').delegate('.like-btn-replay','click', function() {
-    var replay_id = $( this ).attr( 'data-id' );
-    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_replay_reaction', replay_id: replay_id}, function (data) {
-      if(data.status == 200) {
-        $('.reactions-box-comment-replay-container-'+replay_id).toggle();
-        $('.replay-reactions-icons-'+replay_id).html(data.reactions);
-        $('.replay-status-reaction-'+replay_id).removeClass("active-like");
-      }
-    });
-  });
-
-
-  //reactions comment lightbox
-  $('body').delegate('.like-btn-lightbox-comment','mouseenter', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-        $('.reactions-lightbox-comment-container-'+id).fadeIn(50);
-    }, 500);
-  });
-
-  $('body').delegate('.like-btn-lightbox-comment','mouseleave', function() {
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-      if( $('.reactions-lightbox-comment-container-'+id+':hover').length == 0 && $('#comment_' + id + ' .wo-reaction-lightbox-comment:hover').length == 0 ){
-        $('.reactions-lightbox-comment-container-'+id).fadeOut(50);
-      }
-    }, 500);
-  });
-  
-  $('body').delegate('.reactions-box','mouseleave', function() {
-    if( !$( this ).hasClass( 'reactions-lightbox-comment-container-' + $( this ).attr( 'data-id' ) ) ){
-      return false;
-    }
-    var id = $( this ).attr( 'data-id' );
-    setTimeout( function () {
-        $('.reactions-lightbox-comment-container-'+id).fadeOut(50);
-    }, 500);
-  });
-
-  $('body').delegate('.like-btn-lightbox-comment','click', function() {
-    var comment_id = $( this ).attr( 'data-id' );
-    $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_comment_reaction', comment_id: comment_id}, function (data) {
-      if(data.status == 200) {
-        $('.reactions-box-comment-replay-container-'+comment_id).toggle();
-        $('.lightbox-comment-reactions-icons-'+comment_id).html(data.reactions);
-        $('.lightbox-comment-status-reaction-'+comment_id).removeClass("active-like");
-      }
-    });
-  });
-
-});
 
 function Wo_ShowCommentCombo(post_id){
   comment_combo_wrapper = $('.wo_comment_combo_' + post_id);

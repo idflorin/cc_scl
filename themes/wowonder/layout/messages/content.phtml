@@ -1090,11 +1090,16 @@ function Wo_getNewMessages() {
         if (data.color) {
             $(".text-sender-container .red-list").css('background', data.color);
         }
+        isMedia = false;
         if (data.hasOwnProperty('isMedia')) {
+        	if (isMedia == true) {
+        		isMedia = true;
+        	}
+        } 
+        if (isMedia == true) {
         	$("#messages-recipient-" + data.sender).find('p').html("<?php echo $wo['lang']['media'];?>");
         } else {
-        	
-        	$("#messages-recipient-" + data.sender).find('p').html(data.message);
+        	$("#messages-recipient-" + data.sender).find('p').html(data.message_html);
         }
         $("#messages-recipient-" + data.sender).parent().prepend($("#messages-recipient-" + data.sender));
         $("#messages-recipient-" + data.sender).find(".messages-last-sent").replaceWith(data.time);

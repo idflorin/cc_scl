@@ -841,6 +841,16 @@ class FunctionsUtils {
         return result
     }
 
+    async Wo_CountUnseenMessages(ctx, user_id) {
+        let result = await ctx.wo_messages.count({
+            where: {
+                to_id: user_id,
+                seen: 0
+            }
+        })
+        return result
+    }
+
     async Wo_CountMessages(ctx, user_id, from_id) {
         let blocked = await ctx.wo_blocks.findAll({
             attributes: [

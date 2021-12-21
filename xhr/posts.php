@@ -635,8 +635,18 @@ if ($f == 'posts') {
                         'status' => 200,
                         'html' => $html,
                         'invalid_file' => $invalid_file,
-                        'post_count' => (!empty($wo['story']['publisher']['details']) ? $wo['story']['publisher']['details']['post_count'] : 0)
+                        'post_count' => (!empty($wo['story']['publisher']['details']) ? $wo['story']['publisher']['details']['post_count'] : 0),
+                        'mention' => []
                     );
+                    $mention_regex = '/@([A-Za-z0-9_]+)/i';
+                    preg_match_all($mention_regex, $_POST['postText'], $matches);
+                    foreach ($matches[1] as $match) {
+                        $match         = Wo_Secure($match);
+                        $match_user    = Wo_UserData(Wo_UserIdFromUsername($match));
+                        if (isset($match_user['user_id'])) {
+                            $data['mention'][]   = $match_user['user_id'];
+                        }
+                    }
                     $data['send_notify'] = 'no';
                     $data['post_id'] = $wo['story']['id'];
                     if ($wo['config']['notify_new_post'] == 1) {
@@ -1280,8 +1290,18 @@ if ($f == 'posts') {
                 $data = array(
                     'status' => 200,
                     'html' => $html,
-                    'comments_num' => Wo_CountPostComment($_POST['post_id'])
+                    'comments_num' => Wo_CountPostComment($_POST['post_id']),
+                    'mention' => []
                 );
+                $mention_regex = '/@([A-Za-z0-9_]+)/i';
+                preg_match_all($mention_regex, $_POST['text'], $matches);
+                foreach ($matches[1] as $match) {
+                    $match         = Wo_Secure($match);
+                    $match_user    = Wo_UserData(Wo_UserIdFromUsername($match));
+                    if (isset($match_user['user_id'])) {
+                        $data['mention'][]   = $match_user['user_id'];
+                    }
+                }
                 if (Wo_CanSenEmails()) {
                     $data['can_send'] = 1;
                 }
@@ -1341,8 +1361,18 @@ if ($f == 'posts') {
                 $data = array(
                     'status' => 200,
                     'html' => $html,
-                    'replies_num' => Wo_CountCommentReplies($_POST['comment_id'])
+                    'replies_num' => Wo_CountCommentReplies($_POST['comment_id']),
+                    'mention' => []
                 );
+                $mention_regex = '/@([A-Za-z0-9_]+)/i';
+                preg_match_all($mention_regex, $_POST['text'], $matches);
+                foreach ($matches[1] as $match) {
+                    $match         = Wo_Secure($match);
+                    $match_user    = Wo_UserData(Wo_UserIdFromUsername($match));
+                    if (isset($match_user['user_id'])) {
+                        $data['mention'][]   = $match_user['user_id'];
+                    }
+                }
                 if (Wo_CanSenEmails()) {
                     $data['can_send'] = 1;
                 }

@@ -269,7 +269,9 @@ function joinChannel() {
                       var formData = new FormData();
                       formData.append('thumb',thumb);
                       formData.append('post_id',data.post_id);
-
+                      if (node_socket_flow == "1") {
+                        socket.emit("user_followers_notification", { user_id: _getCookie("user_id")});
+                      }
                       $.ajax({
                         processData: false,
                         url: Wo_Ajax_Requests_File() + "?f=live&s=create_thumb",

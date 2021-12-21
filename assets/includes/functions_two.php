@@ -4289,9 +4289,7 @@ function Wo_RegisterCommentReply($data = array()) {
         }
         $also = array();
         if (!empty($user_id)) {
-            if (Wo_IsCommentOnwer($data['user_id'], $data['comment_id'])) {
-                $also = Wo_GetRepliedUsers($data['comment_id']);
-            }
+            $also = Wo_GetRepliedUsers($data['comment_id']);
             if (isset($also) && is_array($also)) {
                 foreach ($also as $user) {
                     $notification_data_array = array(

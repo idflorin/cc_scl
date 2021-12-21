@@ -5468,7 +5468,7 @@ function Wo_DeleteGChat($group_id = false) {
         return false;
     }
     @mysqli_query($sqlConnect, "DELETE FROM " . T_MESSAGES . " WHERE `group_id` = {$group_id}");
-    @mysqli_query($sqlConnect, "DELETE FROM " . T_GROUP_CHAT_USERS . " WHERE `group_id` = {$group_id}");
+    @mysqli_query($sqlConnect, "DELETE FROM " . T_GROUP_CHAT_USERS . " WHERE `group_id` = {$group_id}"); 
     return mysqli_query($sqlConnect, "DELETE FROM " . T_GROUP_CHAT . " WHERE `group_id` = {$group_id}");
 }
 function Wo_ExitGChat($group_id = false) {

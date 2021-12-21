@@ -56,6 +56,9 @@
             data: {f: 'poke',received_user_id:received_user_id,send_user_id:send_user_id,poke_id:poke_id},
         })
         .done(function(data) {
+            if (node_socket_flow == "1") {
+                socket.emit("user_notification", { to_id: received_user_id, user_id: _getCookie("user_id")});
+            }
             if (data.status == 200) {
                 $(self).parent('div').parent('.poke_info').parent('.wo_poke_users').parent('.wo_pokes_cont').remove();
                 Wo_Delay(function(){

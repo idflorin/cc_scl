@@ -169,8 +169,11 @@ module.exports.privateMessageToPersonOwnerFalse = async (ctx, io, data, fromUser
         receiver: data.to_id,
         sender: ctx.userHashUserId[data.from_id],
         color: color,
-        message: sendable_message,
-        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
+        message: data.msg,
+        message_html: sendable_message,
+        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
+        isMedia: false,
+        isRecord: false,
     });
 }
 
@@ -215,7 +218,10 @@ module.exports.privateMessagePageToPersonOwnerFalseWithMedia = async (ctx, io, d
         receiver: data.to_id,
         sender: ctx.userHashUserId[data.from_id],
         isMedia: true,
-        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
+        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
+        mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+        isMedia: true,
+        isRecord: true,
     });
 }
 
@@ -226,7 +232,10 @@ module.exports.privateMessageToPersonOwnerFalseWithMedia = async (ctx, io, data,
         receiver: data.to_id,
         sender: ctx.userHashUserId[data.from_id],
         isMedia: true,
-        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
+        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
+        mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+        isMedia: true,
+        isRecord: true,
     });
 }
 
@@ -238,8 +247,11 @@ module.exports.privateMessagePageToPersonOwnerFalse = async (ctx, io, data, from
         receiver: data.to_id,
         sender: ctx.userHashUserId[data.from_id],
         color: color,
-        message: sendable_message,
-        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
+        message: data.msg,
+        message_html: sendable_message,
+        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
+        isMedia: false,
+        isRecord: false,
     });
 }
 
