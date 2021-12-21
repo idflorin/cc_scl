@@ -12,6 +12,13 @@ if ($wo['user']['is_pro'] != 0) {
                 'status' => 0
             );
             $db->insert(T_REFUND,$registration_data);
+            $notification_data_array = array(
+                'recipient_id' => 0,
+                'type' => 'refund',
+                'time' => time(),
+                'admin' => 1
+            );
+            $db->insert(T_NOTIFICATION,$notification_data_array);
             $response_data = array(
                         'api_status' => 200,
                         'message' => "Your request has been successfully sent, we will notify you once it&#039;s approved"

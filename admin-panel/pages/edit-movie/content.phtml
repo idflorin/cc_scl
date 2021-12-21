@@ -12,53 +12,65 @@ $source = $source[0];
 
 ?>
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>Manage Features > Movies > Edit Movie "<?php echo $source['name'];?>"</h2>
+    <div>
+        <h3>Movies > Edit Movie "<?php echo $source['name'];?>"</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Manage Features</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Movies</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Movies > Edit Movie "<?php echo $source['name'];?>"</li>
+            </ol>
+        </nav>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
         <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Edit Movie</h2>
-                </div>
-                <div class="body">
+                <div class="card-body">
+                	<h6 class="card-title">Edit Movie</h6>
                     <div class="" id="film-alert"></div>
                     <form class="newforum" method="POST" id="new-film">
                         <div class="form-group form-float">
                             <div class="form-line">
+                            	<label class="form-label">Movie Title</label>
                                 <input type="text" id="name" name="name" class="form-control" value="<?php echo $source['name'];?>">
-                                <label class="form-label">Movie Title</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                            	<label class="form-label">Description</label>
                                 <textarea name="description" id="description" class="form-control" cols="30" rows="3"><?php echo br2nl($source['description']);?></textarea>
-                                <label class="form-label">Description</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                            	<label class="form-label">Stars <small>Separated by comma,</small></label>
                                 <textarea name="stars" id="stars" class="form-control" cols="30" rows="3"><?php echo $source['stars'];?></textarea>
-                                <label class="form-label">Stars <small>Separated by comma,</small></label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                            	<label class="form-label">Producer</label>
                                 <input type="text" id="producer" name="producer" class="form-control" value="<?php echo $source['producer'];?>">
-                                <label class="form-label">Producer</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                            	<label class="form-label">Release</label>
                                 <input type="number" id="release" name="release" class="form-control" min="1900" max="<?php echo date('Y') ?>" value="<?php echo $source['release'];?>">
-                                <label class="form-label">Release</label>
                             </div>
                         </div>
                          <div class="form-group form-float">
                             <div class="form-line">
+                            	<label class="form-label">Duration</label>
                                 <input type="number" id="duration" name="duration" class="form-control" min="10" max="350" value="<?php echo $source['duration'];?>">
-                                <label class="form-label">Duration</label>
                             </div>
                         </div>
                         <br>
@@ -103,8 +115,8 @@ $source = $source[0];
                         <br><br>
                         <div class="form-group form-float">
                             <div class="form-line">
+                            	<label class="form-label">Rating (Between 1 -> 10)</label>
                                 <input type="number" id="rating" name="rating" class="form-control" min="1" max="10" step="0.1" value="<?php echo $source['rating'];?>">
-                                <label class="form-label">Rating (Between 1 -> 10)</label>
                             </div>
                         </div>
                         <div class="clearfix"></div>

@@ -31,7 +31,8 @@ $allow_array     = array(
     'wallet',
     'download_user_info',
     'movies',
-    'funding'
+    'funding',
+    'stripe'
 );
 $non_login_array = array(
     'session_status',
@@ -85,6 +86,7 @@ if ($wo['config']['membership_system'] == 1) {
     $non_login_array[] = 'paypro_with_bitcoin';
     $non_login_array[] = '2checkout_pro';
     $non_login_array[] = 'bank_transfer';
+    $non_login_array[] = 'stripe';
 }
 if (!in_array($f, $allow_array)) {
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {

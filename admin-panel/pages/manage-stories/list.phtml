@@ -1,4 +1,5 @@
-<tr data-status-id="<?php echo $wo['status']['id']?>">
+<tr data-status-id="<?php echo $wo['status']['id']?>" data_selected="<?php echo $wo['status']['id']?>">
+  <td><input type="checkbox" id="check-data-<?php echo $wo['status']['id']?>" class="delete-checkbox filled-in"><label for="check-data-<?php echo $wo['status']['id']?>"></label></td>
    <td><?php echo $wo['status']['id']?></td>
    <td>
       <span><?php echo $wo['status']['expires']; ?></span>
@@ -15,6 +16,6 @@
      </div>
    </td>
    <td>
-      <button onclick="Wo_DeleteStatus(<?php echo $wo['status']['id']; ?>)" type="button" class="btn btn-danger waves-effect waves-light">DELETE</button>
+      <button onclick="Wo_DeleteStatus(<?php echo $wo['status']['id']; ?>,'hide')" type="button" class="btn bg-danger admn_table_btn">Delete</button>
    </td>
 </tr>

@@ -1,5 +1,6 @@
  <?php $user = Wo_GetUserProType($wo['userlist']['pro_type']);?>
- <tr class="setting-userlist" id="UserID_<?php echo $wo['userlist']['user_id']?>" data-user-id="<?php echo $wo['userlist']['user_id']?>">
+ <tr class="setting-userlist" id="UserID_<?php echo $wo['userlist']['user_id']?>" data-user-id="<?php echo $wo['userlist']['user_id']?>" data_selected="<?php echo $wo['userlist']['user_id']?>">
+   <td><input type="checkbox" id="check-data-<?php echo $wo['userlist']['user_id']?>" class="delete-checkbox filled-in"><label for="check-data-<?php echo $wo['userlist']['user_id']?>"></label></td>
    <td><?php echo $wo['userlist']['user_id']?></td>
    <td>
       <a href="<?php echo $wo['userlist']['url']; ?>">
@@ -15,6 +16,6 @@
    </td>
    <td><?php echo (Wo_UserActive($wo['userlist']['username']) === true) ? '<span class="label label-success">' . $wo['lang']['active'] . '</span>': '<span class="label label-danger">' . $wo['lang']['pending'] . '</span>';?></td>
    <td>
-      <a target="_blank" class="btn btn-info waves-effect" href="<?php echo Wo_SeoLink('index.php?link1=setting&user=' . $wo['userlist']['username'] . '&page=general-setting') ?>">EDIT</a>
+      <a target="_blank" class="btn bg-info admn_table_btn" href="<?php echo Wo_SeoLink('index.php?link1=setting&user=' . $wo['userlist']['username'] . '&page=general-setting') ?>">Edit</a>
    </td>
 </tr>

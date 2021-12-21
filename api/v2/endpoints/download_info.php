@@ -79,7 +79,7 @@ if (!empty($data)) {
         'info_file' => $hash
     ));
     $response_data['message'] = $wo['lang']['file_ready'];
-    $response_data['link'] = Wo_GetMedia($hash);
+    $response_data['link'] = $wo['config']['site_url'] . '/' . $hash;
     $response_data['api_status'] = 200;
 }
 else{

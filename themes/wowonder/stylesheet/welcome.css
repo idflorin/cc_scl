@@ -23,7 +23,7 @@
 .payment_box .btn {width: 100%;background-color: white;color: #2c2c2c;text-align: inherit;display: flex;align-items: center;border-bottom: 1px solid rgba(0, 0, 0, 0.07);border-radius: 0;padding: 20px 25px;transition: all 0.15s;font-family: "Lato", sans-serif; font-weight: 600;box-shadow: none;}
 .payment_box .btn:hover {background-color: rgba(0, 0, 0, 0.04);}
 .payment_box .btn:last-child {border:0;}
-.payment_box .btn svg {margin-right: 15px;width: 32px;height: 32px;}
+.payment_box .btn svg, .payment_box .btn img {margin-right: 15px;width: 32px;height: 32px;}
 
 /*Plans*/
 .login form.wow_membr_signup {padding: 15px 30px 30px;}
@@ -45,7 +45,12 @@
 
 /*Bank transfer Modal*/
 svg {vertical-align: middle;}
-
+.wow_pops_head {position: relative;background: #8b6060;color: #fff;text-align: center;padding: 25px 0 115px;border-radius: 3px 3px 0 0;margin-bottom: -50px;}
+.wow_pops_head > svg {position: absolute;bottom: 0;left: 0;width: 100%;height: 120px;color: #fff;}
+.wow_pops_head .close {position: absolute;top: 7px;right: 7px;padding: 0;opacity: 0.4;text-shadow: none;color: white;}
+.wow_pops_head .close:hover {opacity: 1;}
+.wow_pops_head h4 {margin: 0;font-weight: 400;font-family: "Roboto", sans-serif;font-size: 19px;}
+.wow_pops_head h4 svg {width: 27px;height: 27px;margin: -2px 2px 0 0;background-color: rgba(255, 255, 255, 0.2);border-radius: 50%;padding: 5px;}
 .dt_bank_trans_modal .bank_info {width: 100%;margin-top: 24px;margin-bottom: 30px;}
 .dt_bank_trans_modal .bank_info .dt_settings_header {width: 100%;margin-left: auto;margin-right: auto;border-radius: 7px;height: auto;background-color: #2196f3;background: linear-gradient(90deg, #03A9F4 0%, #2196f3 35%, #3F51B5 100%);padding: 16px;overflow: hidden;position: relative;}
 .dt_bank_trans_modal .dt_settings_circle-1 {width: 290px;height: 290px;background-image: radial-gradient(circle 800px at 75% -25%,#000000 0,rgba(255, 255, 255, 0) 100%);left: -28px;top: -28px;opacity: .05;position: absolute;border-radius: 50%;pointer-events: none;}
@@ -78,3 +83,7 @@ svg {vertical-align: middle;}
 #bank_transfer_donate_modal.up_rec_active .upload_bank_receipts {display: block;}
 #bank_transfer_donate_modal.up_rec_img_ready .upload_bank_receipts img {width: 100%;height: 100%;object-fit: cover;}
 #bank_transfer_donate_modal.up_rec_img_ready .upload_bank_receipts svg, #bank_transfer_donate_modal.up_rec_img_ready .upload_bank_receipts p {display: none;}
+
+@media (min-width:400px) {
+.payment_box {width: 360px;}
+}

@@ -1,4 +1,4 @@
-<script src="https://checkout.stripe.com/checkout.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <?php $loadPage = Wo_LoadPage('thirdparty/paypal-demo'); echo (!empty($loadPage)) ? $loadPage : '';?>
 <div class="row">
 	<div class="col-md-3">
@@ -387,22 +387,10 @@ function SignatureRazorpay() {
 			img = 'vip';
 		}
 		if (payment_type != 'bank_payment' && payment_type != 'checkout') {
-			var handler = StripeCheckout.configure({
-				key: "<?php echo $wo['config']['stripe_id'];?>",
-				locale: 'english',
-				image: '<?php echo $wo['config']['theme_url']?>/img/' + img + '.png',
-				token: function(token) {
-				$('.modal-body').html('<i class="fa fa-spin fa-spinner"></i> <?php echo $wo['lang']['c_payment'] ?>');
-				$('#pay-go-pro').modal({
-					show: true
-					});
-					$.post(Wo_Ajax_Requests_File() + '?f=stripe_payment_wallet', {stripeToken:token.id, amount:$('#amount').val()}, function (data) {
-						if (data.status == 200) {
-							window.location.href = data.location;
-						} else {
-							$('.modal-body').html('<i class="fa fa-spin fa-spinner"></i> <?php echo $wo['lang']['payment_declined'] ?>');
-						}
-					});
+			var stripe = Stripe('<?php echo $wo['config']['stripe_id'];?>');
+			$.post(Wo_Ajax_Requests_File() + '?f=stripe&s=session', {amount: $('#amount').val(),type:'wallet'}, function(data, textStatus, xhr) {
+				if (data.status == 200) {
+					return stripe.redirectToCheckout({ sessionId: data.sessionId });
 				}
 			});
 		}
@@ -419,29 +407,6 @@ function SignatureRazorpay() {
 				});
 			}
 
-		} else if (payment_type == 'credit_card') {
-			handler.open({
-			name: "<?php echo $wo['config']['siteName']?>",
-			description: description,
-			amount: amount,
-			currency: '<?php echo $wo['config']['stripe_currency']?>',
-			opened: function () {
-				$('#pay-go-pro').modal('hide');
-				$('.btn-cart').attr('disabled', false).html("<i class='fa fa-credit-card'></i> <?php echo $wo['lang']['credit_card'] ?>");
-			}
-			});
-		} else if (payment_type == 'alipay') {
-			handler.open({
-			name: "<?php echo $wo['config']['siteName']?>",
-			description: description,
-			amount: Number($('#amount').val()) * 100,
-			alipay: true,
-			currency: '<?php echo $wo['config']['stripe_currency']?>',
-			opened: function () {
-				$('#pay-go-pro').modal('hide');
-				$('.btn-alipay').attr('disabled', false).html("<i class='fa fa-credit-card'></i> Alipay");
-			}
-			});
 		} else if (payment_type == 'bank_payment') {
 	    	$('#configreset').click();
 	    	$(".prv-img").html('<div class="thumbnail-rendderer"><div><h4 class="bold"><?php echo $wo['lang']['drop_img_here']; ?></h4><div class="error-text-renderer"></div><div><span><?php echo $wo['lang']['or']; ?></span><p><?php echo $wo['lang']['browse_to_upload']; ?></p></div></div> </div>');

@@ -295,7 +295,7 @@ $(function () {
     }
     if (is_day_enabled != 1) {
       setTimeout(function () {
-        $('.greetalert').css('border-left', '2.5px solid ' + color );
+        $('.greetalert').css('border-color', color );
         $('#daynightmsg').html('<div class="small-texts">' + greet + '</div><p>' + quote + '</p>');
         $('.greetalert').removeClass('hidden');
       }, 100);

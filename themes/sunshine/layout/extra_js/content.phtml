@@ -709,50 +709,12 @@ function Wo_StripeDonate(fund_id,amount,type = 'stripe') {
 
   
 
-  var handler = StripeCheckout.configure({
-    key: "<?php echo $wo['config']['stripe_id'];?>",
-    locale: 'english',
-    image: '',
-    token: function(token) {
-    $('.modal-body').html('<i class="fa fa-spin fa-spinner"></i> <?php echo $wo['lang']['c_payment'] ?>');
-    $('#pay-go-pro').modal({
-      show: true
-      });
-      $.post(Wo_Ajax_Requests_File() + '?f=funding&s=stripe', {stripeToken:token.id,amount:amount,fund_id:fund_id}, function (data) {
-        if (data.status == 200) {
-          window.location.href = data.location;
-        } else {
-          $('.btn-cart').attr('disabled', false).html('<i class="fa fa-spin fa-spinner"></i> <?php echo $wo['lang']['payment_declined'] ?>');
-        }
-      });
+  var stripe = Stripe('<?php echo $wo['config']['stripe_id'];?>');
+  $.post(Wo_Ajax_Requests_File() + '?f=stripe&s=session', {amount: amount,type:'fund',fund_id:fund_id}, function(data, textStatus, xhr) {
+    if (data.status == 200) {
+      return stripe.redirectToCheckout({ sessionId: data.sessionId });
     }
   });
-
-  if (type == 'stripe') {
-    handler.open({
-      name: "<?php echo $wo['config']['siteName']?>",
-      description: "<?php echo $wo['lang']['donate']?>",
-      amount: amount*100,
-      currency: '<?php echo $wo['config']['stripe_currency']?>',
-      opened: function () {
-        $('#pay-go-pro').modal('hide');
-        $('.btn-cart').attr('disabled', false).html('<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 58 58" xml:space="preserve"> <g id="XMLID_9_"> <path id="XMLID_114_" style="fill:#8798CC;" d="M54.783,50H3.217C1.44,50,0,48.56,0,46.783V11.217C0,9.44,1.44,8,3.217,8h51.566 C56.56,8,58,9.44,58,11.217v35.566C58,48.56,56.56,50,54.783,50"/> <rect id="XMLID_113_" y="13" style="fill:#556180;" width="58" height="8"/> <path id="XMLID_112_" style="fill:#B0D3F0;" d="M15,26H6c-0.553,0-1,0.448-1,1s0.447,1,1,1h9c0.553,0,1-0.448,1-1S15.553,26,15,26" /> <path id="XMLID_111_" style="fill:#B0D3F0;" d="M29,27c0-0.552-0.447-1-1-1h-9c-0.553,0-1,0.448-1,1s0.447,1,1,1h9 C28.553,28,29,27.552,29,27"/> <path id="XMLID_110_" style="fill:#B0D3F0;" d="M7,31H6c-0.553,0-1,0.448-1,1s0.447,1,1,1h1c0.553,0,1-0.448,1-1S7.553,31,7,31"/> <path id="XMLID_109_" style="fill:#B0D3F0;" d="M13,31h-2c-0.553,0-1,0.448-1,1s0.447,1,1,1h2c0.553,0,1-0.448,1-1S13.553,31,13,31 "/> <path id="XMLID_108_" style="fill:#B0D3F0;" d="M18,31h-1c-0.553,0-1,0.448-1,1s0.447,1,1,1h1c0.553,0,1-0.448,1-1S18.553,31,18,31 "/> <path id="XMLID_107_" style="fill:#B0D3F0;" d="M24,31h-2c-0.553,0-1,0.448-1,1s0.447,1,1,1h2c0.553,0,1-0.448,1-1S24.553,31,24,31 "/> <path id="XMLID_106_" style="fill:#B0D3F0;" d="M27.29,31.29C27.109,31.48,27,31.74,27,32c0,0.26,0.109,0.52,0.29,0.71 C27.478,32.89,27.728,33,28,33c0.26,0,0.519-0.11,0.71-0.29C28.89,32.52,29,32.26,29,32c0-0.26-0.11-0.52-0.29-0.71 C28.34,30.92,27.66,30.92,27.29,31.29"/> <rect id="XMLID_105_" x="36" y="34" style="fill:#91BAE1;" width="16" height="10"/> </g> </svg><?php echo $wo['lang']['credit_card'] ?>');
-      }
-    });
-  }
-  else{
-    handler.open({
-      name: "<?php echo $wo['config']['siteName']?>",
-      description: "<?php echo $wo['lang']['donate']?>",
-      amount: amount*100,
-      alipay: true,
-      currency: '<?php echo $wo['config']['stripe_currency']?>',
-      opened: function () {
-        $('#pay-go-pro').modal('hide');
-        $('.btn-alipay').attr('disabled', false).html('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 48 48" xml:space="preserve"><path d="M42 11v27a4 4 0 0 1-4 4H11a5 5 0 0 1-5-5V11a5 5 0 0 1 5-5h26a5 5 0 0 1 5 5z" fill="#5B9EDD"/><path d="M29.91 27.17C32 23.641 33 19 33 19h-7v-2h9v-2h-9v-3.98L22 11v4h-9v2h9v2h-8v2s13.125 0 14.5-.01c-.281.793-.99 3.189-2.015 5.055C22.602 24.84 19.019 24 16.143 24c-6.898 0-8.428 3.481-8.102 6.664.263 2.54 2.145 6.248 7.893 6.248 5.251 0 9.49-3.023 12.099-6.622C33.008 32.591 38.263 34.909 42 37v-6.038c-3.951-1.361-8.11-2.431-12.09-3.792zm-14.812 7.592c-4.858 0-5.61-2.75-5.694-4.392-.079-1.436.886-4.132 6.371-4.132 2.04 0 5.276 1.046 8.909 2.57-2.053 2.708-5.343 5.954-9.586 5.954z" fill="#FFF"/></svg>Alipay');
-      }
-    });
-  }
 }
 
 function Wo_BankTransferDonate(fund_id,amount) {

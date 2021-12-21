@@ -143,7 +143,7 @@
         <!-- offer -->
 
         <!-- postFile -->
-         <?php if(!empty($wo['story']['postFile'])) { ?>
+         <?php if(!empty($wo['story']['postFile']) && $wo['story']['multi_image'] == 0) { ?>
          <div class="post-file wo_shared_doc_file" id="fullsizeimg">
             <?php
                $media = array(

@@ -896,40 +896,100 @@ function str_replace_first($search, $replace, $subject) {
     }
     return $subject;
 }
+function substitute($stringOrFunction, $number) {
+    //$string = $stringOrFunction;
+    return $number.' '.$stringOrFunction;
+}
 function Wo_Time_Elapsed_String($ptime) {
     global $wo;
-    $etime = time() - $ptime;
+    $etime = (time()) - $ptime;
+
     if ($etime < 1) {
-        return '0 seconds';
+        //return '0 seconds';
+        return 'Now';
     }
-    $a        = array(
-        365 * 24 * 60 * 60 => $wo['lang']['year'],
-        30 * 24 * 60 * 60 => $wo['lang']['month'],
-        24 * 60 * 60 => $wo['lang']['day'],
-        60 * 60 => $wo['lang']['hour'],
-        60 => $wo['lang']['minute'],
-        1 => $wo['lang']['second']
-    );
-    $a_plural = array(
-        $wo['lang']['year'] => $wo['lang']['years'],
-        $wo['lang']['month'] => $wo['lang']['months'],
-        $wo['lang']['day'] => $wo['lang']['days'],
-        $wo['lang']['hour'] => $wo['lang']['hours'],
-        $wo['lang']['minute'] => $wo['lang']['minutes'],
-        $wo['lang']['second'] => $wo['lang']['seconds']
-    );
-    foreach ($a as $secs => $str) {
-        $d = $etime / $secs;
-        if ($d >= 1) {
-            $r = round($d);
-            if ($wo['language_type'] == 'rtl') {
-                $time_ago = $wo['lang']['time_ago'] . ' ' . $r . ' ' . ($r > 1 ? $a_plural[$str] : $str);
-            } else {
-                $time_ago = $r . ' ' . ($r > 1 ? $a_plural[$str] : $str) . ' ' . $wo['lang']['time_ago'];
-            }
-            return $time_ago;
-        }
+    
+    $seconds = abs($etime);
+    $minutes = $seconds / 60;
+    $hours = $minutes / 60;
+    $days = $hours / 24;
+    $weeks = $days / 7;
+    $years = $days / 365;
+    if ($seconds < 45) {
+        return substitute($wo['lang']['now'], '');
     }
+    elseif ($seconds < 90) {
+        return substitute($wo['lang']['_time_m'], 1);
+    }
+    elseif ($minutes < 45) {
+        return substitute($wo['lang']['_time_m'], round($minutes));
+    }
+    elseif ($minutes < 90) {
+        return substitute($wo['lang']['_time_h'], 1);
+    }
+    elseif ($hours < 24) {
+        return substitute($wo['lang']['_time_hrs'], round($hours));
+    }
+    elseif ($hours < 42) {
+        return substitute($wo['lang']['_time_d'], 1);
+    }
+    elseif ($days < 7) {
+        return substitute($wo['lang']['_time_d'], round($days));
+    }
+    elseif ($weeks < 2) {
+        return substitute($wo['lang']['_time_w'], 1);
+    }
+    elseif ($weeks < 52) {
+        return substitute($wo['lang']['_time_w'], round($weeks));
+    }
+    elseif ($years < 1.5) {
+        return substitute($wo['lang']['_time_y'], 1);
+    }
+    else {
+        return substitute($wo['lang']['_time_yrs'], round($years));
+    }
+
+    // $a        = array(
+    //     365 * 24 * 60 * 60 => $wo['lang']['year'],
+    //     30 * 24 * 60 * 60 => $wo['lang']['month'],
+    //     24 * 60 * 60 => $wo['lang']['day'],
+    //     60 * 60 => $wo['lang']['hour'],
+    //     60 => $wo['lang']['minute'],
+    //     1 => $wo['lang']['second']
+    // );
+    // $a_plural = array(
+    //     $wo['lang']['year'] => $wo['lang']['years'],
+    //     $wo['lang']['month'] => $wo['lang']['months'],
+    //     $wo['lang']['day'] => $wo['lang']['days'],
+    //     $wo['lang']['hour'] => $wo['lang']['hours'],
+    //     $wo['lang']['minute'] => $wo['lang']['minutes'],
+    //     $wo['lang']['second'] => $wo['lang']['seconds']
+    // );
+    // foreach ($a as $secs => $str) {
+    //     $d = $etime / $secs;
+    //     if ($d >= 1) {
+    //         $r = round($d);
+    //         if ($wo['language_type'] == 'rtl') {
+    //             //$time_ago = $wo['lang']['time_ago'] . ' ' . $r . ' ' . ($r > 1 ? $a_plural[$str] : $str);
+    //             if ($secs > 1) {
+    //                 $time_ago = $r . ' ' . ($r > 1 ? $a_plural[$str] : $str);
+    //             }
+    //             else{
+    //                 $time_ago = $wo['lang']['now'];
+    //             }
+                
+    //         } else {
+    //             //$time_ago = $r . ' ' . ($r > 1 ? $a_plural[$str] : $str) . ' ' . $wo['lang']['time_ago'];
+    //             if ($secs > 1) {
+    //                 $time_ago = $r . ' ' . ($r > 1 ? $a_plural[$str] : $str);
+    //             }
+    //             else{
+    //                 $time_ago = $wo['lang']['now'];
+    //             }
+    //         }
+    //         return $time_ago;
+    //     }
+    // }
 }
 function Wo_FolderSize($dir) {
     $count_size = 0;
@@ -1041,7 +1101,13 @@ function Wo_CompressImage($source_url, $destination_url, $quality) {
             }
         }
     }
-    @imagejpeg($image, $destination_url, $quality);
+    if ($finfof == 'image/png') {
+        @imagepng($image);
+    }
+    else{
+        @imagejpeg($image, $destination_url, $quality);
+    }
+    
     return $destination_url;
 }
 

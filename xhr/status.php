@@ -210,4 +210,17 @@ if ($f == 'status') {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'remove_multi_status') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (is_numeric($value) && $value > 0) {
+                    Wo_DeleteStatus(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
 }

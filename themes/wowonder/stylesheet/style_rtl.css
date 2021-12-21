@@ -317,6 +317,12 @@ strong {
 #wo_comment_combo .comment_combo_footer .wo_comment_fopt {
     text-align: end !important;
 }
+#wo_comment_combo .comment_combo_footer .wo_comment_fopt > .pull-right {
+	float: left !important;
+}
+#wo_comment_combo .comment_combo_footer .wo_comment_fopt .btn svg {
+    transform: scaleX(-1);
+}
 .event_invite_frnd input{
     padding-left: 10px;
     padding-right: 40px;
@@ -946,9 +952,6 @@ body .wow_sett_sidebar > ul > li > a svg {
     margin-right: 23px !important;
     padding-right: 23px;
 }
-body .wow_side_loggd_usr_hdr {
-    padding-left: 0;padding-right: 53px;
-}
 body .wow_side_loggd_usr_hdr .avatar {
     left: auto;
     right: 0;
@@ -1049,6 +1052,18 @@ body .invite-user-form button svg {
 	transform: rotate(180deg);
 }
 
+body .navbar-default .dropdown-menu li a svg {
+    margin: -3px 2px 0 15px;
+}
+.wo_blogcomm_combo button svg {
+	transform: scaleX(-1);
+}
+body .greetalert {border-left: 0;border-right: 2.5px solid;}
+body .text-sender-container .outgoing .message-model {
+    margin-right: auto;
+    margin-left: 0;
+}
+
 
 
 
@@ -1117,9 +1132,12 @@ body .wo_imagecombo_lbox.story_lightbox .story_image_owner {
 }
 }
 @media (max-width: 600px) {
-    .profile-container .card {
-        border-bottom-right-radius: 3px !important;
-    }
+.profile-container .card {
+	border-bottom-right-radius: 3px !important;
+}
+body .text-sender-container .msg_usr_info_top_list .msg_usr_cht_opts_btns > span {
+    margin-right: 0 !important;margin-left: 4px !important;
+}
 }
 @media (max-width: 570px){
 .wo_loading_post_child {

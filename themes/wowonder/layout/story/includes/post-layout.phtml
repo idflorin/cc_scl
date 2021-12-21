@@ -140,7 +140,7 @@ $current_post = $wo['current_post'] = $wo['story'];
         <!-- offer -->
         
         <!-- postFile -->
-        <?php if(!empty($wo['story']['postFile'])) { ?>
+        <?php if(!empty($wo['story']['postFile']) && $wo['story']['multi_image'] == 0) { ?>
 
         <div class="post-file wo_shared_doc_file" id="fullsizeimg">
           <!-- <div style="width: 100%;height: 100%;position: absolute;background-color: rgba(0,0,0,0.3);filter: blur(5px);"></div> -->

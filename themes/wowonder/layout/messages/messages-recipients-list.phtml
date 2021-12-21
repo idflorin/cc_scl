@@ -22,7 +22,7 @@ if (!empty($message['from_id'])) {
 		<?php } else { ?>
 			<div class="online_dot off_usr"><div class="dot"></div></div>
 		<?php } ?>
-		<span class="new-message-alert <?php echo ($message_count == 0) ? 'hidden' : ''; ?>"><?php echo $message_count; ?></span>
+		<span class="new-message-alert <?php echo ($message_count == 0) ? 'hidden' : ''; ?>"></span>
 	</div>
 	<div class="msg_rght_prt">
 		<div class="messages-last-sent <?php echo ($message_count == 0) ? '' : 'new_msg_lst_lsent'; ?> <?php echo Wo_RightToLeft('pull-right');?> time ajax-time" title="<?php echo date('c',$message['time']); ?>"><?php echo (!empty($message['time'])) ? Wo_Time_Elapsed_String($message['time']) : '';?></div>

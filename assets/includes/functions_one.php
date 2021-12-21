@@ -489,6 +489,22 @@ function Wo_UserData($user_id, $password = true) {
     if ($password == false) {
         unset($fetched_data['password']);
     }
+    $fetched_data['avatar_post_id'] = 0;
+    $fetched_data['cover_post_id'] = 0;
+    $query_avatar  = mysqli_query($sqlConnect, " SELECT `id`  FROM " . T_POSTS . "  WHERE `postType` = 'profile_picture' AND `user_id` = {$user_id} ORDER BY 'id' DESC");
+    if ($query_avatar) {
+        $query_avatar_data = mysqli_fetch_assoc($query_avatar);
+        if (!empty($query_avatar_data) && !empty($query_avatar_data['id'])) {
+            $fetched_data['avatar_post_id'] = $query_avatar_data['id'];
+        }
+    }
+    $query_avatar  = mysqli_query($sqlConnect, " SELECT `id`  FROM " . T_POSTS . "  WHERE `postType` = 'profile_cover_picture' AND `user_id` = {$user_id} ORDER BY 'id' DESC");
+    if ($query_avatar) {
+        $query_avatar_data = mysqli_fetch_assoc($query_avatar);
+        if (!empty($query_avatar_data) && !empty($query_avatar_data['id'])) {
+            $fetched_data['cover_post_id'] = $query_avatar_data['id'];
+        }
+    }
     $fetched_data['avatar_org'] = $fetched_data['avatar'];
     $fetched_data['cover_org']  = $fetched_data['cover'];
     $explode2                   = @end(explode('.', $fetched_data['cover']));
@@ -726,13 +742,30 @@ function Wo_SlugPost($string) {
     return $slug . '.html';
 }
 function Wo_GetPostIdFromUrl($string) {
+    global $wo;
     $slug_string = '';
     $string      = Wo_Secure($string);
-    if (preg_match('/[^a-z\s-]/i', $string)) {
+    if (preg_match('/[^a-z\s-]/i', $string) && $wo['config']['useSeoFrindly'] == 1 && !is_numeric($string)) {
         $string_exp  = @explode('_', $string);
         $slug_string = $string_exp[0];
-    } else {
+    } elseif($wo['config']['useSeoFrindly'] == 0) {
         $slug_string = $string;
+    } else {
+        return false;
+    }
+    return Wo_Secure($slug_string);
+}
+function Wo_GetBlogIdFromUrl($string) {
+    global $wo;
+    $slug_string = '';
+    $string      = Wo_Secure($string);
+    if (preg_match('/[^a-z\s-]/i', $string) && $wo['config']['useSeoFrindly'] == 1 && !is_numeric($string)) {
+        $string_exp  = @explode('_', $string);
+        $slug_string = $string_exp[0];
+    } elseif($wo['config']['useSeoFrindly'] == 0) {
+        $slug_string = $string;
+    } else {
+        return false;
     }
     return Wo_Secure($slug_string);
 }
@@ -2598,7 +2631,8 @@ function Wo_RegisterNotification($data = array()) {
                         'subject' => 'New notification',
                         'charSet' => 'utf-8',
                         'message_body' => Wo_LoadPage('emails/notifiction-email'),
-                        'is_html' => true
+                        'is_html' => true,
+                        'notifier' => $notifier
                     );
                     if ($wo['config']['smtp_or_mail'] == 'smtp') {
                         $send_message_data['insert_database'] = 1;
@@ -4556,6 +4590,7 @@ function Wo_CheckIfUserCanPost($num = 10) {
     if ($sql_query['count'] > $num) {
         return false;
     }
+    return true;
 }
 function Wo_CheckIfUserCanRegister($num = 10) {
     global $wo, $sqlConnect;
@@ -4604,7 +4639,7 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
             return false;
         }
     }
-    if (Wo_CheckIfUserCanPost($wo['config']['post_limit']) === false) {
+    if (!Wo_CheckIfUserCanPost($wo['config']['post_limit'])) {
         return false;
     }
     if (!empty($re_data['postText'])) {
@@ -4623,7 +4658,14 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $re_data['postText'], $match)) {
             $re_data['postYoutube'] = Wo_Secure($match[1]);
             //$re_data['postText'] = preg_replace('/((?:https?:\/\/)?www\.youtube\.com\/watch\?v=\w+)/', "", $re_data['postText']);
-            $re_data['postText'] = preg_replace($match[0], "", $re_data['postText']);
+            //$re_data['postText'] = preg_replace($match[0], "", $re_data['postText']);
+            $link_regex = '/(http\:\/\/|https\:\/\/|www\.)([^\ ]+)/i';
+            preg_match_all($link_regex, $re_data['postText'], $matches);
+            foreach ($matches[0] as $match) {
+                $match_url           = strip_tags($match);
+                $syntax              = '';
+                $re_data['postText'] = str_replace($match, $syntax, $re_data['postText']);
+            }
             $is_there_video         = true;
         }
         if (Wo_IsUrl($wo['config']['playtube_url']) && preg_match('#'.$playtube_root.'\/(?:watch|embed)\/(.*)#i', $re_data['postText'], $match)) {
@@ -5053,7 +5095,7 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
     if (!empty($story['postFeeling'])) {
         $story['postFeelingIcon'] = $wo['feelingIcons'][$story['postFeeling']];
     }
-    if (isset($story['Orginaltext']) && !empty($story['Orginaltext']) && $wo['config']['useSeoFrindly'] == 1) {
+    if ($wo['config']['useSeoFrindly'] == 1) {
         $story['url'] = Wo_SeoLink('index.php?link1=post&id=' . $story['id']) . '_' . Wo_SlugPost($story['Orginaltext']);
     } else {
         $story['url'] = Wo_SeoLink('index.php?link1=post&id=' . $story['id']);
@@ -5404,6 +5446,10 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                 if ($wo['config']['job_system'] == 1) {
                     $query_text .= " AND `job_id` > '0'";
                 }
+            case 'offer':
+                if ($wo['config']['offer_system'] == 1) {
+                    $query_text .= " AND `offer_id` > '0'";
+                }
                 break;
         }
         if (!$wo['loggedin'] || $Wo_page_publisher['user_id'] != $wo['user']['id']) {
@@ -5491,7 +5537,7 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                   OR `page_id` IN (SELECT `page_id` FROM " . T_PAGES_LIKES . " WHERE `user_id` = {$logged_user_id} AND `active` = '1')
                   OR `group_id` IN (SELECT `id` FROM " . T_GROUPS . " WHERE `user_id` = {$logged_user_id})
                   OR `event_id` IN (SELECT `event_id` FROM " . T_EVENTS_GOING . " WHERE `user_id` = {$logged_user_id})
-                  OR `group_id` IN (SELECT `group_id` FROM " . T_GROUP_MEMBERS . " WHERE `user_id` = {$logged_user_id} AND `user_id` IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$logged_user_id} AND `active` = '1')
+                  OR `group_id` IN (SELECT `group_id` FROM " . T_GROUP_MEMBERS . " WHERE `user_id` = {$logged_user_id}
                   )
             )";
         }
@@ -5601,7 +5647,6 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
                     LIMIT {$limit}";
     }
     $data = array();
-    
     $sql  = mysqli_query($sqlConnect, $query_text);
     $ids = array();
     while ($fetched_data = mysqli_fetch_assoc($sql)) {
@@ -7738,6 +7783,7 @@ function Wo_GetPostComment($comment_id = 0) {
     if ($wo['config']['second_post_button'] == 'reaction') {
         $fetched_data['reaction'] = Wo_GetPostReactionsTypes($fetched_data['id'],'comment');
     }
+    $fetched_data['replies_count'] = Wo_CountCommentReplies($fetched_data['id']);
     return $fetched_data;
 }
 function Wo_CountPostComment($post_id = '') {

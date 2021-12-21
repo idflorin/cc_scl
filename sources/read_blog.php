@@ -8,7 +8,7 @@ if (empty($_GET['id'])) {
   header("Location: " . $wo['config']['site_url']);
   exit();
 }
-$_GET['id'] = Wo_GetPostIdFromUrl($_GET['id']);
+$_GET['id'] = Wo_GetBlogIdFromUrl($_GET['id']);
 if (empty($_GET['id']) || !is_numeric($_GET['id'])) {
 	header("Location: " . $wo['config']['site_url']);
 	exit();

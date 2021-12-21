@@ -1,43 +1,56 @@
 <div class="container-fluid">
+    <div>
+        <h3>Configure Storage Settings</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Settings</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Configure Storage Settings</li>
+            </ol>
+        </nav>
+    </div>
     <div class="alert alert-warning">
         <i class="fa fa-fw fa-exclamation-triangle"></i> <strong>Important:</strong> You can't enable two or three storages at the same time, if you enable FTP, amazon s3 will be automatically disabled, same for amazon s3 and Digitalocean.
-      </div>
-    <div class="block-header">
-        <h2>General Settings > Upload Settings > Configure Storage Settings</h2>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
         <div class="col-lg-6 col-md-6 ">
             <div class="card">
-                <div class="header">
-                    <h2>Amazon S3 Settings</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success general-settings-alert"></div>
+                <div class="card-body">
+                    <h6 class="card-title">Amazon S3 Settings</h6>
+                    <div class="general-settings-alert"></div>
                     <form class="general-settings" method="POST">
                         <label for="amazone_s3">Amazon S3 Storage</label>
                         <div class="form-group">
-                            <input type="radio" name="amazone_s3" id="amazone_s3-enabled" value="1" <?php echo ($wo['config']['amazone_s3'] == 1) ? 'checked': '';?>>
-                            <label for="amazone_s3-enabled">Enabled</label>
-                            <input type="radio" name="amazone_s3" id="amazone_s3-disabled" value="0" <?php echo ($wo['config']['amazone_s3'] == 0) ? 'checked': '';?>>
-                            <label for="amazone_s3-disabled" class="m-l-20">Disabled</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="amazone_s3" id="amazone_s3-enabled" value="1" <?php echo ($wo['config']['amazone_s3'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="amazone_s3-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="amazone_s3" id="amazone_s3-disabled" value="0" <?php echo ($wo['config']['amazone_s3'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="amazone_s3-disabled" class="m-l-20">Disabled</label>
+                            </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="bucket_name" name="bucket_name" class="form-control" value="<?php echo $wo['config']['bucket_name']?>">
                                 <label class="form-label">Amazon Bucket Name</label>
+                                <input type="text" id="bucket_name" name="bucket_name" class="form-control" value="<?php echo $wo['config']['bucket_name']?>">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="amazone_s3_key" name="amazone_s3_key" class="form-control" value="<?php echo $wo['config']['amazone_s3_key']?>">
                                 <label class="form-label">Amazon S3 Key</label>
+                                <input type="text" id="amazone_s3_key" name="amazone_s3_key" class="form-control" value="<?php echo $wo['config']['amazone_s3_key']?>">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="amazone_s3_s_key" name="amazone_s3_s_key" class="form-control" value="<?php echo $wo['config']['amazone_s3_s_key']?>">
                                 <label class="form-label">Amazon S3 Secret Key</label>
+                                <input type="text" id="amazone_s3_s_key" name="amazone_s3_s_key" class="form-control" value="<?php echo $wo['config']['amazone_s3_s_key']?>">
                             </div>
                         </div>
                         <label for="region">Amazon S3 bucket Region</label>
@@ -59,48 +72,115 @@
                         </select>
                         <div class="clearfix"></div>
                         <br><br>
-                        <span class="help-block ">1. Before enabling Amazon S3, make sure you upload the whole "upload/" folder to your bucket.</span>
-		                <span class="help-block ">2. Before disabling Amazon S3, make sure you download the whole "upload/" folder to your server.</span>
-		                <span class="help-block ">3. We recommend to upload the folder and files via <a href="http://s3tools.org/s3cmd">S3cmd</a>.</span>
-		                <span class="help-block ">4. If your site is still brand new, you can escape the upload step, but make sure to click on "Test Connection".</span>
+                        <p class="help-block ">1. Before enabling Amazon S3, make sure you upload the whole "upload/" folder to your bucket.</p>
+		                <p class="help-block ">2. Before disabling Amazon S3, make sure you download the whole "upload/" folder to your server.</p>
+		                <p class="help-block ">3. We recommend to upload the folder and files via <a href="http://s3tools.org/s3cmd">S3cmd</a>.</p>
+		                <p class="help-block ">4. If your site is still brand new, you can escape the upload step, but make sure to click on "Test Connection".</p>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                         <button type="button" class="btn btn-warning m-t-15 waves-effect" onclick="Wo_TestS3()">Test Connection</button>
                     </form>
                 </div>
             </div>
+			<div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">FTP Settings</h6>
+                    <br>
+                    <small>You can upload files directly from your server to another FTP server and load them from there.</small><br>
+                    <small>Impotant: This may slow down your site's upload/delete speed, make sure to use fast FTP server.</small>
+                    <div class="ftp-settings-alert"></div>
+                    <form class="ftp-settings" method="POST">
+                        <label for="ftp_upload">FTP Storage</label>
+                        <div class="form-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="ftp_upload" id="ftp_upload-enabled" value="1" <?php echo ($wo['config']['ftp_upload'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="ftp_upload-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="ftp_upload" id="ftp_upload-disabled" value="0" <?php echo ($wo['config']['ftp_upload'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="ftp_upload-disabled" class="m-l-20">Disabled</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">FTP Hostname</label>
+                                <input type="text" id="ftp_host" name="ftp_host" class="form-control" value="<?php echo $wo['config']['ftp_host']?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">FTP Username</label>
+                                <input type="text" id="ftp_username" name="ftp_username" class="form-control" value="<?php echo $wo['config']['ftp_username']?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">FTP Password</label>
+                                <input type="text" id="ftp_password" name="ftp_password" class="form-control" value="<?php echo $wo['config']['ftp_password']?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">FTP Port</label>
+                                <input type="text" id="ftp_port" name="ftp_port" class="form-control" value="<?php echo $wo['config']['ftp_port']?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">FTP Path</label>
+                                <input type="text" id="ftp_path" name="ftp_path" class="form-control" value="<?php echo $wo['config']['ftp_path']?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">FTP Endpoint (IP or domain where the FTP server is pointed to) example: wowonderstorage.com.</label>
+                                <input type="text" id="ftp_endpoint" name="ftp_endpoint" class="form-control" value="<?php echo $wo['config']['ftp_endpoint']?>">
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <p class="help-block ">1. Before enabling FTP, make sure you upload the whole "upload/" folder to your FTP server.</p>
+                        <p class="help-block ">2. Before disabling FTP, make sure you download the whole "upload/" folder to your server.</p>
+                        <p class="help-block ">3. If your site is still brand new, you can escape the upload step, but make sure to click on "Test Connection".</p>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                        <button type="button" class="btn btn-warning m-t-15 waves-effect" onclick="Wo_TestFTP()">Test FTP Connection</button>
+                    </form>
+                </div>
+            </div>
         </div>
         <div class="col-lg-6 col-md-6 ">
             <div class="card">
-                <div class="header">
-                    <h2>Digitalocean Spaces Settings</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success spaces-settings-alert"></div>
+                <div class="card-body">
+                    <h6 class="card-title">Digitalocean Spaces Settings</h6>
+                    <div class="spaces-settings-alert"></div>
                     <form class="spaces-settings" method="POST">
                         <label for="spaces">Digitalocean Spaces Storage</label>
                         <div class="form-group">
-                            <input type="radio" name="spaces" id="spaces-enabled" value="1" <?php echo ($wo['config']['spaces'] == 1) ? 'checked': '';?>>
-                            <label for="spaces-enabled">Enabled</label>
-                            <input type="radio" name="spaces" id="spaces-disabled" value="0" <?php echo ($wo['config']['spaces'] == 0) ? 'checked': '';?>>
-                            <label for="spaces-disabled" class="m-l-20">Disabled</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="spaces" id="spaces-enabled" value="1" <?php echo ($wo['config']['spaces'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="spaces-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="spaces" id="spaces-disabled" value="0" <?php echo ($wo['config']['spaces'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="spaces-disabled" class="m-l-20">Disabled</label>
+                            </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="space_name" name="space_name" class="form-control" value="<?php echo $wo['config']['space_name']?>">
                                 <label class="form-label">Digitalocean Space Name</label>
+                                <input type="text" id="space_name" name="space_name" class="form-control" value="<?php echo $wo['config']['space_name']?>">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="spaces_key" name="spaces_key" class="form-control" value="<?php echo $wo['config']['spaces_key']?>">
                                 <label class="form-label">Digitalocean Key</label>
+                                <input type="text" id="spaces_key" name="spaces_key" class="form-control" value="<?php echo $wo['config']['spaces_key']?>">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="spaces_secret" name="spaces_secret" class="form-control" value="<?php echo $wo['config']['spaces_secret']?>">
                                 <label class="form-label">Digitalocean Secret</label>
+                                <input type="text" id="spaces_secret" name="spaces_secret" class="form-control" value="<?php echo $wo['config']['spaces_secret']?>">
                             </div>
                         </div>
                         <label for="space_region">Digitalocean bucket region</label>
@@ -112,118 +192,53 @@
                         </select>
                         <div class="clearfix"></div>
                         <br><br>
-                        <span class="help-block ">1. Before enabling Digitalocean, make sure you upload the whole "upload/" folder to your bucket.</span>
-                        <span class="help-block ">2. Before disabling Digitalocean, make sure you download the whole "upload/" folder to your server.</span>
-                        <span class="help-block ">4. If your site is still brand new, you can escape the upload step, but make sure to click on "Test Connection".</span>
+                        <p class="help-block ">1. Before enabling Digitalocean, make sure you upload the whole "upload/" folder to your bucket.</p>
+                        <p class="help-block ">2. Before disabling Digitalocean, make sure you download the whole "upload/" folder to your server.</p>
+                        <p class="help-block ">4. If your site is still brand new, you can escape the upload step, but make sure to click on "Test Connection".</p>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                         <button type="button" class="btn btn-warning m-t-15 waves-effect" onclick="Wo_TestSpaces()">Test Connection</button>
                     </form>
                 </div>
             </div>
-            <br><br>
-        </div>
-        <div class="col-lg-6 col-md-6 ">
-            <div class="card">
-                <div class="header">
-                    <h2>FTP Settings</h2><br>
-                    <small>You can upload files directly from your server to another FTP server and load them from there.</small><br>
-                    <small>Impotant: This may slow down your site's upload/delete speed, make sure to use fast FTP server.</small>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success ftp-settings-alert"></div>
-                    <form class="ftp-settings" method="POST">
-                        <label for="ftp_upload">FTP Storage</label>
-                        <div class="form-group">
-                            <input type="radio" name="ftp_upload" id="ftp_upload-enabled" value="1" <?php echo ($wo['config']['ftp_upload'] == 1) ? 'checked': '';?>>
-                            <label for="ftp_upload-enabled">Enabled</label>
-                            <input type="radio" name="ftp_upload" id="ftp_upload-disabled" value="0" <?php echo ($wo['config']['ftp_upload'] == 0) ? 'checked': '';?>>
-                            <label for="ftp_upload-disabled" class="m-l-20">Disabled</label>
-                        </div>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="ftp_host" name="ftp_host" class="form-control" value="<?php echo $wo['config']['ftp_host']?>">
-                                <label class="form-label">FTP Hostname</label>
-                            </div>
-                        </div>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="ftp_username" name="ftp_username" class="form-control" value="<?php echo $wo['config']['ftp_username']?>">
-                                <label class="form-label">FTP Username</label>
-                            </div>
-                        </div>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="ftp_password" name="ftp_password" class="form-control" value="<?php echo $wo['config']['ftp_password']?>">
-                                <label class="form-label">FTP Password</label>
-                            </div>
-                        </div>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="ftp_port" name="ftp_port" class="form-control" value="<?php echo $wo['config']['ftp_port']?>">
-                                <label class="form-label">FTP Port</label>
-                            </div>
-                        </div>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="ftp_path" name="ftp_path" class="form-control" value="<?php echo $wo['config']['ftp_path']?>">
-                                <label class="form-label">FTP Path</label>
-                            </div>
-                        </div>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="ftp_endpoint" name="ftp_endpoint" class="form-control" value="<?php echo $wo['config']['ftp_endpoint']?>">
-                                <label class="form-label">FTP Endpoint (IP or domain where the FTP server is pointed to) example: wowonderstorage.com.</label>
-                            </div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <span class="help-block ">1. Before enabling FTP, make sure you upload the whole "upload/" folder to your FTP server.</span>
-                        <span class="help-block ">2. Before disabling FTP, make sure you download the whole "upload/" folder to your server.</span>
-                        <span class="help-block ">3. If your site is still brand new, you can escape the upload step, but make sure to click on "Test Connection".</span>
-                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
-                        <button type="button" class="btn btn-warning m-t-15 waves-effect" onclick="Wo_TestFTP()">Test FTP Connection</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6 col-md-6 ">
-            <div class="card">
-                <div class="header">
-                    <h2>Google Cloud Settings</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success drive-settings-alert"></div>
+			<div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Google Cloud Settings</h6>
+                    <div class="drive-settings-alert"></div>
                     <form class="drive-settings" method="POST">
                         <label for="cloud_upload">Google Cloud Storage</label>
                         <div class="form-group">
-                            <input type="radio" name="cloud_upload" id="cloud_upload-enabled" value="1" <?php echo ($wo['config']['cloud_upload'] == 1) ? 'checked': '';?>>
-                            <label for="cloud_upload-enabled">Enabled</label>
-                            <input type="radio" name="cloud_upload" id="cloud_upload-disabled" value="0" <?php echo ($wo['config']['cloud_upload'] == 0) ? 'checked': '';?>>
-                            <label for="cloud_upload-disabled" class="m-l-20">Disabled</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="cloud_upload" id="cloud_upload-enabled" value="1" <?php echo ($wo['config']['cloud_upload'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="cloud_upload-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="cloud_upload" id="cloud_upload-disabled" value="0" <?php echo ($wo['config']['cloud_upload'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="cloud_upload-disabled" class="m-l-20">Disabled</label>
+                            </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="cloud_bucket_name" name="cloud_bucket_name" class="form-control" value="<?php echo $wo['config']['cloud_bucket_name']?>">
                                 <label class="form-label">Google Cloud Bucket Name</label>
+                                <input type="text" id="cloud_bucket_name" name="cloud_bucket_name" class="form-control" value="<?php echo $wo['config']['cloud_bucket_name']?>">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line focused">
-                                <input type="file" id="cloud_file" name="cloud_file" class="form-control">
                                 <label class="form-label">Google Cloud File</label>
+                                <input type="file" id="cloud_file" name="cloud_file" class="form-control">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="cloud_file_path" class="form-control" value="<?php echo $wo['config']['cloud_file_path']?>" readonly>
                                 <label class="form-label">Google Cloud File Path</label>
+                                <input type="text" id="cloud_file_path" class="form-control" value="<?php echo $wo['config']['cloud_file_path']?>" readonly>
                             </div>
                         </div>
                         <div class="clearfix"></div>
                         <br>
-                        <span class="help-block ">1. make sure you upload the whole "upload/" folder to your bucket.</span>
-                        <span class="help-block ">2. make sure to keep (Google Cloud File) on your server. in Google Cloud File Path (<?php echo $wo['config']['cloud_file_path']?>)</span>
+                        <p class="help-block ">1. make sure you upload the whole "upload/" folder to your bucket.</p>
+                        <p class="help-block ">2. make sure to keep (Google Cloud File) on your server. in Google Cloud File Path (<?php echo $wo['config']['cloud_file_path']?>)</p>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                         <button type="button" class="btn btn-warning m-t-15 waves-effect" onclick="Wo_TestCloud()">Test Cloud Connection</button>
@@ -239,9 +254,15 @@ function Wo_TestCloud() {
     $('form.drive-settings').find('.btn-warning').text('Please wait..');
     $.get(Wo_Ajax_Requests_File(), {f:'admin_setting', s: 'test_cloud'}, function (data) {
         if (data.status == 200) {
-            alert('Connection established!');
+            $('.drive-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Connection established!</div>');
+            setTimeout(function () {
+                $('.drive-settings-alert').empty();
+            }, 2000);
         } else {
-            alert(data.message);
+            $('.drive-settings-alert').html('<div class="alert alert-danger">'+data.message+'</div>');
+            setTimeout(function () {
+                $('.drive-settings-alert').empty();
+            }, 2000);
         }
         $('form.drive-settings').find('.btn-warning').text('Test Cloud Connection');
     });
@@ -250,15 +271,30 @@ function Wo_TestS3() {
 	$('form.general-settings').find('.btn-warning').text('Please wait..');
 	$.get(Wo_Ajax_Requests_File(), {f:'admin_setting', s: 'test_s3'}, function (data) {
 		if (data.status == 200) {
-			alert('Connection established!');
+            $('.general-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Connection established!</div>');
+            setTimeout(function () {
+                $('.general-settings-alert').empty();
+            }, 2000);
 		} else if (data.status == 300) {
-			alert('Bucket doesn\'t exists');
+            $('.general-settings-alert').html('<div class="alert alert-danger">Bucket doesn\'t exists</div>');
+            setTimeout(function () {
+                $('.general-settings-alert').empty();
+            }, 2000);
 		} else if (data.status == 500) {
-			alert('Your s3 account doesn\'t have any buckets, please create one.');
+            $('.general-settings-alert').html('<div class="alert alert-danger">Your s3 account doesn\'t have any buckets, please create one.</div>');
+            setTimeout(function () {
+                $('.general-settings-alert').empty();
+            }, 2000);
 		} else if (data.status == 400) {
-			alert(data.message);
+			$('.general-settings-alert').html('<div class="alert alert-danger">'+data.message+'</div>');
+            setTimeout(function () {
+                $('.general-settings-alert').empty();
+            }, 2000);
 		} else  {
-			alert('Error while connecting to amazone, please check your details');
+            $('.general-settings-alert').html('<div class="alert alert-danger">Error while connecting to amazone, please check your details</div>');
+            setTimeout(function () {
+                $('.general-settings-alert').empty();
+            }, 2000);
 		}
 		$('form.general-settings').find('.btn-warning').text('Test Connection');
 	});
@@ -268,15 +304,30 @@ function Wo_TestSpaces() {
     $('form.spaces-settings').find('.btn-warning').text('Please wait..');
     $.get(Wo_Ajax_Requests_File(), {f:'admin_setting', s: 'test_spaces'}, function (data) {
         if (data.status == 200) {
-            alert('Connection established!');
+            $('.spaces-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Connection established!</div>');
+            setTimeout(function () {
+                $('.spaces-settings-alert').empty();
+            }, 2000);
         } else if (data.status == 300) {
-            alert('Bucket doesn\'t exists');
+            $('.spaces-settings-alert').html('<div class="alert alert-danger">Bucket doesn\'t exists</div>');
+            setTimeout(function () {
+                $('.spaces-settings-alert').empty();
+            }, 2000);
         } else if (data.status == 500) {
-            alert('Your s3 account doesn\'t have any buckets, please create one.');
+            $('.spaces-settings-alert').html('<div class="alert alert-danger">Your s3 account doesn\'t have any buckets, please create one.</div>');
+            setTimeout(function () {
+                $('.spaces-settings-alert').empty();
+            }, 2000);
         } else if (data.status == 400) {
-            alert(data.message);
+            $('.spaces-settings-alert').html('<div class="alert alert-danger">'+data.message+'</div>');
+            setTimeout(function () {
+                $('.spaces-settings-alert').empty();
+            }, 2000);
         } else  {
-            alert('Error while connecting to amazone, please check your details');
+            $('.spaces-settings-alert').html('<div class="alert alert-danger">Error while connecting to amazone, please check your details</div>');
+            setTimeout(function () {
+                $('.spaces-settings-alert').empty();
+            }, 2000);
         }
         $('form.spaces-settings').find('.btn-warning').text('Test Connection');
     });
@@ -285,9 +336,15 @@ function Wo_TestFTP() {
     $('form.ftp-settings').find('.btn-warning').text('Please wait..');
     $.get(Wo_Ajax_Requests_File(), {f:'admin_setting', s: 'test_ftp'}, function (data) {
         if (data.status == 200) {
-            alert('Connection established!');
+            $('.ftp-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Connection established!</div>');
+            setTimeout(function () {
+                $('.ftp-settings-alert').empty();
+            }, 2000);
         } else if (data.status == 400) {
-            alert(data.message);
+            $('.ftp-settings-alert').html('<div class="alert alert-danger">'+data.message+'</div>');
+            setTimeout(function () {
+                $('.ftp-settings-alert').empty();
+            }, 2000);
         }
         $('form.ftp-settings').find('.btn-warning').text('Test FTP Connection');
     });
@@ -306,7 +363,7 @@ $(function() {
                     location.href = data.url;
                 }
             	form_drive_settings.find('.btn-primary').text('Save');
-            	$('.drive-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+            	$('.drive-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
             	setTimeout(function () {
             		$('.drive-settings-alert').empty();
             	}, 2000);
@@ -323,7 +380,7 @@ $(function() {
         success: function(data) {
             if (data.status == 200) {
                 form_general_settings.find('.btn-primary').text('Save');
-                $('.general-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.general-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.general-settings-alert').empty();
                 }, 2000);
@@ -340,7 +397,7 @@ $(function() {
         success: function(data) {
             if (data.status == 200) {
                 form_ftp_settings.find('.btn-primary').text('Save');
-                $('.ftp-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.ftp-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.ftp-settings-alert').empty();
                 }, 2000);
@@ -357,7 +414,7 @@ $(function() {
         success: function(data) {
             if (data.status == 200) {
                 form_spaces_settings.find('.btn-primary').text('Save');
-                $('.spaces-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.spaces-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.spaces-settings-alert').empty();
                 }, 2000);

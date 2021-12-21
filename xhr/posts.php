@@ -3,7 +3,7 @@ if ($f == 'posts') {
     if ($s == 'fetch_url') {
         if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $_POST["url"], $match)) {
             $youtube_video = Wo_Secure($match[1]);
-            $api_request   = file_get_contents('https://www.googleapis.com/youtube/v3/videos?id=' . $youtube_video . '&key=AIzaSyDoOC41IwRzX5XvP7bNiCJXJfcK14HalM0&part=snippet,contentDetails,statistics,status');
+            $api_request   = file_get_contents('https://www.googleapis.com/youtube/v3/videos?id=' . $youtube_video . '&key='.$wo['config']['youtube_api_key'].'&part=snippet,contentDetails,statistics,status');
             $thumbnail     = '';
             if (!empty($api_request)) {
                 $json_decode = json_decode($api_request);
@@ -112,42 +112,48 @@ if ($f == 'posts') {
             $image_urls = array();
             $page_body  = '';
             $get_url    = $_POST["url"];
-            include_once("assets/libraries/simple_html_dom.inc.php");
-            $get_image = getimagesize($get_url);
-            if (!empty($get_image)) {
-                $image_urls[] = $get_url;
-                $page_title   = 'Image';
-            } else {
-                $get_content = file_get_html($get_url);
-                foreach ($get_content->find('title') as $element) {
-                    @$page_title = $element->plaintext;
+            $save = IsSaveUrl($_POST["url"]);
+            if ($save['status'] == 200) {
+                if ($save['type'] == 'image') {
+                    $get_image = getimagesize($get_url);
+                    if (!empty($get_image)) {
+                        $image_urls[] = $get_url;
+                        $page_title   = 'Image';
+                    }
                 }
-                if (empty($page_title)) {
-                    $page_title = '';
-                }
-                @$page_body = $get_content->find("meta[name='description']", 0)->content;
-                $page_body = mb_substr($page_body, 0, 250, "utf-8");
-                if ($page_body === false) {
-                    $page_body = '';
-                }
-                if (empty($page_body)) {
-                    @$page_body = $get_content->find("meta[property='og:description']", 0)->content;
+                elseif ($save['type'] == 'html') {
+                    include_once("assets/libraries/simple_html_dom.inc.php");
+                    $get_content = file_get_html($get_url);
+                    foreach ($get_content->find('title') as $element) {
+                        @$page_title = $element->plaintext;
+                    }
+                    if (empty($page_title)) {
+                        $page_title = '';
+                    }
+                    @$page_body = $get_content->find("meta[name='description']", 0)->content;
                     $page_body = mb_substr($page_body, 0, 250, "utf-8");
                     if ($page_body === false) {
                         $page_body = '';
                     }
-                }
-                $image_urls = array();
-                @$page_image = $get_content->find("meta[property='og:image']", 0)->content;
-                if (!empty($page_image)) {
-                    if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $page_image)) {
-                        $image_urls[] = $page_image;
+                    if (empty($page_body)) {
+                        @$page_body = $get_content->find("meta[property='og:description']", 0)->content;
+                        $page_body = mb_substr($page_body, 0, 250, "utf-8");
+                        if ($page_body === false) {
+                            $page_body = '';
+                        }
                     }
-                } else {
-                    foreach ($get_content->find('img') as $element) {
-                        if (!preg_match('/blank.(.*)/i', $element->src)) {
-                            if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $element->src)) {
-                                $image_urls[] = $element->src;
+                    $image_urls = array();
+                    @$page_image = $get_content->find("meta[property='og:image']", 0)->content;
+                    if (!empty($page_image)) {
+                        if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $page_image)) {
+                            $image_urls[] = $page_image;
+                        }
+                    } else {
+                        foreach ($get_content->find('img') as $element) {
+                            if (!preg_match('/blank.(.*)/i', $element->src)) {
+                                if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $element->src)) {
+                                    $image_urls[] = $element->src;
+                                }
                             }
                         }
                     }
@@ -342,7 +348,7 @@ if ($f == 'posts') {
                             'size' => $_FILES["postPhotos"]["size"][0],
                             'type' => $_FILES["postPhotos"]["type"][0]
                         );
-                        $media    = Wo_ShareFile($fileInfo);
+                        $media    = Wo_ShareFile($fileInfo,1);
                         if (!empty($media)) {
                             $image_file = Wo_GetMedia($media['filename']);
                             $upload = true;
@@ -865,7 +871,7 @@ if ($f == 'posts') {
     }
     if ($s == 'edit_post') {
         $_POST['text'] = trim($_POST['text']);
-        if (!empty($_POST['post_id']) && !empty($_POST['text'])) {
+        if (!empty($_POST['post_id']) && (!empty($_POST['text']) || !empty($_FILES['images']))) {
             $post_id = Wo_Secure($_POST['post_id']);
             $post = $db->where('id',$post_id)->getOne(T_POSTS);
             if (!empty($post)) {
@@ -889,6 +895,66 @@ if ($f == 'posts') {
                 'post_id' => $_POST['post_id'],
                 'text' => $_POST['text']
             ));
+            if (!empty($_FILES['images'])) {
+                if (isset($_FILES['images']['name'])) {
+                    $id = Wo_Secure($_POST['post_id']);
+                    if (count($_FILES['images']['name']) > 0) {
+                        for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
+                            $fileInfo = array(
+                                'file' => $_FILES["images"]["tmp_name"][$i],
+                                'name' => $_FILES['images']['name'][$i],
+                                'size' => $_FILES["images"]["size"][$i],
+                                'type' => $_FILES["images"]["type"][$i],
+                                'types' => 'jpg,png,jpeg,gif'
+                            );
+                            $file     = Wo_ShareFile($fileInfo, 1);
+                            $image_file = Wo_GetMedia($file['filename']);
+                            if ($wo['config']['adult_images'] == 1  && !detect_safe_search($image_file) && $wo['config']['adult_images_action'] == 1) {
+                                $blur = 1;
+                            }
+                            elseif ($wo['config']['adult_images'] == 1 && detect_safe_search($image_file) == false && $wo['config']['adult_images_action'] == 0) {
+                                $invalid_file = 3;
+                                $errors[] = $error_icon . $wo['lang']['adult_image_file'];
+                                Wo_DeletePost($id);
+                                @unlink($file['filename']);
+                                Wo_DeleteFromToS3($file['filename']);
+                            }
+                            if (!empty($file)) {
+                                $image_count = $db->where('post_id',$post_id)->getValue(T_ALBUMS_MEDIA,'COUNT(*)');
+                                if (!empty($post->postFile) && $image_count == 0) {
+                                    $post_data['multi_image'] = 0;
+                                    $post_data['multi_image_post'] = 1;
+                                    $post_data['album_name'] = '';
+                                    $post_data['postFile'] = $post->postFile;
+                                    $post_data['postFileName'] = $post->postFileName;
+                                    $post_data['active'] = 1;
+                                    $post_data['time'] = time();
+                                    $new_id = Wo_RegisterPost($post_data);
+                                    Wo_RegisterAlbumMedia($id, $post->postFile);
+                                    //$media_album = Wo_RegisterAlbumMedia($new_id, $file['filename'],$id);
+                                    $db->where('id',$id)->update(T_POSTS,array('multi_image' => '1',
+                                                                               'multi_image_post' => 0));
+                                }
+                                $media_album = Wo_RegisterAlbumMedia($id, $file['filename']);
+                                $post_data['multi_image'] = 0;
+                                $post_data['multi_image_post'] = 1;
+                                $post_data['album_name'] = '';
+                                $post_data['postFile'] = $file['filename'];
+                                $post_data['postFileName'] = $file['name'];
+                                $post_data['active'] = 1;
+                                $post_data['time'] = time();
+                                $new_id = Wo_RegisterPost($post_data);
+                                $media_album = Wo_RegisterAlbumMedia($new_id, $file['filename'],$id);
+                            }
+                        }
+                    }
+                }
+                $data = array(
+                    'status' => 200,
+                    'html' => '',
+                    'reload' => 'reload'
+                );
+            }
             if (!empty($updatePost)) {
                 if (!empty($post)) {
                     $text = $post->postText;
@@ -904,6 +970,7 @@ if ($f == 'posts') {
                     }
                 }
                 Wo_CleanCache();
+
                 $data = array(
                     'status' => 200,
                     'html' => $updatePost
@@ -911,6 +978,53 @@ if ($f == 'posts') {
                 if (Wo_CanSenEmails()) {
                     $data['can_send'] = 1;
                 }
+                if (!empty($_FILES['images'])) {
+                    $data['reload'] = 'reload';
+                }
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_post_image') {
+        if (!empty($_POST['post_id'])) {
+            $post_id = Wo_Secure($_POST['post_id']);
+            $post = $db->where('id',$post_id)->getOne(T_POSTS);
+            $image_count = $db->where('post_id',$post_id)->getValue(T_ALBUMS_MEDIA,'COUNT(*)');
+            if (!empty($post) && Wo_IsPostOnwer($post_id, $wo['user']['id'])) {
+                if (!empty($_POST['image_id']) && is_numeric($_POST['image_id'])) {
+                    $image_id = Wo_Secure($_POST['image_id']);
+                    if ($image_count > 1) {
+                        $query_two_2 = mysqli_query($sqlConnect, "SELECT * FROM " . T_ALBUMS_MEDIA . " WHERE `id` = '".$image_id."' AND `post_id` = '".$post_id."' ");
+                        while ($fetched_data_s = mysqli_fetch_assoc($query_two_2)) {
+                            $image_post = $db->where('parent_id',$post_id)->where('image',$fetched_data_s['image'])->getOne(T_ALBUMS_MEDIA);
+                            if (!empty($image_post)) {
+                                Wo_DeletePost($image_post->post_id);
+                            }
+                            $explode2 = @end(explode('.', $fetched_data_s['image']));
+                            $explode3 = @explode('.', $fetched_data_s['image']);
+                            $media_2  = $explode3[0] . '_small.' . $explode2;
+                            @unlink(trim($media_2));
+                            @unlink($fetched_data_s['image']);
+                            $delete_from_s3 = Wo_DeleteFromToS3($media_2);
+                            $delete_from_s3 = Wo_DeleteFromToS3($fetched_data_s['image']);
+                            mysqli_query($sqlConnect, "DELETE FROM " . T_ALBUMS_MEDIA . " WHERE `id` = '".$image_id."' ");
+                        }
+                    }
+                }
+                // else if(!empty($post->postFile) && $image_count > 0){
+                //     $file_extension = pathinfo($post->postFile, PATHINFO_EXTENSION);
+                //     if ($file_extension == 'jpg' || $file_extension == 'jpeg' || $file_extension == 'png' || $file_extension == 'gif') {
+                //         $explode2 = @end(explode('.', $post->postFile));
+                //         $explode3 = @explode('.', $post->postFile);
+                //         $media_2  = $explode3[0] . '_small.' . $explode2;
+                //         @unlink(trim($media_2));
+                //         @unlink($post->postFile);
+                //         $delete_from_s3 = Wo_DeleteFromToS3($media_2);
+                //         $delete_from_s3 = Wo_DeleteFromToS3($post->postFile);
+                //     }
+                // }
             }
         }
         header("Content-type: application/json");

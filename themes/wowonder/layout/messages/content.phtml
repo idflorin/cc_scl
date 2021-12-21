@@ -223,6 +223,116 @@ if (!empty($_GET['user']) && empty($_GET['page'])) {
 </div>
 
 <script type="text/javascript">
+  function escapeRegExp(str) {
+        let arr = str.match(/[.*+?^{}()|[\]\\]/g)
+        if (arr && arr.length) {
+            for (let a of arr) {
+                str = str.replace(/[.*+?^{}()|[\]\\]/g, '\\' + a)
+            }
+        }
+        return str
+  }
+  function Wo_EmoSend(str) {
+        var emo = {
+            ':)': 'smile',
+            '(<': 'joy',
+            '**)': 'relaxed',
+            ':p': 'stuck-out-tongue-winking-eye',
+            ':_p': 'stuck-out-tongue',
+            'B)': 'sunglasses',
+            ';)': 'wink',
+            ':D': 'grin',
+            '/_)': 'smirk',
+            '0)': 'innocent',
+            ':_(': 'cry',
+            ':__(': 'sob',
+            ':(': 'disappointed',
+            ':*': 'kissing-heart',
+            '<3': 'heart',
+            '</3': 'broken-heart',
+            '*_*': 'heart-eyes',
+            '<5': 'star',
+            ':o': 'open-mouth',
+            ':0': 'scream',
+            'o(': 'anguished',
+            '-_(': 'unamused',
+            'x(': 'angry',
+            'X(': 'rage',
+            '-_-': 'expressionless',
+            ':-/': 'confused',
+            ':|': 'neutral-face',
+            '!_': 'exclamation',
+            ':|': 'neutral-face',
+            ':|': 'neutral-face',
+            ':yum:': 'yum',
+            ':triumph:': 'triumph',
+            ':imp:': 'imp',
+            ':hear_no_evil:': 'hear-no-evil',
+            ':alien:': 'alien',
+            ':yellow_heart:': 'yellow-heart',
+            ':sleeping:': 'sleeping',
+            ':mask:': 'mask',
+            ':no_mouth:': 'no-mouth',
+            ':weary:': 'weary',
+            ':dizzy_face:': 'dizzy-face',
+            ':man:': 'man',
+            ':woman:': 'woman',
+            ':boy:': 'boy',
+            ':girl:': 'girl',
+            ':оlder_man:': 'older-man',
+            ':оlder_woman:': 'older-woman',
+            ':cop:': 'cop',
+            ':dancers:': 'dancers',
+            ':speak_no_evil:': 'speak-no-evil',
+            ':lips:': 'lips',
+            ':see_no_evil:': 'see-no-evil',
+            ':dog:': 'dog',
+            ':bear:': 'bear',
+            ':rose:': 'rose',
+            ':gift_heart:': 'gift-heart',
+            ':ghost:': 'ghost',
+            ':bell:': 'bell',
+            ':video_game:': 'video-game',
+            ':soccer:': 'soccer',
+            ':books:': 'books',
+            ':moneybag:': 'moneybag',
+            ':mortar_board:': 'mortar-board',
+            ':hand:': 'hand',
+            ':tiger:': 'tiger',
+            ':elephant:': 'elephant',
+            ':scream_cat:': 'scream-cat',
+            ':monkey:': 'monkey',
+            ':bird:': 'bird',
+            ':snowflake:': 'snowflake',
+            ':sunny:': 'sunny',
+            ':оcean:': 'ocean',
+            ':umbrella:': 'umbrella',
+            ':hibiscus:': 'hibiscus',
+            ':tulip:': 'tulip',
+            ':computer:': 'computer',
+            ':bomb:': 'bomb',
+            ':gem:': 'gem',
+            ':ring:': 'ring'
+        }
+        var hasHTML = false;
+        if (str) {
+            //replace all using regex
+            for (var code of Object.keys(emo).reverse()) {
+                var searchRegExp = new RegExp(escapeRegExp(code), "gi");
+
+                if (!hasHTML) {
+                    var check = str.match(searchRegExp)
+                    if (check) {
+                        hasHTML = true;
+                    } else {
+                        continue
+                    }
+                }
+                str = str.replace(searchRegExp, '<i class="twa-lg twa twa-' + emo[code] + '"></i>');
+            }
+        }
+        return {str, hasHTML}
+    }
 var hash = $('.main_session').val();
 $.ajaxSetup({ 
 data: {
@@ -272,15 +382,199 @@ $(function () {
   <?php if ($wo['config']['maxCharacters'] != 10000) { ?>
   $('#sendMessage').limit("<?php echo $wo['config']['maxCharacters']?>", '#charsLeft');
   <?php } ?>
+ 
+  var main_hash_id   = $('.main_session').val();
+  var file_uploading = false;
+
+  <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+  Wo_getNewMessages()
+  $('form.sendMessages').submit(()=>{
+      chat_number = $('#user-id').val();
+    	first_chat = $('.messages-recipients-list').first();
+    	first_chat_id = $(first_chat).attr('id');
+    	sending_text = $('.mobileleftpane .text-sender-container textarea').val();
+    	if (sending_text.length  > 100) {
+    		sending_text = jQuery.trim(sending_text).substring(0, 97)+'...';
+    	}
+
+      $('#messages-recipient-'+chat_number).insertBefore( $( "#"+first_chat_id ) );
+      var emosend = Wo_EmoSend(sending_text)
+      if(emosend.hasHTML) {
+        $('#messages-recipient-'+chat_number).find('p').html(emosend.str);
+      } else {
+        if(sending_text){
+        $('#messages-recipient-'+chat_number).find('p').text(sending_text);
+        }
+      }
+    	$('#messages-recipient-'+chat_number).find('.messages-last-sent').text('<?php echo $wo['lang']['now'];?>');
+    	$('#messages-recipient-'+chat_number).find('.messages-last-sent').attr('title', '0 seconds');
+    	$('#messages-recipient-'+chat_number).find('.messages-last-sent').removeClass('ajax-time');
+
+      $('.mobileleftpane .text-sender-container textarea').val('');
+      $('.sendMessage').attr('disabled', true);
+      var user_id_ = $('#user-id').val();
+      $('body').attr('sending-' + user_id_, true);
+      $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>');
+        console.log(" from message page ")
+        
+        var hexDigits = new Array("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"); 
+        function rgb2hex(rgb) {
+          rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+          return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+        }
+
+        function hex(x) {
+          return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+        }
+      if(sending_text!="" || sending_text.trim()!=""){
+        if($('[data-target="#groups-message"]').attr("aria-expanded") === "true"){
+            socket.emit("group_message_page", {
+              group_id: $('#messages-group-id').val(), 
+              from_id: _getCookie("user_id"),
+              username: '<?php echo $wo['user']['username']; ?>',
+              msg: sending_text,
+              color: rgb2hex($(".send-button").css("background-color")),
+              isSticker: false
+            },  (data)=>{
+            if (data.status == 200) {
+            $("#message-record-file").val('');
+            $("#message-record-name").val('');
+            $('#chatStickerMessage').val('');
+            Wo_CleanRecordNodes();
+            Wo_StopLocalStream();
+            
+            if($('.messages-container').length == 0) {
+              $(".messages-container").html(data.html);
+            } else {
+              $(".no-messages").hide();
+              $(".messages-container").append(data.html);
+            }
+            var user_id_ = $('#user-id').val();
+            $('body').attr('sending-' + user_id_, false);
+            $('form.sendMessages').clearForm();
+            $('#sendMessage').val('').attr('disabled', false).keyup().focus();
+            setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
+            if (data.invalid_file == 1) {
+              $("#invalid_file").modal('show');
+              Wo_Delay(function(){
+                  $("#invalid_file").modal('hide');
+              },3000);
+            }
+            if (data.invalid_file == 2) {
+              $("#file_not_supported").modal('show');
+              Wo_Delay(function(){
+                  $("#file_not_supported").modal('hide');
+              },3000);
+            }
+          }
+          else if(data.status == 500 && data.invalid_file == 1){
+            $("#invalid_file").modal('show');
+            Wo_Delay(function(){
+                $("#invalid_file").modal('hide');
+            },3000);
+          }
+          else if(data.status == 500 && data.invalid_file == 2){
+            $("#file_not_supported").modal('show');
+            Wo_Delay(function(){
+                $("#file_not_supported").modal('hide');
+            },3000);
+          }
+          else if(data.status == 500 && data.invalid_file == 3){
+            $("#pro_upload_file").modal('show');
+            Wo_Delay(function(){
+              $("#pro_upload_file").modal('hide');
+            },3000);
+          }
+          if (file_uploading) {
+            file_uploading = false;
+            $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>');
+          }
+          $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>');
+        })
+        }
+        else {
+          socket.emit("private_message_page", {
+            to_id: chat_number, 
+            from_id: _getCookie("user_id"),
+            username: '<?php echo $wo['user']['username']; ?>',
+            msg: sending_text,
+            color: rgb2hex($(".send-button").css("background-color")),
+            isSticker: false
+          },  (data)=>{
+          if (data.status == 200) {
+          $("#message-record-file").val('');
+          $("#message-record-name").val('');
+          $('#chatStickerMessage').val('');
+          Wo_CleanRecordNodes();
+          Wo_StopLocalStream();
+          
+          if($('.messages-container').length == 0) {
+            $(".messages-container").html(data.html);
+          } else {
+            $(".no-messages").hide();
+            $(".messages-container").append(data.html);
+          }
+          var user_id_ = $('#user-id').val();
+          $('body').attr('sending-' + user_id_, false);
+          $('form.sendMessages').clearForm();
+          $('#sendMessage').val('').attr('disabled', false).keyup().focus();
+          setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
+          if (data.invalid_file == 1) {
+            $("#invalid_file").modal('show');
+            Wo_Delay(function(){
+                $("#invalid_file").modal('hide');
+            },3000);
+          }
+          if (data.invalid_file == 2) {
+            $("#file_not_supported").modal('show');
+            Wo_Delay(function(){
+                $("#file_not_supported").modal('hide');
+            },3000);
+          }
+        }
+        else if(data.status == 500 && data.invalid_file == 1){
+          $("#invalid_file").modal('show');
+          Wo_Delay(function(){
+              $("#invalid_file").modal('hide');
+          },3000);
+        }
+        else if(data.status == 500 && data.invalid_file == 2){
+          $("#file_not_supported").modal('show');
+          Wo_Delay(function(){
+              $("#file_not_supported").modal('hide');
+          },3000);
+        }
+        else if(data.status == 500 && data.invalid_file == 3){
+          $("#pro_upload_file").modal('show');
+          Wo_Delay(function(){
+            $("#pro_upload_file").modal('hide');
+          },3000);
+        }
+        if (file_uploading) {
+          file_uploading = false;
+          $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>');
+        }
+        $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>');
+      })
+    }
+  }
+  return false
+  })
+  <?php } else { ?>
   setTimeout(Wo_getNewMessages, 5000);
   setTimeout(Wo_UpdateUsers, 10000);
   <?php if ($wo['config']['message_seen'] == 1) { ?>
   setTimeout(Wo_getMessageSeen, 12000);
   <?php } ?>
-  var main_hash_id   = $('.main_session').val();
-  var file_uploading = false;
-
-  $('form.sendMessages').ajaxForm({
+    $('form.sendMessages').ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=messages&s=send_message&hash=' + main_hash_id,
     beforeSend: function () {
     	chat_number = $('#user-id').val();
@@ -294,10 +588,9 @@ $(function () {
     	$('#messages-recipient-'+chat_number).insertBefore( $( "#"+first_chat_id ) );
 
     	$('#messages-recipient-'+chat_number).find('p').text(sending_text);
-    	$('#messages-recipient-'+chat_number).find('.messages-last-sent').text('<?php echo $wo['lang']['time_just_now'];?>');
+    	$('#messages-recipient-'+chat_number).find('.messages-last-sent').text('<?php echo $wo['lang']['now'];?>');
     	$('#messages-recipient-'+chat_number).find('.messages-last-sent').attr('title', '0 seconds');
-
-
+    	$('#messages-recipient-'+chat_number).find('.messages-last-sent').removeClass('ajax-time');
 
       $('.mobileleftpane .text-sender-container textarea').val('');
       $('.sendMessage').attr('disabled', true);
@@ -329,9 +622,11 @@ $(function () {
         $('body').attr('sending-' + user_id_, false);
         $('form.sendMessages').clearForm();
         $('#sendMessage').val('').attr('disabled', false).keyup().focus();
-        $(".messages-container").animate({
-          scrollTop: $('.messages-container')[0].scrollHeight
-        }, 500);
+        setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
         if (data.invalid_file == 1) {
           $("#invalid_file").modal('show');
           Wo_Delay(function(){
@@ -370,6 +665,7 @@ $(function () {
       $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>');
     }
   });
+<?php } ?>
 });
 
 function Wo_ChatStickerMessage(self){
@@ -421,7 +717,49 @@ function Wo_GetMessagesUsers(query) {
   });
 }
 
+function messageTyping(){
+  // console.log("Typing registered")
+  socket.on("typing",(data)=>{
+   
+    var user_id = $("#user-id").val()
+    
+    if ( data.sender_id === +user_id && data.is_typing == 200) {
+      $('.message-contnaier:last').find('.message-typing').html('<div class="incoming pull-left" id="typing"><div class="message-typing message-details"><div class="message-user-image pull-left"><img src="' + data.img + '" alt="Profile Picture"></div><svg width="30" height="40" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" fill="currentColor"> <circle cx="15" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="60" cy="15" r="9" fill-opacity="0.3"> <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s" values=".5;1;.5" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="105" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> </svg></div></div>').fadeIn(300);
+    } else {
+       for (let a of $('.message-contnaier')) {
+         $(a).find('.message-typing').empty()
+       }
+    } 
+  })
+}
+
+$(()=>{
+  <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+  console.log("registering update user list")
+    socket.on("update-message-users-list", (data)=>{
+      if(data.status == 200) {
+        $('.messages-users-list').find('.messages-chat-list').html(data.html);
+      }
+      else{
+        $('.messages-users-list').find('.messages-chat-list').html('<span class="no-online-users center-text empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><?php echo $wo['lang']['no_users_found']; ?></span>');
+      }
+    })
+    socket.on("update-group-side", (data)=>{
+      if(data.status == 200) {
+        $('.messages-users-list').find('.messages-group-list').html(data.html);
+      }
+      else{
+        $('.messages-users-list').find('.messages-group-list').html('<span class="no-online-users center-text empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><?php echo $wo['lang']['no_users_found']; ?></span>');
+      }
+    })
+    messageTyping()
+    <?php } ?>
+})
+
 function Wo_UpdateUsers() {
+  <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+   
+  <?php } else { ?>
   if ($('.messages-search-users-form #query').val().length > 0) {
        return false;
   }
@@ -437,6 +775,7 @@ function Wo_UpdateUsers() {
       $('.messages-users-list').find('.messages-chat-list').html('<span class="no-online-users center-text empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><?php echo $wo['lang']['no_users_found']; ?></span>');
     }
   });
+  <?php }  ?>
 }
 
 function Wo_DeleteConversation(user_id) {
@@ -463,6 +802,10 @@ function Wo_DeleteConversation(user_id) {
 function Wo_GetUserMessages(user_id, user_name, userlink) {
   view_more_wrapper = $('.view-more-wrapper');
 
+  <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+    socket.emit("active-message-user-change", {from_id: _getCookie("user_id"), user_id: user_id})
+  <?php } ?>
+
   $('.text-sender-container').find('.ball-pulse').fadeIn(100);
   $('.text-sender-container').find('.msg_progress').fadeIn(100);
   
@@ -488,7 +831,7 @@ function Wo_GetUserMessages(user_id, user_name, userlink) {
       $('.wo_msg_dtl_most_bottom').css('display', 'block');
       $('.send-button').css('background-color', data.color);
       $('.send-button').css('border-color', data.color);
-	  $('#wo_msg_right_prt .message-option-btns .btn svg').css('color', data.color);
+	    $('#wo_msg_right_prt .message-option-btns .btn svg').css('color', data.color);
       $('#user-chat-link').attr('href', data.url);
       $('#block-url').attr('href', data.block_url);
       $('#user-avatar-right img').attr('src', data.avatar).removeClass('hidden');
@@ -513,14 +856,16 @@ function Wo_GetUserMessages(user_id, user_name, userlink) {
       <?php }?>
       if(data.html.length == 0) {
         view_more_wrapper.hide();
-        $('.messages-container').html('<div class="no-messages empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg><?php echo $wo["lang"]["no_more_message_to_show"];?> </div>');
+        $('.messages-container').html('<div class="no-messages empty_state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.021 512.021" xml:space="preserve"> <path style="fill:#64B5F6;" d="M338.214,344.556l-64-64.107c-4.16-4.171-10.914-4.179-15.085-0.019 c-2.006,2.001-3.133,4.717-3.134,7.55v149.44c0.003,4.589,2.942,8.662,7.296,10.112c1.086,0.367,2.224,0.555,3.371,0.555 c3.357,0,6.519-1.581,8.533-4.267l64-85.333C342.376,354.244,341.958,348.31,338.214,344.556z"/> <path style="fill:#1976D2;" d="M291.366,320.641l-64-21.333c-5.587-1.868-11.631,1.147-13.499,6.734 c-0.732,2.19-0.734,4.558-0.005,6.749l42.667,128c1.453,4.362,5.536,7.302,10.133,7.296h0.661c4.819-0.3,8.836-3.8,9.792-8.533 l21.333-106.667C299.523,327.601,296.483,322.345,291.366,320.641z"/> <path style="fill:#2196F3;" d="M507.43,23.446c-3.399-2.377-7.867-2.568-11.456-0.491L90.641,257.622 c-5.096,2.955-6.832,9.482-3.877,14.578c1.306,2.253,3.391,3.95,5.861,4.771l191.573,63.872l148.907,63.829 c5.417,2.316,11.685-0.197,14.001-5.614c0.321-0.752,0.555-1.538,0.697-2.343l64-362.667 C512.531,29.965,510.825,25.829,507.43,23.446z"/> <g> <path style="fill:#1976D2;" d="M510.011,38.38c3.441-4.781,2.355-11.447-2.426-14.889c-4.259-3.065-10.115-2.578-13.808,1.15 L215.611,318.017l80.277,27.733L510.011,38.38z"/> <path style="fill:#1976D2;" d="M26.065,420.246c-2.679,0.003-5.26-1.003-7.232-2.816c-5.319-4.892-10.553-9.92-15.701-15.083 c-4.171-4.165-4.176-10.922-0.011-15.093c4.165-4.171,10.922-4.176,15.093-0.011c4.949,4.949,9.984,9.792,15.083,14.485 c4.336,3.988,4.618,10.736,0.63,15.072C31.904,418.999,29.052,420.249,26.065,420.246z"/> <path style="fill:#1976D2;" d="M171.387,490.54c-10.278-0.033-20.527-1.098-30.592-3.179c-5.814-0.95-9.757-6.434-8.806-12.248 c0.95-5.814,6.434-9.757,12.248-8.806c0.277,0.045,0.553,0.102,0.825,0.169c8.683,1.792,17.524,2.707,26.389,2.731h0.064h4.8 c5.559-0.531,10.497,3.545,11.028,9.104c0.037,0.385,0.051,0.771,0.044,1.157c0.216,5.884-4.377,10.831-10.261,11.051h-5.568 L171.387,490.54z M94.95,470.124c-1.708,0-3.39-0.409-4.907-1.195c-10.486-5.487-20.611-11.636-30.315-18.411 c-4.727-3.515-5.709-10.197-2.194-14.925c3.355-4.511,9.634-5.644,14.354-2.59c8.937,6.286,18.272,11.987,27.947,17.067 c5.231,2.709,7.276,9.146,4.567,14.377c-1.833,3.54-5.487,5.762-9.474,5.762L94.95,470.124z"/> <path style="fill:#1976D2;" d="M226.235,479.105c-5.891,0.048-10.705-4.688-10.753-10.579c-0.035-4.307,2.524-8.213,6.487-9.901 c6.141-2.627,12.105-5.648,17.856-9.045c5.146-2.867,11.642-1.019,14.509,4.127c2.767,4.967,1.152,11.231-3.672,14.241 c-6.542,3.867-13.325,7.309-20.309,10.304C229.05,478.806,227.651,479.097,226.235,479.105z"/> </g></svg><?php echo $wo["lang"]["no_more_message_to_show"];?> </div>');
       } else {
         $('.messages-container').html(data.html);
         view_more_wrapper.html('<a href="javascript:void(0);" title="' + data.view_more_text + '"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M13,15L15.5,17.5L16.92,16.08L12,11.16L7.08,16.08L8.5,17.5L11,15V21H13V15M3,3H21V5H3V3M3,7H13V9H3V7Z" /></svg></a>').show();
         view_more_wrapper.attr('onclick', 'Wo_getOldMessages(' + user_id + ');').removeClass('hidden');
-        $(".messages-container").animate({
-          scrollTop: $('.messages-container')[0].scrollHeight
-        }, 200);
+        setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 1000);
       }
       <?php if ($wo['config']['message_seen'] == 1) { ?>
          Wo_getMessageSeen();
@@ -556,6 +901,10 @@ function Wo_GetUserMessages(user_id, user_name, userlink) {
 
 function Wo_GetGroupMessages(group_id, group_name) {
   view_more_wrapper = $('.view-more-wrapper');
+
+  <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+    socket.emit("active-message-user-change", {from_id: _getCookie("user_id"), group_id: group_id, group:true})
+  <?php } ?>
   
   $('.text-sender-container').find('.ball-pulse').fadeIn(100);
   $('.text-sender-container').find('.msg_progress').fadeIn(100);
@@ -591,15 +940,17 @@ function Wo_GetGroupMessages(group_id, group_name) {
 
       if(data.html.length == 0) {
         view_more_wrapper.hide();
-        $('.messages-container').html('<div class="no-messages empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg><?php echo $wo["lang"]["no_more_message_to_show"];?> </div>');
+        $('.messages-container').html('<div class="no-messages empty_state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.021 512.021" xml:space="preserve"> <path style="fill:#64B5F6;" d="M338.214,344.556l-64-64.107c-4.16-4.171-10.914-4.179-15.085-0.019 c-2.006,2.001-3.133,4.717-3.134,7.55v149.44c0.003,4.589,2.942,8.662,7.296,10.112c1.086,0.367,2.224,0.555,3.371,0.555 c3.357,0,6.519-1.581,8.533-4.267l64-85.333C342.376,354.244,341.958,348.31,338.214,344.556z"/> <path style="fill:#1976D2;" d="M291.366,320.641l-64-21.333c-5.587-1.868-11.631,1.147-13.499,6.734 c-0.732,2.19-0.734,4.558-0.005,6.749l42.667,128c1.453,4.362,5.536,7.302,10.133,7.296h0.661c4.819-0.3,8.836-3.8,9.792-8.533 l21.333-106.667C299.523,327.601,296.483,322.345,291.366,320.641z"/> <path style="fill:#2196F3;" d="M507.43,23.446c-3.399-2.377-7.867-2.568-11.456-0.491L90.641,257.622 c-5.096,2.955-6.832,9.482-3.877,14.578c1.306,2.253,3.391,3.95,5.861,4.771l191.573,63.872l148.907,63.829 c5.417,2.316,11.685-0.197,14.001-5.614c0.321-0.752,0.555-1.538,0.697-2.343l64-362.667 C512.531,29.965,510.825,25.829,507.43,23.446z"/> <g> <path style="fill:#1976D2;" d="M510.011,38.38c3.441-4.781,2.355-11.447-2.426-14.889c-4.259-3.065-10.115-2.578-13.808,1.15 L215.611,318.017l80.277,27.733L510.011,38.38z"/> <path style="fill:#1976D2;" d="M26.065,420.246c-2.679,0.003-5.26-1.003-7.232-2.816c-5.319-4.892-10.553-9.92-15.701-15.083 c-4.171-4.165-4.176-10.922-0.011-15.093c4.165-4.171,10.922-4.176,15.093-0.011c4.949,4.949,9.984,9.792,15.083,14.485 c4.336,3.988,4.618,10.736,0.63,15.072C31.904,418.999,29.052,420.249,26.065,420.246z"/> <path style="fill:#1976D2;" d="M171.387,490.54c-10.278-0.033-20.527-1.098-30.592-3.179c-5.814-0.95-9.757-6.434-8.806-12.248 c0.95-5.814,6.434-9.757,12.248-8.806c0.277,0.045,0.553,0.102,0.825,0.169c8.683,1.792,17.524,2.707,26.389,2.731h0.064h4.8 c5.559-0.531,10.497,3.545,11.028,9.104c0.037,0.385,0.051,0.771,0.044,1.157c0.216,5.884-4.377,10.831-10.261,11.051h-5.568 L171.387,490.54z M94.95,470.124c-1.708,0-3.39-0.409-4.907-1.195c-10.486-5.487-20.611-11.636-30.315-18.411 c-4.727-3.515-5.709-10.197-2.194-14.925c3.355-4.511,9.634-5.644,14.354-2.59c8.937,6.286,18.272,11.987,27.947,17.067 c5.231,2.709,7.276,9.146,4.567,14.377c-1.833,3.54-5.487,5.762-9.474,5.762L94.95,470.124z"/> <path style="fill:#1976D2;" d="M226.235,479.105c-5.891,0.048-10.705-4.688-10.753-10.579c-0.035-4.307,2.524-8.213,6.487-9.901 c6.141-2.627,12.105-5.648,17.856-9.045c5.146-2.867,11.642-1.019,14.509,4.127c2.767,4.967,1.152,11.231-3.672,14.241 c-6.542,3.867-13.325,7.309-20.309,10.304C229.05,478.806,227.651,479.097,226.235,479.105z"/> </g></svg><?php echo $wo["lang"]["no_more_message_to_show"];?> </div>');
       } 
       else {
         $('.messages-container').html(data.html);
 		view_more_wrapper.html('<a href="javascript:void(0);" title="' + data.view_more_text + '"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M13,15L15.5,17.5L16.92,16.08L12,11.16L7.08,16.08L8.5,17.5L11,15V21H13V15M3,3H21V5H3V3M3,7H13V9H3V7Z" /></svg></a>').show();
         view_more_wrapper.attr('onclick', 'Wo_getOldGroupMessages(' + group_id + ');').removeClass('hidden');
-        $(".messages-container").animate({
-          scrollTop: $('.messages-container')[0].scrollHeight
-        }, 200);
+        setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
       }
       $('.text-sender-container').find('.ball-pulse').fadeOut(100);
 	  $('.text-sender-container').find('.msg_progress').fadeOut(100);
@@ -679,15 +1030,17 @@ function Wo_GetPageMessages(page_id, page_user_id,page_name,user_id) {
 
       if(data.html.length == 0) {
         view_more_wrapper.hide();
-        $('.messages-container').html('<div class="no-messages empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="8"></line></svg><?php echo $wo["lang"]["no_more_message_to_show"];?> </div>');
+        $('.messages-container').html('<div class="no-messages empty_state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.021 512.021" xml:space="preserve"> <path style="fill:#64B5F6;" d="M338.214,344.556l-64-64.107c-4.16-4.171-10.914-4.179-15.085-0.019 c-2.006,2.001-3.133,4.717-3.134,7.55v149.44c0.003,4.589,2.942,8.662,7.296,10.112c1.086,0.367,2.224,0.555,3.371,0.555 c3.357,0,6.519-1.581,8.533-4.267l64-85.333C342.376,354.244,341.958,348.31,338.214,344.556z"/> <path style="fill:#1976D2;" d="M291.366,320.641l-64-21.333c-5.587-1.868-11.631,1.147-13.499,6.734 c-0.732,2.19-0.734,4.558-0.005,6.749l42.667,128c1.453,4.362,5.536,7.302,10.133,7.296h0.661c4.819-0.3,8.836-3.8,9.792-8.533 l21.333-106.667C299.523,327.601,296.483,322.345,291.366,320.641z"/> <path style="fill:#2196F3;" d="M507.43,23.446c-3.399-2.377-7.867-2.568-11.456-0.491L90.641,257.622 c-5.096,2.955-6.832,9.482-3.877,14.578c1.306,2.253,3.391,3.95,5.861,4.771l191.573,63.872l148.907,63.829 c5.417,2.316,11.685-0.197,14.001-5.614c0.321-0.752,0.555-1.538,0.697-2.343l64-362.667 C512.531,29.965,510.825,25.829,507.43,23.446z"/> <g> <path style="fill:#1976D2;" d="M510.011,38.38c3.441-4.781,2.355-11.447-2.426-14.889c-4.259-3.065-10.115-2.578-13.808,1.15 L215.611,318.017l80.277,27.733L510.011,38.38z"/> <path style="fill:#1976D2;" d="M26.065,420.246c-2.679,0.003-5.26-1.003-7.232-2.816c-5.319-4.892-10.553-9.92-15.701-15.083 c-4.171-4.165-4.176-10.922-0.011-15.093c4.165-4.171,10.922-4.176,15.093-0.011c4.949,4.949,9.984,9.792,15.083,14.485 c4.336,3.988,4.618,10.736,0.63,15.072C31.904,418.999,29.052,420.249,26.065,420.246z"/> <path style="fill:#1976D2;" d="M171.387,490.54c-10.278-0.033-20.527-1.098-30.592-3.179c-5.814-0.95-9.757-6.434-8.806-12.248 c0.95-5.814,6.434-9.757,12.248-8.806c0.277,0.045,0.553,0.102,0.825,0.169c8.683,1.792,17.524,2.707,26.389,2.731h0.064h4.8 c5.559-0.531,10.497,3.545,11.028,9.104c0.037,0.385,0.051,0.771,0.044,1.157c0.216,5.884-4.377,10.831-10.261,11.051h-5.568 L171.387,490.54z M94.95,470.124c-1.708,0-3.39-0.409-4.907-1.195c-10.486-5.487-20.611-11.636-30.315-18.411 c-4.727-3.515-5.709-10.197-2.194-14.925c3.355-4.511,9.634-5.644,14.354-2.59c8.937,6.286,18.272,11.987,27.947,17.067 c5.231,2.709,7.276,9.146,4.567,14.377c-1.833,3.54-5.487,5.762-9.474,5.762L94.95,470.124z"/> <path style="fill:#1976D2;" d="M226.235,479.105c-5.891,0.048-10.705-4.688-10.753-10.579c-0.035-4.307,2.524-8.213,6.487-9.901 c6.141-2.627,12.105-5.648,17.856-9.045c5.146-2.867,11.642-1.019,14.509,4.127c2.767,4.967,1.152,11.231-3.672,14.241 c-6.542,3.867-13.325,7.309-20.309,10.304C229.05,478.806,227.651,479.097,226.235,479.105z"/> </g></svg><?php echo $wo["lang"]["no_more_message_to_show"];?> </div>');
       } 
       else {
         $('.messages-container').html(data.html);
         view_more_wrapper.html('<a href="javascript:void(0);" title="' + data.view_more_text + '"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M13,15L15.5,17.5L16.92,16.08L12,11.16L7.08,16.08L8.5,17.5L11,15V21H13V15M3,3H21V5H3V3M3,7H13V9H3V7Z" /></svg></a>').show();
         view_more_wrapper.attr('onclick', 'Wo_getOldPageMessages(' + page_id + ','+page_user_id+');').removeClass('hidden');
-        $(".messages-container").animate({
-          scrollTop: $('.messages-container')[0].scrollHeight
-        }, 200);
+        setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
       }
       $('.text-sender-container').find('.ball-pulse').fadeOut(100);
 	  $('.text-sender-container').find('.msg_progress').fadeOut(100);
@@ -697,12 +1050,89 @@ function Wo_GetPageMessages(page_id, page_user_id,page_name,user_id) {
 
 
 function Wo_getNewMessages() {
-  user_id = $('#user-id').val();
-  group_id = $('#messages-group-id').val();
-  page_id = $('#messages-page-id').val();
-  from_id = $('#messages-from-id').val();
-  to_id = $('#messages-to-id').val();
-  message_id = $('.messages-container').find('.messages-wrapper:last').attr('data-message-id');
+  let user_id = $('#user-id').val();
+  let group_id = $('#messages-group-id').val();
+  let page_id = $('#messages-page-id').val();
+  let from_id = $('#messages-from-id').val();
+  let to_id = $('#messages-to-id').val();
+  let message_id = $('.messages-container').find('.messages-wrapper:last').attr('data-message-id');
+  <?php if ($wo['config']['node_socket_flow'] == "1")
+  {
+    ?>
+  socket.on("private_message_page", (data)=>{
+       user_id = $('#user-id').val();
+       group_id = $('#messages-group-id').val();
+       page_id = $('#messages-page-id').val();
+       from_id = $('#messages-from-id').val();
+       to_id = $('#messages-to-id').val();
+        if (data.color) {
+            $(".text-sender-container .red-list").css('background', data.color);
+        }
+        if(data.status == 200) {
+          if(!$(".messages-container").find(".no-messages").length){
+            if(+user_id === +data.sender || (data.self && (+data.id === +user_id))){
+              $('.message-contnaier:last').find('.message-typing').empty()
+              $(".messages-container").append(data.html);
+              setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
+              if(data.sender == <?php echo $wo['user']['user_id']; ?>){
+                $('.send-button').css('background-color', data.color);
+                $('.send-button').css('border-color', data.color);
+                $('#wo_msg_right_prt .message-option-btns .btn svg').css('color', data.color);
+                $(".messages-container").find(".pull-right").find(".message").css('background-color', data.color);
+                $(".messages-container").find(".pull-right").find(".message-text").css('background-color', data.color)
+              }
+            }
+            if(data.sender != <?php echo $wo['user']['user_id']; ?>) {
+              document.getElementById('message-sound').play();
+              if(!$('.sendMessage').is(':focus')) {
+                document.title = 'New Message ' + document_title;
+              }
+            }
+          }
+        }
+      });
+      socket.on("group_message_page", (data)=>{
+       user_id = $('#user-id').val();
+       group_id = $('#messages-group-id').val();
+       page_id = $('#messages-page-id').val();
+       from_id = $('#messages-from-id').val();
+       to_id = $('#messages-to-id').val();
+        if (data.color) {
+            $(".text-sender-container .red-list").css('background', data.color);
+        }
+        if(data.status == 200) {
+          if(!$(".messages-container").find(".no-messages").length){
+            if(+group_id === +data.id || (data.self && (+data.id === +group_id))){
+              $('.message-contnaier:last').find('.message-typing').empty()
+              $(".messages-container").append(data.html);
+              setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
+              if(data.self){
+                $('.send-button').css('background-color', data.color);
+                $('.send-button').css('border-color', data.color);
+                $('#wo_msg_right_prt .message-option-btns .btn svg').css('color', data.color);
+                $(".messages-container").find(".pull-right").find(".message").css('background-color', data.color);
+                $(".messages-container").find(".pull-right").find(".message-text").css('background-color', data.color)
+              }
+            }
+            if(!data.self) {
+              document.getElementById('message-sound').play();
+              if(!$('.sendMessage').is(':focus')) {
+                document.title = 'New Message ' + document_title;
+              }
+            }
+          }
+        }
+      });
+  <?php } ?>
+
   if(user_id == 0 && group_id == 0) {
     return false;
   }
@@ -710,34 +1140,46 @@ function Wo_getNewMessages() {
      return false;
   }
   if (message_id) {
-    $.get(Wo_Ajax_Requests_File(), {
-      f: 'messages',
-      s: 'get_new_messages',
-      user_id: user_id,
-      group_id: group_id,
-      page_id: page_id,
-      from_id: from_id,
-      to_id: to_id,
-      message_id: message_id
-    }, function (data) {
-      if (data.color) {
-          $(".text-sender-container .red-list").css('background', data.color);
-      }
-      if(data.status == 200) {
-        $(".messages-container").append(data.html);
-        $(".messages-container").animate({
-          scrollTop: $('.messages-container')[0].scrollHeight
-        }, 200);
-        if(data.sender == user_id) {
-          document.getElementById('message-sound').play();
-          if(!$('.sendMessage').is(':focus')) {
-            document.title = 'New Message ' + document_title;
-          }
-        }
-      }
+  <?php if ($wo['config']['node_socket_flow'] == "0")
+  {
+    ?>
+    $.get(Wo_Ajax_Requests_File(), {	
+      f: 'messages',	
+      s: 'get_new_messages',	
+      user_id: user_id,	
+      group_id: group_id,	
+      page_id: page_id,	
+      from_id: from_id,	
+      to_id: to_id,	
+      message_id: message_id	
+    }, function (data) {	
+      if (data.color) {	
+          $(".text-sender-container .red-list").css('background', data.color);	
+      }	
+      if(data.status == 200) {	
+        $(".messages-container").append(data.html);	
+        setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);	
+        if(data.sender == user_id) {	
+          document.getElementById('message-sound').play();	
+          if(!$('.sendMessage').is(':focus')) {	
+            document.title = 'New Message ' + document_title;	
+          }	
+        }	
+      }	
     });
+  <?php } ?>
+
   }
+  <?php if ($wo['config']['node_socket_flow'] == "0")
+  {
+    ?>
+
   setTimeout(Wo_getNewMessages, 5000);
+  <?php } ?>
 }
 
 function Wo_getMessageSeen() {
@@ -753,9 +1195,11 @@ function Wo_getMessageSeen() {
     setTimeout(Wo_getMessageSeen, 12000);
     if(data.status == 200) {
       $('.messages-text:last').find('.message-seen').hide().html('<i class="fa fa-check"></i> <?php echo $wo["lang"]["seen"];?> (<span class="ajax-time" title="' + data.time + '">' + data.seen + '</span>)').fadeIn(300);
-      $(".messages-container").animate({
-        scrollTop: $('.messages-container')[0].scrollHeight
-      }, 200);
+      setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
     }
   });
 }
@@ -765,17 +1209,62 @@ function Wo_SubmitForm(e) {
   document.title = document_title;
   <?php if ($wo['config']['maxCharacters'] != 10000) { ?>
   $('.charsLeft-message').fadeIn(200);
+  var chat_number = $('#user-id').val();
+  if(e.keyCode && ![17, 18, 9, 13].includes(e.keyCode)){
+    socket.emit("typing", { recipient_id: chat_number, user_id: _getCookie("user_id") })
+  }
   <?php } ?>
   if(e.keyCode == 13 && e.shiftKey == 0) {
     e.preventDefault();
+    //$('form.sendMessages').submit()
     Wo_GetMRecordLink();
   }
 }
 
 function Wo_getOldMessages(user_id) {
+  var $current_top_element = $('.messages-container').children().first();
   view_more_wrapper = $('.view-more-wrapper');
   before_message_id = $('.messages-text:first').attr('data-message-id');
   $('.text-sender-container').find('.msg_progress').fadeIn(100);
+  let from_id = _getCookie("user_id")
+  let to_id = $(".messages-users-list").find(".active").find(".active").attr("id").substr("messages-recipient-".length)
+  var hexDigits = new Array("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"); 
+  function rgb2hex(rgb) {
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+  }
+
+  function hex(x) {
+    return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+  }
+  <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+      socket.emit("loadmore_page", {
+        from_id: from_id,
+        to_id: to_id,
+        username: '<?php echo $wo['user']['username']; ?>',
+        before_message_id: before_message_id,
+        color: rgb2hex($(".send-button").css("background-color"))
+      }, async (data)=>{
+            if(data.status == 200) {
+              if(data.html.length == 0) {
+                view_more_wrapper.html('<a href="javascript:void(0);" title="<?php echo $wo["lang"]["no_more_message_to_show"];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" /></svg></a>').show();
+                view_more_wrapper.delay(2000).slideUp(200);
+              } else {
+                $('.messages-container').prepend(data.html);
+                var previous_height = 0;
+				$current_top_element.prevAll().each(function() {
+				  previous_height += $(this).outerHeight();
+				});
+
+				$('.messages-container').scrollTop(previous_height);
+              }
+            } else {
+            view_more_wrapper.hide();
+          }
+        $('.text-sender-container').find('.msg_progress').fadeOut(100);
+      })
+    <?php } ?>
+  <?php if ($wo['config']['node_socket_flow'] == "0") { ?>
   $.get(Wo_Ajax_Requests_File(), {
     f: 'messages',
     s: 'load_previous_messages',
@@ -788,38 +1277,95 @@ function Wo_getOldMessages(user_id) {
         view_more_wrapper.delay(2000).slideUp(200);
       } else {
         $('.messages-container').prepend(data.html);
+        var previous_height = 0;
+		$current_top_element.prevAll().each(function() {
+		  previous_height += $(this).outerHeight();
+		});
+
+		$('.messages-container').scrollTop(previous_height);
       }
     } else {
       view_more_wrapper.hide();
     }
 	$('.text-sender-container').find('.msg_progress').fadeOut(100);
   });
+<?php } ?>
 }
 function Wo_getOldGroupMessages(group_id) {
+	var $current_top_element = $('.messages-container').children().first();
   view_more_wrapper = $('.view-more-wrapper');
   before_message_id = $('.messages-text:first').attr('data-message-id');
   $('.text-sender-container').find('.msg_progress').fadeIn(100);
-  $.get(Wo_Ajax_Requests_File(), {
-    f: 'messages',
-    s: 'load_previous_messages',
-    group_id: group_id,
-    before_message_id: before_message_id
-  }, function (data) {
-    if(data.status == 200) {
-      if(data.html.length == 0) {
-		view_more_wrapper.html('<a href="javascript:void(0);" title="<?php echo $wo["lang"]["no_more_message_to_show"];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" /></svg></a>').show();
-        view_more_wrapper.delay(2000).slideUp(200);
-      } else {
-        $('.messages-container').prepend(data.html);
-      }
-    } else {
-      view_more_wrapper.hide();
+  <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+  let from_id = _getCookie("user_id")
+  var hexDigits = new Array("0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"); 
+  function rgb2hex(rgb) {
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+  }
+
+  function hex(x) {
+    return isNaN(x) ? "00" : hexDigits[(x - x % 16) / 16] + hexDigits[x % 16];
+  }
+  if($('[data-target="#groups-message"]').attr("aria-expanded") === "true"){
+      socket.emit("loadmore_group_page", {
+        from_id: from_id,
+        group_id: group_id,
+        username: '<?php echo $wo['user']['username']; ?>',
+        before_message_id: before_message_id,
+        color: rgb2hex($(".send-button").css("background-color"))
+      }, async (data)=>{
+            if(data.status == 200) {
+              if(data.html.length == 0) {
+                view_more_wrapper.html('<a href="javascript:void(0);" title="<?php echo $wo["lang"]["no_more_message_to_show"];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" /></svg></a>').show();
+                view_more_wrapper.delay(2000).slideUp(200);
+              } else {
+                $('.messages-container').prepend(data.html);
+                var previous_height = 0;
+				$current_top_element.prevAll().each(function() {
+				  previous_height += $(this).outerHeight();
+				});
+
+				$('.messages-container').scrollTop(previous_height);
+              }
+            } else {
+            view_more_wrapper.hide();
+          }
+        $('.text-sender-container').find('.msg_progress').fadeOut(100);
+      })
     }
-	$('.text-sender-container').find('.msg_progress').fadeOut(100);
-  });
+    else {
+        $.get(Wo_Ajax_Requests_File(), {
+          f: 'messages',
+          s: 'load_previous_messages',
+          group_id: group_id,
+          before_message_id: before_message_id
+        }, function (data) {
+          if(data.status == 200) {
+            if(data.html.length == 0) {
+          view_more_wrapper.html('<a href="javascript:void(0);" title="<?php echo $wo["lang"]["no_more_message_to_show"];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" /></svg></a>').show();
+              view_more_wrapper.delay(2000).slideUp(200);
+            } else {
+              $('.messages-container').prepend(data.html);
+              var previous_height = 0;
+				$current_top_element.prevAll().each(function() {
+				  previous_height += $(this).outerHeight();
+				});
+
+				$('.messages-container').scrollTop(previous_height);
+            }
+          } else {
+            view_more_wrapper.hide();
+          }
+        $('.text-sender-container').find('.msg_progress').fadeOut(100);
+        });
+    }
+  <?php } ?>
+
 }
 
 function Wo_getOldPageMessages(page_id,from_id,to_id) {
+	var $current_top_element = $('.messages-container').children().first();
   view_more_wrapper = $('.view-more-wrapper');
   before_message_id = $('.messages-text:first').attr('data-message-id');
   $('.text-sender-container').find('.ball-pulse').fadeIn(100);
@@ -838,6 +1384,12 @@ function Wo_getOldPageMessages(page_id,from_id,to_id) {
         view_more_wrapper.delay(1000).slideUp(200);
       } else {
         $('.messages-container').prepend(data.html);
+        var previous_height = 0;
+				$current_top_element.prevAll().each(function() {
+				  previous_height += $(this).outerHeight();
+				});
+
+				$('.messages-container').scrollTop(previous_height);
       }
     } else {
       view_more_wrapper.hide();
@@ -850,7 +1402,127 @@ function Wo_getOldPageMessages(page_id,from_id,to_id) {
 function Wo_ShareFile() {
   document.title = document_title;
   $("#sendMessage").focus();
-  $("form.sendMessages").submit();
+  <?php if ($wo['config']['node_socket_flow'] == "0") { ?>
+    $("form.sendMessages").submit();
+  <?php } ?>
+  <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+  var main_hash_id   = $('.main_session').val();
+  var file_uploading = false;
+  var chat_number = $('#user-id').val();
+
+    $("form.sendMessages").ajaxSubmit({
+    url: Wo_Ajax_Requests_File() + '?f=messages&s=send_message&hash=' + main_hash_id,
+    beforeSend: function () {
+    	chat_number = $('#user-id').val();
+    	group_id = $('#group-id').val();
+    	first_chat = $('.messages-recipients-list').first();
+    	first_chat_id = $(first_chat).attr('id');
+    	sending_text = $('.mobileleftpane .text-sender-container textarea').val();
+    	if (sending_text.length  > 100) {
+    		sending_text = jQuery.trim(sending_text).substring(0, 97)+'...';
+    	}
+
+    	$('#messages-recipient-'+chat_number).insertBefore( $( "#"+first_chat_id ) );
+
+    	$('#messages-recipient-'+chat_number).find('p').text(sending_text);
+    	$('#messages-recipient-'+chat_number).find('.messages-last-sent').text('<?php echo $wo['lang']['now'];?>');
+    	$('#messages-recipient-'+chat_number).find('.messages-last-sent').attr('title', '0 seconds');
+    	$('#messages-recipient-'+chat_number).find('.messages-last-sent').removeClass('ajax-time');
+
+      $('.mobileleftpane .text-sender-container textarea').val('');
+      $('.sendMessage').attr('disabled', true);
+      var user_id_ = $('#user-id').val();
+      $('body').attr('sending-' + user_id_, true);
+      $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>');
+    },
+    uploadProgress: function () {
+      if ($("#sendMessasgeFile").val() != '') {
+        $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-loader"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line></svg>');
+        file_uploading = true;
+      }
+    },
+    success: function (data) {
+      if(data.status == 200) {
+        $("#message-record-file").val('');
+        $("#message-record-name").val('');
+        $('#chatStickerMessage').val('');
+        Wo_CleanRecordNodes();
+        Wo_StopLocalStream();
+        
+        if($('.messages-container').length == 0) {
+          $(".messages-container").html(data.html);
+        } else {
+          $(".no-messages").hide();
+          $(".messages-container").append(data.html);
+        }
+        var user_id_ = $('#user-id').val();
+        $('body').attr('sending-' + user_id_, false);
+        $('form.sendMessages').clearForm();
+        $('#sendMessage').val('').attr('disabled', false).keyup().focus();
+        setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
+        if (data.invalid_file == 1) {
+          $("#invalid_file").modal('show');
+          Wo_Delay(function(){
+              $("#invalid_file").modal('hide');
+          },3000);
+        }
+        if (data.invalid_file == 2) {
+          $("#file_not_supported").modal('show');
+          Wo_Delay(function(){
+              $("#file_not_supported").modal('hide');
+          },3000);
+        }
+      }
+      else if(data.status == 500 && data.invalid_file == 1){
+        $("#invalid_file").modal('show');
+        Wo_Delay(function(){
+            $("#invalid_file").modal('hide');
+        },3000);
+      }
+      else if(data.status == 500 && data.invalid_file == 2){
+        $("#file_not_supported").modal('show');
+        Wo_Delay(function(){
+            $("#file_not_supported").modal('hide');
+        },3000);
+      }
+      else if(data.status == 500 && data.invalid_file == 3){
+	      $("#pro_upload_file").modal('show');
+	      Wo_Delay(function(){
+	        $("#pro_upload_file").modal('hide');
+	      },3000);
+      }
+      var dom = $($.parseHTML(data.html));
+      var mediaId = dom.find(".messages-wrapper").attr("data-message-id");
+      if($('[data-target="#groups-message"]').attr("aria-expanded") === "true"){
+        socket.emit("group_message_page", {
+          group_id: $('#messages-group-id').val(),
+          from_id: _getCookie("user_id"),
+          username: '<?php echo $wo['user']['username']; ?>',
+          mediaId: mediaId,
+          isSticker: false
+        })
+      }
+      else{
+      socket.emit("private_message_page", {
+        to_id: chat_number, 
+        from_id: _getCookie("user_id"),
+        username: '<?php echo $wo['user']['username']; ?>',
+        mediaId: mediaId,
+        isSticker: false
+      })
+      }
+      if (file_uploading) {
+        file_uploading = false;
+        $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>');
+      }
+      $('form.sendMessages').find('.send-button').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>');
+    }
+   })
+  <?php } ?>
 }
 
 
@@ -965,6 +1637,7 @@ jQuery(document).ready(function($) {
             $(".group_chat_mbr_list").empty();
             $(".group_chat_avatar").empty();
             chat_part_array = [];
+            socket.emit("sync_groups", {"from_id": _getCookie("user_id")})
         }
         else if (data.status == 500){
             $("#insert-caht-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');

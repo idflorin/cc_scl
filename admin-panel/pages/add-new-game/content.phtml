@@ -89,25 +89,35 @@ if (!empty($_GET['delete_ip'])) {
 }
 ?>
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>Manage Features > Games > Add New Game</h2>
+    <div>
+        <h3>Add New Game</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Manage Features</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Games</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Add New Game</li>
+            </ol>
+        </nav>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
         <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Add New Game <small>Supported from (miniclip.com , y8.com , freeonlinegames.com , zone.msn.com) </small></h2>
-                    <br>
+                <div class="card-body">
+                  <h6 class="card-title">Add New Game <small>Supported from (miniclip.com , y8.com , freeonlinegames.com , zone.msn.com) </small></h6>
+                  <br>
                     <p>Supported Sites Links Exampels</p>
                     <p>miniclip.com <small>https://www.miniclip.com/games/8-ball-pool-multiplayer/en/</small></p>
                     <p>y8.com <small>https://www.y8.com/games/penalty_shooters_2</small></p>
                     <p>freeonlinegames.com <small>http://www.freeonlinegames.com/embed/125874</small></p>
                     <p>zone.msn.com <small>https://zone.msn.com/gameplayer/gameplayerHTML.aspx?game=bubbletown&instance=default</small></p>
-
-
-                </div>
-                <div class="body">
                       <?php if (!empty($error)) { ?>
 				      <div class="alert alert-danger">
 				      	<?php echo $error;?>
@@ -121,20 +131,20 @@ if (!empty($_GET['delete_ip'])) {
                     <form class="" method="POST">
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Game URL <small>Example: https://www.miniclip.com/games/8-ball-pool-multiplayer/en/</small></label>
                                 <input type="text" id="game" name="game" class="form-control">
-                                <label class="form-label">Game URL <small>Example: https://www.miniclip.com/games/8-ball-pool-multiplayer/en/</small></label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Game Image URL <small>Example: https://static.miniclipcdn.com/content/game-icons/medium/8-Ball-Pool_26-02-2015.jpg</small></label>
                                 <input type="text" id="avatar" name="avatar" class="form-control">
-                                <label class="form-label">Game Image URL <small>Example: https://static.miniclipcdn.com/content/game-icons/medium/8-Ball-Pool_26-02-2015.jpg</small></label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Game Name</label>
                                 <input type="text" id="name" name="name" class="form-control">
-                                <label class="form-label">Game Name</label>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">

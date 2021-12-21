@@ -1,28 +1,40 @@
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>Manage Features > Forums > Create New Section</h2>
+    <div>
+        <h3>Create New Section</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Manage Features</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Forums</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Create New Section</li>
+            </ol>
+        </nav>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
         <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Create New Section</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success newsection-alert"></div>
-                    <div class="alert alert-danger newsection-error-alert"></div>
+                <div class="card-body">
+                    <h6 class="card-title">Create New Section</h6>
+                    <div class="newsection-alert"></div>
+                    <div class="newsection-error-alert"></div>
                     <form class="newsection" method="POST">
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="name" name="name" class="form-control">
                                 <label class="form-label">Name</label>
+                                <input type="text" id="name" name="name" class="form-control">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <textarea name="description" id="description" class="form-control" cols="30" rows="3"></textarea>
                                 <label class="form-label">Description</label>
+                                <textarea name="description" id="description" class="form-control" cols="30" rows="3"></textarea>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -46,11 +58,15 @@ $(function() {
         success: function(data) {
             if (data.status == 200) {
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.newsection-alert').html('<i class="fa fa-check"></i> Section successfully added');
-                $('.newsection-error-alert').empty();
+                $('.newsection-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Section successfully added</div>');
+                setTimeout(function () {
+                    $('.newsection-alert').empty();
+                }, 2000);
             } else {
-                $('.newsection-alert').empty();
-                $(".newsection-error-alert").html(data['message']);
+                $('.newsection-alert').html('<div class="alert alert-danger">'+data['message']+'</div>');
+                setTimeout(function () {
+                    $('.newsection-alert').empty();
+                }, 2000);
             } 
             form_new_section.find('button').text('Create');
         }

@@ -88,6 +88,7 @@
 					</div>
 				</div>
 				<!-- Multiple Radios (inline) -->
+				<?php if ($wo['config']['pages'] == 1) { ?>
 				<div class="form-group">
 					<?php 
 						$selected_e_liked_page = ($wo['setting']['notification_settings']['e_liked_page'] == 1)   ? ' checked' : '';
@@ -97,7 +98,9 @@
 						<label for="e_liked_page"><?php echo $wo['lang']['e_liked_page']; ?></label>
 					</div>
 				</div>
+				<?php } ?>
 				<!-- Multiple Radios (inline) -->
+				<?php if ($wo['config']['profileVisit'] == 1) { ?>
 				<div class="form-group">
 					<?php 
 						$selected_e_visited = ($wo['setting']['notification_settings']['e_visited'] == 1)   ? ' checked' : '';
@@ -107,6 +110,7 @@
 						<label for="e_visited"><?php echo $wo['lang']['e_visited_my_profile']; ?></label>
 					</div>
 				</div>
+				<?php } ?>
 				<!-- Multiple Radios (inline) -->
 				<div class="form-group">
 					<?php 
@@ -118,6 +122,7 @@
 					</div>
 				</div>
 				<!-- Multiple Radios (inline) -->
+				<?php if ($wo['config']['groups'] == 1) { ?>
 				<div class="form-group">
 					<?php 
 						$selected_e_joined_group = ($wo['setting']['notification_settings']['e_joined_group'] == 1)   ? ' checked' : '';
@@ -127,6 +132,7 @@
 						<label for="e_joined_group"><?php echo $wo['lang']['e_joined_group']; ?></label>
 					</div>
 				</div>
+				<?php } ?>
 				<!-- Multiple Radios (inline) -->
 				<div class="form-group">
 					<?php 

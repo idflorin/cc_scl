@@ -13,6 +13,24 @@ require_once('assets/init.php');
 if ($wo['loggedin'] == true) {
     $update_last_seen = Wo_LastSeen($wo['user']['user_id']);
 }
+if (!empty($_GET)) {
+    foreach ($_GET as $key => $value) {
+        $value = preg_replace('/on[^<>=]+=[^<>]*/m', '', $value);
+        $_GET[$key] = strip_tags($value);
+    }
+}
+if (!empty($_REQUEST)) {
+    foreach ($_REQUEST as $key => $value) {
+        $value = preg_replace('/on[^<>=]+=[^<>]*/m', '', $value);
+        $_REQUEST[$key] = strip_tags($value);
+    }
+}
+if (!empty($_POST)) {
+    foreach ($_POST as $key => $value) {
+        $value = preg_replace('/on[^<>=]+=[^<>]*/m', '', $value);
+        $_POST[$key] = strip_tags($value);
+    }
+}
 $page = '';
 if ($wo['loggedin'] == true && !isset($_GET['link1'])) {
     $page = 'home';
@@ -491,6 +509,9 @@ if ($wo['config']['membership_system'] == 1) {
                     break;
                 case 'terms':
                     include('sources/term.php');
+                    break;
+                case 'site-pages':
+                    include('sources/site_pages.php');
                     break;
             }
         }

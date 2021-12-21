@@ -52,6 +52,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 'placement' => 'multi_image_post',
                 'anonymous' => true
             );
+            if (!empty($_POST['post_type']) && in_array($_POST['post_type'], array('photos','video','music','files','maps','text'))) {
+            	$postsData['filter_by'] = Wo_Secure($_POST['post_type']);
+            }
 			$posts = Wo_GetPosts($postsData);
 			foreach ($posts as $key => $value) {
 				$posts[$key]['shared_info'] = null;

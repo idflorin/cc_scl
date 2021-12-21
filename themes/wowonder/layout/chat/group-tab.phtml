@@ -81,7 +81,18 @@
     $('.emo-btn-<?php echo $wo['chat']['group']['group_id'];?>').click(function () {
         $('.emo-group-container-<?php echo $wo['chat']['group']['group_id'];?>').toggle();
     });
-
+    <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+    $('.group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>').scroll(
+      ()=>{
+        var st = $('.group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>').scrollTop();  
+        if(st==0) {
+          socket.emit("loadmore_group", {from_id: _getCookie("user_id"), group_id: '<?php echo $wo['chat']['group']['group_id'];?>', before_message_id: $(".chat-messages").find(".messages-wrapper").attr("id").substr("messageId_".length)}, (data)=>{
+            var chat_messages_wrapper = $('.group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>');
+            chat_messages_wrapper.find(".chat-messages").prepend(data.html); 
+          })
+        }
+      })
+    <?php } ?>
     $(".clear_group_chat_<?php echo $wo['chat']['group']['group_id'];?>").click(function(event) {
       event.stopPropagation();
       $.ajax({
@@ -100,105 +111,276 @@
     });
     });
 
+    console.log("Group chat "+'<?php echo $wo['chat']['group']['group_id'];?>')
+   <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
     var chat_messages_wrapper = $('.group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>');
-    chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
-    $('.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').ajaxForm({
-        url: Wo_Ajax_Requests_File() + '?f=chat&s=send_message&group_id=<?php echo $wo['chat']['group']['group_id'];?>&hash=' + main_hash_id,
-        type:"POST",
-        uploadProgress: function() {
-		  $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeIn(100);
-        },
-        success: function(data) {
-            if (data.status == 200) {
+      $('.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').submit(function(e) { 
+        e.preventDefault();
+        var text_message = escapeHTML($('.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?> #sendMessage').val());
+        socket.emit("group_message", {
+          group_id: '<?php echo $wo['chat']['group']['group_id'];?>', 
+          from_id: _getCookie("user_id"),
+          username: '<?php echo $wo['user']['username']; ?>',
+          msg: text_message,
+          isSticker: false
+        },  (data)=>{
+          if (data.status == 200) {
 
-              if ($('#no_messages_<?php echo $wo['chat']['group']['group_id'];?>').length > 0) {
-                $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').html(data.html);
+            if ($('#no_messages_<?php echo $wo['chat']['group']['group_id'];?>').length > 0) {
+              $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').html(data.html);
+            }
+            else{
+              $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').append(data.html);
+            }
+            if (data.invalid_file == 1) {
+                $("#invalid_file").modal('show');
+                Wo_Delay(function(){
+                  $("#invalid_file").modal('hide');
+                },3000);
+                
+            }
+            if (data.invalid_file == 2) {
+                $("#file_not_supported").modal('show');
+                Wo_Delay(function(){
+                  $("#file_not_supported").modal('hide');
+                },3000);
+            }
+            if (data.file == true) {
+              $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+            }
+            
+          }
+          else if(data.status == 500 && data.invalid_file == 1){
+            $("#invalid_file").modal('show');
+                Wo_Delay(function(){
+                  $("#invalid_file").modal('hide');
+            },3000);
+            $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+          }
+          else if(data.status == 500 && data.invalid_file == 2){
+            $("#file_not_supported").modal('show');
+                Wo_Delay(function(){
+                  $("#file_not_supported").modal('hide');
+            },3000);
+            $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+          }
+          else if(data.status == 500 && data.invalid_file == 3){
+            $("#pro_upload_file").modal('show');
+            Wo_Delay(function(){
+              $("#pro_upload_file").modal('hide');
+            },3000);
+            $('form.chat-sending-form-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+          }
+          $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('#sendMessasgeFile').val('');
+          $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('textarea').val('');
+          setTimeout(function() {
+                chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
+          }, 100);
+        });
+        return false
+      });
+    <?php } ?>
+
+    <?php if ($wo['config']['node_socket_flow'] == "0"){?>
+      var chat_messages_wrapper = $('.group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>');
+      chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
+      $('.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').ajaxForm({
+          url: Wo_Ajax_Requests_File() + '?f=chat&s=send_message&group_id=<?php echo $wo['chat']['group']['group_id'];?>&hash=' + main_hash_id,
+          type:"POST",
+          uploadProgress: function() {
+        $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeIn(100);
+          },
+          success: function(data) {
+              if (data.status == 200) {
+
+                if ($('#no_messages_<?php echo $wo['chat']['group']['group_id'];?>').length > 0) {
+                  $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').html(data.html);
+                }
+                else{
+                  $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').append(data.html);
+                }
+                if (data.invalid_file == 1) {
+                    $("#invalid_file").modal('show');
+                    Wo_Delay(function(){
+                      $("#invalid_file").modal('hide');
+                    },3000);
+                    
+                }
+                if (data.invalid_file == 2) {
+                    $("#file_not_supported").modal('show');
+                    Wo_Delay(function(){
+                      $("#file_not_supported").modal('hide');
+                    },3000);
+                }
+                if (data.file == true) {
+                  $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+                }
+                
               }
-              else{
-                $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').append(data.html);
-              }
-              if (data.invalid_file == 1) {
-                  $("#invalid_file").modal('show');
-                  Wo_Delay(function(){
-                    $("#invalid_file").modal('hide');
-                  },3000);
-                  
-              }
-              if (data.invalid_file == 2) {
-                  $("#file_not_supported").modal('show');
-                  Wo_Delay(function(){
-                    $("#file_not_supported").modal('hide');
-                  },3000);
-              }
-              if (data.file == true) {
+              else if(data.status == 500 && data.invalid_file == 1){
+                $("#invalid_file").modal('show');
+                    Wo_Delay(function(){
+                      $("#invalid_file").modal('hide');
+                },3000);
                 $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
               }
-              
-            }
-            else if(data.status == 500 && data.invalid_file == 1){
-              $("#invalid_file").modal('show');
-                  Wo_Delay(function(){
-                    $("#invalid_file").modal('hide');
-              },3000);
-              $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
-            }
-            else if(data.status == 500 && data.invalid_file == 2){
-              $("#file_not_supported").modal('show');
-                  Wo_Delay(function(){
-                    $("#file_not_supported").modal('hide');
-              },3000);
-              $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
-            }
-            else if(data.status == 500 && data.invalid_file == 3){
-              $("#pro_upload_file").modal('show');
-              Wo_Delay(function(){
-                $("#pro_upload_file").modal('hide');
-              },3000);
-              $('form.chat-sending-form-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
-            }
-            $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('#sendMessasgeFile').val('');
-            $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('textarea').val('');
-            setTimeout(function() {
-                  chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
-            }, 100);
+              else if(data.status == 500 && data.invalid_file == 2){
+                $("#file_not_supported").modal('show');
+                    Wo_Delay(function(){
+                      $("#file_not_supported").modal('hide');
+                },3000);
+                $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+              }
+              else if(data.status == 500 && data.invalid_file == 3){
+                $("#pro_upload_file").modal('show');
+                Wo_Delay(function(){
+                  $("#pro_upload_file").modal('hide');
+                },3000);
+                $('form.chat-sending-form-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+              }
+              $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('#sendMessasgeFile').val('');
+              $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('textarea').val('');
+              setTimeout(function() {
+                    chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
+              }, 100);
 
-        }
-
-    });
-
-    setInterval(function(){
-      var last_group_message = ($("[data-group-tmessage-id]").length > 0) ? $("[data-group-tmessage-id]").last().attr('data-group-tmessage-id') : 0;
-      $.ajax({
-        url: Wo_Ajax_Requests_File(),
-        type: 'GET',
-        dataType: 'json',
-        data: {f: 'chat',s:'get_new_group_messages',message_id:last_group_message,group_id:'<?php echo $wo['chat']['group']['group_id'];?>'},
-      })
-      .done(function(data) {
-        if (data.status == 200) {
-          if ($(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.no_message').length > 0) {
-            $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').html(data.html);
-          }else{
-            $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').append(data.html);
           }
-          
-          chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
-        }
-      })
-      .fail(function() {
-        console.log("error");
-      })
-    },5000);
+
+      });
+
+      setInterval(function(){
+        var last_group_message = ($("[data-group-tmessage-id]").length > 0) ? $("[data-group-tmessage-id]").last().attr('data-group-tmessage-id') : 0;
+        $.ajax({
+          url: Wo_Ajax_Requests_File(),
+          type: 'GET',
+          dataType: 'json',
+          data: {f: 'chat',s:'get_new_group_messages',message_id:last_group_message,group_id:'<?php echo $wo['chat']['group']['group_id'];?>'},
+        })
+        .done(function(data) {
+          if (data.status == 200) {
+            if ($(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.no_message').length > 0) {
+              $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').html(data.html);
+            }else{
+              $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').append(data.html);
+            }
+            
+            chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
+          }
+        })
+        .fail(function() {
+          console.log("error");
+        })
+      },5000);
+      <?php } ?>
 
   });
 
   function Wo_SubmitChatGroupForm(e, id) {
+    <?php 
+    if ($wo['config']['node_socket_flow'] == "1"){ 
+      ?>
+      if ($("#sendMessasgeFile").val() != '') {
+        e.preventDefault();
+        var chat_messages_wrapper = $('.group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>');
+        chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
+        var main_hash_id = $('.main_session').val();
+
+        $('.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').ajaxSubmit({
+            url: Wo_Ajax_Requests_File() + '?f=chat&s=send_message&group_id=<?php echo $wo['chat']['group']['group_id'];?>&hash=' + main_hash_id,
+            type:"POST",
+            uploadProgress: function() {
+              $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeIn(100);
+            },
+            success: function(data) {
+                if (data.status == 200) {
+
+                  if ($('#no_messages_<?php echo $wo['chat']['group']['group_id'];?>').length > 0) {
+                    $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').html(data.html);
+                  }
+                  else {
+                    $(".group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>").find('.chat-messages').append(data.html);
+                  }
+                  var dom = $($.parseHTML(data.html));
+                  var mediaId = dom.attr("data-group-tmessage-id");
+                  
+                  console.log("Group media id to be found here")
+                  if (data.invalid_file == 1) {
+                      $("#invalid_file").modal('show');
+                      Wo_Delay(function(){
+                        $("#invalid_file").modal('hide');
+                      },3000);
+                  }
+                  else if (data.invalid_file == 2) {
+                      $("#file_not_supported").modal('show');
+                      Wo_Delay(function(){
+                        $("#file_not_supported").modal('hide');
+                      },3000);
+                  }
+                  else {
+                    socket.emit("group_message", {
+                      group_id: '<?php echo $wo['chat']['group']['group_id'];?>', 
+                      from_id: _getCookie("user_id"),
+                      username: '<?php echo $wo['user']['username']; ?>',
+                      mediaId: mediaId,
+                      isSticker: false
+                    })
+                  }
+
+                  if (data.file == true) {
+                    $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+                  }
+                } 
+              
+                else if(data.status == 500 && data.invalid_file == 1){
+                  $("#invalid_file").modal('show');
+                      Wo_Delay(function(){
+                        $("#invalid_file").modal('hide');
+                  },3000);
+                  $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+                }
+                else if(data.status == 500 && data.invalid_file == 2){
+                  $("#file_not_supported").modal('show');
+                      Wo_Delay(function(){
+                        $("#file_not_supported").modal('hide');
+                  },3000);
+                  $('form.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+                }
+                else if(data.status == 500 && data.invalid_file == 3){
+                  $("#pro_upload_file").modal('show');
+                  Wo_Delay(function(){
+                    $("#pro_upload_file").modal('hide');
+                  },3000);
+                  $('form.chat-sending-form-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
+                }
+                $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('#sendMessasgeFile').val('');
+                $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('textarea').val('');
+                setTimeout(function() {
+                      chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
+                }, 100);
+          }
+        });
+       }
+       else if (e.keyCode == 13 && e.shiftKey == 0 || $("#sendMessasgeFile").val() != '') {
+          e.preventDefault();
+          if(!groupChatListener["<?php echo $wo['chat']['group']['group_id'];?>"]){
+          console.log("Listening to group messages")
+          groupChatListener["<?php echo $wo['chat']['group']['group_id'];?>"] = 1;
+      }
+     
+      var chat_messages_wrapper = $('.group-messages-wrapper-<?php echo $wo['chat']['group']['group_id'];?>');
+      chat_messages_wrapper.scrollTop(chat_messages_wrapper[0].scrollHeight);
+       
+       $('.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').submit()
+          // $('.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').submit();
+       }
+       <?php } else { ?>
     document.title = document_title;
     chat_tab_container = $('.chat_main_' + id);
     if (e.keyCode == 13 && e.shiftKey == 0 || $("#sendMessasgeFile").val() != '') {
         e.preventDefault();
         $('.group-chat-sending-<?php echo $wo['chat']['group']['group_id'];?>').submit();
     }
+  <?php } ?>
   }
 
  function Wo_ClearGroupHistory(id = false){
@@ -288,4 +470,10 @@
       console.log("error");
     })
   }
+  function escapeHTML(string) {
+    var pre = document.createElement('pre');
+    var text = document.createTextNode( string );
+    pre.appendChild(text);
+    return pre.innerHTML;
+}
 </script>

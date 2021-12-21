@@ -1,6 +1,6 @@
 <?php
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(0);
 header('Cache-Control: max-age=846000');
 
@@ -835,52 +835,55 @@ if ($wo['config']['colored_posts_system'] == 1) {
 if ($wo['loggedin'] == true && $wo['user']['is_pro']) {
     $notify = false;
     $remove = false;
-    switch ($wo['user']['pro_type']) {
-        case '1':
-            if ($wo['pro_packages']['star']['time'] > 0) {
-                $end_time = $wo['user']['pro_time'] + $star_package_duration;
-                if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
-                    $notify = true;
+    if ($wo['config']['pro']) {
+        switch ($wo['user']['pro_type']) {
+            case '1':
+                if ($wo['pro_packages']['star']['time'] > 0) {
+                    $end_time = $wo['user']['pro_time'] + $star_package_duration;
+                    if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
+                        $notify = true;
+                    }
+                    elseif ($end_time <= time()) {
+                        $remove = true;
+                    }
                 }
-                elseif ($end_time <= time()) {
-                    $remove = true;
+                break;
+            case '2':
+                if ($wo['pro_packages']['hot']['time'] > 0) {
+                    $end_time = $wo['user']['pro_time'] + $hot_package_duration;
+                    if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
+                        $notify = true;
+                    }
+                    elseif ($end_time <= time()) {
+                        $remove = true;
+                    }
                 }
-            }
-            break;
-        case '2':
-            if ($wo['pro_packages']['hot']['time'] > 0) {
-                $end_time = $wo['user']['pro_time'] + $hot_package_duration;
-                if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
-                    $notify = true;
+                break;
+            case '3':
+                if ($wo['pro_packages']['ultima']['time'] > 0) {
+                    $end_time = $wo['user']['pro_time'] + $ultima_package_duration;
+                    if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
+                        $notify = true;
+                    }
+                    elseif ($end_time <= time()) {
+                        $remove = true;
+                    }
                 }
-                elseif ($end_time <= time()) {
-                    $remove = true;
+                break;
+            case '4':
+                if ($wo['pro_packages']['vip']['time'] > 0) {
+                    $end_time = $wo['user']['pro_time'] + $vip_package_duration;
+                    if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
+                        $notify = true;
+                    }
+                    elseif ($end_time <= time()) {
+                        $remove = true;
+                    }
                 }
-            }
-            break;
-        case '3':
-            if ($wo['pro_packages']['ultima']['time'] > 0) {
-                $end_time = $wo['user']['pro_time'] + $ultima_package_duration;
-                if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
-                    $notify = true;
-                }
-                elseif ($end_time <= time()) {
-                    $remove = true;
-                }
-            }
-            break;
-        case '4':
-            if ($wo['pro_packages']['vip']['time'] > 0) {
-                $end_time = $wo['user']['pro_time'] + $vip_package_duration;
-                if ($end_time > time() && $end_time <= time()+(60*60*24*3)) {
-                    $notify = true;
-                }
-                elseif ($end_time <= time()) {
-                    $remove = true;
-                }
-            }
-            break;
+                break;
+        }
     }
+        
 
     if ($notify == true) {
         $start = date_create(date('Y-m-d H:i:s',time()));

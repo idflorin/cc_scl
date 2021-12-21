@@ -31,6 +31,24 @@ if ($wo['loggedin'] == true) {
     //     }
     // }
 }
+if (!empty($_GET)) {
+    foreach ($_GET as $key => $value) {
+        $value = preg_replace('/on[^<>=]+=[^<>]*/m', '', $value);
+        $_GET[$key] = strip_tags($value);
+    }
+}
+if (!empty($_REQUEST)) {
+    foreach ($_REQUEST as $key => $value) {
+        $value = preg_replace('/on[^<>=]+=[^<>]*/m', '', $value);
+        $_REQUEST[$key] = strip_tags($value);
+    }
+}
+if (!empty($_POST)) {
+    foreach ($_POST as $key => $value) {
+        $value = preg_replace('/on[^<>=]+=[^<>]*/m', '', $value);
+        $_POST[$key] = strip_tags($value);
+    }
+}
 if (!empty($_GET['ref']) && $wo['loggedin'] == false && !isset($_COOKIE['src'])) {
     $get_ip = get_ip_address();
     if (!isset($_SESSION['ref']) && !empty($get_ip)) {
@@ -530,6 +548,9 @@ if ($wo['config']['membership_system'] == 1) {
                     break;
                 case 'terms':
                     include('sources/term.php');
+                    break;
+                case 'site-pages':
+                    include('sources/site_pages.php');
                     break;
             }
         }

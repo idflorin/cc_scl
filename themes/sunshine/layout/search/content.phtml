@@ -140,11 +140,11 @@ $type_to_find = '<h5 class="search-filter-center-text empty_state"><svg xmlns="h
 							<script>
 								<?php
 									$age_from = 18;
-									if (!empty($_GET['age_from'])) {
+									if (!empty($_GET['age_from']) && is_numeric($_GET['age_from'])) {
 										$age_from = Wo_Secure( $_GET['age_from'] );
 									}
 									$age_to = 50;
-									if (!empty($_GET['age_to'])) {
+									if (!empty($_GET['age_to']) && is_numeric($_GET['age_to'])) {
 										$age_to = Wo_Secure( $_GET['age_to'] );
 									}
 								?>

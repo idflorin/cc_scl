@@ -1,18 +1,27 @@
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>Updates > Updates & Bug Fixes</h2>
+    <div>
+        <h3>Updates & Bug Fixes</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Updates</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Updates & Bug Fixes</li>
+            </ol>
+        </nav>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
         <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Check For New Updates</h2><br>
-                    <!-- <div>This system allows to update your site automatically, or download the script updates from our servers.</div> -->
-                </div>
-                <div class="body">
+                <div class="card-body">
+                    <h6 class="card-title">Check For New Updates</h6>
+                    <div class="CheckForUpdates_alert"></div>
                     <div class="alert alert-warning">
-                        The auto update system is disabled for now due multiple themes, if you want to update your site, you can update your site manually following this <a href="https://docs.wowonder.com/faqs.html#a-23423422" style="color: #fff; text-decoration: underline;">guide</a>
+                        The auto update system is disabled for now due multiple themes, if you want to update your site, you can update your site manually following this <a href="https://docs.wowonder.com/faqs.html#a-23423422">guide</a>
                     </div>
                 	<!-- <div class="alert alert-danger">
                 		<b>Important:</b> <br><br>
@@ -39,10 +48,9 @@
         </div>
          <div class="col-lg-6 col-md-6">
             <div class="card updates-layout hidden">
-                <div class="header">
-                    <h2>New update is available!</h2>
-                </div>
-                <div class="body">
+                <div class="card-body">
+                    <h6 class="card-title">New update is available!</h6>
+                    <div class="RunUpdates_alert"></div>
                     <div>The following version(s) will be installed:</div>
                     <div class="updates"></div>
                     <button class="btn btn-success waves-effect waves-light m-t-10 run-update" onclick="Wo_RunUpdates()">Install Updates</button>
@@ -75,11 +83,20 @@ function Wo_CheckForUpdates() {
 			});
 			$('#script-version').val(data.script_version);
 		} else if (data.status == 300) {
-			alert('Your site is up to date.');
+            $('.CheckForUpdates_alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Your site is up to date.</div>');
+            setTimeout(function () {
+                $('.CheckForUpdates_alert').empty();
+            }, 2000);
 		} else if (data.status == 400) {
-			alert(data.ERROR_NAME);
+            $('.CheckForUpdates_alert').html('<div class="alert alert-danger">'+data.ERROR_NAME+'</div>');
+            setTimeout(function () {
+                $('.CheckForUpdates_alert').empty();
+            }, 2000);
 		}  else  {
-			alert('Error while connecting to server, please check your details');
+            $('.CheckForUpdates_alert').html('<div class="alert alert-danger">Error while connecting to server, please check your details</div>');
+            setTimeout(function () {
+                $('.CheckForUpdates_alert').empty();
+            }, 2000);
 		}
 		$('.check-update-button').text('Check For Updates');
 	});
@@ -89,14 +106,26 @@ function Wo_DownloadUpdates() {
 	var purchase_code = $('.purchase_code').val();
 	$.get(Wo_Ajax_Requests_File(), {f: 'download_updates', purchase_code: purchase_code}, function (data) {
 		if (data.status == 200) {
-			alert('The update(s) was downloaded.');
+            $('.RunUpdates_alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> The update(s) was downloaded.</div>');
+            setTimeout(function () {
+                $('.RunUpdates_alert').empty();
+            }, 2000);
 			$('.updates-layout').addClass('hidden');
 		} else if (data.status == 300) {
-			alert('Your site is up to date.');
+            $('.RunUpdates_alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Your site is up to date.</div>');
+            setTimeout(function () {
+                $('.RunUpdates_alert').empty();
+            }, 2000);
 		} else if (data.status == 400) {
-			alert(data.ERROR_NAME);
+            $('.RunUpdates_alert').html('<div class="alert alert-danger">'+data.ERROR_NAME+'</div>');
+            setTimeout(function () {
+                $('.RunUpdates_alert').empty();
+            }, 2000);
 		}  else  {
-			alert('Error while connecting to server, please check your details');
+            $('.RunUpdates_alert').html('<div class="alert alert-danger">Error while connecting to server, please check your details</div>');
+            setTimeout(function () {
+                $('.RunUpdates_alert').empty();
+            }, 2000);
 		}
 		$('.download-update').text('Download Updates');
 	});
@@ -108,14 +137,26 @@ function Wo_RunUpdates() {
 	var script_version = $('#script-version').val();
 	$.get('<?php echo $wo['config']['site_url']?>/updater.php', {f: 'run_updater', purchase_code: purchase_code, script_version:script_version}, function (data) {
 		if (data.status == 200) {
-			alert('Your site was updated, please refresh your page and clean your browser cache.');
+            $('.RunUpdates_alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Your site was updated, please refresh your page and clean your browser cache.</div>');
+            setTimeout(function () {
+                $('.RunUpdates_alert').empty();
+            }, 2000);
 			$('.updates-layout').addClass('hidden');
 		} else if (data.status == 300) {
-			alert('Your site is up to date.');
+            $('.RunUpdates_alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Your site is up to date.</div>');
+            setTimeout(function () {
+                $('.RunUpdates_alert').empty();
+            }, 2000);
 		} else if (data.status == 400) {
-			alert(data.ERROR_NAME);
+            $('.RunUpdates_alert').html('<div class="alert alert-danger">'+data.ERROR_NAME+'</div>');
+            setTimeout(function () {
+                $('.RunUpdates_alert').empty();
+            }, 2000);
 		}  else  {
-			alert('Error while connecting to server, please check your details');
+            $('.RunUpdates_alert').html('<div class="alert alert-danger">Error while connecting to server, please check your details</div>');
+            setTimeout(function () {
+                $('.RunUpdates_alert').empty();
+            }, 2000);
 		}
 		$('.run-update').text('Install Updates');
 	});

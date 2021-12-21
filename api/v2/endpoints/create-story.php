@@ -68,31 +68,54 @@ if (empty($error_code)) {
                 'filename' => $filename,
                 'expire' => time()+(60*60*24)
             );
+            $img_types     = array(
+                'image/png',
+                'image/jpeg',
+                'image/jpg',
+                'image/gif'
+            );
             $thumb     = '';
             if (empty($thumb)) {
-                if (in_array(strtolower(pathinfo($filename, PATHINFO_EXTENSION)), array(
-                    "gif",
-                    "jpg",
-                    "png",
-                    'jpeg'
-                ))) {
-                    $thumb             = $filename;
-                    $explode2          = @end(explode('.', $thumb));
-                    $explode3          = @explode('.', $thumb);
-                    $last_file         = $explode3[0] . '_small.' . $explode2;
-                    $arrContextOptions = array(
-                        "ssl" => array(
-                            "verify_peer" => false,
-                            "verify_peer_name" => false
-                        )
+                if (in_array(strtolower(pathinfo($media['filename'], PATHINFO_EXTENSION)), array(
+                                    "m4v",
+                                    "avi",
+                                    "mpg",
+                                    'mp4'
+                                )) && !empty($_FILES["cover"]) && in_array($_FILES["cover"]["type"], $img_types)) {
+                    $fileInfo = array(
+                        'file' => $_FILES["cover"]["tmp_name"],
+                        'name' => $_FILES['cover']['name'],
+                        'size' => $_FILES["cover"]["size"],
+                        'type' => $_FILES["cover"]["type"]
                     );
-                    $fileget           = file_get_contents(Wo_GetMedia($thumb), false, stream_context_create($arrContextOptions));
-                    if (!empty($fileget)) {
-                        $importImage = @file_put_contents($thumb, $fileget);
+                    $media            = Wo_ShareFile($fileInfo);
+                    $file_type        = explode('/', $fileInfo['type']);
+                    if (empty($thumb)) {
+                        if (in_array(strtolower(pathinfo($media['filename'], PATHINFO_EXTENSION)), array(
+                            "gif",
+                            "jpg",
+                            "png",
+                            'jpeg'
+                        ))) {
+                            $thumb             = $media['filename'];
+                            $explode2          = @end(explode('.', $thumb));
+                            $explode3          = @explode('.', $thumb);
+                            $last_file         = $explode3[0] . '_small.' . $explode2;
+                            $arrContextOptions = array(
+                                "ssl" => array(
+                                    "verify_peer" => false,
+                                    "verify_peer_name" => false
+                                )
+                            );
+                            $fileget           = file_get_contents(Wo_GetMedia($thumb), false, stream_context_create($arrContextOptions));
+                            if (!empty($fileget)) {
+                                $importImage = @file_put_contents($thumb, $fileget);
+                            }
+                            $crop_image = Wo_Resize_Crop_Image(400, 400, $thumb, $last_file, 60);
+                            $upload_s3  = Wo_UploadToS3($last_file);
+                            $thumb      = $last_file;
+                        }
                     }
-                    $crop_image = Wo_Resize_Crop_Image(100, 100, $thumb, $last_file, 60);
-                    $upload_s3  = Wo_UploadToS3($last_file);
-                    $thumb      = $last_file;
                 }
             }
         }

@@ -15,18 +15,27 @@ $final_array['STYLE']  = (
 );
 ?>
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>Design > Custom JS / CSS</h2>
+    <div>
+        <h3>Custom JS / CSS</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Design</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Custom JS / CSS</li>
+            </ol>
+        </nav>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
         <div class="col-lg-12 col-md-12">
             <div class="card">
-                <div class="header">
-                    <h2>Custom JS / CSS</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success ads-settings-alert"></div>
+                <div class="card-body">
+                    <h6 class="card-title">Custom JS / CSS</h6>
+                    <div class="ads-settings-alert"></div>
                     <form class="ads-settings" method="POST">
                         <div class="form-group">
                         	<label class="form-label">Header Custom JavaScript</small></label>
@@ -78,29 +87,23 @@ $(function() {
         },
         success: function(data) {
         	if (data.status == 200) {
-               swal({
-                  title: "Changes Saved!",
-                  text: "Your changes have been saved successfully",
-                  type: "success"
-               });
+                $('.ads-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Your changes have been saved successfully</div>');
+                setTimeout(function () {
+                    $('.ads-settings-alert').empty();
+                }, 2000);
 	           }
 	           else if (data.status == 400) {
-	               swal({
-	                  title: "Request Error!",
-	                  text: "Please check your details!",
-	                  type: "error"
-	               });
+                $('.ads-settings-alert').html('<div class="alert alert-danger">Please check your details!</div>');
+                setTimeout(function () {
+                    $('.ads-settings-alert').empty();
+                }, 2000);
 	           }
 	           else if (data.status == 500) {
-	               swal({
-	                  title: "File Permissions Error!",
-	                  text: "Can't save changes. themes/{{CONFIG theme}}/custom directory is not writable!",
-	                  type: "error"
-	               });
+                   $('.ads-settings-alert').html('<div class="alert alert-danger">Can`t save changes. themes/{{CONFIG theme}}/custom directory is not writable!</div>');
+                    setTimeout(function () {
+                        $('.ads-settings-alert').empty();
+                    }, 2000);
 	           }
-	           setTimeout(function(){
-	               swal.close();
-	           }, 5000);
 	           form_ads_settings.find('.waves-effect').text('Save');
               $("html, body").animate({ scrollTop: 0 }, "slow");
         }

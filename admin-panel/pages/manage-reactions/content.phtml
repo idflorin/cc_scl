@@ -1,17 +1,28 @@
 <?php $wo['reactions_types'] = Wo_GetReactionsTypes(''); ?>
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>Manage Features > Manage Reactions</h2>
+    <div>
+        <h3>Manage Reactions</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Settings</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Posts</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Manage Reactions</li>
+            </ol>
+        </nav>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
         <div class="col-lg-12 col-md-12">
             <div class="card">
-                <div class="header">
-                    <h2>Add Reaction</h2>
-                </div>
-                <div class="body">
-
+                <div class="card-body">
+                  <h6 class="card-title">Add Reaction</h6>
                   <div class="row">
                        <div class="col-md-12" style="margin-bottom:0;">
                         <div class="add_reaction_form_alert"></div>
@@ -21,8 +32,8 @@
                                     <div class="col-md-2" id="normal-query-form">
                                       <div class="form-group form-float">
                                           <div class="form-line">
+                                            <label class="form-label"><?php echo ucfirst($wo['key_']); ?></label>
                                               <input type="text" class="form-control" name="<?php echo($wo['key_']) ?>">
-                                              <label class="form-label"><?php echo ucfirst($wo['key_']); ?></label>
                                           </div>
                                       </div>
                                     </div>
@@ -31,8 +42,16 @@
                                 <div class="col-md-2" id="normal-query-form">
                                   <div class="form-group form-float">
                                       <div class="form-line focused">
-                                          <input type="file" class="form-control" name="wowonder">
-                                          <label class="form-label">Reaction Wowonder Theme Icon</label>
+                                        <label class="form-label">Wowonder Reaction Icon</label>
+										<div class="btn-file d-flex align-items-center">
+											<input type="file" id="wowonder-icon" accept="image/x-png, image/gif, image/jpeg" name="wowonder" class="hidden">
+											<div class="mr-2 change-file-ico">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"></path></svg>
+											</div>
+											<div class="full-width">
+												<b id="wowonder-icon-name">Reaction Icon</b>
+											</div>
+										</div>
                                       </div>
                                   </div>
                                 </div>
@@ -40,8 +59,16 @@
                                 <div class="col-md-2" id="normal-query-form">
                                   <div class="form-group form-float">
                                       <div class="form-line focused">
-                                          <input type="file" class="form-control" name="sunshine">
-                                          <label class="form-label">Reaction Sunshine Theme Icon</label>
+                                        <label class="form-label">Sunshine Reaction Icon</label>
+										<div class="btn-file d-flex align-items-center">
+											<input type="file" id="sunshine-icon" accept="image/x-png, image/gif, image/jpeg" name="sunshine" class="hidden">
+											<div class="mr-2 change-file-ico">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16.5,6V17.5A4,4 0 0,1 12.5,21.5A4,4 0 0,1 8.5,17.5V5A2.5,2.5 0 0,1 11,2.5A2.5,2.5 0 0,1 13.5,5V15.5A1,1 0 0,1 12.5,16.5A1,1 0 0,1 11.5,15.5V6H10V15.5A2.5,2.5 0 0,0 12.5,18A2.5,2.5 0 0,0 15,15.5V5A4,4 0 0,0 11,1A4,4 0 0,0 7,5V17.5A5.5,5.5 0 0,0 12.5,23A5.5,5.5 0 0,0 18,17.5V6H16.5Z"></path></svg>
+											</div>
+											<div class="full-width">
+												<b id="sunshine-icon-name">Reaction Icon</b>
+											</div>
+										</div>
                                       </div>
                                   </div>
                                 </div>
@@ -49,7 +76,7 @@
 
                                 <div class="clearfix"></div>
                               <div class="col-md-2">
-                                  <button class="btn btn-info">Add</button>
+                                  <button class="btn btn-primary">Add</button>
                               </div>
                               </div>
                               <div class="clearfix"></div>
@@ -61,10 +88,8 @@
         </div>
         <div class="col-lg-12 col-md-12">
             <div class="card">
-                <div class="header">
-                    <h2>Manage Reaction</h2>
-                </div>
-                <div class="body">
+                <div class="card-body">
+                  <h6 class="card-title">Manage Reaction</h6>
                    <div class="clearfix"></div>
                    <!-- <div class="col-md-2" id="normal-query-form">
                       <div class="form-group form-float">
@@ -122,23 +147,25 @@
         <div class="clearfix"></div>
     </div>
     <!-- #END# Vertical Layout -->
-<div id="delete-modal" class="modal fade" role="dialog" data-id="">
-  <div class="modal-dialog">
-    <div class="modal-content modal-col-red">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">DELETE REACTION</h4>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to continue? this action can't be undo</p>
-      </div>
-      <div class="modal-footer">
-      	<button type="button" class="btn btn-link waves-effect" data-dismiss="modal" data-type="user" id="delete_reaction">DELETE</button>
-        <button type="button" class="btn btn-link waves-effect" data-dismiss="modal">CLOSE</button>
-      </div>
+    <div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModal1Label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModal1Label">DELETE REACTION</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to continue? this action can't be undo
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Delete</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 <div class="modal fade" id="editcategoryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -167,31 +194,45 @@
   </div>
 </div>
 
+<style type="text/css">
+	.btn-file { position: relative; overflow: hidden;cursor: pointer;}
+	.btn-file input[type=file] { position: absolute; top: 0; right: 0; min-width: 100%; min-height: 100%; font-size: 100px; text-align: right; opacity: 0; outline: none; background: #fff; cursor: inherit; display: block; }
+	.change-file-ico {min-width: 36px;}
+	.change-file-ico svg {border-radius: 50%;background: rgb(2 154 214 / 15%);color: #029ad6;padding: 7px;width: 36px;height: 36px;}
+	.full-width {width: 100%;}
+	#wowonder-icon-name, #sunshine-icon-name {font-weight: normal;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;display: block;}
+</style>
 
 <script>
+	$("#wowonder-icon").change(function () {
+		var filename = $(this).val().replace(/C:\\fakepath\\/i, '');
+		$("#wowonder-icon-name").text(filename);
+    });
+	$("#sunshine-icon").change(function () {
+		var filename = $(this).val().replace(/C:\\fakepath\\/i, '');
+		$("#sunshine-icon-name").text(filename);
+    });
   function ReactionStatus(self,id) {
     $(self).text('Please wait..');
     $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=reaction_status', {id: id}, function(data, textStatus, xhr) {
       window.location.reload();
     });
   }
-  function DeleteReaction(self,id) {
-    event.preventDefault();
-    $('#delete-modal').attr('data-id', id).modal('show');
+  function DeleteReaction(self,id,type = 'show') {
+    if (type == 'hide') {
+      $('#DeleteModal').find('.btn-primary').attr('onclick', "DeleteReaction(this,'"+id+"')");
+      $('#DeleteModal').modal('show');
+      return false;
+    }
+    $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=delete_reaction', {id: id}, function(data, textStatus, xhr) {
+        if (data.status == 200) {
+            $('#list-'+id).slideUp('slow');
+            setTimeout(function () {
+                $('#list-'+id).remove();
+            },2000);
+        }
+    });
   }
-
-  $(document).on('click', '#delete_reaction', function(event) {
-      event.preventDefault();
-      id = $('#delete-modal').attr('data-id');
-      $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=delete_reaction', {id: id}, function(data, textStatus, xhr) {
-          if (data.status == 200) {
-              $('#list-'+id).slideUp('slow');
-              setTimeout(function () {
-                  $('#list-'+id).remove();
-              },2000);
-          }
-      });
-  });
 
   function EditReaction(id) {
     $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=get_reaction_form', {id: id}, function(data, textStatus, xhr) {
@@ -208,11 +249,11 @@ var edit_reaction_form = $('form.edit_reaction_form');
 add_reaction_form.ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=add_reaction',
     beforeSend: function() {
-        add_reaction_form.find('.waves-effect').text("Please wait..");
+        add_reaction_form.find('.btn-info').text("Please wait..");
     },
     success: function(data) {
+      add_reaction_form.find('.btn-info').text('Add');
         if (data.status == 200) {
-            add_reaction_form.find('.waves-effect').text('Save');
             $('.add_reaction_form_alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Reaction successfully added</div>');
             setTimeout(function () {
                 $('.add_reaction_form_alert').empty();
@@ -231,11 +272,11 @@ add_reaction_form.ajaxForm({
 edit_reaction_form.ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=edit_reaction&hash=' + $('.main_session').val(),
     beforeSend: function() {
-        edit_reaction_form.find('.waves-effect').text("Please wait..");
+        $('#editcategoryModal').find('.btn-primary').text("Please wait..");
     },
     success: function(data) {
         if (data.status == 200) {
-            edit_reaction_form.find('.waves-effect').text('Save');
+            $('#editcategoryModal').find('.btn-primary').text('SAVE CHANGES');
             $('.edit_reaction_form_alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Reaction successfully edited</div>');
             setTimeout(function () {
                 $('.edit_reaction_form_alert').empty();

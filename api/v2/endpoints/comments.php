@@ -24,11 +24,16 @@ $required_fields =  array(
                         'reaction_comment',
                         'reaction_reply',
                         'comment_like',
-                        'comment_dislike'
+                        'comment_dislike',
+                        'reply_like',
+                        'reply_dislike',
+                        'get_comment_likes',
+                        'get_comment_dislikes'
                     );
 
 $limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);
 $after_post_id = (!empty($_POST['after_post_id']) && is_numeric($_POST['after_post_id']) && $_POST['after_post_id'] > 0 ? Wo_Secure($_POST['after_post_id']) : 0);
+$offset = (!empty($_POST['offset']) && is_numeric($_POST['offset']) && $_POST['offset'] > 0 ? Wo_Secure($_POST['offset']) : 0);
 
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 
@@ -446,6 +451,98 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_code    = 6;
             $error_message = 'comment_id can not be empty.';
         }  
+    }
+    if ($_POST['type'] == 'reply_like') {
+        if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
+            if (Wo_AddCommentReplyLikes($_POST['reply_id'], '') == 'unliked') {
+                $response_data = array(
+                    'api_status' => 200,
+                    'likes' => Wo_CountCommentReplyLikes($_POST['reply_id'])
+                );
+            } else {
+                $response_data = array(
+                    'api_status' => 200,
+                    'likes' => Wo_CountCommentReplyLikes($_POST['reply_id'])
+                );
+            }
+            //$response_data['dislike'] = 0;
+            if ($wo['config']['second_post_button'] == 'dislike') {
+                //$response_data['dislike']   = 1;
+                $response_data['dislike'] = Wo_CountCommentReplyWonders($_POST['reply_id']);
+            }
+        }
+        else{
+            $error_code    = 6;
+            $error_message = 'reply_id can not be empty.';
+        }
+    }
+    if ($_POST['type'] == 'reply_dislike') {
+        if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
+            if (Wo_AddCommentReplyWonders($_POST['reply_id'], '') == 'unwonder') {
+                $response_data = array(
+                    'status' => 200,
+                    'dislike' => Wo_CountCommentReplyWonders($_POST['reply_id'])
+                );
+            } else {
+                $response_data = array(
+                    'status' => 200,
+                    'dislike' => Wo_CountCommentReplyWonders($_POST['reply_id'])
+                );
+            }
+            if ($wo['config']['second_post_button'] == 'dislike') {
+                $response_data['likes'] = Wo_CountCommentReplyLikes($_POST['reply_id']);
+            }
+        }
+        else{
+            $error_code    = 6;
+            $error_message = 'reply_id can not be empty.';
+        }
+    }
+    if ($_POST['type'] == 'get_comment_likes') {
+        if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
+            $id = Wo_Secure($_POST['id']);
+            $liked_data = array();
+            $likedUsers = Wo_GetPostCommentLikes($id,$limit,$offset);
+            if (!empty($likedUsers)) {
+                foreach ($likedUsers as $key => $value) {
+                    foreach ($non_allowed as $key4 => $value4) {
+                      unset($likedUsers[$key][$value4]);
+                    }
+                }
+                $liked_data = $likedUsers;
+            }
+            $response_data = array(
+                'status' => 200,
+                'likedUsers' => $liked_data
+            );
+        }
+        else{
+            $error_code    = 4;
+            $error_message = 'id can not be empty';
+        }
+    }
+    if ($_POST['type'] == 'get_comment_dislikes') {
+        if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
+            $id = Wo_Secure($_POST['id']);
+            $liked_data = array();
+            $likedUsers = Wo_GetPostCommentWonders($id,$limit,$offset);
+            if (!empty($likedUsers)) {
+                foreach ($likedUsers as $key => $value) {
+                    foreach ($non_allowed as $key4 => $value4) {
+                      unset($likedUsers[$key][$value4]);
+                    }
+                }
+                $liked_data = $likedUsers;
+            }
+            $response_data = array(
+                'status' => 200,
+                'dislikedUsers' => $liked_data
+            );
+        }
+        else{
+            $error_code    = 4;
+            $error_message = 'id can not be empty';
+        }
     }
 
 

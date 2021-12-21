@@ -44,6 +44,8 @@ $get_config['group_custom_fields'] = Wo_GetCustomFields('group');
 $get_config['product_custom_fields'] = Wo_GetCustomFields('product');
 
 $get_config['post_reactions_types'] = $wo['reactions_types'];
+$get_config['pro_packages'] = $wo['pro_packages'];
+$get_config['pro_packages_types'] = $wo['pro_packages_types'];
 $response_data      = array(
     'api_status' => 200,
     'config' => $get_config

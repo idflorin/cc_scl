@@ -103,6 +103,7 @@ $pages = array(
     'manage-invitation',
     'send_email',
     'live',
+    'node',
 );
 $mod_pages = array('dashboard', 'post-settings', 'manage-stickers', 'manage-gifts', 'manage-users', 'online-users', 'manage-stories', 'manage-pages', 'manage-groups', 'manage-posts', 'manage-articles', 'manage-events', 'manage-forum-threads', 'manage-forum-messages', 'manage-movies', 'manage-games', 'add-new-game', 'manage-user-ads', 'manage-reports', 'manage-third-psites', 'edit-movie','bank-receipts','job-categories','manage-jobs');
 
@@ -133,7 +134,7 @@ if ($is_moderoter == true && $is_admin == false) {
     }
 }
 if (in_array($page, $pages)) {
-    $page_loaded = Wo_LoadAdminPage("$page/content");
+   $page_loaded = Wo_LoadAdminPage("$page/content");
 }
 if (empty($page_loaded)) {
     header("Location: " . Wo_SeoLink('index.php?link1=admin-cp'));
@@ -176,227 +177,505 @@ if ($wo['config']['live_video'] == 1) {
         }
     }
 }
-
+$notify_count = $db->where('recipient_id',0)->where('admin',1)->where('seen',0)->getValue(T_NOTIFICATION,'COUNT(*)');
+$notifications = $db->where('recipient_id',0)->where('admin',1)->where('seen',0)->orderBy('id','DESC')->get(T_NOTIFICATION);
+$old_notifications = $db->where('recipient_id',0)->where('admin',1)->where('seen',0,'!=')->orderBy('id','DESC')->get(T_NOTIFICATION,5);
+$mode = 'day';
+if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
+    $mode = 'night';
+}
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Admin Panel | <?php echo $wo['config']['siteTitle']; ?></title>
     <link rel="icon" href="<?php echo $wo['config']['theme_url']; ?>/img/icon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&subset=latin,cyrillic-ext" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
-    <meta name="robots" content="noindex">
-    <meta name="googlebot" content="noindex">
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery/jquery.min.js'); ?>"></script>
-    <link href="<?php echo Wo_LoadAdminLink('plugins/bootstrap/css/bootstrap.css'); ?>" rel="stylesheet">
-    <link href="<?php echo Wo_LoadAdminLink('plugins/node-waves/waves.css'); ?>" rel="stylesheet" />
-    <link href="<?php echo Wo_LoadAdminLink('plugins/animate-css/animate.css'); ?>" rel="stylesheet" />
-    <link href="<?php echo Wo_LoadAdminLink('css/style.css'); ?>" rel="stylesheet">
-    <link href="<?php echo Wo_LoadAdminLink('plugins/sweetalert/sweetalert.css'); ?>" rel="stylesheet" />
-    <link href="<?php echo Wo_LoadAdminLink('css/themes/all-themes.css'); ?>" rel="stylesheet" />
-    <link href="<?php echo Wo_LoadAdminLink('plugins/bootstrap-select/css/bootstrap-select.css'); ?>" rel="stylesheet" />
-    <link href="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/skin/bootstrap/css/dataTables.bootstrap.css'); ?>" rel="stylesheet">
-    <link href="<?php echo Wo_LoadAdminLink('plugins/bootstrap-colorpicker/css/bootstrap-colorpicker.css'); ?>" rel="stylesheet">
-    <script src="<?php echo Wo_LoadAdminLink('plugins/codemirror-5.30.0/lib/codemirror.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/codemirror-5.30.0/mode/css/css.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery.form.min.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/codemirror-5.30.0/mode/javascript/javascript.js'); ?>"></script>
-    <link href="<?php echo Wo_LoadAdminLink('plugins/codemirror-5.30.0/lib/codemirror.css'); ?>" rel="stylesheet">
-    <link href="<?php echo $wo['config']['theme_url']; ?>/stylesheet/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" />
-    <script src="<?php echo Wo_LoadAdminLink('plugins/m-popup/jquery.magnific-popup.min.js'); ?>"></script>
-    <link href="<?php echo Wo_LoadAdminLink('plugins/m-popup/magnific-popup.css'); ?>" rel="stylesheet">
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
+    <!-- Main css -->
+    <link rel="stylesheet" href="<?php echo(Wo_LoadAdminLink('vendors/bundle.css')) ?>" type="text/css">
+
+    <!-- Google font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Daterangepicker -->
+    <link rel="stylesheet" href="<?php echo(Wo_LoadAdminLink('vendors/datepicker/daterangepicker.css')) ?>" type="text/css">
+
+    <!-- DataTable -->
+    <link rel="stylesheet" href="<?php echo(Wo_LoadAdminLink('vendors/dataTable/datatables.min.css')) ?>" type="text/css">
+
+<!-- App css -->
+    <link rel="stylesheet" href="<?php echo(Wo_LoadAdminLink('assets/css/app.css')) ?>" type="text/css">
+    <!-- Main scripts -->
+<script src="<?php echo(Wo_LoadAdminLink('vendors/bundle.js')) ?>"></script>
+
+    <!-- Apex chart -->
+    <script src="<?php echo(Wo_LoadAdminLink('vendors/charts/apex/apexcharts.min.js')) ?>"></script>
+
+    <!-- Daterangepicker -->
+    <script src="<?php echo(Wo_LoadAdminLink('vendors/datepicker/daterangepicker.js')) ?>"></script>
+
+    <!-- DataTable -->
+    <script src="<?php echo(Wo_LoadAdminLink('vendors/dataTable/datatables.min.js')) ?>"></script>
+
+    <!-- Dashboard scripts -->
+    <script src="<?php echo(Wo_LoadAdminLink('assets/js/examples/pages/dashboard.js')) ?>"></script>
+    <script src="<?php echo Wo_LoadAdminLink('vendors/charts/chartjs/chart.min.js'); ?>"></script>
+
+<!-- App scripts -->
+
+<script type="text/javascript" src="<?php echo $pt->config->theme_url; ?>/js/jquery.form.min.js"></script>
+<link href="<?php echo Wo_LoadAdminLink('vendors/sweetalert/sweetalert.css'); ?>" rel="stylesheet" />
+<script src="<?php echo Wo_LoadAdminLink('assets/js/admin.js'); ?>"></script>
+<link rel="stylesheet" href="<?php echo(Wo_LoadAdminLink('vendors/select2/css/select2.min.css')) ?>" type="text/css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+<?php if ($page == 'create-article' || $page == 'edit-article' || $page == 'manage-announcements' || $page == 'newsletters') { ?>
+<script src="<?php echo Wo_LoadAdminLink('vendors/tinymce/js/tinymce/tinymce.min.js'); ?>"></script>
+<script src="<?php echo Wo_LoadAdminLink('vendors/bootstrap-tagsinput/src/bootstrap-tagsinput.js'); ?>"></script>
+<link href="<?php echo Wo_LoadAdminLink('vendors/bootstrap-tagsinput/src/bootstrap-tagsinput.css'); ?>" rel="stylesheet" />
+<?php } ?>
+<?php if ($page == 'custom-code') { ?>
+<script src="<?php echo Wo_LoadAdminLink('vendors/codemirror-5.30.0/lib/codemirror.js'); ?>"></script>
+<script src="<?php echo Wo_LoadAdminLink('vendors/codemirror-5.30.0/mode/css/css.js'); ?>"></script>
+<script src="<?php echo Wo_LoadAdminLink('vendors/codemirror-5.30.0/mode/javascript/javascript.js'); ?>"></script>
+<link rel="stylesheet" href="<?php echo Wo_LoadAdminLink('vendors/codemirror-5.30.0/lib/codemirror.css'); ?>">
+<?php } ?>
+
+
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <?php if ($page == 'bank-receipts' || $page == 'manage-verification-reqeusts' || $page == 'monetization-requests' || $page == 'manage-user-ads') { ?>
+        <!-- Css -->
+        <link rel="stylesheet" href="<?php echo(Wo_LoadAdminLink('vendors/lightbox/magnific-popup.css')) ?>" type="text/css">
+
+        <!-- Javascript -->
+        <script src="<?php echo(Wo_LoadAdminLink('vendors/lightbox/jquery.magnific-popup.min.js')) ?>"></script>
+        <script src="<?php echo(Wo_LoadAdminLink('vendors/charts/justgage/raphael-2.1.4.min.js')) ?>"></script>
+        <script src="<?php echo(Wo_LoadAdminLink('vendors/charts/justgage/justgage.js')) ?>"></script>
+    <?php } ?>
+    <script src="<?php echo Wo_LoadAdminLink('assets/js/jquery.form.min.js'); ?>"></script>
     <script>
         function Wo_Ajax_Requests_File(){
             return "<?php echo $wo['config']['site_url'].'/requests.php';?>"
         }
     </script>
+    <style>
+        body {background-color: <?php echo $wo['config']['btn_background_color'];?>;}
+        .btn.btn-primary, a.btn[href="#next"], a.btn[href="#previous"] {color: <?php echo $wo['config']['btn_color'];?> !important;background: <?php echo $wo['config']['btn_background_color'];?>;border-color: <?php echo $wo['config']['btn_background_color'];?>;}
+        .btn.btn-primary:not(:disabled):not(.disabled):hover, a.btn[href="#next"]:not(:disabled):not(.disabled):hover, a.btn[href="#previous"]:not(:disabled):not(.disabled):hover, .btn.btn-primary:not(:disabled):not(.disabled):focus, a.btn[href="#next"]:not(:disabled):not(.disabled):focus, a.btn[href="#previous"]:not(:disabled):not(.disabled):focus, .btn.btn-primary:not(:disabled):not(.disabled):active, a.btn[href="#next"]:not(:disabled):not(.disabled):active, a.btn[href="#previous"]:not(:disabled):not(.disabled):active, .btn.btn-primary:not(:disabled):not(.disabled).active, a.btn[href="#next"]:not(:disabled):not(.disabled).active, a.btn[href="#previous"]:not(:disabled):not(.disabled).active {background: <?php echo $wo['config']['btn_hover_background_color'];?>;border-color: <?php echo $wo['config']['btn_hover_background_color'];?>;}
+        body.dark .navigation .navigation-menu-body ul li a.active, .breadcrumb .breadcrumb-item.active, body.dark .breadcrumb li.breadcrumb-item.active, body.dark .navigation .navigation-menu-body ul li a.active .nav-link-icon {color: <?php echo $wo['config']['btn_background_color'];?> !important;}
+        .card form .form-check-inline input:checked {background-color: <?php echo $wo['config']['btn_background_color'];?>;}
+        .card form .form-check-inline input:checked + label::before, .card form .form-check-inline input:active + label::before {border-color: <?php echo $wo['config']['btn_background_color'];?>;}
+        .card form .form-check-inline label::after {background-color: <?php echo $wo['config']['btn_background_color'];?>;}
+        .select2-container--default.select2-container--focus .select2-selection--multiple {border: 2px solid <?php echo $wo['config']['btn_background_color'];?> !important;}
+    </style>
 </head>
+<body <?php echo ($mode == 'night' ? 'class="dark"' : ''); ?>>
+    <input type="hidden" class="main_session" value="<?php echo Wo_CreateMainSession();?>">
+    <div class="colors"> <!-- To use theme colors with Javascript -->
+        <div class="bg-primary"></div>
+        <div class="bg-primary-bright"></div>
+        <div class="bg-secondary"></div>
+        <div class="bg-secondary-bright"></div>
+        <div class="bg-info"></div>
+        <div class="bg-info-bright"></div>
+        <div class="bg-success"></div>
+        <div class="bg-success-bright"></div>
+        <div class="bg-danger"></div>
+        <div class="bg-danger-bright"></div>
+        <div class="bg-warning"></div>
+        <div class="bg-warning-bright"></div>
+    </div>
+<!-- Preloader -->
+<div class="preloader">
+    <div class="preloader-icon"></div>
+    <span>Loading...</span>
+</div>
+<!-- ./ Preloader -->
 
-<body class="theme-red">
-   <input type="hidden" class="main_session" value="<?php echo Wo_CreateMainSession();?>">
-    <!-- Page Loader -->
-    <div class="page-loader-wrapper">
-        <div class="loader">
-            <div class="preloader">
-                <div class="spinner-layer pl-red">
-                    <div class="circle-clipper left">
-                        <div class="circle"></div>
-                    </div>
-                    <div class="circle-clipper right">
-                        <div class="circle"></div>
-                    </div>
+<!-- Sidebar group -->
+<div class="sidebar-group">
+
+</div>
+<!-- ./ Sidebar group -->
+
+<!-- Layout wrapper -->
+<div class="layout-wrapper">
+
+    <!-- Header -->
+    <div class="header d-print-none">
+        <div class="header-container">
+            <div class="header-left">
+                <div class="navigation-toggler">
+                    <a href="#" data-action="navigation-toggler">
+                        <i data-feather="menu"></i>
+                    </a>
+                </div>
+
+                <div class="header-logo">
+                    <a href="<?php echo $wo['config']['site_url'] ?>">
+                        <img class="logo" src="<?php echo $wo['config']['theme_url'];?>/img/logo.<?php echo $wo['config']['logo_extension'];?>" alt="logo">
+                    </a>
                 </div>
             </div>
-            <p>Please wait...</p>
+
+            <div class="header-body">
+                <div class="header-body-left">
+                    <ul class="navbar-nav">
+                        <li class="nav-item mr-3">
+                            <div class="header-search-form">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <button class="btn">
+                                            <i data-feather="search"></i>
+                                        </button>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Search"  onkeyup="searchInFiles($(this).val())">
+                                    <div class="pt_admin_hdr_srch_reslts" id="search_for_bar"></div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="header-body-right">
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link <?php if ($notify_count > 0) { ?> nav-link-notify<?php } ?>" title="Notifications" data-toggle="dropdown">
+                                <i data-feather="bell"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-big">
+                                <div
+                                    class="border-bottom px-4 py-3 text-center d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Notifications</h5>
+                                    <?php if ($notify_count > 0) { ?>
+                                    <small class="opacity-7"><?php echo $notify_count; ?>   unread notifications</small>
+                                    <?php } ?>
+                                </div>
+                                <div class="dropdown-scroll">
+                                    <ul class="list-group list-group-flush">
+                                        <?php if ($notify_count > 0) { ?>
+                                            <li class="px-4 py-2 text-center small text-muted bg-light">Unread Notifications</li>
+                                            <?php if (!empty($notifications)) { 
+                                                    foreach ($notifications as $key => $notify) {
+                                                        $page_ = '';
+                                                        $text = '';
+                                                        if ($notify->type == 'bank') {
+                                                            $page_ = 'bank-receipts';
+                                                            $text = 'You have a new bank payment awaiting your approval';
+                                                        }
+                                                        elseif ($notify->type == 'verify') {
+                                                            $page_ = 'manage-verification-reqeusts';
+                                                            $text = 'You have a new verification requests awaiting your approval';
+                                                        }
+                                                        elseif ($notify->type == 'refund') {
+                                                            $page_ = 'pro-refund';
+                                                            $text = 'You have a new refund requests awaiting your approval';
+                                                        }
+                                                        elseif ($notify->type == 'with') {
+                                                            $page_ = 'payment-reqeuests';
+                                                            $text = 'You have a new withdrawal requests awaiting your approval';
+                                                        }
+                                                        elseif ($notify->type == 'report') {
+                                                            $page_ = 'manage-reports';
+                                                            $text = 'You have a new reports awaiting your approval';
+                                                        }
+                                                ?>
+                                            <li class="px-4 py-3 list-group-item">
+                                                <a href="<?php echo Wo_LoadAdminLinkSettings($page_); ?>" class="d-flex align-items-center hide-show-toggler">
+                                                    <div class="flex-shrink-0">
+                                                        <figure class="avatar mr-3">
+                                                            <span
+                                                                class="avatar-title bg-info-bright text-info rounded-circle">
+                                                                <?php if ($notify->type == 'bank') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                                <?php }elseif ($notify->type == 'verify') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#2196f3" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"></path></svg>
+                                                                <?php }elseif ($notify->type == 'refund') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                                                <?php }elseif ($notify->type == 'with') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                                                <?php }elseif ($notify->type == 'report') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-flag"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                                                                <?php } ?>
+                                                                
+                                                            </span>
+                                                        </figure>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0 line-height-20 d-flex justify-content-between">
+                                                            <?php echo $text; ?>
+                                                        </p>
+                                                        <span class="text-muted small"><?php echo Wo_Time_Elapsed_String($notify->time); ?></span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <?php } } ?>
+                                        <?php } ?>
+                                        <?php if ($notify_count == 0 && !empty($old_notifications)) { ?>
+                                            <li class="px-4 py-2 text-center small text-muted bg-light">Old Notifications</li>
+                                            <?php
+                                                    foreach ($old_notifications as $key => $notify) {
+                                                        $page_ = '';
+                                                        $text = '';
+                                                        if ($notify->type == 'bank') {
+                                                            $page_ = 'bank-receipts';
+                                                            $text = 'You have a new bank payment awaiting your approval';
+                                                        }
+                                                        elseif ($notify->type == 'verify') {
+                                                            $page_ = 'verification-requests';
+                                                            $text = 'You have a new verification requests awaiting your approval';
+                                                        }
+                                                        elseif ($notify->type == 'refund') {
+                                                            $page_ = 'pro-refund';
+                                                            $text = 'You have a new refund requests awaiting your approval';
+                                                        }
+                                                        elseif ($notify->type == 'with') {
+                                                            $page_ = 'payment-requests';
+                                                            $text = 'You have a new withdrawal requests awaiting your approval';
+                                                        }
+                                                        elseif ($notify->type == 'report') {
+                                                            $page_ = 'manage-reports';
+                                                            $text = 'You have a new reports awaiting your approval';
+                                                        }
+                                                ?>
+                                            <li class="px-4 py-3 list-group-item">
+                                                <a href="<?php echo Wo_LoadAdminLinkSettings($page_); ?>" class="d-flex align-items-center hide-show-toggler">
+                                                    <div class="flex-shrink-0">
+                                                        <figure class="avatar mr-3">
+                                                            <span class="avatar-title bg-secondary-bright text-secondary rounded-circle">
+                                                                <?php if ($notify->type == 'bank') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather feather-credit-card"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                                                <?php }elseif ($notify->type == 'verify') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#2196f3" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z"></path></svg>
+                                                                <?php }elseif ($notify->type == 'refund') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-refresh-cw"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                                                                <?php }elseif ($notify->type == 'with') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                                                                <?php }elseif ($notify->type == 'report') { ?>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-flag"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
+                                                                <?php } ?>
+                                                            </span>
+                                                        </figure>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0 line-height-20 d-flex justify-content-between">
+                                                            <?php echo $text; ?>
+                                                        </p>
+                                                        <span class="text-muted small"><?php echo Wo_Time_Elapsed_String($notify->time); ?></span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        <?php } } ?>
+                                    </ul>
+                                </div>
+                                <?php if ($notify_count > 0) { ?>
+                                <div class="px-4 py-3 text-right border-top">
+                                    <ul class="list-inline small">
+                                        <li class="list-inline-item mb-0">
+                                            <a href="javascript:void(0)" onclick="ReadNotify()">Mark All Read</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <?php } ?>
+                            </div>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" title="User menu" data-toggle="dropdown">
+                                <figure class="avatar avatar-sm">
+                                    <img src="<?php echo $wo['user']['avatar']; ?>"
+                                         class="rounded-circle"
+                                         alt="avatar">
+                                </figure>
+                                <span class="ml-2 d-sm-inline d-none"><?php echo $wo['user']['name']; ?></span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-big">
+                                <div class="text-center py-4">
+                                    <figure class="avatar avatar-lg mb-3 border-0">
+                                        <img src="<?php echo $wo['user']['avatar']; ?>"
+                                             class="rounded-circle" alt="image">
+                                    </figure>
+                                    <h5 class="text-center"><?php echo $wo['user']['name']; ?></h5>
+                                    <div class="mb-3 small text-center text-muted"><?php echo $wo['user']['email']; ?></div>
+                                    <a href="<?php echo $wo['user']['url']; ?>" class="btn btn-outline-light btn-rounded">View Profile</a>
+                                </div>
+                                <div class="list-group">
+                                    <a href="<?php echo(Wo_Link('logout')) ?>" class="list-group-item text-danger">Sign Out!</a>
+                                    <?php if ($mode == 'night') { ?>
+                                        <a href="javascript:void(0)" class="list-group-item admin_mode" onclick="ChangeMode('day')">
+                                            <span id="night-mode-text">Day mode</span>
+                                            <svg class="feather feather-moon float-right" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                                        </a>
+                                    <?php }else{ ?>
+                                        <a href="javascript:void(0)" class="list-group-item admin_mode" onclick="ChangeMode('night')">
+                                            <span id="night-mode-text">Night mode</span>
+                                            <svg class="feather feather-moon float-right" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                                        </a>
+                                    <?php } ?>
+                                    
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item header-toggler">
+                    <a href="#" class="nav-link">
+                        <i data-feather="arrow-down"></i>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
-    <!-- #END# Page Loader -->
-    <!-- Overlay For Sidebars -->
-    <div class="overlay"></div>
-    <!-- #END# Overlay For Sidebars -->
-    <!-- Top Bar -->
-    <nav class="navbar">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a href="javascript:void(0);" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false"></a>
-                <a href="javascript:void(0);" class="bars"></a>
-                <a class="navbar-brand" href="<?php echo $wo['site_url']; ?>"><img src="<?php echo $wo['config']['theme_url']; ?>/img/logo.png" alt=""></a>
+    <!-- ./ Header -->
+
+    <!-- Content wrapper -->
+    <div class="content-wrapper">
+        <!-- begin::navigation -->
+        <div class="navigation">
+            <div class="navigation-header">
+                <span>Navigation</span>
+                <a href="#">
+                    <i class="ti-close"></i>
+                </a>
             </div>
-            <div class="navbar-header pull-right">
-                <div class="form-group form-float wo_admin_hdr_srch">
-                    <div class="form-line">
-                        <input type="text" id="search_for" name="search_for" class="form-control" onkeyup="searchInFiles($(this).val())" placeholder="Search Settings">
-                    </div>
-                    <div class="wo_admin_hdr_srch_reslts" id="search_for_bar"></div>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <!-- #Top Bar -->
-    <section>
-        <!-- Left Sidebar -->
-        <aside id="leftsidebar" class="sidebar">
-            <!-- User Info -->
-            <div class="user-info">
-                <div class="image">
-                    <img src="<?php echo $wo['user']['avatar']; ?>" width="48" height="48" alt="User" />
-                </div>
-                <div class="info-container">
-                    <div class="name">Welcome back, <a href="<?php echo $wo['user']['url']; ?>" target="_blank"><?php echo $wo['user']['name']; ?></a></div>
-                    <div class="name" style="font-size: 12px">Logged in as <?php echo ($is_admin) ? 'Administrator' : 'Moderator' ?></div>
-                </div>
-            </div>
-            <!-- #User Info -->
-            <!-- Menu -->
-            <div class="menu">
-                <ul class="list">
-                    <li <?php echo ($page == 'dashboard') ? 'class="active"' : ''; ?>>
-                        <a href="<?php echo Wo_LoadAdminLinkSettings(''); ?>">
-                            <i class="material-icons">dashboard</i>
+            <div class="navigation-menu-body">
+                <ul>
+                    <li>
+                        <a <?php echo ($page == 'dashboard') ? 'class="active"' : ''; ?>  href="<?php echo Wo_LoadAdminLinkSettings(''); ?>">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">dashboard</i>
+                            </span>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'general-settings' || $page == 'post-settings' || $page == 'site-settings' || $page == 'email-settings' || $page == 'social-login' || $page == 'site-features' || $page == 'amazon-settings' ||  $page == 'video-settings' || $page == 'payment-settings' || $page == 'manage-currencies' || $page == 'manage-colored-posts' || $page == 'live' || $page == 'manage-reactions') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">settings</i>
+                    <li <?php echo ($page == 'general-settings' || $page == 'post-settings' || $page == 'site-settings' || $page == 'email-settings' || $page == 'social-login' || $page == 'site-features' || $page == 'amazon-settings' ||  $page == 'video-settings' || $page == 'payment-settings' || $page == 'manage-currencies' || $page == 'manage-colored-posts' || $page == 'live' || $page == 'node' || $page == 'manage-reactions') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">settings</i>
+                            </span>
                             <span>Settings</span>
                         </a>
                         <ul class="ml-menu">
-                            <li <?php echo ($page == 'general-settings') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('general-settings'); ?>">General Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'general-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('general-settings'); ?>">General Settings</a>
                             </li>
-                            <li <?php echo ($page == 'site-settings') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('site-settings'); ?>">Site Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'site-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('site-settings'); ?>">Site Settings</a>
                             </li>
-                            <li <?php echo ($page == 'site-features') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('site-features'); ?>">Manage Site Features</a>
+                            <li>
+                                <a <?php echo ($page == 'site-features') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('site-features'); ?>">Manage Site Features</a>
                             </li>
-                            <li <?php echo ($page == 'email-settings') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('email-settings'); ?>">E-mail & SMS Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'email-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('email-settings'); ?>">E-mail & SMS Settings</a>
                             </li>
-                            <li <?php echo ($page == 'video-settings') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('video-settings'); ?>">Video & Audio Chat Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'video-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('video-settings'); ?>">Video & Audio Chat Settings</a>
                             </li>
-                            <li <?php echo ($page == 'social-login') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('social-login'); ?>">Social Login Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'social-login') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('social-login'); ?>">Social Login Settings</a>
                             </li>
-                            <li <?php echo ($page == 'payment-settings') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('payment-settings'); ?>">Payment System Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'payment-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('payment-settings'); ?>">Payment System Settings</a>
                             </li>
-                            <li <?php echo ($page == 'manage-currencies') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-currencies'); ?>">Manage Currencies</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-currencies') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-currencies'); ?>">Manage Currencies</a>
                             </li>
-                            <li <?php echo ($page == 'amazon-settings') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('amazon-settings'); ?>">Storage Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'amazon-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('amazon-settings'); ?>">Storage Settings</a>
                             </li>
-                            <li <?php echo ($page == 'live') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('live'); ?>">Live Stream Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'live') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('live'); ?>">Live Stream Settings</a>
                             </li>
-                            <li <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts' || $page == 'manage-reactions') ? 'class="active"' : ''; ?>>
-                                <a href="javascript:void(0);" class="menu-toggle">Posts</a>
+                            <li>
+                                <a <?php echo ($page == 'node') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('node'); ?>">NodeJs</a>
+                            </li>
+                            <li>
+                                <a <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts' || $page == 'manage-reactions') ? 'class="open"' : ''; ?> href="javascript:void(0);">Posts</a>
                                 <ul class="ml-menu">
-                                    <li <?php echo ($page == 'post-settings') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('post-settings'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'post-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('post-settings'); ?>">
                                             <span>Post Settings</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'manage-colored-posts') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-colored-posts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>">
                                             <span>Manage Colored Posts</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'manage-reactions') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-reactions'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-reactions') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-reactions'); ?>">
                                             <span>Post Reactions</span>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-                            <!-- <li <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts' || $page == 'manage-reactions') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('post-settings'); ?>">Post Settings</a>
-                            </li> -->
-                            
                         </ul>
                     </li>
-                    <?php } ?>
-                    <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'manage-languages' || $page == 'add-language' || $page == 'edit-lang') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">language</i>
+                    <li <?php echo ($page == 'manage-languages' || $page == 'add-language' || $page == 'edit-lang') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">language</i>
+                            </span>
                             <span>Languages</span>
                         </a>
-                        <ul class="ml-menu">
-                            <li <?php echo ($page == 'add-language') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('add-language'); ?>">Add New Language & Keys</a>
+                        <ul <?php echo ($page == 'manage-languages' || $page == 'add-language' || $page == 'edit-lang') ? 'style="display: block;"' : ''; ?>>
+                            <li>
+                                <a <?php echo ($page == 'add-language') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-language'); ?>">Add New Language & Keys</a>
                             </li>
-                            <li <?php echo ($page == 'manage-languages') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-languages'); ?>">Manage Languages</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-languages' || $page == 'edit-lang') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-languages'); ?>">Manage Languages</a>
                             </li>
                         </ul>
                     </li>
                     <?php } ?>
-                    <li <?php echo ($page == 'manage-users' || $page == 'manage-stories' || $page == 'manage-profile-fields' || $page == 'add-new-profile-field' || $page == 'edit-profile-field' || $page == 'manage-verification-reqeusts' || $page == 'affiliates-settings' || $page == 'payment-reqeuests' || $page == 'referrals-list' || $page == 'online-users' || $page == 'manage-genders') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">account_circle</i>
+                    <li  <?php echo ($page == 'manage-users' || $page == 'manage-stories' || $page == 'manage-profile-fields' || $page == 'add-new-profile-field' || $page == 'edit-profile-field' || $page == 'manage-verification-reqeusts' || $page == 'affiliates-settings' || $page == 'payment-reqeuests' || $page == 'referrals-list' || $page == 'online-users' || $page == 'manage-genders') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">account_circle</i>
+                            </span>
                             <span>Users</span>
                         </a>
                         <ul class="ml-menu">
-                            <li <?php echo ($page == 'manage-users') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-users'); ?>">Manage Users</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-users'); ?>">Manage Users</a>
                             </li>
-                            <li <?php echo ($page == 'online-users') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('online-users'); ?>">Online Users</a>
+                            <li>
+                                <a <?php echo ($page == 'online-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('online-users'); ?>">Online Users</a>
                             </li>
-                            <li <?php echo ($page == 'manage-stories') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-stories'); ?>">Manage User Stories / Status</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-stories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-stories'); ?>">Manage User Stories / Status</a>
                             </li>
                             <?php if ($is_admin == true) { ?>
-                            <li <?php echo ($page == 'manage-profile-fields') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-profile-fields'); ?>">Manage Custom Profile Fields</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-profile-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-profile-fields'); ?>">Manage Custom Profile Fields</a>
                             </li>
                             <?php } ?>
                             <?php if ($is_admin == true) { ?>
-                            <li <?php echo ($page == 'manage-verification-reqeusts') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-verification-reqeusts'); ?>">Manage Verification Requests</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-verification-reqeusts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-verification-reqeusts'); ?>">Manage Verification Requests</a>
                             </li>
                             <?php } ?>
                             <?php if ($is_admin == true) { ?>
-                            <li <?php echo ($page == 'affiliates-settings' || $page == 'payment-reqeuests' || $page == 'referrals-list') ? 'class="active"' : ''; ?>>
-                                <a href="javascript:void(0);" class="menu-toggle">Affiliates System</a>
+                            <li>
+                                <a <?php echo ($page == 'affiliates-settings' || $page == 'payment-reqeuests' || $page == 'referrals-list') ? 'class="active"' : ''; ?> href="javascript:void(0);">Affiliates System</a>
                                 <ul class="ml-menu">
-                                    <li <?php echo ($page == 'affiliates-settings') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('affiliates-settings'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'affiliates-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('affiliates-settings'); ?>">
                                             <span>Affiliates Settings</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'payment-reqeuests') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('payment-reqeuests'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'payment-reqeuests') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('payment-reqeuests'); ?>">
                                             <span>Payment Requests</span>
                                         </a>
                                     </li>
@@ -404,131 +683,128 @@ if ($wo['config']['live_video'] == 1) {
                             </li>
                             <?php } ?>
                             <?php if ($is_admin == true) { ?>
-                            <li <?php echo ($page == 'manage-genders') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-genders'); ?>">Manage genders</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-genders') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-genders'); ?>">Manage genders</a>
                             </li>
                             <?php } ?>
                         </ul>
                     </li>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'pro-settings' || $page == 'pro-memebers' || $page == 'pro-payments' || $page == 'pro-features' || $page == 'pro-refund') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">stars</i>
-                            <span>Pro System</span>
-                        </a>
-                        <ul class="ml-menu">
-                            <li <?php echo ($page == 'pro-settings') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('pro-settings'); ?>">Pro System Settings</a>
-                            </li>
-                            <li <?php echo ($page == 'pro-features') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('pro-features'); ?>">Pro Features</a>
-                            </li>
-                            <li <?php echo ($page == 'pro-payments') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>">Manage Payments</a>
-                            </li>
-                            <li <?php echo ($page == 'pro-memebers') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('pro-memebers'); ?>">Manage Pro Members</a>
-                            </li>
-                            <li <?php echo ($page == 'pro-refund') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('pro-refund'); ?>">Manage Pro Refund</a>
-                            </li>
-                        </ul>
-                    </li>
+                        <li <?php echo ($page == 'pro-settings' || $page == 'pro-memebers' || $page == 'pro-payments' || $page == 'pro-features' || $page == 'pro-refund') ? 'class="open"' : ''; ?>>
+                            <a href="#">
+                                <span class="nav-link-icon">
+                                    <i class="material-icons">stars</i>
+                                </span>
+                                <span>Pro System</span>
+                            </a>
+                            <ul class="ml-menu">
+                                <li>
+                                    <a <?php echo ($page == 'pro-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-settings'); ?>">Pro System Settings</a>
+                                </li>
+                                <li>
+                                    <a <?php echo ($page == 'pro-features') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-features'); ?>">Pro Features</a>
+                                </li>
+                                <li>
+                                    <a <?php echo ($page == 'pro-payments') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>">Manage Payments</a>
+                                </li>
+                                <li>
+                                    <a <?php echo ($page == 'pro-memebers') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-memebers'); ?>">Manage Pro Members</a>
+                                </li>
+                                <li>
+                                    <a <?php echo ($page == 'pro-refund') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-refund'); ?>">Manage Pro Refund</a>
+                                </li>
+                            </ul>
+                        </li>
                     <?php } ?>
-                     <li <?php echo ($page == 'manage-apps' || $page == 'manage-pages' || $page == 'manage-stickers' || $page == 'add-new-sticker' || $page == 'manage-gifts' || $page == 'add-new-gift' || $page == 'manage-groups' || $page == 'manage-posts' || $page == 'manage-articles' || $page == 'manage-events'||  $page == 'manage-forum-sections' || $page == 'manage-forum-forums' || $page == 'manage-forum-threads' || $page == 'manage-forum-messages' || $page == 'create-new-forum' || $page == 'create-new-section' || $page == 'manage-movies' || $page == 'add-new-movies' || $page == 'manage-games' || $page == 'add-new-game' || $page == 'edit-movie' || $page == 'pages-categories' || $page == 'pages-sub-categories' || $page == 'groups-sub-categories' || $page == 'products-sub-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories' || $page == 'manage-fund' || $page == 'manage-jobs' || $page == 'manage-offers' || $page == 'pages-fields' || $page == 'groups-fields' || $page == 'products-fields') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">view_agenda</i>
+                    <li <?php echo ($page == 'manage-apps' || $page == 'manage-pages' || $page == 'manage-stickers' || $page == 'add-new-sticker' || $page == 'manage-gifts' || $page == 'add-new-gift' || $page == 'manage-groups' || $page == 'manage-posts' || $page == 'manage-articles' || $page == 'manage-events'||  $page == 'manage-forum-sections' || $page == 'manage-forum-forums' || $page == 'manage-forum-threads' || $page == 'manage-forum-messages' || $page == 'create-new-forum' || $page == 'create-new-section' || $page == 'manage-movies' || $page == 'add-new-movies' || $page == 'manage-games' || $page == 'add-new-game' || $page == 'edit-movie' || $page == 'pages-categories' || $page == 'pages-sub-categories' || $page == 'groups-sub-categories' || $page == 'products-sub-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories' || $page == 'manage-fund' || $page == 'manage-jobs' || $page == 'manage-offers' || $page == 'pages-fields' || $page == 'groups-fields' || $page == 'products-fields') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">view_agenda</i>
+                            </span>
                             <span>Manage Features</span>
                         </a>
                         <ul class="ml-menu">
-                            <!-- <li <?php echo ($page == 'manage-colored-posts') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>">Manage Colored Posts</a>
-                            </li> -->
-                            <!-- <li <?php echo ($page == 'manage-reactions') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-reactions'); ?>">Reactions</a>
-                            </li> -->
-                            <li <?php echo ($page == 'manage-apps') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps'); ?>">Apps</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-apps') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-apps'); ?>">Apps</a>
                             </li>
-                            <li <?php echo ($page == 'manage-pages') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-pages'); ?>">Pages</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-pages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-pages'); ?>">Pages</a>
                             </li>
-                            <li <?php echo ($page == 'manage-groups') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-groups'); ?>">Groups</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-groups') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-groups'); ?>">Groups</a>
                             </li>
-                            <li <?php echo ($page == 'manage-posts') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-posts'); ?>">Posts</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-posts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-posts'); ?>">Posts</a>
                             </li>
-                            <li <?php echo ($page == 'manage-fund') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-fund'); ?>">Fundings</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-fund') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-fund'); ?>">Fundings</a>
                             </li>
-                            <li <?php echo ($page == 'manage-jobs') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-jobs'); ?>">Jobs</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-jobs') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-jobs'); ?>">Jobs</a>
                             </li>
-                            <li <?php echo ($page == 'manage-offers') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-offers'); ?>">Offers</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-offers') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-offers'); ?>">Offers</a>
                             </li>
-                            <li <?php echo ($page == 'manage-articles') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-articles'); ?>">Articles (Blog)</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-articles') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-articles'); ?>">Articles (Blog)</a>
                             </li>
-                            <li <?php echo ($page == 'manage-events') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-events'); ?>">Events</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-events') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-events'); ?>">Events</a>
                             </li>
-                            <li <?php echo ($page == 'manage-forum-sections' || $page == 'manage-forum-forums' || $page == 'manage-forum-threads' || $page == 'manage-forum-messages' || $page == 'create-new-forum' || $page == 'create-new-section') ? 'class="active"' : ''; ?>>
-                                <a href="javascript:void(0);" class="menu-toggle">Forums</a>
+                            <li <?php echo ($page == 'manage-forum-sections' || $page == 'manage-forum-forums' || $page == 'manage-forum-threads' || $page == 'manage-forum-messages' || $page == 'create-new-forum' || $page == 'create-new-section') ? 'class="open"' : ''; ?>>
+                                <a href="javascript:void(0);">Forums</a>
                                 <ul class="ml-menu">
                                     <?php if ($is_admin == true) { ?>
-                                    <li <?php echo ($page == 'manage-forum-sections') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-sections'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-forum-sections') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-sections'); ?>">
                                             <span>Manage Forums Sections</span>
                                         </a>
                                     </li>
                                     <?php } ?>
                                     <?php if ($is_admin == true) { ?>
-                                    <li <?php echo ($page == 'manage-forum-forums') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-forums'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-forum-forums') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-forums'); ?>">
                                             <span>Manage Forums</span>
                                         </a>
                                     </li>
                                     <?php } ?>
-                                    <li <?php echo ($page == 'manage-forum-threads') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-threads'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-forum-threads') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-threads'); ?>">
                                             <span>Manage Threads</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'manage-forum-messages') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-messages'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-forum-messages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-messages'); ?>">
                                             <span>Manage Replies</span>
                                         </a>
                                     </li>
                                     <?php if ($is_admin == true) { ?>
-                                    <li <?php echo ($page == 'create-new-section') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('create-new-section'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'create-new-section') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('create-new-section'); ?>">
                                             <span>Create New Section</span>
                                         </a>
                                     </li>
                                     <?php } ?>
                                     <?php if ($is_admin == true) { ?>
-                                    <li <?php echo ($page == 'create-new-forum') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('create-new-forum'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'create-new-forum') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('create-new-forum'); ?>">
                                             <span>Create New Forum</span>
                                         </a>
                                     </li>
                                     <?php } ?>
                                 </ul>
                             </li>
-                            
-                            <li <?php echo ($page == 'manage-movies' || $page == 'add-new-movies') ? 'class="active"' : ''; ?>>
-                                <a href="javascript:void(0);" class="menu-toggle">Movies</a>
+                            <li <?php echo ($page == 'manage-movies' || $page == 'add-new-movies') ? 'class="open"' : ''; ?>>
+                                <a href="javascript:void(0);">Movies</a>
                                 <ul class="ml-menu">
-                                    <li <?php echo ($page == 'manage-movies') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-movies'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-movies') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-movies'); ?>">
                                             <span>Manage Movies</span>
                                         </a>
                                     </li>
                                     <?php if ($is_admin == true) { ?>
-                                    <li <?php echo ($page == 'add-new-movies') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('add-new-movies'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'add-new-movies') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-movies'); ?>">
                                             <span>Add New Movie</span>
                                         </a>
                                     </li>
@@ -536,81 +812,81 @@ if ($wo['config']['live_video'] == 1) {
                                 </ul>
                             </li>
 
-                            <li <?php echo ($page == 'manage-games' || $page == 'add-new-game') ? 'class="active"' : ''; ?>>
-                                <a href="javascript:void(0);" class="menu-toggle">Games</a>
+                            <li <?php echo ($page == 'manage-games' || $page == 'add-new-game') ? 'class="open"' : ''; ?>>
+                                <a href="javascript:void(0);">Games</a>
                                 <ul class="ml-menu">
-                                    <li <?php echo ($page == 'manage-games') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-games'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-games') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-games'); ?>">
                                             <span>Manage Games</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'add-new-game') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('add-new-game'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'add-new-game') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-game'); ?>">
                                             <span>Add New Game</span>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-                            <li <?php echo ($page == 'pages-categories' || $page == 'pages-sub-categories' || $page == 'groups-sub-categories' || $page == 'products-sub-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories') ? 'class="active"' : ''; ?>>
-                                <a href="javascript:void(0);" class="menu-toggle">Categories</a>
+                            <li <?php echo ($page == 'pages-categories' || $page == 'pages-sub-categories' || $page == 'groups-sub-categories' || $page == 'products-sub-categories' || $page == 'groups-categories' || $page == 'blogs-categories' || $page == 'products-categories') ? 'class="open"' : ''; ?>>
+                                <a href="javascript:void(0);">Categories</a>
                                 <ul class="ml-menu">
-                                    <li <?php echo ($page == 'pages-categories') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('pages-categories'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'pages-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pages-categories'); ?>">
                                             <span>Pages Categories</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'pages-sub-categories') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('pages-sub-categories'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'pages-sub-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pages-sub-categories'); ?>">
                                             <span>Pages Sub Categories</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'groups-categories') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('groups-categories'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'groups-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('groups-categories'); ?>">
                                             <span>Groups Categories</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'groups-sub-categories') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('groups-sub-categories'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'groups-sub-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('groups-sub-categories'); ?>">
                                             <span>Groups Sub Categories</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'blogs-categories') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('blogs-categories'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'blogs-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('blogs-categories'); ?>">
                                             <span>Blogs Categories</span>
                                         </a>
                                     </li> 
-                                    <li <?php echo ($page == 'products-categories') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('products-categories'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'products-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('products-categories'); ?>">
                                             <span>Products Categories</span>
                                         </a>
                                     </li> 
-                                    <li <?php echo ($page == 'products-sub-categories') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('products-sub-categories'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'products-sub-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('products-sub-categories'); ?>">
                                             <span>Products Sub Categories</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'job-categories') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('job-categories'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'job-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('job-categories'); ?>">
                                             <span>Job Categories</span>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
-                            <li <?php echo ($page == 'pages-fields' || $page == 'groups-fields' || $page == 'products-fields') ? 'class="active"' : ''; ?>>
-                                <a href="javascript:void(0);" class="menu-toggle">Custom Fields</a>
+                            <li <?php echo ($page == 'pages-fields' || $page == 'groups-fields' || $page == 'products-fields') ? 'class="open"' : ''; ?>>
+                                <a href="javascript:void(0);">Custom Fields</a>
                                 <ul class="ml-menu">
-                                    <li <?php echo ($page == 'pages-fields') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('pages-fields'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'pages-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pages-fields'); ?>">
                                             <span>Pages Fields</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'groups-fields') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('groups-fields'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'groups-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('groups-fields'); ?>">
                                             <span>Groups Fields</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'products-fields') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('products-fields'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'products-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('products-fields'); ?>">
                                             <span>Products Fields</span>
                                         </a>
                                     </li>
@@ -618,16 +894,16 @@ if ($wo['config']['live_video'] == 1) {
                             </li>
 
                             <?php if ($wo['config']['gift_system'] == 1){?>
-                            <li <?php echo ($page == 'manage-gifts' || $page == 'add-new-gift') ? 'class="active"' : ''; ?>>
-                                <a href="javascript:void(0);" class="menu-toggle">Gifts</a>
+                            <li <?php echo ($page == 'manage-gifts' || $page == 'add-new-gift') ? 'class="open"' : ''; ?>>
+                                <a href="javascript:void(0);">Gifts</a>
                                 <ul class="ml-menu">
-                                    <li <?php echo ($page == 'manage-gifts') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-gifts'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-gifts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-gifts'); ?>">
                                             <span>Manage Gifts</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'add-new-gift') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('add-new-gift'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'add-new-gift') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-gift'); ?>">
                                             <span>Add New Gift</span>
                                         </a>
                                     </li>
@@ -636,190 +912,207 @@ if ($wo['config']['live_video'] == 1) {
                             <?php } ?>
 
                             <?php if ($wo['config']['stickers_system'] == 1){?>
-                            <li <?php echo ($page == 'manage-stickers' || $page == 'add-new-sticker') ? 'class="active"' : ''; ?>>
-                                <a href="javascript:void(0);" class="menu-toggle">Chat Stickers</a>
+                            <li <?php echo ($page == 'manage-stickers' || $page == 'add-new-sticker') ? 'class="open"' : ''; ?>>
+                                <a href="javascript:void(0);">Chat Stickers</a>
                                 <ul class="ml-menu">
-                                    <li <?php echo ($page == 'manage-stickers') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('manage-stickers'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'manage-stickers') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-stickers'); ?>">
                                             <span>Manage Stickers</span>
                                         </a>
                                     </li>
-                                    <li <?php echo ($page == 'add-new-sticker') ? 'class="active"' : ''; ?>>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('add-new-sticker'); ?>">
+                                    <li>
+                                        <a <?php echo ($page == 'add-new-sticker') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-sticker'); ?>">
                                             <span>Add New sticker</span>
                                         </a>
                                     </li>
                                 </ul>
                             </li>
                             <?php } ?>
-
                         </ul>
                     </li>
-                    <li <?php echo ($page == 'bank-receipts') ? 'class="active"' : ''; ?>>
-                        <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts'); ?>">
-                            <i class="material-icons">credit_card</i>
+                    <li>
+                        <a <?php echo ($page == 'bank-receipts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts'); ?>">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">credit_card</i>
+                            </span>
                             <span>Manage Bank Receipts</span>
                         </a>
                     </li>
-                    <li <?php echo ($page == 'ads-settings' || $page == 'manage-site-ads' || $page == 'manage-user-ads') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">attach_money</i>
+                    <li <?php echo ($page == 'ads-settings' || $page == 'manage-site-ads' || $page == 'manage-user-ads') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">attach_money</i>
+                            </span>
                             <span>Advertisement</span>
                         </a>
                         <ul class="ml-menu">
                             <?php if ($is_admin == true) { ?>
-                            <li <?php echo ($page == 'ads-settings') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('ads-settings'); ?>">Advertisement System Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'ads-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('ads-settings'); ?>">Advertisement System Settings</a>
                             </li>
                             <?php } ?>
                             <?php if ($is_admin == true) { ?>
-                            <li <?php echo ($page == 'manage-site-ads') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-site-ads'); ?>">Manage Site Advertisements</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-site-ads') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-site-ads'); ?>">Manage Site Advertisements</a>
                             </li>
                             <?php } ?>
-                            <li <?php echo ($page == 'manage-user-ads') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-user-ads'); ?>">Manage User Advertisements</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-user-ads') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-user-ads'); ?>">Manage User Advertisements</a>
                             </li>
                         </ul>
                     </li>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'manage-themes' || $page == 'manage-site-design' || $page == 'custom-code') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">color_lens</i>
+                    <li <?php echo ($page == 'manage-themes' || $page == 'manage-site-design' || $page == 'custom-code') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">color_lens</i>
+                            </span>
                             <span>Design</span>
                         </a>
                         <ul class="ml-menu">
-                            <li <?php echo ($page == 'manage-themes') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-themes'); ?>">Themes</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-themes') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-themes'); ?>">Themes</a>
                             </li>
-                            <li <?php echo ($page == 'manage-site-design') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-site-design'); ?>">Change Site Design</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-site-design') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-site-design'); ?>">Change Site Design</a>
                             </li>
-                            <li <?php echo ($page == 'custom-code') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('custom-code'); ?>">Custom JS / CSS</a>
+                            <li>
+                                <a <?php echo ($page == 'custom-code') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('custom-code'); ?>">Custom JS / CSS</a>
                             </li>
                         </ul>
                     </li>
                     <?php } ?>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'manage-announcements' || $page == 'mailing-list' || $page == 'mass-notifications' || $page == 'ban-users' || $page == 'generate-sitemap' || $page == 'manage-invitation-keys' || $page == 'backups' || $page == 'auto-delete' || $page == 'auto-friend' || $page == 'fake-users' || $page == 'auto-like' || $page == 'auto-join' || $page == 'send_email' || $page == 'manage-invitation') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">build</i>
+                    <li <?php echo ($page == 'manage-announcements' || $page == 'mailing-list' || $page == 'mass-notifications' || $page == 'ban-users' || $page == 'generate-sitemap' || $page == 'manage-invitation-keys' || $page == 'backups' || $page == 'auto-delete' || $page == 'auto-friend' || $page == 'fake-users' || $page == 'auto-like' || $page == 'auto-join' || $page == 'send_email' || $page == 'manage-invitation') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">build</i>
+                            </span>
                             <span>Tools</span>
                         </a>
                         <ul class="ml-menu">
-                            <li <?php echo ($page == 'manage-invitation') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation'); ?>">Users Invitation</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-invitation') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation'); ?>">Users Invitation</a>
                             </li>
-                            <li <?php echo ($page == 'send_email') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('send_email'); ?>">Send E-mail</a>
+                            <li>
+                                <a <?php echo ($page == 'send_email') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('send_email'); ?>">Send E-mail</a>
                             </li>
-                            <li <?php echo ($page == 'manage-announcements') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-announcements'); ?>">Announcements</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-announcements') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-announcements'); ?>">Announcements</a>
                             </li>
-                            <li <?php echo ($page == 'auto-delete') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('auto-delete'); ?>">Auto Delete Data</a>
+                            <li>
+                                <a <?php echo ($page == 'auto-delete') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-delete'); ?>">Auto Delete Data</a>
                             </li>
-                            <li <?php echo ($page == 'auto-friend') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('auto-friend'); ?>">Auto Friend</a>
+                            <li>
+                                <a <?php echo ($page == 'auto-friend') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-friend'); ?>">Auto Friend</a>
                             </li>
-                            <li <?php echo ($page == 'auto-like') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('auto-like'); ?>">Auto Page Like</a>
+                            <li>
+                                <a <?php echo ($page == 'auto-like') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-like'); ?>">Auto Page Like</a>
                             </li>
-                            <li <?php echo ($page == 'auto-join') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('auto-join'); ?>">Auto Group Join</a>
+                            <li>
+                                <a <?php echo ($page == 'auto-join') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-join'); ?>">Auto Group Join</a>
                             </li>
-                            <li <?php echo ($page == 'fake-users') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('fake-users'); ?>">Fake User Generator</a>
+                            <li>
+                                <a <?php echo ($page == 'fake-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('fake-users'); ?>">Fake User Generator</a>
                             </li>
                             
-                            <li <?php echo ($page == 'mailing-list') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('mailing-list'); ?>">Maling List</a>
+                            <li>
+                                <a <?php echo ($page == 'mailing-list') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('mailing-list'); ?>">Maling List</a>
                             </li>
-                            <li <?php echo ($page == 'mass-notifications') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('mass-notifications'); ?>">Mass Notifications</a>
+                            <li>
+                                <a <?php echo ($page == 'mass-notifications') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('mass-notifications'); ?>">Mass Notifications</a>
                             </li>
-                            <li <?php echo ($page == 'ban-users') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('ban-users'); ?>">BlackList</a>
+                            <li>
+                                <a <?php echo ($page == 'ban-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('ban-users'); ?>">BlackList</a>
                             </li>
-                            <li <?php echo ($page == 'generate-sitemap') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('generate-sitemap'); ?>">Generate SiteMap</a>
+                            <li>
+                                <a <?php echo ($page == 'generate-sitemap') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('generate-sitemap'); ?>">Generate SiteMap</a>
                             </li>
-                            <li <?php echo ($page == 'manage-invitation-keys') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation-keys'); ?>">Invitation Codes</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-invitation-keys') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation-keys'); ?>">Invitation Codes</a>
                             </li>
-                            <li <?php echo ($page == 'backups') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('backups'); ?>">Backup SQL & Files</a>
+                            <li>
+                                <a <?php echo ($page == 'backups') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('backups'); ?>">Backup SQL & Files</a>
                             </li>
                         </ul>
                     </li>
                     <?php } ?>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'edit-terms-pages' || $page == 'manage-custom-pages' || $page == 'add-new-custom-page' || $page == 'edit-custom-page') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">description</i>
+                    <li <?php echo ($page == 'edit-terms-pages' || $page == 'manage-custom-pages' || $page == 'add-new-custom-page' || $page == 'edit-custom-page') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">description</i>
+                            </span>
                             <span>Pages</span>
                         </a>
                         <ul class="ml-menu">
-                            <li <?php echo ($page == 'manage-custom-pages') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-custom-pages'); ?>">Manage Custom Pages</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-custom-pages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-custom-pages'); ?>">Manage Custom Pages</a>
                             </li>
-                            <li <?php echo ($page == 'edit-terms-pages') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('edit-terms-pages'); ?>">Edit Terms Pages</a>
+                            <li>
+                                <a <?php echo ($page == 'edit-terms-pages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('edit-terms-pages'); ?>">Edit Terms Pages</a>
                             </li>
                         </ul>
                     </li>
                     <?php } ?>
-                     <li <?php echo ($page == 'manage-reports') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">warning</i>
+                     <li <?php echo ($page == 'manage-reports') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">warning</i>
+                            </span>
                             <span>Reports</span>
                         </a>
                         <ul class="ml-menu">
-                            <li <?php echo ($page == 'manage-reports') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-reports'); ?>">Manage Reports</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-reports') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-reports'); ?>">Manage Reports</a>
                             </li>
                         </ul>
                     </li>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'verfiy-applications' || $page == 'push-notifications-system' || $page == 'manage-api-access-keys' || $page == 'manage-third-psites') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">compare_arrows</i>
+                    <li <?php echo ($page == 'verfiy-applications' || $page == 'push-notifications-system' || $page == 'manage-api-access-keys' || $page == 'manage-third-psites') ? 'class="open"' : ''; ?>>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">compare_arrows</i>
+                            </span>
                             <span>API Settings</span>
                         </a>
                         <ul class="ml-menu">
-                            <li <?php echo ($page == 'manage-api-access-keys') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-api-access-keys'); ?>">Manage API Server Key</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-api-access-keys') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-api-access-keys'); ?>">Manage API Server Key</a>
                             </li>
-                            <li <?php echo ($page == 'push-notifications-system') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('push-notifications-system'); ?>">Push Notifications Settings</a>
+                            <li>
+                                <a <?php echo ($page == 'push-notifications-system') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('push-notifications-system'); ?>">Push Notifications Settings</a>
                             </li>
-                            <li <?php echo ($page == 'verfiy-applications') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('verfiy-applications'); ?>">Verify Applications</a>
+                            <li>
+                                <a <?php echo ($page == 'verfiy-applications') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('verfiy-applications'); ?>">Verify Applications</a>
                             </li>
-                            <li <?php echo ($page == 'manage-third-psites') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-third-psites'); ?>">3rd Party Scripts</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-third-psites') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-third-psites'); ?>">3rd Party Scripts</a>
                             </li>
                         </ul>
                     </li>
                     <?php } ?>
                     <?php if ($is_admin == true) { ?>
                     <li <?php echo ($page == 'manage-updates') ? 'class="active"' : ''; ?>>
-                        <a href="javascript:void(0);" class="menu-toggle">
-                            <i class="material-icons">cloud_download</i>
+                        <a href="#">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">cloud_download</i>
+                            </span>
                             <span>Updates</span>
                         </a>
                         <ul class="ml-menu">
-                            <li <?php echo ($page == 'manage-updates') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-updates'); ?>">Updates & Bug Fixes</a>
+                            <li>
+                                <a <?php echo ($page == 'manage-updates') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-updates'); ?>">Updates & Bug Fixes</a>
                             </li>
                         </ul>
                     </li>
                     <?php } ?>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'changelog') ? 'class="active"' : ''; ?>>
-                        <a href="<?php echo Wo_LoadAdminLinkSettings('changelog'); ?>">
-                            <i class="material-icons">update</i>
+                    <li>
+                        <a <?php echo ($page == 'changelog') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('changelog'); ?>">
+                            <span class="nav-link-icon">
+                                <i class="material-icons">update</i>
+                            </span>
                             <span>Changelogs</span>
                         </a>
                     </li>
@@ -827,194 +1120,139 @@ if ($wo['config']['live_video'] == 1) {
                     <?php if ($is_admin == true) { ?>
                     <li>
                         <a href="http://docs.wowonder.com/#faq" target="_blank">
-                            <i class="material-icons">more_vert</i>
+                            <span class="nav-link-icon">
+                                <i class="material-icons">more_vert</i>
+                            </span>
                             <span>FAQs</span>
                         </a>
                     </li>
                     <?php } ?>
                 </ul>
             </div>
-            <!-- #Menu -->
-            <!-- Footer -->
-            <div class="legal">
-                <div class="copyright">
-                    Copyright &copy; <?php  echo date('Y') ?> <a href="javascript:void(0);"><?php echo $wo['config']['siteName'] ?></a>.
-                </div>
-                <div class="version">
-                    <b>Version: </b> <?php echo $wo['script_version'] ?>
-                </div>
-            </div>
-            <!-- #Footer -->
-        </aside>
-        <!-- #END# Left Sidebar -->
-    </section>
-
-    <section class="content">
-        <div class="container-fluid">
-              <?php if (is_dir('install')) { ?>
-              <div class="alert alert-danger">
-                <i class="fa fa-fw fa-exclamation-triangle"></i> <strong>Risk:</strong> Please delete the ./install folder for security reasons.
-              </div>
-              <?php } ?>
-              <?php 
-              $warnings = Wo_GetScriptWarnings();
-              if (!empty($warnings)) {
-                 foreach ($warnings as $key => $value1) { ?>
-                   <div class="alert alert-warning">
-                      <i class="fa fa-fw fa-exclamation-circle"></i>
-                      <?php 
-                      if ($key == "STRICT_TRANS_TABLES") {
-                        echo "<strong>Warning:</strong> The sql-mode <b>STRICT_TRANS_TABLES</b> is enabled in your mysql server, please contact your host provider to disable it.";
-                      }
-                      if ($key == "STRICT_ALL_TABLES") {
-                        echo "<strong>Warning:</strong> The sql-mode <b>STRICT_ALL_TABLES</b> is enabled in your mysql server, please contact your host provider to disable it.";
-                      }
-                      if ($key == "safe_mode") {
-                        echo "<strong>Warning:</strong> The php-mode <b>safe_mode</b> is enabled in your server, please contact your host provider to disable it.";
-                      }
-                      if ($key == "allow_url_fopen") {
-                        echo "<strong>Warning:</strong> The php-extension <b>allow_url_fopen</b> is disabled in your server, please contact your host provider to enable it.";
-                      }
-                      if ($key == 'update_file') {
-                        echo "<strong>Important:</strong> The file <b>update.php</b> is uploaded and not run yet, <a href='" . $wo['config']['site_url']. "/update.php' style='color:#fff; text-decoration:underline;'>Click Here</a> to update the script to v" . $wo['script_version'];
-                      }
-                      ?>
-                   </div>
-                 <?php }
-              }
-              ?>
         </div>
-        <?php echo $page_loaded; ?>
-    </section>
-    
-    <!-- Bootstrap Core Js -->
-    <script src="<?php echo Wo_LoadAdminLink('plugins/bootstrap/js/bootstrap.js'); ?>"></script>
+        <!-- end::navigation -->
 
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/jquery.dataTables.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/skin/bootstrap/js/dataTables.bootstrap.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/extensions/export/dataTables.buttons.min.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/extensions/export/buttons.flash.min.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/extensions/export/jszip.min.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/extensions/export/pdfmake.min.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/extensions/export/vfs_fonts.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/extensions/export/buttons.html5.min.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-datatable/extensions/export/buttons.print.min.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('js/pages/tables/jquery-datatable.js'); ?>"></script>
+        <!-- Content body -->
+        <div class="content-body">
+            <!-- Content -->
+            <div class="content ">
+                <?php echo $page_loaded; ?>
+            </div>
+            <!-- ./ Content -->
 
-    <!-- Select Plugin Js -->
-    <script src="<?php echo Wo_LoadAdminLink('plugins/bootstrap-select/js/bootstrap-select.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('plugins/sweetalert/sweetalert.min.js'); ?>"></script>
+        </div>
+        <!-- ./ Content body -->
+    </div>
+    <!-- ./ Content wrapper -->
+</div>
+<!-- ./ Layout wrapper -->
 
-    <!-- ColorPicker Plugin Js -->
-    <script src="<?php echo Wo_LoadAdminLink('plugins/bootstrap-colorpicker/js/bootstrap-colorpicker.js'); ?>"></script>
-
-    <!-- Slimscroll Plugin Js -->
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-slimscroll/jquery.slimscroll.js'); ?>"></script>
-
-    <!-- Waves Effect Plugin Js -->
-    <script src="<?php echo Wo_LoadAdminLink('plugins/node-waves/waves.js'); ?>"></script>
-
-    <!-- Jquery CountTo Plugin Js -->
-    <script src="<?php echo Wo_LoadAdminLink('plugins/jquery-countto/jquery.countTo.js'); ?>"></script>
-
-    <!-- Custom Js -->
-    <script src="<?php echo Wo_LoadAdminLink('js/admin.js'); ?>"></script>
-    <script src="<?php echo Wo_LoadAdminLink('js/pages/index.js'); ?>"></script>
-</body>
-
-</html>
-<style> 
-.sidebar .user-info {
-    background-size: cover;
-}
-.theme-red .sidebar .menu .list li.active > :first-child i, .theme-red .sidebar .menu .list li.active > :first-child span {
-    color: <?php echo $wo['config']['btn_background_color']?>;
-}
-.theme-red .navbar {
-    background: <?php echo $wo['config']['header_background']?>;
-}
-.sidebar .user-info {
-    background: <?php echo $wo['config']['btn_background_color']?> !important;
-}
-[type="radio"]:checked + label:after, [type="radio"].with-gap:checked + label:after {
-    background-color: <?php echo $wo['config']['btn_background_color']?> !important;
-}
-[type="radio"]:checked + label:after, [type="radio"].with-gap:checked + label:before, [type="radio"].with-gap:checked + label:after {
-    border: 2px solid <?php echo $wo['config']['btn_background_color']?> !important;
-}
-
-.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
-    background-color: <?php echo $wo['config']['btn_background_color']?> !important;
-}
-.sidebar .user-info {
-    height: 135px !important;
-}
-.sidebar .menu .list .ml-menu span {
-    margin: 0 !important;
-}
-.sidebar .menu .list .ml-menu li.active a.toggled:not(.menu-toggle):before, .sidebar .menu .list .ml-menu li.active a.toggled:not(.menu-toggle), .theme-red .sidebar .legal .copyright a {
-    color: <?php echo $wo['config']['btn_background_color']?> !important;
-}
-.spinner-layer.pl-red {
-    border-color:  <?php echo $wo['config']['btn_background_color']?>;
-}
-</style>
-
-<script>
-$(document).ready(function(){
-    $('[data-toggle="popover"]').popover();   
-    var hash = $('.main_session').val();
-      $.ajaxSetup({ 
-        data: {
-            hash: hash
-        },
-        cache: false 
-      });
-});
-
-
-
-function searchInFiles(keyword) {
-    if (keyword.length > 2) {
-        $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=search_in_pages', {keyword: keyword}, function(data, textStatus, xhr) {
-            if (data.html != '') {
-                $('#search_for_bar').html(data.html)
+<script src="<?php echo Wo_LoadAdminLink('vendors/sweetalert/sweetalert.min.js'); ?>"></script>
+<script src="<?php echo(Wo_LoadAdminLink('vendors/select2/js/select2.min.js')) ?>"></script>
+    <script src="<?php echo(Wo_LoadAdminLink('assets/js/examples/select2.js')) ?>"></script>
+    <script src="<?php echo(Wo_LoadAdminLink('assets/js/app.min.js')) ?>"></script>
+    <script type="text/javascript">
+        function ChangeMode(mode) {
+            if (mode == 'day') {
+                $('body').removeClass('dark');
+                $('.admin_mode').html('<span id="night-mode-text">Night mode</span><svg class="feather feather-moon float-right" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>');
+                $('.admin_mode').attr('onclick', "ChangeMode('night')");
+            }
+            else{
+                $('body').addClass('dark');
+                $('.admin_mode').html('<span id="night-mode-text">Day mode</span><svg class="feather feather-moon float-right" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>');
+                $('.admin_mode').attr('onclick', "ChangeMode('day')");
+            }
+            hash_id = $('#hash_id').val();
+            $.get(Wo_Ajax_Requests_File(),{f:'admin_setting', s:'change_mode', hash_id: hash_id}, function(data) {});
+        }
+        $(document).ready(function(){
+            $('[data-toggle="popover"]').popover();   
+            var hash = $('.main_session').val();
+              $.ajaxSetup({ 
+                data: {
+                    hash: hash
+                },
+                cache: false 
+              });
+        });
+        $('body').on('click', function (e) {
+            $('.dropdown-animating').removeClass('show');
+            $('.dropdown-menu').removeClass('show');
+        });
+        function searchInFiles(keyword) {
+            if (keyword.length > 2) {
+                $.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=search_in_pages', {keyword: keyword}, function(data, textStatus, xhr) {
+                    if (data.html != '') {
+                        $('#search_for_bar').html(data.html)
+                    }
+                    else{
+                        $('#search_for_bar').html('')
+                    }
+                });
             }
             else{
                 $('#search_for_bar').html('')
             }
-        });
-    }
-    else{
-        $('#search_for_bar').html('')
-    }
-}
-$(window).load(function() {
-    jQuery.fn.highlight = function (str, className) {
-        if (str != '') {
-            var aTags = document.getElementsByTagName("h2");
-            var bTags = document.getElementsByTagName("label");
-            var searchText = str.toLowerCase();
-
-            if (aTags.length > 0) {
-                for (var i = 0; i < aTags.length; i++) {
-                    var tag_text = aTags[i].textContent.toLowerCase();
-                    if (tag_text.indexOf(searchText) != -1) {
-                        $(aTags[i]).addClass(className)
-                    }
-                }
-            }
-
-            if (bTags.length > 0) {
-                for (var i = 0; i < bTags.length; i++) {
-                    var tag_text = bTags[i].textContent.toLowerCase();
-                    if (tag_text.indexOf(searchText) != -1) {
-                        $(bTags[i]).addClass(className)
-                    }
-                }
-            }
         }
-    };
-    jQuery.fn.highlight("<?php echo (!empty($_GET['highlight']) ? $_GET['highlight'] : '') ?>",'highlight_text');
-});
-</script>
+        jQuery(document).ready(function($) {
+            jQuery.fn.highlight = function (str, className) {
+                if (str != '') {
+                    var aTags = document.getElementsByTagName("h2");
+                    var bTags = document.getElementsByTagName("label");
+                    var cTags = document.getElementsByTagName("h3");
+                    var dTags = document.getElementsByTagName("h6");
+                    var searchText = str.toLowerCase();
+
+                    if (aTags.length > 0) {
+                        for (var i = 0; i < aTags.length; i++) {
+                            var tag_text = aTags[i].textContent.toLowerCase();
+                            if (tag_text.indexOf(searchText) != -1) {
+                                $(aTags[i]).addClass(className)
+                            }
+                        }
+                    }
+
+                    if (bTags.length > 0) {
+                        for (var i = 0; i < bTags.length; i++) {
+                            var tag_text = bTags[i].textContent.toLowerCase();
+                            if (tag_text.indexOf(searchText) != -1) {
+                                $(bTags[i]).addClass(className)
+                            }
+                        }
+                    }
+
+                    if (cTags.length > 0) {
+                        for (var i = 0; i < cTags.length; i++) {
+                            var tag_text = cTags[i].textContent.toLowerCase();
+                            if (tag_text.indexOf(searchText) != -1) {
+                                $(cTags[i]).addClass(className)
+                            }
+                        }
+                    }
+
+                    if (dTags.length > 0) {
+                        for (var i = 0; i < dTags.length; i++) {
+                            var tag_text = dTags[i].textContent.toLowerCase();
+                            if (tag_text.indexOf(searchText) != -1) {
+                                $(dTags[i]).addClass(className)
+                            }
+                        }
+                    }
+                }
+            };
+            jQuery.fn.highlight("<?php echo (!empty($_GET['highlight']) ? $_GET['highlight'] : '') ?>",'highlight_text');
+        });
+        $(document).on('click', '#search_for_bar a', function(event) {
+            event.preventDefault();
+            location.href = $(this).attr('href');
+        });
+        function ReadNotify() {
+            hash_id = $('#hash_id').val();
+            $.get(Wo_Ajax_Requests_File(),{f:'admin_setting', s:'ReadNotify', hash_id: hash_id});
+            location.reload();
+        }
+    </script>
+
+</body>
+</html>

@@ -26,7 +26,8 @@ if ($f == 'coinpayments_procallback') {
                     $query_one      = " UPDATE " . T_USERS . " SET {$impload} WHERE `user_id` = {$user_id} ";
                     $mysqli         = mysqli_query($sqlConnect, $query_one);
                     $date           = date('n') . '/' . date("Y");
-                    $create_payment = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENTS . " (`user_id`, `amount`, `date`, `type`) VALUES ({$user_id}, {$amount1}, '{$date}', '{$user_type}')");
+                    $time = time();
+                    $create_payment = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENTS . " (`user_id`, `amount`, `date`, `type`,`time`) VALUES ({$user_id}, {$amount1}, '{$date}', '{$user_type}', '{$time}')");
                     if ($user_type == 1) {
                         $img = $wo['lang']['star'];
                     } else if ($user_type == 2) {

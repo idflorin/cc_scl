@@ -258,6 +258,21 @@
 			if ($wo['page_profile']['user_id'] == $wo['user']['id']) {
 				echo '<div class="list-group profile-lists"><h5 class="search-filter-center-text empty_state" style="margin: 30px 0;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>' . str_replace('{{page_name}}', $wo['page_profile']['page_name'], $wo['lang']['post_offer_text']).' '.$wo['config']['siteName'] . '.<br><br><br><br><span class="btn btn-main" onclick="OpenCreateOfferModal()">'.$wo['lang']['create_offer'].' </span></h5></div>';
 			}
+			$page_offer = Wo_GetPosts(array('filter_by' => 'offer', 'page_id' => $wo['page_profile']['page_id'])); 
+			if (!empty($page_offer)) { ?>
+
+				<div id="posts" data-story-page="<?php echo $wo['page_profile']['page_id'];?>">
+					<div class="post-container sun_post">
+						<input id="page_post_offer_filter" type="hidden">
+						
+				<?php foreach ($page_offer as $key => $wo['story']) {
+					echo Wo_LoadPage('story/content');
+				} ?>
+
+					</div>
+				</div>
+				<?php 
+			}
 		}
 		 } else { ?>
 		
@@ -422,6 +437,15 @@
 			<li class="list-group-item">
 				<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=jobs" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=jobs');?>">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" class="feather" viewBox="0 0 24 24"><path fill="currentColor" d="M10,2H14A2,2 0 0,1 16,4V6H20A2,2 0 0,1 22,8V19A2,2 0 0,1 20,21H4C2.89,21 2,20.1 2,19V8C2,6.89 2.89,6 4,6H8V4C8,2.89 8.89,2 10,2M14,6V4H10V6H14Z" /></svg> <?php echo $wo['lang']['jobs']; ?>
+				</a>
+			</li>
+			<?php } ?>
+
+			<?php if ($wo['config']['offer_system'] == 1){ ?>
+
+			<li class="list-group-item">
+				<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=offer" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=offer');?>">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> <?php echo $wo['lang']['offer']; ?>
 				</a>
 			</li>
 			<?php } ?>

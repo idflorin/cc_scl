@@ -127,7 +127,7 @@ footer:empty {padding: 0}
 .payment_box .btn {width: 100%;background-color: white;color: #2c2c2c;text-align: inherit;display: flex;align-items: center;border-bottom: 1px solid rgba(0, 0, 0, 0.07);border-radius: 0;padding: 20px 25px;transition: all 0.15s;font-family: "Lato", sans-serif; font-weight: 600;box-shadow: none;}
 .payment_box .btn:hover {background-color: rgba(0, 0, 0, 0.04);}
 .payment_box .btn:last-child {border:0;}
-.payment_box .btn svg {margin-right: 15px;width: 32px;height: 32px;}
+.payment_box .btn svg, .payment_box .btn img {margin-right: 15px;width: 32px;height: 32px;}
 
 
 
@@ -180,3 +180,7 @@ svg {vertical-align: middle;}
 #bank_transfer_donate_modal.up_rec_active .upload_bank_receipts {display: block;}
 #bank_transfer_donate_modal.up_rec_img_ready .upload_bank_receipts img {width: 100%;height: 100%;object-fit: cover;}
 #bank_transfer_donate_modal.up_rec_img_ready .upload_bank_receipts svg, #bank_transfer_donate_modal.up_rec_img_ready .upload_bank_receipts p {display: none;}
+
+@media (min-width:400px) {
+.payment_box {width: 360px;}
+}

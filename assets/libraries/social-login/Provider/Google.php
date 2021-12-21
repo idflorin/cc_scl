@@ -19,20 +19,20 @@ use Hybridauth\User;
  *
  *   $config = [
  *       'callback' => Hybridauth\HttpClient\Util::getCurrentUrl(),
- *       'keys'     => [ 'id' => '', 'secret' => '' ],
- *       'scope'    => 'profile https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/plus.profile.emails.read',
+ *       'keys' => ['id' => '', 'secret' => ''],
+ *       'scope' => 'https://www.googleapis.com/auth/userinfo.profile',
  *
  *        // google's custom auth url params
  *       'authorize_url_parameters' => [
  *              'approval_prompt' => 'force', // to pass only when you need to acquire a new refresh token.
- *              'access_type'     => ..,      // is set to 'offline' by default
- *              'hd'              => ..,
- *              'state'           => ..,
+ *              'access_type' => ..,      // is set to 'offline' by default
+ *              'hd' => ..,
+ *              'state' => ..,
  *              // etc.
  *       ]
  *   ];
  *
- *   $adapter = new Hybridauth\Provider\Google( $config );
+ *   $adapter = new Hybridauth\Provider\Google($config);
  *
  *   try {
  *       $adapter->authenticate();
@@ -40,41 +40,41 @@ use Hybridauth\User;
  *       $userProfile = $adapter->getUserProfile();
  *       $tokens = $adapter->getAccessToken();
  *       $contacts = $adapter->getUserContacts(['max-results' => 75]);
- *   }
- *   catch( Exception $e ){
+ *   } catch (\Exception $e) {
  *       echo $e->getMessage() ;
  *   }
  */
 class Google extends OAuth2
 {
     /**
-    * {@inheritdoc}
-    */
-    public $scope = 'profile https://www.googleapis.com/auth/plus.profile.emails.read';
+     * {@inheritdoc}
+     */
+    // phpcs:ignore
+    protected $scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
 
     /**
-    * {@inheritdoc}
-    */
-    protected $apiBaseUrl = 'https://www.googleapis.com/plus/v1/';
+     * {@inheritdoc}
+     */
+    protected $apiBaseUrl = 'https://www.googleapis.com/';
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected $authorizeUrl = 'https://accounts.google.com/o/oauth2/auth';
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected $accessTokenUrl = 'https://accounts.google.com/o/oauth2/token';
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected $apiDocumentation = 'https://developers.google.com/identity/protocols/OAuth2';
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     protected function initialize()
     {
         parent::initialize();
@@ -83,113 +83,53 @@ class Google extends OAuth2
             'access_type' => 'offline'
         ];
 
-        $this->tokenRefreshParameters += [
-            'client_id' => $this->clientId,
-            'client_secret' => $this->clientSecret
-        ];
+        if ($this->isRefreshTokenAvailable()) {
+            $this->tokenRefreshParameters += [
+                'client_id' => $this->clientId,
+                'client_secret' => $this->clientSecret
+            ];
+        }
     }
 
     /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     *
+     * See: https://developers.google.com/identity/protocols/OpenIDConnect#obtainuserinfo
+     */
     public function getUserProfile()
     {
-        $response = $this->apiRequest('people/me');
+        $response = $this->apiRequest('oauth2/v3/userinfo');
 
         $data = new Data\Collection($response);
 
-        if (! $data->exists('id')) {
+        if (!$data->exists('sub')) {
             throw new UnexpectedApiResponseException('Provider API returned an unexpected response.');
         }
 
         $userProfile = new User\Profile();
 
-        $userProfile->identifier  = $data->get('id');
-        $userProfile->firstName   = $data->filter('name')->get('givenName');
-        $userProfile->lastName    = $data->filter('name')->get('familyName');
-        $userProfile->displayName = $data->get('displayName');
-        $userProfile->photoURL    = $data->get('image');
-        $userProfile->profileURL  = $data->get('url');
-        $userProfile->description = $data->get('aboutMe');
-        $userProfile->gender      = $data->get('gender');
-        $userProfile->language    = $data->get('language');
-        $userProfile->email       = $data->get('email');
-        $userProfile->phone       = $data->get('phone');
-        $userProfile->country     = $data->get('country');
-        $userProfile->region      = $data->get('region');
-        $userProfile->zip         = $data->get('zip');
+        $userProfile->identifier = $data->get('sub');
+        $userProfile->firstName = $data->get('given_name');
+        $userProfile->lastName = $data->get('family_name');
+        $userProfile->displayName = $data->get('name');
+        $userProfile->photoURL = $data->get('picture');
+        $userProfile->profileURL = $data->get('profile');
+        $userProfile->gender = $data->get('gender');
+        $userProfile->language = $data->get('locale');
+        $userProfile->email = $data->get('email');
 
-        $userProfile->emailVerified = $data->get('verified') ? $userProfile->email : '';
+        $userProfile->emailVerified = $data->get('email_verified') ? $userProfile->email : '';
 
-        if ($data->filter('image')->exists('url')) {
-            $userProfile->photoURL = substr($data->filter('image')->get('url'), 0, -2) . 150;
-        }
-
-        if (! $userProfile->email && $data->exists('emails')) {
-            $userProfile = $this->fetchUserEmail($userProfile, $data);
-        }
-
-        if (! $userProfile->profileURL && $data->exists('urls')) {
-            $userProfile = $this->fetchUserProfileUrl($userProfile, $data);
-        }
-
-        if (! $userProfile->profileURL && $data->exists('urls')) {
-            $userProfile = $this->fetchBirthday($userProfile, $data->get('birthday'));
+        if ($this->config->get('photo_size')) {
+            $userProfile->photoURL .= '?sz=' . $this->config->get('photo_size');
         }
 
         return $userProfile;
     }
 
     /**
-    * Fetch user email
-    */
-    protected function fetchUserEmail(User\Profile $userProfile, Data\Collection $data)
-    {
-        foreach ($data->get('emails') as $email) {
-            if ('account' == $email->type) {
-                $userProfile->email         = $email->value;
-                $userProfile->emailVerified = $email->value;
-
-                break;
-            }
-        }
-
-        return $userProfile;
-    }
-
-    /**
-    * Fetch user profile url
-    */
-    protected function fetchUserProfileUrl(User\Profile $userProfile, Data\Collection $data)
-    {
-        foreach ($data->get('urls') as $url) {
-            if ($url->get('primary')) {
-                $userProfile->webSiteURL = $url->get('value');
-
-                break;
-            }
-        }
-
-        return $userProfile;
-    }
-
-    /**
-    * Fetch use birthday
-    */
-    protected function fetchBirthday(User\Profile $userProfile, $birthday)
-    {
-        $result = (new Data\Parser())->parseBirthday($birthday, '-');
-
-        $userProfile->birthDay   = (int) $result[0];
-        $userProfile->birthMonth = (int) $result[1];
-        $userProfile->birthYear  = (int) $result[2];
-
-        return $userProfile;
-    }
-
-    /**
-    * {@inheritdoc}
-    */
+     * {@inheritdoc}
+     */
     public function getUserContacts($parameters = [])
     {
         $parameters = ['max-results' => 500] + $parameters;
@@ -199,23 +139,26 @@ class Google extends OAuth2
             return $this->getGmailContacts($parameters);
         }
 
-        // Google social contacts
-        if (false !== strpos($this->scope, '/auth/plus.login')) {
-            return $this->getGplusContacts($parameters);
-        }
+        return [];
     }
 
     /**
-    * Retrieve Gmail contacts
-    */
+     * Retrieve Gmail contacts
+     *
+     * @param array $parameters
+     *
+     * @return array
+     *
+     * @throws \Exception
+     */
     protected function getGmailContacts($parameters = [])
     {
         $url = 'https://www.google.com/m8/feeds/contacts/default/full?'
-                    . http_build_query(array_replace([ 'alt' => 'json', 'v' => '3.0' ], (array)$parameters));
+            . http_build_query(array_replace(['alt' => 'json', 'v' => '3.0'], (array)$parameters));
 
         $response = $this->apiRequest($url);
 
-        if (! $response) {
+        if (!$response) {
             return [];
         }
 
@@ -226,11 +169,11 @@ class Google extends OAuth2
                 $uc = new User\Contact();
 
                 $uc->email = isset($entry->{'gd$email'}[0]->address)
-                            ? (string) $entry->{'gd$email'}[0]->address
-                            : '';
+                    ? (string)$entry->{'gd$email'}[0]->address
+                    : '';
 
-                $uc->displayName = isset($entry->title->{'$t'}) ? (string) $entry->title->{'$t'} : '';
-                $uc->identifier  = ($uc->email != '') ? $uc->email : '';
+                $uc->displayName = isset($entry->title->{'$t'}) ? (string)$entry->title->{'$t'} : '';
+                $uc->identifier = ($uc->email != '') ? $uc->email : '';
                 $uc->description = '';
 
                 if (property_exists($response, 'website')) {
@@ -249,36 +192,6 @@ class Google extends OAuth2
 
                 $contacts[] = $uc;
             }
-        }
-
-        return $contacts;
-    }
-
-    /**
-    * Retrieve Google plus contacts
-    */
-    protected function getGplusContacts($parameters = [])
-    {
-        $contacts = [];
-
-        $url = 'https://www.googleapis.com/plus/v1/people/me/people/visible?'
-                    . http_build_query($parameters);
-
-        $response = $this->apiRequest($url);
-
-        $data = new Data\Collection($response);
-
-        foreach ($data->get('items') as $item) {
-            $userContact = new User\Contact();
-
-            $userContact->identifier  = $item->get('id');
-            $userContact->email       = $item->get('email');
-            $userContact->displayName = $item->get('displayName');
-            $userContact->description = $item->get('objectType');
-            $userContact->photoURL    = $item->filter('image')->get('url');
-            $userContact->profileURL  = $item->get('url');
-
-            $contacts[] = $userContact;
         }
 
         return $contacts;

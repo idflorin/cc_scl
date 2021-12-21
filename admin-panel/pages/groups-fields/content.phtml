@@ -1,19 +1,32 @@
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>Custom Fields > Groups Fields</h2>
+    <div>
+        <h3>Groups Fields</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Custom Fields</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Groups Fields</li>
+            </ol>
+        </nav>
     </div>
     <div class="row">
         <div class="col-lg-12 col-md-12">
             <div class="card">
-                <div class="header">
-                    <h2>Groups Fields</h2> 
-                    <a href="javascript:void(0)" class="btn btn-warning waves-effect waves-light m-t-20" onclick="ShowAddModal()">Create New Custom Field</a>
-                </div>
-                <div class="body">
+                <div class="card-body">
+					<a href="javascript:void(0)" class="btn btn-warning waves-effect waves-light m-t-20 pull-right" onclick="ShowAddModal()">Create New Custom Field</a>
+                  <h6 class="card-title">Groups Fields</h6>
+                  
+                  <div class="clearfix"></div>
+                  <br>
                    <div class="table-responsive1">
                         <table class="table table-bordered table-striped table-hover">
                             <thead>
                                 <tr>
+                                  <th><input type="checkbox" id="check-all" class="filled-in check-all" ><label for="check-all"></label></th>
                                    <th>ID</th>
 					               <th>Field name</th>
 					               <th>Type</th>
@@ -31,6 +44,13 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="clearfix"></div>
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3">
+                                <span>&nbsp;</span>
+                                <button type="button" class="btn btn-info waves-effect delete-selected d-block" disabled>Delete Selected<span></span></button>
+                            </div>
+                        </div>
                 </div>
             </div>
         </div>
@@ -61,21 +81,21 @@
           <br>
           <div class="form-group form-float">
               <div class="form-line">
+                <label class="form-label">Field Name</label>
                   <input type="text" id="name" name="name" class="form-control">
-                  <label class="form-label">Field Name</label>
               </div>
           </div>
          
           <div class="form-group form-float">
               <div class="form-line">
+                <label class="form-label">Field Length: <small>Default value is 32, and max value is 1000</small></label>
                   <input type="text" id="length" name="length" class="form-control" value="32">
-                  <label class="form-label">Field Length: <small>Default value is 32, and max value is 1000</small></label>
               </div>
           </div>
            <div class="form-group form-float">
               <div class="form-line">
+                <label class="form-label">Field Description: <small>The description will show under the field</small></label>
                   <textarea name="description" id="description" class="form-control" cols="30" rows="3"></textarea>
-                  <label class="form-label">Field Description: <small>The description will show under the field</small></label>
               </div>
           </div>
           <label for="required">Required Field <small>(Can Not Be Empty)</small></label>
@@ -87,8 +107,8 @@
           <br><br>
           <div class="form-group form-float options" style="display:none">
               <div class="form-line">
+                <label class="form-label">Select Field Options: <small>One option per line.</small></label>
                   <textarea name="options" id="options" class="form-control" cols="30" rows="3"></textarea>
-                  <label class="form-label">Select Field Options: <small>One option per line.</small></label>
               </div>
           </div>
           <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -111,7 +131,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content modal_content_back">
       <div class="modal-header">
-        <h5 class="modal-title" id="editcategoryModalLabel">Add New Field</h5>
+        <h5 class="modal-title" id="editcategoryModalLabel">Edit Field</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -136,7 +156,44 @@
     </div>
   </div>
 </div>
-
+<div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModal1Label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModal1Label">Delete field?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this field?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="SelectedDeleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModal1Label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModal1Label">Delete field?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure that you want to remove the selected field?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="DeleteSelected()" data-dismiss="modal">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
 var add_custom_field_form = $('form.add_custom_field_form');
 
@@ -213,41 +270,47 @@ function ShowEditModal(self,id) {
   });
   
 }
-$(function () {
-  $('table').DataTable();
-});
 
 
-function Wo_DeleteStatus(id){
-  if (!id || !confirm('Are you sure you want to delete this status?')) {
-    return false;
-  }
-  $("[data-status-id='"+id+"']").slideUp(function(){
-    $(this).remove();
-  });
-  $.ajax({
-    url: Wo_Ajax_Requests_File(),
-    type: 'GET',
-    dataType: 'json',
-    data: {f: 'status',s:'remove',id:id},
-  })
-  .done(function(data) {
-    
-  })
-  .fail(function() {
-    console.log("error");
-  })
-}
-function Wo_DeleteField(id) {
+
+function Wo_DeleteField(id,type = 'show') {
   if (id == '') {
     return false;
   }
-  if (!confirm('Are you sure you want to delete this field?')) {
-    return false;
-  }
+  if (type == 'hide') {
+      $('#DeleteModal').find('.btn-primary').attr('onclick', "Wo_DeleteField('"+id+"')");
+      $('#DeleteModal').modal('show');
+      return false;
+    }
   $('#' + id).fadeOut(300, function () {
     $(this).remove();
   });
   $.get(Wo_Ajax_Requests_File(), {f: 'admin_setting', s:'delete_custom_field', id:id, type:'group'});
+}
+$('.check-all').on('click', function(event) {
+    $('input:checkbox').not(this).prop('checked', this.checked);
+});
+$('.delete-checkbox, .check-all').change(function(event) {
+    $('.delete-selected').attr('disabled', false);
+    $('.delete-selected').find('span').text(' (' + $('.delete-checkbox:checked').length + ')');
+});
+
+$('.delete-selected').on('click', function(event) {
+    event.preventDefault();
+    $('#SelectedDeleteModal').modal('show');
+});
+function DeleteSelected() {
+    data = new Array();
+    $('td input:checked').parents('tr').each(function () {
+        data.push($(this).attr('data_selected'));
+    });
+    $('.delete-selected').attr('disabled', true);
+    $('.delete-selected').text('Please wait..');
+    $.post(Wo_Ajax_Requests_File()+"?f=admin_setting&s=remove_multi_custom_field&type=group", {ids: data}, function () {
+        $.each( data, function( index, value ){
+            $('#' + value).remove();
+        });
+        $('.delete-selected').text('Delete Selected');
+    });
 }
 </script>

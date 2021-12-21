@@ -14,6 +14,13 @@ if ($f == "refund_pro") {
                         'status' => 0
                     );
                     $db->insert(T_REFUND,$registration_data);
+                    $notification_data_array = array(
+                        'recipient_id' => 0,
+                        'type' => 'refund',
+                        'time' => time(),
+                        'admin' => 1
+                    );
+                    $db->insert(T_NOTIFICATION,$notification_data_array);
                     $data = array(
                         'message' => $success_icon . $wo['lang']['bank_transfer_request'],
                         'status' => 200,

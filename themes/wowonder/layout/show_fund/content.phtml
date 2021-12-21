@@ -1,8 +1,8 @@
 <?php if ($wo['config']['credit_card'] == 'yes') { ?>
-<script src="https://checkout.stripe.com/checkout.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <?php } ?>
 
-<style>.wow_main_float_head.show-fnds:before {background-image: url(<?php echo($wo['fund']['image']); ?>)}</style>
+<style>.wow_main_float_head.show-fnds:before {background-image: url(<?php echo($wo['fund']['image']); ?>)}@media (max-width: 990px) {footer .footer-wrapper {display: none;}}</style>
 
 <div class="page-margin">
 	<div class="wow_main_float_head show-fnds">

@@ -35,17 +35,29 @@ if (isset($_FILES['media_file'])) {
 ?>
 
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>Manage Features > Gifts > Add New Gift</h2>
+    <div>
+        <h3>Add New Gift</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Manage Features</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Gifts</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Add New Gift</li>
+            </ol>
+        </nav>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
         <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Add New Gift </h2>
-                </div>
-                <div class="body">
+                <div class="card-body">
+                    <h6 class="card-title">Add New Gift</h6>
                       <?php if (!empty($error)) { ?>
 				      <div class="alert alert-danger">
 				      	<?php echo $error;?>
@@ -59,14 +71,14 @@ if (isset($_FILES['media_file'])) {
                     <form class="" enctype="multipart/form-data" action="<?php echo Wo_LoadAdminLinkSettings('add-new-gift'); ?>" method="POST">
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="gift_name" name="gift_name" class="form-control">
                                 <label class="form-label">Gift Name URL</label>
+                                <input type="text" id="gift_name" name="gift_name" class="form-control">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="file" id="media_file" name="media_file" class="form-control">
                                 <label class="form-label">Gift File <small>only: .jpg,.jpeg,.png,.gif allowed</small></label>
+                                <input type="file" id="media_file" name="media_file" class="form-control">
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">

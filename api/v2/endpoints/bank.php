@@ -31,6 +31,28 @@ if (empty($error_code)) {
                                                        'mode'         => 'wallet'));
 	        }
     	}
+        elseif (!empty($_POST['payment_type']) && $_POST['payment_type'] == 'funding') {
+            if (empty($_POST['price']) || !is_numeric($_POST['price']) || $_POST['price'] < 1 || empty($_POST['fund_id']) || !is_numeric($_POST['fund_id']) || $_POST['fund_id'] < 1) {
+                $error_code    = 5;
+                $error_message = 'price fund_id can not be empty';
+            }
+            else{
+                $fund_id = Wo_Secure($_POST['fund_id']);
+                $fund = $db->where('id',$fund_id)->getOne(T_FUNDING);
+                if (!empty($fund)) {
+                    $insert_id = Wo_InsertBankTrnsfer(array('user_id' => $wo['user']['id'],
+                                                           'description' => $description,
+                                                           'price'       => Wo_Secure($_POST['price']),
+                                                           'receipt_file' => $mediaFilename,
+                                                           'mode'         => 'donate',
+                                                           'fund_id' => $fund_id));
+                }
+                else{
+                    $error_code    = 6;
+                    $error_message = 'fund not found';
+                }
+            }
+        }
     	else{
     		if (empty($_POST['type']) || !in_array($_POST['type'], array_keys($wo['pro_packages_types']))) {
     			$error_code    = 6;

@@ -152,6 +152,15 @@ if ($f == 'register') {
         }
         
         if ($register === true) {
+            if (!empty($wo['config']['auto_friend_users'])) {
+                $autoFollow = Wo_AutoFollow(Wo_UserIdFromUsername($_POST['username']));
+            }
+            if (!empty($wo['config']['auto_page_like'])) {
+                Wo_AutoPageLike(Wo_UserIdFromUsername($_POST['username']));
+            }
+            if (!empty($wo['config']['auto_group_join'])) {
+                Wo_AutoGroupJoin(Wo_UserIdFromUsername($_POST['username']));
+            }
             if ($activate == 1) {
                 $data  = array(
                     'status' => 200,
@@ -163,15 +172,7 @@ if ($f == 'register') {
                     $_SESSION['user_id'] = $session;
                     setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
                 }
-                if (!empty($wo['config']['auto_friend_users'])) {
-                    $autoFollow = Wo_AutoFollow(Wo_UserIdFromUsername($_POST['username']));
-                }
-                if (!empty($wo['config']['auto_page_like'])) {
-                    Wo_AutoPageLike(Wo_UserIdFromUsername($_POST['username']));
-                }
-                if (!empty($wo['config']['auto_group_join'])) {
-                    Wo_AutoGroupJoin(Wo_UserIdFromUsername($_POST['username']));
-                }
+                
                 $data['location'] = Wo_SeoLink('index.php?link1=start-up');
                 if ($wo['config']['membership_system'] == 1) {
                     $data['location'] = Wo_SeoLink('index.php?link1=go-pro');

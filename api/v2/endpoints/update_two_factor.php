@@ -18,23 +18,35 @@ if (!empty($_POST['type']) && $_POST['type'] == 'verify') {
 	        $error_message = 'wrong confirmation code';
         }
         if (empty($error_code)) {
-            if ($wo['config']['two_factor_type'] == 'phone') {
-                $Update_data['phone_number'] = $wo['user']['new_phone'];
-                $Update_data['new_phone'] = '';
-            }
-            if ($wo['config']['two_factor_type'] == 'email') {
+            // if ($wo['config']['two_factor_type'] == 'phone') {
+            // 	if (!empty($wo['user']['new_phone'])) {
+            // 		$Update_data['phone_number'] = $wo['user']['new_phone'];
+	           //      $Update_data['new_phone'] = '';
+            // 	}
+            // }
+            // if ($wo['config']['two_factor_type'] == 'email') {
+            // 	if (!empty($wo['user']['new_email']) && filter_var($wo['user']['new_email'], FILTER_VALIDATE_EMAIL)) {
+            // 		$Update_data['email'] = $wo['user']['new_email'];
+	           //      $Update_data['new_email'] = '';
+            // 	}
+            // }
+            // if ($wo['config']['two_factor_type'] == 'both') {
+            //     if (!empty($wo['user']['new_email']) && filter_var($wo['user']['new_email'], FILTER_VALIDATE_EMAIL)) {
+            //         $Update_data['email'] = $wo['user']['new_email'];
+            //         $Update_data['new_email'] = '';
+            //     }
+            //     if (!empty($wo['user']['new_phone'])) {
+            //         $Update_data['phone_number'] = $wo['user']['new_phone'];
+            //         $Update_data['new_phone'] = '';
+            //     }
+            // }
+            if (!empty($wo['user']['new_email']) && filter_var($wo['user']['new_email'], FILTER_VALIDATE_EMAIL)) {
                 $Update_data['email'] = $wo['user']['new_email'];
                 $Update_data['new_email'] = '';
             }
-            if ($wo['config']['two_factor_type'] == 'both') {
-                if (!empty($wo['user']['new_email'])) {
-                    $Update_data['email'] = $wo['user']['new_email'];
-                    $Update_data['new_email'] = '';
-                }
-                if (!empty($wo['user']['new_phone'])) {
-                    $Update_data['phone_number'] = $wo['user']['new_phone'];
-                    $Update_data['new_phone'] = '';
-                }
+            if (!empty($wo['user']['new_phone'])) {
+                $Update_data['phone_number'] = $wo['user']['new_phone'];
+                $Update_data['new_phone'] = '';
             }
             $Update_data['two_factor_verified'] = 1;
             $Update_data['two_factor'] = 1;

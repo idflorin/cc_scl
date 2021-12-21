@@ -772,7 +772,7 @@ function Wo_UpdateBalance($user_id = 0, $balance = 0, $type = '+') {
     return false;
 }
 function Wo_RequestNewPayment($user_id = 0, $amount = 0,$insert_array = array()) {
-    global $sqlConnect;
+    global $sqlConnect,$db;
     if (empty($user_id)) {
         return false;
     }
@@ -799,6 +799,13 @@ function Wo_RequestNewPayment($user_id = 0, $amount = 0,$insert_array = array())
     $query_text  = "INSERT INTO " . T_A_REQUESTS . " (`user_id`, `amount`, `full_amount`, `time`, `iban`, `country`, `full_name`, `swift_code`, `address`) VALUES ('$user_id', '$amount', '$full_amount', '$time', '".$args['iban']."', '".$args['country']."', '".$args['full_name']."', '".$args['swift_code']."', '".$args['address']."')";
     $query       = mysqli_query($sqlConnect, $query_text);
     if ($query) {
+        $notification_data_array = array(
+            'recipient_id' => 0,
+            'type' => 'with',
+            'time' => time(),
+            'admin' => 1
+        );
+        $db->insert(T_NOTIFICATION,$notification_data_array);
         return true;
     }
     return false;
@@ -1473,7 +1480,12 @@ function Wo_GetArticle($id = 0) {
         $fetched_data['author']        = Wo_UserData($fetched_data['user']);
         $fetched_data['thumbnail']     = Wo_GetMedia($fetched_data['thumbnail']);
         $fetched_data['tags_array']    = @explode(',', $fetched_data['tags']);
-        $fetched_data['url']           = Wo_SeoLink('index.php?link1=read-blog&id=' . $fetched_data['id'] . '_' . Wo_SlugPost($fetched_data['title']));
+        if ($wo['config']['useSeoFrindly'] == 1) {
+            $fetched_data['url']           = Wo_SeoLink('index.php?link1=read-blog&id=' . $fetched_data['id'] . '_' . Wo_SlugPost($fetched_data['title']));
+        }
+        else{
+            $fetched_data['url']           = Wo_SeoLink('index.php?link1=read-blog&id=' . $fetched_data['id']);
+        }
         $fetched_data['author']        = Wo_UserData($fetched_data['user']);
         $fetched_data['category_link'] = Wo_SeoLink('index.php?link1=blog-category&id=' . $fetched_data['category']);
         $fetched_data['category_name'] = '';
@@ -2469,6 +2481,8 @@ function Wo_NotificationWebPushNotifier() {
                     }
                     $send_array['notification']['notification_content']     = $sql_get_notification_for_push['type_text'];
                     $send_array['notification']['notification_data']['url'] = $sql_get_notification_for_push['url'];
+                    $send_array['notification']['notification_data']['post_id'] = $sql_get_notification_for_push['post_id'];
+                    $send_array['notification']['notification_data']['type'] = $sql_get_notification_for_push['type'];
 
                     if ($wo['config']['android_push_native'] == 1 && !empty($to_data['android_n_device_id'])) {
                         $send_array['send_to'] = array($to_data['android_n_device_id']);
@@ -4554,10 +4568,17 @@ function Wo_HidePost($id = false) {
     return $result;
 }
 function Wo_SendVerificationRequest($registration_data = array()) {
-    global $sqlConnect, $wo;
+    global $sqlConnect, $wo,$db;
     if ($wo['loggedin'] == false || !is_array($registration_data) || empty($registration_data) || Wo_IsAdmin()) {
         return false;
     }
+    $notification_data_array = array(
+        'recipient_id' => 0,
+        'type' => 'verify',
+        'time' => time(),
+        'admin' => 1
+    );
+    $db->insert(T_NOTIFICATION,$notification_data_array);
     $fields = '`' . implode('`, `', array_keys($registration_data)) . '`';
     $data   = '\'' . implode('\', \'', $registration_data) . '\'';
     $sql    = "INSERT INTO " . T_VERIFICATION_REQUESTS . " ({$fields}) VALUES ({$data})";
@@ -5287,7 +5308,7 @@ function Wo_IsReportExists($id = false, $type = 'user') {
     return $match;
 }
 function Wo_ReportUser($user = false, $text = '') {
-    global $sqlConnect, $wo;
+    global $sqlConnect, $wo,$db;
     if ($wo['loggedin'] == false || !$user) {
         return false;
     }
@@ -5302,6 +5323,13 @@ function Wo_ReportUser($user = false, $text = '') {
                  VALUES (null,'$user','$user_id','$text','$time')";
         @mysqli_query($sqlConnect, $sql);
         $code = 1;
+        $notification_data_array = array(
+            'recipient_id' => 0,
+            'type' => 'report',
+            'time' => time(),
+            'admin' => 1
+        );
+        $db->insert(T_NOTIFICATION,$notification_data_array);
     } else {
         $sql = " DELETE FROM " . T_REPORTS . " WHERE `user_id` = {$user_id} AND `profile_id` = {$user} ";
         @mysqli_query($sqlConnect, $sql);
@@ -5330,6 +5358,13 @@ function Wo_ReportPage($page = false, $text = '') {
                  VALUES (null,'$page','$user_id','$text','$time')";
         @mysqli_query($sqlConnect, $sql1);
         $code = 1;
+        $notification_data_array = array(
+            'recipient_id' => 0,
+            'type' => 'report',
+            'time' => time(),
+            'admin' => 1
+        );
+        $db->insert(T_NOTIFICATION,$notification_data_array);
     } else {
         $sql2 = " DELETE FROM " . T_REPORTS . " WHERE `user_id` = {$user_id} AND `page_id` = {$page} ";
         @mysqli_query($sqlConnect, $sql2);
@@ -5358,6 +5393,13 @@ function Wo_ReportGroup($group = false, $text = '') {
                  VALUES (null,'$group','$user_id','$text','$time')";
         @mysqli_query($sqlConnect, $sql1);
         $code = 1;
+        $notification_data_array = array(
+            'recipient_id' => 0,
+            'type' => 'report',
+            'time' => time(),
+            'admin' => 1
+        );
+        $db->insert(T_NOTIFICATION,$notification_data_array);
     } else {
         $sql2 = " DELETE FROM " . T_REPORTS . " WHERE `user_id` = {$user_id} AND `group_id` = {$group} ";
         @mysqli_query($sqlConnect, $sql2);
@@ -6429,10 +6471,17 @@ function Wo_DeleteAllUserPosts($user_id)
 
 
 function Wo_InsertBankTrnsfer($inserted_data) {
-    global $wo, $sqlConnect;
+    global $wo, $sqlConnect,$db;
     if (empty($inserted_data)) {
         return false;
     }
+    $notification_data_array = array(
+        'recipient_id' => 0,
+        'type' => 'bank',
+        'time' => time(),
+        'admin' => 1
+    );
+    $db->insert(T_NOTIFICATION,$notification_data_array);
     $fields = '`' . implode('`, `', array_keys($inserted_data)) . '`';
     $data   = '\'' . implode('\', \'', $inserted_data) . '\'';
     $query  = mysqli_query($sqlConnect, "INSERT INTO " . T_BANK_TRANSFER . " ({$fields}) VALUES ({$data})");
@@ -6838,6 +6887,7 @@ function GetFundingByUserId($user_id ,$limit = 6,$offset=0)
                 $new_data->bar = $percent;
             }
             $new_data->user_data = Wo_UserData($fund->user_id);
+            $new_data->is_donate = $db->where('funding_id',$fund->id)->where('user_id',$wo['user']['id'])->getValue(T_FUNDING_RAISE,"COUNT(*)");
             $new_data = (Array) $new_data;
             $data[] = $new_data;
         }
@@ -6877,6 +6927,7 @@ function GetFundingById($id,$type = 'id')
             $funding->bar = $percent;
         }
         $funding->user_data = Wo_UserData($funding->user_id);
+        $funding->is_donate = $db->where('funding_id',$funding->id)->where('user_id',$wo['user']['id'])->getValue(T_FUNDING_RAISE,"COUNT(*)");
         $funding = (Array) $funding;
         return $funding;
     }
@@ -6908,6 +6959,7 @@ function GetFunding($limit = 6,$offset=0)
                 $new_data->bar = $percent;
             }
             $new_data->user_data = Wo_UserData($fund->user_id);
+            $new_data->is_donate = $db->where('funding_id',$fund->id)->where('user_id',$wo['user']['id'])->getValue(T_FUNDING_RAISE,"COUNT(*)");
             $new_data = (Array) $new_data;
             $data[] = $new_data;
         }

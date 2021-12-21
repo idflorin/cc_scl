@@ -8,21 +8,21 @@
 <br>
 <div class="form-group form-float">
     <div class="form-line focused">
+      <label class="form-label">Field Name</label>
         <input type="text" id="name" name="name" class="form-control" value="<?php echo($wo['field']->name) ?>">
-        <label class="form-label">Field Name</label>
     </div>
 </div>
 
 <div class="form-group form-float">
     <div class="form-line focused">
+      <label class="form-label">Field Length: <small>Default value is 32, and max value is 1000</small></label>
         <input type="text" id="length" name="length" class="form-control" value="<?php echo($wo['field']->length) ?>">
-        <label class="form-label">Field Length: <small>Default value is 32, and max value is 1000</small></label>
     </div>
 </div>
  <div class="form-group form-float">
     <div class="form-line focused">
+      <label class="form-label">Field Description: <small>The description will show under the field</small></label>
         <textarea name="description" id="description" class="form-control" cols="30" rows="3"><?php echo($wo['field']->description) ?></textarea>
-        <label class="form-label">Field Description: <small>The description will show under the field</small></label>
     </div>
 </div>
 <label for="required">Required Field <small>(Can Not Be Empty)</small></label>
@@ -34,8 +34,8 @@
 <br><br>
 <div class="form-group form-float options_<?php echo($wo['field']->id) ?>" style="display:none">
     <div class="form-line focused">
+      <label class="form-label">Select Field Options: <small>One option per line.</small></label>
         <textarea name="options" id="options" class="form-control" cols="30" rows="3"><?php echo str_replace(',', "\n", $wo['field']->options)?></textarea>
-        <label class="form-label">Select Field Options: <small>One option per line.</small></label>
     </div>
 </div>
 <input type="hidden" name="id" value="<?php echo($wo['field']->id) ?>">

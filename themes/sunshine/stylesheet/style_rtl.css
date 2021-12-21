@@ -1066,6 +1066,7 @@ body .invite-user-form button {
 body .invite-user-form input {
     padding: 3px 10px 3px 45px;
 }
+body #wo_msg_right_prt .text-sender-container .outgoing .message-model {margin-left: 0;margin-right: auto;}
 
 
 

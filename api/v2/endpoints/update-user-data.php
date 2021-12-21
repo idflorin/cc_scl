@@ -55,6 +55,47 @@ if (!empty($user_data['email'])) {
         $error_code    = 6;
         $error_message = 'Invalid email characters';
     }
+    if (empty($error_code)) {
+        $code = rand(111111, 999999);
+        $hash_code = md5($code);
+        $message = "Your confirmation code is: $code";
+        if ($user_data['email'] != $wo['user']['email'] && $wo['config']['sms_or_email'] == 'mail' && $wo['config']['emailValidation'] == 1) {
+             $send_message_data       = array(
+                'from_email' => $wo['config']['siteEmail'],
+                'from_name' => $wo['config']['siteName'],
+                'to_email' => $user_data['email'],
+                'to_name' => $wo['user']['name'],
+                'subject' => 'Please verify that it’s you',
+                'charSet' => 'utf-8',
+                'message_body' => $message,
+                'is_html' => true
+            );
+            $send = Wo_SendMessage($send_message_data);
+            if ($send) {
+                $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
+                                                                                                     'new_email'      => Wo_Secure($user_data['email'])));
+                $response_data['type'] = 'code sent';
+                unset($user_data['email']);
+            }
+            else{
+                $error_code    = 7;
+                $error_message = 'code not sent';
+            }
+        }
+        elseif ($user_data['email'] != $wo['user']['email'] && $wo['config']['sms_or_email'] == 'sms' && $wo['config']['emailValidation'] == 1) {
+            $send = Wo_SendSMSMessage($user_data['email'], $message);
+            if ($send) {
+                $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
+                                                                                                     'new_email'  => Wo_Secure($user_data['email'])));
+                $response_data['type'] = 'code sent';
+                unset($user_data['email']);
+            }
+            else{
+                $error_code    = 7;
+                $error_message = 'code not sent';
+            }
+        }
+    }
 }
 
 if (!empty($user_data['phone_number'])) {
@@ -62,6 +103,47 @@ if (!empty($user_data['phone_number'])) {
     if ($is_exist && $user_data['phone_number'] != $wo['user']['phone_number']) {
         $error_code    = 7;
         $error_message = 'Phone number already used';
+    }
+    if (empty($error_code)) {
+        $code = rand(111111, 999999);
+        $hash_code = md5($code);
+        $message = "Your confirmation code is: $code";
+        if ($user_data['phone_number'] != $wo['user']['phone_number'] && $wo['config']['sms_or_email'] == 'mail' && $wo['config']['emailValidation'] == 1) {
+             $send_message_data       = array(
+                'from_email' => $wo['config']['siteEmail'],
+                'from_name' => $wo['config']['siteName'],
+                'to_email' => $wo['user']['email'],
+                'to_name' => $wo['user']['name'],
+                'subject' => 'Please verify that it’s you',
+                'charSet' => 'utf-8',
+                'message_body' => $message,
+                'is_html' => true
+            );
+            $send = Wo_SendMessage($send_message_data);
+            if ($send) {
+                $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
+                                                                                                     'new_phone'      => Wo_Secure($user_data['phone_number'])));
+                $response_data['type'] = 'code sent';
+                unset($user_data['phone_number']);
+            }
+            else{
+                $error_code    = 7;
+                $error_message = 'code not sent';
+            }
+        }
+        elseif ($user_data['phone_number'] != $wo['user']['phone_number'] && $wo['config']['sms_or_email'] == 'sms' && $wo['config']['emailValidation'] == 1) {
+            $send = Wo_SendSMSMessage($user_data['phone_number'], $message);
+            if ($send) {
+                $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
+                                                                                                     'new_phone'  => Wo_Secure($user_data['phone_number'])));
+                $response_data['type'] = 'code sent';
+                unset($user_data['phone_number']);
+            }
+            else{
+                $error_code    = 7;
+                $error_message = 'code not sent';
+            }
+        }
     }
 }
 
@@ -146,14 +228,16 @@ if (!empty($_FILES["cover"]["tmp_name"])) {
 if (isset($user_data['server_key'])) {
 	unset($user_data['server_key']);
 }
-
+if (!empty($_POST['about'])) {
+    $user_data['about'] = Wo_Secure($_POST['about']);
+}
 if (empty($error_code)) {
     foreach ($remove_from_list as $rkey => $rvalue) {
         unset($user_data[$rvalue]);
     }
 	foreach ($user_data as $key => $value) {
 
-		if (!isset($wo['user'][$key]) && !in_array($key, $escape)) {
+		if (!in_array($key, array_keys($wo['user'])) && !in_array($key, $escape)) {
 			$error_code = 1;
 			$error_message = "Key #$key not found, check Wo_Users table to get the correct information, or you can use the following keys: $keys";
 			unset($user_data[$key]);
@@ -171,6 +255,7 @@ if (!is_numeric($_POST['relationship']) || empty($_POST['relationship'])) {
     $user_data['relationship_id'] = 0;
     Wo_DeleteMyRelationShip();
 }
+
 if (!empty($_POST['relationship']) && is_numeric($_POST['relationship']) && $_POST['relationship'] > 0 && $_POST['relationship'] <= 4) {
     if ($_POST['relationship'] > 1 && isset($_POST['relationship_user']) && is_numeric($_POST['relationship_user']) && $_POST['relationship_user'] > 0) {
         $relationship_user = Wo_Secure($_POST['relationship_user']);

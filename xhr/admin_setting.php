@@ -440,6 +440,778 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'delete_multi_users') {
+        if (!empty($_POST['ids']) && !empty($_POST['type']) && in_array($_POST['type'], array('activate','deactivate','delete','free','star','hot','ultima','vip'))) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (is_numeric($value) && $value > 0) {
+                    if ($_POST['type'] == 'delete') {
+                        $delete = Wo_DeleteUser(Wo_Secure($value));
+                    }
+                    elseif ($_POST['type'] == 'activate') {
+                        $db->where('user_id', Wo_Secure($value));
+
+                        $update_data = array('active' => '1','email_code' => '');
+                        $update = $db->update(T_USERS, $update_data);
+                    }
+                    elseif ($_POST['type'] == 'deactivate') {
+                        $db->where('user_id', Wo_Secure($value));
+
+                        $update_data = array('active' => 0,'email_code' => '');
+                        $update = $db->update(T_USERS, $update_data);
+                    }
+                    elseif ($_POST['type'] == 'free') {
+                        $member_type = 0;
+                        $member_pro  = 0;
+                        $down        = Wo_DownUpgradeUser(Wo_Secure($value));
+                        $update_data = array('pro_type' => $member_type,'is_pro' => $member_pro,'pro_time' => 0);
+                        Wo_UpdateUserData(Wo_Secure($value), $update_data);
+                    }
+                    elseif ($_POST['type'] == 'star') {
+                        $member_type = 1;
+                        $member_pro  = 1;
+                        $time        = time();
+                        $update_data = array('pro_type' => $member_type,'is_pro' => $member_pro,'pro_time' => $time);
+                        Wo_UpdateUserData(Wo_Secure($value), $update_data);
+                    } 
+                    elseif ($_POST['type'] == 'hot') {
+                        $member_type = 2;
+                        $member_pro  = 1;
+                        $time        = time();
+                        $update_data = array('pro_type' => $member_type,'is_pro' => $member_pro,'pro_time' => $time);
+                        Wo_UpdateUserData(Wo_Secure($value), $update_data);
+                    } 
+                    elseif ($_POST['type'] == 'ultima') {
+                        $member_type = 3;
+                        $member_pro  = 1;
+                        $time        = time();
+                        $update_data = array('pro_type' => $member_type,'is_pro' => $member_pro,'pro_time' => $time);
+                        Wo_UpdateUserData(Wo_Secure($value), $update_data);
+                    } 
+                    elseif ($_POST['type'] == 'vip') {
+                        $member_type = 4;
+                        $member_pro  = 1;
+                        $time        = time();
+                        $update_data = array('pro_type' => $member_type,'is_pro' => $member_pro,'pro_time' => $time);
+                        Wo_UpdateUserData(Wo_Secure($value), $update_data);
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_verification') {
+        if (!empty($_POST['ids']) && !empty($_POST['type']) && in_array($_POST['type'], array('verify','delete'))) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (is_numeric($value) && $value > 0) {
+                    $verify = $db->where('id',Wo_Secure($value))->getOne(T_VERIFICATION_REQUESTS);
+                    if ($_POST['type'] == 'delete') {
+                        Wo_DeleteVerificationRequest(Wo_Secure($value));
+                    }
+                    elseif ($_POST['type'] == 'verify') {
+                        $id = $verify->user_id;
+                        if (!empty($verify->page_id) && $verify->page_id > 0) {
+                            $id = $verify->page_id;
+                        }
+                        Wo_VerifyUser($id, $verify->id, $verify->type);
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'delete_multi_refund') {
+        if (!empty($_POST['ids']) && !empty($_POST['type']) && in_array($_POST['type'], array('approve','delete'))) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (is_numeric($value) && $value > 0) {
+                    $request = $db->where('id',Wo_Secure($value))->getOne(T_REFUND);
+                    if ($_POST['type'] == 'delete') {
+                        $db->where('id',Wo_Secure($value))->delete(T_REFUND);
+                        $data = array(
+                            'status' => 200
+                        );
+                        $notification_data_array = array(
+                            'recipient_id' => $request->user_id,
+                            'type' => 'admin_notification',
+                            'url' => 'index.php?link1=home',
+                            'text' => $wo['lang']['refund_decline'],
+                            'type2' => 'refund_decline'
+                        );
+                        Wo_RegisterNotification($notification_data_array);
+                    }
+                    elseif ($_POST['type'] == 'approve') {
+                        $price = $wo['pro_packages'][$request->pro_type]['price'];
+                        $db->where('user_id',$request->user_id)->update(T_USERS,array('balance' => $db->inc($price),
+                                                                                      'is_pro' => 0));
+                        $db->where('id',Wo_Secure($value))->delete(T_REFUND);
+                        $notification_data_array = array(
+                            'recipient_id' => $request->user_id,
+                            'type' => 'admin_notification',
+                            'url' => 'index.php?link1=setting&page=payments',
+                            'text' => $wo['lang']['refund_approve'],
+                            'type2' => 'refund_approve'
+                        );
+                        Wo_RegisterNotification($notification_data_array);
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'delete_multi_blog') {
+        if (!empty($_POST['ids']) && !empty($_POST['type']) && in_array($_POST['type'], array('activate','deactivate','delete'))) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (is_numeric($value) && $value > 0) {
+                    $post = $db->where('id',Wo_Secure($value))->getOne(T_BLOG);
+                    if ($_POST['type'] == 'delete') {
+                        Wo_DeleteMyBlog(Wo_Secure($value));
+                    }
+                    elseif ($_POST['type'] == 'activate') {
+                        if (!empty($post)) {
+                            $db->where('id',Wo_Secure($value))->update(T_BLOG,array('active' => '1'));
+                            $db->where('blog_id',Wo_Secure($value))->update(T_POSTS,array('active' => 1));
+                            $notification_data_array = array(
+                                'recipient_id' => $post->user,
+                                'type' => 'admin_notification',
+                                'url' => 'index.php?link1=read-blog&id='.$post->id,
+                                'text' => $wo['lang']['approve_blog'],
+                                'type2' => 'approve_blog'
+                            );
+                            Wo_RegisterNotification($notification_data_array);
+                        }
+                    }
+                    elseif ($_POST['type'] == 'deactivate') {
+                        if (!empty($post)) {
+                            $db->where('id',Wo_Secure($value))->update(T_BLOG,array('active' => '0'));
+                            $db->where('blog_id',Wo_Secure($value))->update(T_POSTS,array('active' => 0));
+                        }
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'delete_multi_post') {
+        if (!empty($_POST['ids']) && !empty($_POST['type']) && in_array($_POST['type'], array('activate','deactivate','delete'))) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (is_numeric($value) && $value > 0) {
+                    $post = $db->where('id',Wo_Secure($value))->getOne(T_POSTS);
+                    if ($_POST['type'] == 'delete') {
+                        Wo_DeletePost(Wo_Secure($value));
+                    }
+                    elseif ($_POST['type'] == 'activate') {
+                        if (!empty($post)) {
+                            $db->where('id',Wo_Secure($value))->update(T_POSTS,array('active' => 1));
+                            if (!empty($post->blog_id)) {
+                                $db->where('id',$post->blog_id)->update(T_BLOG,array('active' => '1'));
+                            }
+                            $notification_data_array = array(
+                                'recipient_id' => $post->user_id,
+                                'type' => 'admin_notification',
+                                'url' => 'index.php?link1=post&id='.$post->id,
+                                'text' => $wo['lang']['approve_post'],
+                                'type2' => 'approve_post'
+                            );
+                            Wo_RegisterNotification($notification_data_array);
+                        }
+                    }
+                    elseif ($_POST['type'] == 'deactivate') {
+                        if (!empty($post)) {
+                            $db->where('id',Wo_Secure($value))->update(T_POSTS,array('active' => 0));
+                            if (!empty($post->blog_id)) {
+                                $db->where('id',$post->blog_id)->update(T_BLOG,array('active' => '0'));
+                            }
+                        }
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_gender') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && in_array($value, array_keys($wo['genders']))) {
+                    $db->where('lang_key',Wo_Secure($value))->delete(T_LANGS);
+                    $gender = $db->where('gender_id',Wo_Secure($value))->getOne(T_GENDER);
+                    if (!empty($gender)) {
+                        $link = $gender->image;
+                        if (file_exists($link)) {
+                            @unlink(trim($link));
+                        }
+                        else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
+                            @Wo_DeleteFromToS3($link);
+                        }
+                        $db->where('gender_id',Wo_Secure($value))->delete(T_GENDER);
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_event') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteEvent($value);
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_category') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value)) {
+                    $types = array('page' => T_PAGES_CATEGORY,'group' => T_GROUPS_CATEGORY,'blog' => T_BLOGS_CATEGORY,'product' => T_PRODUCTS_CATEGORY,'job' => T_JOB_CATEGORY);
+                    if (!empty($_GET['type']) && in_array($_GET['type'], array_keys($types))) {
+                        if ($value != 'other' && $value != 'all_') {
+                            $lang_key = Wo_Secure($value);
+                            $category = $db->where('lang_key',$lang_key)->getOne($types[$_GET['type']]);
+                            if (!empty($category)) {
+                                $db->where('lang_key',$lang_key)->delete(T_LANGS);
+                                $db->where('lang_key',$lang_key)->delete($types[$_GET['type']]);
+                                if ($_GET['type'] == 'page') {
+                                    $db->where('page_category',$category->id)->update(T_PAGES,array('page_category' => 1));
+                                }
+                                if ($_GET['type'] == 'group') {
+                                    $db->where('category',$category->id)->update(T_GROUPS,array('category' => 1));
+                                }
+                                if ($_GET['type'] == 'blog') {
+                                    $db->where('category',$category->id)->update(T_BLOG,array('category' => 1));
+                                }
+                                if ($_GET['type'] == 'product') {
+                                    $db->where('category',$category->id)->update(T_PRODUCTS,array('category' => 0));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_custom_field') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value)) {
+                    $placement_array = array('page','group','product');
+                    if (!empty($_GET['type']) && in_array($_GET['type'], $placement_array)) {
+                        $delete = Wo_DeleteCustomField($value,$_GET['type']);
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_invitation') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteUserInvitation('id', $value);
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_ban') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value)) {
+                    Wo_DeleteBanned(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_code') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteAdminInvitation('id', $value);
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_page') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                     Wo_DeleteCustomPage($value);
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_ads') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteUserAd($value);
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_sub_category') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value)) {
+                    $types = array('page','group','product');
+                    if (!empty($_GET['type']) && in_array($_GET['type'], $types)) {
+                        $lang_key = Wo_Secure($value);
+                        $category = $db->where('lang_key',$lang_key)->where('type',Wo_Secure($_GET['type']))->getOne(T_SUB_CATEGORIES);
+                        if (!empty($category)) {
+                            $db->where('lang_key',$lang_key)->delete(T_LANGS);
+                            $db->where('id',$category->id)->delete(T_SUB_CATEGORIES);
+
+                            if ($_GET['type'] == 'page') {
+                                $db->where('sub_category',$category->id)->update(T_PAGES,array('sub_category' => ''));
+                            }
+                            if ($_GET['type'] == 'group') {
+                                $db->where('sub_category',$category->id)->update(T_GROUPS,array('sub_category' => ''));
+                            }
+                            if ($_GET['type'] == 'product') {
+                                $db->where('sub_category',$category->id)->update(T_PRODUCTS,array('sub_category' => ''));
+                            }
+                        }
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_section') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteForumSection(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_game') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteGame(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_reply') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteThreadReply(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_movies') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteFilm(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_thread') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteForumThread(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_forum') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteForum(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_page') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeletePage(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_fund') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value3) {
+                if (!empty($value3) && is_numeric($value3) && $value3 > 0) {
+                    $id = Wo_Secure($value3);
+                    $fund = $db->where('id',$id)->getOne(T_FUNDING);
+                    if (!empty($fund)) {
+
+                        @Wo_DeleteFromToS3($fund->image);
+
+                        if (file_exists($fund->image)) {
+                            try {
+                                unlink($fund->image);   
+                            }
+                            catch (Exception $e) {
+                            }
+                        }
+
+                        $db->where('id',$id)->delete(T_FUNDING);
+                        $raise = $db->where('funding_id',$id)->get(T_FUNDING_RAISE);
+                        $db->where('funding_id',$id)->delete(T_FUNDING_RAISE);
+                        $posts = $db->where('fund_id',$id)->get(T_POSTS);
+                        if (!empty($posts)) {
+                            foreach ($posts as $key => $value) {
+                                $db->where('parent_id',$value->id)->delete(T_POSTS);
+                            }
+                        }
+                            
+                        $db->where('fund_id',$id)->delete(T_POSTS);
+                        foreach ($raise as $key => $value) {
+                            $raise_posts = $db->where('fund_raise_id',$value->id)->get(T_POSTS);
+                            if (!empty($raise_posts)) {
+                                foreach ($posts as $key => $value1) {
+                                    $db->where('parent_id',$value1->id)->delete(T_POSTS);
+                                }
+                            }
+                            $db->where('fund_raise_id',$value->id)->delete(T_POSTS);
+                        }
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_offer') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    $offer_id = Wo_Secure($value);
+                    $offer = $db->where('id',$offer_id)->getOne(T_OFFER);
+                    if (!empty($offer)) {
+                        if (!empty($offer->image)) {
+                            @unlink($offer->image);
+                            Wo_DeleteFromToS3($offer->image);
+                        }
+                    }
+                    $db->where('id',$offer_id)->delete(T_OFFER);
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_job') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    $job_id = Wo_Secure($value);
+                    $job = $db->where('id',$job_id)->getOne(T_JOB);
+                    if (!empty($job)) {
+                        if ($job->image_type != 'cover') {
+                            @unlink($job->image);
+                            Wo_DeleteFromToS3($job->image);
+                        }
+                        
+                    }
+                    $db->where('id',$job_id)->delete(T_JOB);
+                    $db->where('job_id',$job_id)->delete(T_JOB_APPLY);
+                    $post = $db->where('job_id',$job_id)->getOne(T_POSTS);
+                    if (!empty($post)) {
+                        Wo_DeletePost($post->id);
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_group') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteGroup(Wo_Secure($value));
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_app') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteApp($value);
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_gift') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteGift($value);
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_sticker') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (!empty($value) && is_numeric($value) && $value > 0) {
+                    Wo_DeleteSticker($value);
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'remove_multi_payment') {
+        if (!empty($_POST['ids']) && !empty($_POST['type']) && in_array($_POST['type'], array('paid','decline','delete'))) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (is_numeric($value) && $value > 0) {
+                    $get_payment_info = Wo_GetPaymentHistory(Wo_Secure($value));
+                    if ($_POST['type'] == 'delete') {
+                        if (!empty($get_payment_info)) {
+                            $id     = $get_payment_info['id'];
+                            $update = mysqli_query($sqlConnect, "UPDATE " . T_A_REQUESTS . " SET status = '2' WHERE id = {$id}");
+                            if ($update) {
+                                $body              = Wo_LoadPage('emails/payment-declined');
+                                $body              = str_replace('{name}', $get_payment_info['user']['name'], $body);
+                                $body              = str_replace('{amount}', $get_payment_info['amount'], $body);
+                                $body              = str_replace('{site_name}', $config['siteName'], $body);
+                                $send_message_data = array(
+                                    'from_email' => $wo['config']['siteEmail'],
+                                    'from_name' => $wo['config']['siteName'],
+                                    'to_email' => $get_payment_info['user']['email'],
+                                    'to_name' => $get_payment_info['user']['name'],
+                                    'subject' => 'Payment Declined | ' . $wo['config']['siteName'],
+                                    'charSet' => 'utf-8',
+                                    'message_body' => $body,
+                                    'is_html' => true
+                                );
+                                $send_message      = Wo_SendMessage($send_message_data);
+
+                                $notification_data_array = array(
+                                    'recipient_id' => $get_payment_info['user_id'],
+                                    'type' => 'admin_notification',
+                                    'url' => 'index.php?link1=setting&page=payments',
+                                    'text' => $wo['lang']['withdraw_declined'],
+                                    'type2' => 'withdraw_declined'
+                                );
+                                Wo_RegisterNotification($notification_data_array);
+                            }
+                        }
+                        $db->where('id',Wo_Secure($value))->delete(T_A_REQUESTS);
+                    }
+                    elseif ($_POST['type'] == 'decline') {
+                        if (!empty($get_payment_info)) {
+                            $id     = $get_payment_info['id'];
+                            $update = mysqli_query($sqlConnect, "UPDATE " . T_A_REQUESTS . " SET status = '2' WHERE id = {$id}");
+                            if ($update) {
+                                $body              = Wo_LoadPage('emails/payment-declined');
+                                $body              = str_replace('{name}', $get_payment_info['user']['name'], $body);
+                                $body              = str_replace('{amount}', $get_payment_info['amount'], $body);
+                                $body              = str_replace('{site_name}', $config['siteName'], $body);
+                                $send_message_data = array(
+                                    'from_email' => $wo['config']['siteEmail'],
+                                    'from_name' => $wo['config']['siteName'],
+                                    'to_email' => $get_payment_info['user']['email'],
+                                    'to_name' => $get_payment_info['user']['name'],
+                                    'subject' => 'Payment Declined | ' . $wo['config']['siteName'],
+                                    'charSet' => 'utf-8',
+                                    'message_body' => $body,
+                                    'is_html' => true
+                                );
+                                $send_message      = Wo_SendMessage($send_message_data);
+
+                                $notification_data_array = array(
+                                    'recipient_id' => $get_payment_info['user_id'],
+                                    'type' => 'admin_notification',
+                                    'url' => 'index.php?link1=setting&page=payments',
+                                    'text' => $wo['lang']['withdraw_declined'],
+                                    'type2' => 'withdraw_declined'
+                                );
+                                Wo_RegisterNotification($notification_data_array);
+                            }
+                        }
+                    }
+                    elseif ($_POST['type'] == 'paid') {
+                        if (!empty($get_payment_info)) {
+                            $id     = $get_payment_info['id'];
+                            $update = mysqli_query($sqlConnect, "UPDATE " . T_A_REQUESTS . " SET status = '1' WHERE id = {$id}");
+                            if ($update) {
+                                $body              = Wo_LoadPage('emails/payment-sent');
+                                $body              = str_replace('{name}', $get_payment_info['user']['name'], $body);
+                                $body              = str_replace('{amount}', $get_payment_info['amount'], $body);
+                                $body              = str_replace('{site_name}', $config['siteName'], $body);
+                                $send_message_data = array(
+                                    'from_email' => $wo['config']['siteEmail'],
+                                    'from_name' => $wo['config']['siteName'],
+                                    'to_email' => $get_payment_info['user']['email'],
+                                    'to_name' => $get_payment_info['user']['name'],
+                                    'subject' => 'New Payment | ' . $wo['config']['siteName'],
+                                    'charSet' => 'utf-8',
+                                    'message_body' => $body,
+                                    'is_html' => true
+                                );
+                                $send_message      = Wo_SendMessage($send_message_data);
+
+                                $notification_data_array = array(
+                                    'recipient_id' => $get_payment_info['user_id'],
+                                    'type' => 'admin_notification',
+                                    'url' => 'index.php?link1=setting&page=payments',
+                                    'text' => $wo['lang']['withdraw_approve'],
+                                    'type2' => 'withdraw_approve'
+                                );
+                                Wo_RegisterNotification($notification_data_array);
+                            }
+                        }
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
+    if ($s == 'delete_multi_report') {
+        if (!empty($_POST['ids']) && !empty($_POST['type']) && in_array($_POST['type'], array('safe','delete'))) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (is_numeric($value) && $value > 0) {
+                    $report = $db->where('id',Wo_Secure($value))->getOne(T_REPORTS);
+                    if ($_POST['type'] == 'delete') {
+                        if ($report->post_id != 0) {
+                            Wo_DeletePost($report->post_id);
+                            Wo_DeleteReport($report->id);
+                        }
+                        else if($report->profile_id != 0){
+                            Wo_DeleteUser($report->profile_id);
+                            Wo_DeleteReport($report->id);
+                        }
+                        else if($report->page_id != 0){
+                            Wo_DeletePage($report->page_id);
+                            Wo_DeleteReport($report->id);
+                        }
+                        else if($report->group_id != 0){
+                            Wo_DeleteGroup($report->group_id);
+                            Wo_DeleteReport($report->id);
+                        }
+                        else if($report->comment_id != 0){
+                            Wo_DeletePostComment($report->comment_id);
+                            Wo_DeleteReport($report->id);
+                        }
+                    }
+                    elseif ($_POST['type'] == 'safe') {
+                        Wo_DeleteReport($report->id);
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
 
     // category
     if ($s == 'add_new_category') {
@@ -1037,6 +1809,26 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'remove_multi_lang') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                if (in_array($value, $langs)) {
+                    $lang_name = Wo_Secure($value);
+                    $t_langs   = T_LANGS;
+                    $query     = mysqli_query($sqlConnect, "ALTER TABLE `$t_langs` DROP COLUMN `$lang_name`");
+                    if ($query) {
+                        if (file_exists("assets/languages/extra/$lang_name.php")) {
+                            unlink("assets/languages/extra/$lang_name.php");
+                        }
+                    }
+                }
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
     if ($s == 'reset_windows_app_keys') {
         $app_key    = sha1(rand(111111111, 999999999)) . '-' . md5(microtime()) . '-' . rand(11111111, 99999999);
         $data_array = array(
@@ -1374,6 +2166,17 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'remove_multi_fields') {
+        if (!empty($_POST['ids'])) {
+            foreach ($_POST['ids'] as $key => $value) {
+                Wo_DeleteField(Wo_Secure($value));
+            }
+            $data = ['status' => 200];
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
+        }
+    }
     if ($s == 'delete_page') {
         if (Wo_CheckMainSession($hash_id) === true && !empty($_GET['id'])) {
             $delete = Wo_DeleteCustomPage($_GET['id']);
@@ -1654,7 +2457,13 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 'last_name' => $faker->lastName
             );
             if ($avatar == 1) {
-                $re_data['avatar'] = Wo_ImportImageFromFile($faker->imageUrl($wo['profile_picture_width_crop'], $wo['profile_picture_height_crop']),'_url_image','avatar');
+                $urls = array("http://lorempixel.com/".$wo['profile_picture_width_crop']."/".$wo['profile_picture_height_crop']."/people","https://placeimg.com/".$wo['profile_picture_width_crop']."/".$wo['profile_picture_height_crop']."/people");
+                $rand = rand(0,1);
+                $url = $urls[$rand];
+                $a = Wo_ImportImageFromFile($url,'_url_image','avatar');
+                if (!empty($a)) {
+                    $re_data['avatar'] = $a;
+                }
             }
             $add_user = Wo_RegisterUser($re_data);
         }
@@ -3248,6 +4057,49 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         header("Content-type: application/json");
         echo json_encode($data);
         exit();
+    }
+    if ($s == 'delete_ban') {
+        if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
+            if (Wo_DeleteBanned(Wo_Secure($_POST['id'])) === true) {
+                $data = array(
+                    'status' => 200
+                );
+                header("Content-type: application/json");
+                echo json_encode($data);
+                exit();
+            }
+        }
+    }
+    if ($s == 'new_ban') {
+        if (!empty($_POST['id'])) {
+            if (Wo_BanNewIp(Wo_Secure($_POST['id']))) {
+                $data = array(
+                    'status' => 200
+                );
+                header("Content-type: application/json");
+                echo json_encode($data);
+                exit();
+            }
+        }
+    }
+    if ($s == 'ReadNotify') {
+        $db->where('recipient_id',0)->where('admin',1)->where('seen',0)->update(T_NOTIFICATION,array('seen' => time()));
+    }
+    if ($s == 'change_mode') {
+        if (!empty($_COOKIE['mode'])) {
+            if ($_COOKIE['mode'] == 'night') {
+                setcookie("mode", 'day', time() + (10 * 365 * 24 * 60 * 60), '/');
+                $_COOKIE['mode'] = 'day';
+            }
+            else{
+                setcookie("mode", 'night', time() + (10 * 365 * 24 * 60 * 60), '/');
+                $_COOKIE['mode'] = 'night';
+            }
+        }
+        else{
+            setcookie("mode", 'night', time() + (10 * 365 * 24 * 60 * 60), '/');
+            $_COOKIE['mode'] = 'night';
+        }
     }
 
 

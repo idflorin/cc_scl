@@ -17,7 +17,7 @@ if (!empty($wo['config']['adult_images_file'])) {
 }
 use Google\Cloud\Vision\V1\ImageAnnotatorClient;
 function Wo_ReportPost($post_data = array()) {
-    global $wo, $sqlConnect;
+    global $wo, $sqlConnect,$db;
     if ($wo['loggedin'] == false) {
         return false;
     }
@@ -64,6 +64,13 @@ function Wo_ReportPost($post_data = array()) {
     $query_two     = "INSERT INTO " . T_REPORTS . " (`user_id`, `post_id`, `comment_id`, `time`) VALUES ({$user_id}, {$post_id}, {$comment_id}, " . time() . ")";
     $sql_query_two = mysqli_query($sqlConnect, $query_two);
     if ($sql_query_two) {
+        $notification_data_array = array(
+            'recipient_id' => 0,
+            'type' => 'report',
+            'time' => time(),
+            'admin' => 1
+        );
+        $db->insert(T_NOTIFICATION,$notification_data_array);
         return 'report';
     }
     
@@ -309,7 +316,7 @@ function Wo_VerifyUser($id = 0, $verification_id = 0, $type = '') {
     }
 }
 function Wo_RequestVerification($id = 0, $type = '') {
-    global $sqlConnect;
+    global $sqlConnect,$db;
     if (empty($id) or !is_numeric($id) or $id < 1 or empty($type) or $type != 'Page') {
         return false;
     }
@@ -331,6 +338,13 @@ function Wo_RequestVerification($id = 0, $type = '') {
     }
     $query_one = mysqli_query($sqlConnect, "INSERT INTO " . T_VERIFICATION_REQUESTS . " ($values) VALUES({$id},'{$type}') ");
     if ($query_one) {
+        $notification_data_array = array(
+            'recipient_id' => 0,
+            'type' => 'verify',
+            'time' => time(),
+            'admin' => 1
+        );
+        $db->insert(T_NOTIFICATION,$notification_data_array);
         return true;
     }
 }
@@ -3390,6 +3404,16 @@ function Wo_IsNameExist($username, $active = 0) {
    if (empty($username)) {
        return false;
    }
+   $named_files = array('video-call','video-call-api','confirm-sms','confirm-sms-password','forgot-password','reset-password','start-up','pages','suggested-pages','liked-pages','go-pro','groups','suggested-groups','create-group','group-setting','create-page','page-setting','post','new-game','saved-posts','albums','create-album','contact-us','user-activation','boosted-pages','boosted-posts','new-product','edit-product','my-products','site-pages','blogs','my-blogs','create-blog','read-blog','edit-blog','blog-category','forum-members','forum-members-byname','forum-events','forum-search','forum-search-result','forum-help','forums','forumaddthred','showthread','threadreply','threadquote','editreply','deletereply','mythreads','mymessages','edithread','deletethread','create-event','edit-event','events','events-going','events-interested','events-past','show-event','events-invited','my-events','app-setting','create-app','app','movies-genre','movies-country','watch-film','advertise','create-ads','edit-ads','chart-ads','manage-ads','create-status','friends-nearby','more-status');
+   $files = scandir('sources');
+   unset($files[0]);
+   unset($files[1]);
+   if ($username != 'admin' && (in_array($username . '.php', $files) || in_array($username, $files) || in_array($username, $named_files))) {
+       return array(
+           true,
+           'type' => 'file'
+       );
+   }
    $active_text = '';
    if ($active == 1) {
        $active_text = "AND `active` = '1'";
@@ -4418,6 +4442,30 @@ function Wo_GetPageInviters($user_id, $page_id) {
     }
     return $data;
 }
+function Wo_GetUserInviters($user_id,$limit = 20,$offset = 0) {
+    global $sqlConnect, $wo;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($user_id) || !is_numeric($user_id)) {
+        return false;
+    }
+    $data      = array();
+    $page_id   = Wo_Secure($page_id);
+    $limit = (!empty($limit) && is_numeric($limit) && $limit > 0 ? Wo_Secure($limit) : 20);
+    $offset_text = '';
+    if (!empty($offset) && is_numeric($offset) && $offset > 0) {
+        $offset   = Wo_Secure($offset);
+        $offset_text = ' AND `id` < '.$offset;
+    }
+    $query_one = mysqli_query($sqlConnect, "SELECT * FROM " . T_PAGES_INVAITES . " WHERE `invited_id` = {$user_id} {$offset_text} LIMIT {$limit}");
+    while ($fetched_data = mysqli_fetch_assoc($query_one)) {
+        $page = Wo_PageData($fetched_data['page_id']);
+        $page['invited_id'] = $fetched_data['id'];
+        $data[]                    = $page;
+    }
+    return $data;
+}
 function Wo_DeleteInvites($user_id, $page_id) {
     global $sqlConnect, $wo;
     if ($wo['loggedin'] == false) {
@@ -4626,7 +4674,8 @@ function Wo_GetFemusUsers() {
     $data      = array();
     $time      = time() - 86400;
     $user_id   = Wo_Secure($wo['user']['user_id']);
-    $query_one = " SELECT `user_id` FROM " . T_USERS . " WHERE (`verified` = '1' OR `admin` = '1' OR `active` = '1') AND `user_id` <> '{$user_id}' AND `active` = '1' AND `user_id` NOT IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `following_id` <> {$user_id} AND `active` = '1') AND `avatar` <> '" . $wo['userDefaultAvatar'] . "' AND `lastseen` >= {$time} ORDER BY RAND() LIMIT 20 ";
+    // $query_one = " SELECT `user_id` FROM " . T_USERS . " WHERE (`verified` = '1' OR `admin` = '1' OR `active` = '1') AND `user_id` <> '{$user_id}' AND `active` = '1' AND `user_id` NOT IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `following_id` <> {$user_id} AND `active` = '1') AND `avatar` <> '" . $wo['userDefaultAvatar'] . "' AND `lastseen` >= {$time} ORDER BY RAND() LIMIT 20 ";
+    $query_one = " SELECT `user_id` FROM " . T_USERS . " WHERE (`verified` = '1' OR `admin` = '1' OR `active` = '1') AND follow_privacy = '0' AND `user_id` <> '{$user_id}' AND `active` = '1' AND `user_id` NOT IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `following_id` <> {$user_id} AND `active` = '1') AND `avatar` <> '" . $wo['userDefaultAvatar'] . "' AND `lastseen` >= {$time} ORDER BY RAND() LIMIT 20 ";
     $sql       = mysqli_query($sqlConnect, $query_one);
     while ($fetched_data = mysqli_fetch_assoc($sql)) {
         $user_data = Wo_UserData($fetched_data['user_id']);
@@ -4723,6 +4772,9 @@ function Wo_SendMessage($data = array()) {
     global $wo, $sqlConnect;
     include_once('assets/libraries/PHPMailer-Master/vendor/autoload.php');
     $mail = new PHPMailer\PHPMailer\PHPMailer;
+    if (strpos($data['to_email'], '@google.com') || strpos($data['to_email'], '@facebook.com') || strpos($data['to_email'], '@twitter.com') || strpos($data['to_email'], '@linkedIn.com') || strpos($data['to_email'], '@vk.com') || strpos($data['to_email'], '@instagram.com')) {
+        return false;
+    }
     $email_from      = $data['from_email'] = Wo_Secure($data['from_email']);
     $to_email        = $data['to_email'] = Wo_Secure($data['to_email']);
     $subject         = $data['subject'];
@@ -4946,6 +4998,28 @@ function Wo_SendSMSMessage($to, $message) {
     }
     return false;
 }
+function Wo_ConfirmUserSMS($user_id, $code) {
+    global $sqlConnect;
+    $user_id = Wo_Secure($user_id);
+    $code    = Wo_Secure($code);
+    if (!is_numeric($code) || $code <= 0) {
+        return false;
+    }
+    if (!is_numeric($user_id) || $user_id <= 0) {
+        return false;
+    }
+    $query   = mysqli_query($sqlConnect, " SELECT COUNT(`user_id`)  FROM " . T_USERS . "  WHERE `email_code` = '{$code}' AND `user_id` = '{$user_id}' AND `active` = '0'");
+    $result  = Wo_Sql_Result($query, 0);
+    if ($result == 1) {
+        $email_code = md5(rand(1111, 9999) . time());
+        $query_two = mysqli_query($sqlConnect, " UPDATE " . T_USERS . "  SET `active` = '1', `email_code` = '$email_code' WHERE `user_id` = '{$user_id}' ");
+        if ($query_two) {
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
 function Wo_ConfirmUser($user_id, $code) {
     global $sqlConnect;
     $user_id = Wo_Secure($user_id);
@@ -5043,6 +5117,8 @@ use PayPal\Api\Transaction;
 use PayPal\Api\RedirectUrls;
 use PayPal\Api\Payment;
 use PayPal\Api\PaymentExecution;
+use PayPal\Api\InputFields;
+use PayPal\Api\WebProfile;
 
 use PayPal\Api\ChargeModel;
 use PayPal\Api\Currency;
@@ -5086,6 +5162,24 @@ function Wo_PayPal($type = 'week', $type2 = '') {
     }
     $total = $price;
     if ($wo['config']['recurring_payment'] == 'off') {
+        $inputFields = new InputFields();
+        $inputFields->setAllowNote(true)
+            ->setNoShipping(1)
+            ->setAddressOverride(0);
+        $webProfile = new WebProfile();
+        $webProfile->setName("Purchase pro package ". uniqid())
+            ->setInputFields($inputFields);
+        try {
+            $createdProfile = $webProfile->create($paypal);
+            $createdProfileID = json_decode($createdProfile);
+            $profileid = $createdProfileID->id;
+        } catch(PayPal\Exception\PayPalConnectionException $pce) {
+            $data = array(
+                'type' => 'ERROR',
+                'details' => json_decode($pce->getData())
+            );
+            return $data;
+        }
 
         $payer = new Payer();
         $payer->setPaymentMethod('paypal');
@@ -5108,7 +5202,7 @@ function Wo_PayPal($type = 'week', $type2 = '') {
             $redirectUrls->setReturnUrl($wo['config']['site_url'] . "/requests.php?f=payment&success=true&pro_type={$pro_type}")->setCancelUrl($wo['config']['site_url'] . '/requests.php?f=payment&success=false');
         }
         $payment = new Payment();
-        $payment->setIntent('sale')->setPayer($payer)->setRedirectUrls($redirectUrls)->setTransactions(array(
+        $payment->setExperienceProfileId($profileid)->setIntent('sale')->setPayer($payer)->setRedirectUrls($redirectUrls)->setTransactions(array(
             $transaction
         ));
         try {
@@ -5308,6 +5402,24 @@ function Wo_ReplenishWallet($sum) {
         return false;
     }
     include_once  'assets/includes/paypal_config.php';
+    $inputFields = new InputFields();
+    $inputFields->setAllowNote(true)
+        ->setNoShipping(1)
+        ->setAddressOverride(0);
+    $webProfile = new WebProfile();
+    $webProfile->setName("Purchase pro package ". uniqid())
+        ->setInputFields($inputFields);
+    try {
+        $createdProfile = $webProfile->create($paypal);
+        $createdProfileID = json_decode($createdProfile);
+        $profileid = $createdProfileID->id;
+    } catch(PayPal\Exception\PayPalConnectionException $pce) {
+        $data = array(
+            'type' => 'ERROR',
+            'details' => json_decode($pce->getData())
+        );
+        return $data;
+    }
     $payer = new Payer();
     $payer->setPaymentMethod('paypal');
     $item = new Item();
@@ -5325,7 +5437,7 @@ function Wo_ReplenishWallet($sum) {
     $redirectUrls = new RedirectUrls();
     $redirectUrls->setReturnUrl($wo['config']['site_url'] . "/requests.php?f=wallet&s=get-paid&success=1&amount={$sum}")->setCancelUrl($wo['config']['site_url'] . "/requests.php?f=wallet&s=get-paid&success=1");
     $payment = new Payment();
-    $payment->setIntent('sale')->setPayer($payer)->setRedirectUrls($redirectUrls)->setTransactions(array(
+    $payment->setExperienceProfileId($profileid)->setIntent('sale')->setPayer($payer)->setRedirectUrls($redirectUrls)->setTransactions(array(
         $transaction
     ));
     try {
@@ -5581,7 +5693,8 @@ function Wo_CreatePayment($payment_type = 1) {
         return false;
     }
     $date  = date('n') . '/' . date("Y");
-    $query = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENTS . " (`user_id`, `amount`, `date`, `type`) VALUES ({$user_id}, {$amount}, '{$date}', '{$type}')");
+    $time = time();
+    $query = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENTS . " (`user_id`, `amount`, `date`, `type`,`time`) VALUES ({$user_id}, {$amount}, '{$date}', '{$type}', '{$time}')");
     if ($query) {
         return true;
     }
@@ -6880,5 +6993,47 @@ function Wo_CheckPaystackPayment($ref)
       }else{
         die("Something went wrong while executing curl. Uncomment the var_dump line above this line to see what the issue is. Please check your CURL command to make sure everything is ok");
       }
+}
+function IsSaveUrl($url)
+{
+    if (empty($url)) {
+        return array('status' => 400);
+    }
+    $headers = [];
+    $ch = curl_init();
+    curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt ($ch, CURLOPT_URL, $url);
+    //curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 20);
+    curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
+
+    // Only calling the head
+    curl_setopt($ch, CURLOPT_HEADER, true); // header will be at output
+    curl_setopt($ch, CURLOPT_NOBODY, true);
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION,
+      function($curl, $header) use (&$headers)
+      {
+        $len = strlen($header);
+        $header = explode(':', $header, 2);
+        if (count($header) < 2) // ignore invalid headers
+          return $len;
+
+        $headers[strtolower(trim($header[0]))][] = trim($header[1]);
+
+        return $len;
+      }
+    );
+    $content = curl_exec ($ch);
+    curl_close ($ch);
+    if (!empty($headers['content-type'])) {
+        if (strpos($headers['content-type'][0], '/html')) {
+            return array('status' => 200,
+                         'type' => 'html');
+        }
+        if (strpos($headers['content-type'][0], 'image/') === 0) {
+            return array('status' => 200,
+                         'type' => 'image');
+        }
+    }
+    return array('status' => 400);
 }
 ?>

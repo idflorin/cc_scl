@@ -1,96 +1,115 @@
 <div class="container-fluid">
-    <div class="block-header">
-        <h2>Mobile & API Settings > Push Notifications Settings</h2>
+    <div>
+        <h3>Push Notifications Settings</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">API Settings</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Push Notifications Settings</li>
+            </ol>
+        </nav>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
         <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Push Notifications Settings</h2><br>
-                    <div>This system allows your script to send push notifications to any application who uses our API.<br> To get started, <a href="https://onesignal.com/" target="_blank">Register Here</a>.</div>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success email-settings-alert"></div>
+                <div class="card-body">
+                    <h6 class="card-title">Push Notifications Settings</h6>
+                    <div class="alert alert-info">This system allows your script to send push notifications to any application who uses our API.<br> To get started, <a href="https://onesignal.com/" target="_blank">Register Here</a>.</div>
+                    <div class="email-settings-alert"></div>
                     <form class="email-settings" method="POST">
                         <label for="push">Push Notifications System</label>
                         <div class="form-group">
-                            <input type="radio" name="push" id="push-enabled" value="1" <?php echo ($wo['config']['push'] == 1) ? 'checked': '';?>>
-                            <label for="push-enabled">Enabled</label>
-                            <input type="radio" name="push" id="push-disabled" value="0" <?php echo ($wo['config']['push'] == 0) ? 'checked': '';?>>
-                            <label for="push-disabled" class="m-l-20">Disabled</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="push" id="push-enabled" value="1" <?php echo ($wo['config']['push'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="push-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="push" id="push-disabled" value="0" <?php echo ($wo['config']['push'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="push-disabled" class="m-l-20">Disabled</label>
+                            </div>
                         </div>
-                        <br>
                         <label for="android_push_messages">Android Push Messages (Push User Messages)</label>
                         <div class="form-group">
-                            <input type="radio" name="android_push_messages" id="android_push_messages-enabled" value="1" <?php echo ($wo['config']['android_push_messages'] == 1) ? 'checked': '';?>>
-                            <label for="android_push_messages-enabled">Enabled</label>
-                            <input type="radio" name="android_push_messages" id="android_push_messages-disabled" value="0" <?php echo ($wo['config']['android_push_messages'] == 0) ? 'checked': '';?>>
-                            <label for="android_push_messages-disabled" class="m-l-20">Disabled</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="android_push_messages" id="android_push_messages-enabled" value="1" <?php echo ($wo['config']['android_push_messages'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="android_push_messages-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="android_push_messages" id="android_push_messages-disabled" value="0" <?php echo ($wo['config']['android_push_messages'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="android_push_messages-disabled" class="m-l-20">Disabled</label>
+                            </div>
                         </div>
-                        <br>
                         <label for="ios_push_messages">IOS Push Messages (Push User Messages)</label>
                         <div class="form-group">
-                            <input type="radio" name="ios_push_messages" id="ios_push_messages-enabled" value="1" <?php echo ($wo['config']['ios_push_messages'] == 1) ? 'checked': '';?>>
-                            <label for="ios_push_messages-enabled">Enabled</label>
-                            <input type="radio" name="ios_push_messages" id="ios_push_messages-disabled" value="0" <?php echo ($wo['config']['ios_push_messages'] == 0) ? 'checked': '';?>>
-                            <label for="ios_push_messages-disabled" class="m-l-20">Disabled</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="ios_push_messages" id="ios_push_messages-enabled" value="1" <?php echo ($wo['config']['ios_push_messages'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="ios_push_messages-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="ios_push_messages" id="ios_push_messages-disabled" value="0" <?php echo ($wo['config']['ios_push_messages'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="ios_push_messages-disabled" class="m-l-20">Disabled</label>
+                            </div>
                         </div>
-                        <br>
                         <label for="android_push_native">Android Push Native Site Notifications (Likes, Followed, Wonder, Comment etc)</label>
                         <div class="form-group">
-                            <input type="radio" name="android_push_native" id="android_push_native-enabled" value="1" <?php echo ($wo['config']['android_push_native'] == 1) ? 'checked': '';?>>
-                            <label for="android_push_native-enabled">Enabled</label>
-                            <input type="radio" name="android_push_native" id="android_push_native-disabled" value="0" <?php echo ($wo['config']['android_push_native'] == 0) ? 'checked': '';?>>
-                            <label for="android_push_native-disabled" class="m-l-20">Disabled</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="android_push_native" id="android_push_native-enabled" value="1" <?php echo ($wo['config']['android_push_native'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="android_push_native-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="android_push_native" id="android_push_native-disabled" value="0" <?php echo ($wo['config']['android_push_native'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="android_push_native-disabled" class="m-l-20">Disabled</label>
+                            </div>
                         </div>
-                        <br>
                         <label for="ios_push_native">IOS Push Native Site Notifications (Likes, Followed, Wonder, Comment etc)</label>
                         <div class="form-group">
-                            <input type="radio" name="ios_push_native" id="ios_push_native-enabled" value="1" <?php echo ($wo['config']['ios_push_native'] == 1) ? 'checked': '';?>>
-                            <label for="ios_push_native-enabled">Enabled</label>
-                            <input type="radio" name="ios_push_native" id="ios_push_native-disabled" value="0" <?php echo ($wo['config']['ios_push_native'] == 0) ? 'checked': '';?>>
-                            <label for="ios_push_native-disabled" class="m-l-20">Disabled</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="ios_push_native" id="ios_push_native-enabled" value="1" <?php echo ($wo['config']['ios_push_native'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="ios_push_native-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="ios_push_native" id="ios_push_native-disabled" value="0" <?php echo ($wo['config']['ios_push_native'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="ios_push_native-disabled" class="m-l-20">Disabled</label>
+                            </div>
                         </div>
-                        <br>
-                        
                         <label for="web_push">Web Push Notifications (Chrome, Firefox etc..) SSL required</label>
                         <div class="form-group">
-                            <input type="radio" name="web_push" id="web_push-enabled" value="1" <?php echo ($wo['config']['web_push'] == 1) ? 'checked': '';?>>
-                            <label for="web_push-enabled">Enabled</label>
-                            <input type="radio" name="web_push" id="web_push-disabled" value="0" <?php echo ($wo['config']['web_push'] == 0) ? 'checked': '';?>>
-                            <label for="web_push-disabled" class="m-l-20">Disabled</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="web_push" id="web_push-enabled" value="1" <?php echo ($wo['config']['web_push'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="web_push-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="web_push" id="web_push-disabled" value="0" <?php echo ($wo['config']['web_push'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="web_push-disabled" class="m-l-20">Disabled</label>
+                            </div>
                         </div>
-                        <br>
 
-                        
-
-                        <span class="help-block">Need Help? <a href="https://documentation.onesignal.com/v3.0/docs/setup" target="_blank">Read The Documentation</a></span>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                        <button type="submit" class="btn btn-primary mb-3 waves-effect">Save</button>
+						<div><span class="help-block">Need Help? <a href="https://documentation.onesignal.com/v3.0/docs/setup" target="_blank">Read The Documentation</a></span></div>
                     </form>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-6 col-md-6">
-            <div class="card">
-                <div class="header">
-                    <h2>Android Messenger & Chat Push Notifications Settings</h2><br>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success email3-settings-alert"></div>
+			<div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Android Messenger & Chat Push Notifications Settings</h6>
+                    <div class="email3-settings-alert"></div>
                     <form class="email3-settings" method="POST">
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="android_m_push_id" name="android_m_push_id" class="form-control" value="<?php echo $wo['config']['android_m_push_id'];?>">
                                 <label class="form-label">OneSignal APP ID</label>
+                                <input type="text" id="android_m_push_id" name="android_m_push_id" class="form-control" value="<?php echo $wo['config']['android_m_push_id'];?>">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="android_m_push_key" name="android_m_push_key" class="form-control" value="<?php echo $wo['config']['android_m_push_key'];?>">
                                 <label class="form-label">REST API Key</label>
+                                <input type="text" id="android_m_push_key" name="android_m_push_key" class="form-control" value="<?php echo $wo['config']['android_m_push_key'];?>">
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -98,26 +117,21 @@
                     </form>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-6 col-md-6">
-            <div class="card">
-                <div class="header">
-                    <h2>IOS Messenger & Chat Push Notifications Settings</h2><br>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success ios-m-settings-alert"></div>
+			<div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">IOS Messenger & Chat Push Notifications Settings</h6>
+                    <div class="ios-m-settings-alert"></div>
                     <form class="ios-m-settings" method="POST">
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="ios_m_push_id" name="ios_m_push_id" class="form-control" value="<?php echo $wo['config']['ios_m_push_id'];?>">
                                 <label class="form-label">OneSignal APP ID</label>
+                                <input type="text" id="ios_m_push_id" name="ios_m_push_id" class="form-control" value="<?php echo $wo['config']['ios_m_push_id'];?>">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="ios_m_push_key" name="ios_m_push_key" class="form-control" value="<?php echo $wo['config']['ios_m_push_key'];?>">
                                 <label class="form-label">REST API Key</label>
+                                <input type="text" id="ios_m_push_key" name="ios_m_push_key" class="form-control" value="<?php echo $wo['config']['ios_m_push_key'];?>">
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -129,22 +143,20 @@
 
         <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Android Global Notifications Settings (Likes, Dislikes, Comments, Follow etc.)</h2><br>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success email2-settings-alert"></div>
+                <div class="card-body">
+                    <h6 class="card-title">Android Global Notifications Settings (Likes, Dislikes, Comments, Follow etc.)</h6>
+                    <div class="email2-settings-alert"></div>
                     <form class="email2-settings" method="POST">
                         <div class="form-group form-float">
                             <div class="form-line">
+                                <label class="form-label">OneSignal APP ID</label>
                                 <input type="text" id="android_n_push_id" name="android_n_push_id" class="form-control" value="<?php echo $wo['config']['android_n_push_id'];?>">
-                                <label class="form-label">OneSignal APP ID</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                                <label class="form-label">REST API Key</label>
                                 <input type="text" id="android_n_push_key" name="android_n_push_key" class="form-control" value="<?php echo $wo['config']['android_n_push_key'];?>">
-                                <label class="form-label">REST API Key</label>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -152,26 +164,21 @@
                     </form>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-6 col-md-6 pull-right">
             <div class="card">
-                <div class="header">
-                    <h2>IOS Global Notifications Settings (Likes, Dislikes, Comments, Follow etc.)</h2><br>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success email2-settings-alert"></div>
+                <div class="card-body">
+                    <h6 class="card-title">IOS Global Notifications Settings (Likes, Dislikes, Comments, Follow etc.)</h6>
+                    <div class="email2-settings-alert"></div>
                     <form class="email2-settings" method="POST">
                         <div class="form-group form-float">
                             <div class="form-line">
+                                <label class="form-label">OneSignal APP ID</label>
                                 <input type="text" id="ios_n_push_id" name="ios_n_push_id" class="form-control" value="<?php echo $wo['config']['ios_n_push_id'];?>">
-                                <label class="form-label">OneSignal APP ID</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="ios_n_push_key" name="ios_n_push_key" class="form-control" value="<?php echo $wo['config']['ios_n_push_key'];?>">
                                 <label class="form-label">REST API Key</label>
+                                <input type="text" id="ios_n_push_key" name="ios_n_push_key" class="form-control" value="<?php echo $wo['config']['ios_n_push_key'];?>">
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -179,26 +186,21 @@
                     </form>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-6 col-md-6 pull-left">
             <div class="card">
-                <div class="header">
-                    <h2>Web Global Notifications Settings (Likes, Dislikes, Comments, Follow etc.)</h2><br>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success email2-settings-alert"></div>
+                <div class="card-body">
+                    <h6 class="card-title">Web Global Notifications Settings (Likes, Dislikes, Comments, Follow etc.)</h6>
+                    <div class="email2-settings-alert"></div>
                     <form class="email2-settings" method="POST">
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="web_push_id" name="web_push_id" class="form-control" value="<?php echo $wo['config']['web_push_id'];?>">
                                 <label class="form-label">OneSignal APP ID</label>
+                                <input type="text" id="web_push_id" name="web_push_id" class="form-control" value="<?php echo $wo['config']['web_push_id'];?>">
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <input type="text" id="web_push_key" name="web_push_key" class="form-control" value="<?php echo $wo['config']['web_push_key'];?>">
                                 <label class="form-label">REST API Key</label>
+                                <input type="text" id="web_push_key" name="web_push_key" class="form-control" value="<?php echo $wo['config']['web_push_key'];?>">
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -225,7 +227,7 @@ $(function() {
             if (data.status == 200) {
                 form_email_settings.find('button').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.email-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.email-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.email-settings-alert').empty();
                 }, 2000);
@@ -243,7 +245,7 @@ $(function() {
             if (data.status == 200) {
                 form_email2_settings.find('button').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.email2-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.email2-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.email2-settings-alert').empty();
                 }, 2000);
@@ -261,7 +263,7 @@ $(function() {
             if (data.status == 200) {
                 form_email3_settings.find('button').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.email3-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.email3-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.email3-settings-alert').empty();
                 }, 2000);
@@ -279,7 +281,7 @@ $(function() {
             if (data.status == 200) {
                 form_ios_m_settings.find('button').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.ios-m-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.ios-m-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.ios-m-settings-alert').empty();
                 }, 2000);

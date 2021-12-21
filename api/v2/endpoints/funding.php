@@ -10,7 +10,9 @@ $required_fields =  array(
                         'delete',
                         'funding',
                         'user_funding',
-                        'pay'
+                        'pay',
+                        'get_by_id',
+                        'get_recent_donations'
                     );
 
 $limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);
@@ -264,6 +266,68 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
         else{
             $error_code    = 6;
             $error_message = 'amount,id can not be empty';
+        }
+    }
+    if ($_POST['type'] == 'get_by_id') {
+        if (!empty($_POST['fund_id']) && is_numeric($_POST['fund_id']) && $_POST['fund_id'] > 0) {
+            $fund_id = Wo_Secure($_POST['fund_id']);
+            $fund = GetFundingById($fund_id);
+            if (!empty($fund)) {
+                foreach ($non_allowed as $key4 => $value4) {
+                  unset($fund['user_data'][$value4]);
+                }
+                $fund['recent_donations'] = GetRecentRaise($fund_id,20);
+                if (!empty($fund['recent_donations'])) {
+                    foreach ($fund['recent_donations'] as $key => $value) {
+                        foreach ($non_allowed as $key4 => $value4) {
+                          unset($fund['recent_donations'][$key]['user_data'][$value4]);
+                        }
+                    }
+                }
+                $response_data = array(
+                                'api_status' => 200,
+                                'data' => $fund
+                            );
+            }
+            else{
+                $error_code    = 6;
+                $error_message = 'fund not found';
+            }
+        }
+        else{
+            $error_code    = 5;
+            $error_message = 'fund_id can not be empty';
+        }
+    }
+    if ($_POST['type'] == 'get_recent_donations') {
+        if (!empty($_POST['fund_id']) && is_numeric($_POST['fund_id']) && $_POST['fund_id'] > 0) {
+            $fund_id = Wo_Secure($_POST['fund_id']);
+            $fund = GetFundingById($fund_id);
+            if (!empty($fund)) {
+                $recent_donations = GetRecentRaise($fund_id,$limit,$offset);
+                if (!empty($recent_donations)) {
+                    foreach ($recent_donations as $key => $value) {
+                        foreach ($non_allowed as $key4 => $value4) {
+                          unset($recent_donations[$key]['user_data'][$value4]);
+                        }
+                    }
+                }
+                else{
+                    $recent_donations = array();
+                }
+                $response_data = array(
+                                'api_status' => 200,
+                                'data' => $recent_donations
+                            );
+            }
+            else{
+                $error_code    = 6;
+                $error_message = 'fund not found';
+            }
+        }
+        else{
+            $error_code    = 5;
+            $error_message = 'fund_id can not be empty';
         }
     }
 

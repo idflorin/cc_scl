@@ -12,8 +12,8 @@
      <?php echo ($wo['currency_value'] == $wo['config']['currency']) ? '<span class="label label-success">Default</span>': '';?>
    </td>
    <td>
-      <a href="javascript:void()" onclick="make_default('<?php echo $wo['currency_value']; ?>')" class="btn btn-success waves-effect">Set Default</a>
-      <a href="javascript:void()" onclick="open_edit_currency('<?php echo $wo['currency_value']; ?>','<?php echo($wo['config']['currency_symbol_array'][$wo['currency_value']]) ?>','<?php echo $wo['currency_key']?>')" class="btn btn-info waves-effect">Edit</a>
-      <a href="javascript:void()" onclick="delete_currency('<?php echo $wo['currency_value']; ?>')" class="btn btn-danger waves-effect">DELETE</a>
+      <a href="javascript:void()" onclick="make_default('<?php echo $wo['currency_value']; ?>')" class="btn bg-success admn_table_btn">Set Default</a>
+      <a href="javascript:void()" onclick="open_edit_currency('<?php echo $wo['currency_value']; ?>','<?php echo($wo['config']['currency_symbol_array'][$wo['currency_value']]) ?>','<?php echo $wo['currency_key']?>')" class="btn bg-info admn_table_btn">Edit</a>
+      <a href="javascript:void()" onclick="delete_currency('<?php echo $wo['currency_value']; ?>','hide')" class="btn bg-danger admn_table_btn">Delete</a>
    </td>
 </tr>

@@ -1,40 +1,61 @@
 <div class="container-fluid">
+    <div>
+        <h3>Payment System Settings</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="#">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Settings</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Payment System Settings</li>
+            </ol>
+        </nav>
+    </div>
     <div class="alert alert-warning">
       <i class="fa fa-question-circle fa-fw"></i>Please note that only the supported currencies from the payment provider are showing for each payment method.
-    </div>
-    <div class="block-header">
-        <h2>Settings > Payment System Settings</h2>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
       <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>PayPal payment Settings</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success paypal-settings-alert"></div>
+                <div class="card-body">
+                  <h6 class="card-title">PayPal payment Settings</h6>
+                    <div class="paypal-settings-alert"></div>
                     <form class="paypal-settings" method="POST">
                       <label for="transaction_log">Show transaction logs</label>
                         <div class="form-group">
-                            <input type="radio" name="transaction_log" id="transaction_log-enabled" value="yes" <?php echo ($wo['config']['transaction_log'] == 'yes') ? 'checked': '';?>>
-                            <label for="transaction_log-enabled">Enabled</label>
-                            <input type="radio" name="transaction_log" id="transaction_log-disabled" value="no" <?php echo ($wo['config']['transaction_log'] == 'no') ? 'checked': '';?>>
-                            <label for="transaction_log-disabled" class="m-l-20">Disabled</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="transaction_log" id="transaction_log-enabled" value="yes" <?php echo ($wo['config']['transaction_log'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="transaction_log-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="transaction_log" id="transaction_log-disabled" value="no" <?php echo ($wo['config']['transaction_log'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="transaction_log-disabled" class="m-l-20">Disabled</label>
+                          </div>
                         </div>
                         <label for="paypal">PayPal</label>
                         <div class="form-group">
-                            <input type="radio" name="paypal" id="paypal-enabled" value="yes" <?php echo ($wo['config']['paypal'] == 'yes') ? 'checked': '';?>>
-                            <label for="paypal-enabled">Enabled</label>
-                            <input type="radio" name="paypal" id="paypal-disabled" value="no" <?php echo ($wo['config']['paypal'] == 'no') ? 'checked': '';?>>
-                            <label for="paypal-disabled" class="m-l-20">Disabled</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paypal" id="paypal-enabled" value="yes" <?php echo ($wo['config']['paypal'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paypal-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paypal" id="paypal-disabled" value="no" <?php echo ($wo['config']['paypal'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paypal-disabled" class="m-l-20">Disabled</label>
+                          </div>
                         </div> 
                         <label for="paypal_mode">PayPal Mode</label>
                         <div class="form-group">
-                            <input type="radio" name="paypal_mode" id="paypal_mode-enabled" value="live" <?php echo ($wo['config']['paypal_mode'] == 'live') ? 'checked': '';?>>
-                            <label for="paypal_mode-enabled">Live</label>
-                            <input type="radio" name="paypal_mode" id="paypal_mode-disabled" value="sandbox" <?php echo ($wo['config']['paypal_mode'] == 'sandbox') ? 'checked': '';?>>
-                            <label for="paypal_mode-disabled" class="m-l-20">SandBox</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paypal_mode" id="paypal_mode-enabled" value="live" <?php echo ($wo['config']['paypal_mode'] == 'live') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paypal_mode-enabled">Live</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paypal_mode" id="paypal_mode-disabled" value="sandbox" <?php echo ($wo['config']['paypal_mode'] == 'sandbox') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paypal_mode-disabled" class="m-l-20">SandBox</label>
+                          </div>
                         </div> 
                         <br>
                         <label for="paypal_currency">PayPal Currency</label>
@@ -69,14 +90,14 @@
                         <br>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">PayPal Clinet ID</label>
                                 <input type="text" id="paypal_id" name="paypal_id" class="form-control" value="<?php echo $wo['config']['paypal_id'];?>">
-                                <label class="form-label">PayPal Clinet ID</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">PayPal Secret Key</label>
                                 <input type="text" id="paypal_secret" name="paypal_secret" class="form-control" value="<?php echo $wo['config']['paypal_secret'];?>">
-                                <label class="form-label">PayPal Secret Key</label>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -84,68 +105,34 @@
                     </form>
                 </div>
             </div>
-        </div>
-
-
-        <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Bitcoin payment Settings</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success bitcoin-settings-alert"></div>
-                    <form class="bitcoin-settings" method="POST">
-                       <label for="bitcoin">Bitcoin Payment Method </label>
-                        <div class="form-group">
-                            <input type="radio" name="bitcoin" id="bitcoin-enabled" value="yes" <?php echo ($wo['config']['bitcoin'] == 'yes') ? 'checked': '';?>>
-                            <label for="bitcoin-enabled">Enabled</label>
-                            <input type="radio" name="bitcoin" id="bitcoin-disabled" value="no" <?php echo ($wo['config']['bitcoin'] == 'no') ? 'checked': '';?>>
-                            <label for="bitcoin-disabled" class="m-l-20">Disabled</label>
-                        </div>
-                        <p>You can register merchant account : <a href="https://www.coinpayments.net" target="_blank">coinpayments.net</a></p>
-                        <br>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="coinpayments_secret" name="coinpayments_secret" class="form-control" value="<?php echo $wo['config']['coinpayments_secret'];?>">
-                                <label class="form-label">Coinpayments API Secret Key <small>Your coinpayments secret key</small></label>
-                            </div>
-                        </div>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="coinpayments_id" name="coinpayments_id" class="form-control" value="<?php echo $wo['config']['coinpayments_id'];?>">
-                                <label class="form-label">Coinpayments Publishable Key <small>Your coinpayments Merchant ID</small></label>
-                            </div>
-                        </div>
-                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 col-md-6 pull-right">
-            <div class="card">
-                <div class="header">
-                    <h2>Stripe Payment Settings</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success payment-settings-alert"></div>
+                <div class="card-body">
+                  <h6 class="card-title">Stripe payment Settings</h6>
+                    <div class="payment-settings-alert"></div>
                     <form class="payment-settings" method="POST">
                         <br>
 
                         <label for="credit_card">Stripe Payment Method </label>
                         <div class="form-group">
-                            <input type="radio" name="credit_card" id="credit_card-enabled" value="yes" <?php echo ($wo['config']['credit_card'] == 'yes') ? 'checked': '';?>>
-                            <label for="credit_card-enabled">Enabled</label>
-                            <input type="radio" name="credit_card" id="credit_card-disabled" value="no" <?php echo ($wo['config']['credit_card'] == 'no') ? 'checked': '';?>>
-                            <label for="credit_card-disabled" class="m-l-20">Disabled</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="credit_card" id="credit_card-enabled" value="yes" <?php echo ($wo['config']['credit_card'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="credit_card-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="credit_card" id="credit_card-disabled" value="no" <?php echo ($wo['config']['credit_card'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="credit_card-disabled" class="m-l-20">Disabled</label>
+                          </div>
                         </div> 
                         <label for="alipay">Alipay Payment Method </label>
                         <div class="form-group">
-                            <input type="radio" name="alipay" id="alipay-enabled" value="yes" <?php echo ($wo['config']['alipay'] == 'yes') ? 'checked': '';?>>
-                            <label for="alipay-enabled">Enabled</label>
-                            <input type="radio" name="alipay" id="alipay-disabled" value="no" <?php echo ($wo['config']['alipay'] == 'no') ? 'checked': '';?>>
-                            <label for="alipay-disabled" class="m-l-20">Disabled</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="alipay" id="alipay-enabled" value="yes" <?php echo ($wo['config']['alipay'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="alipay-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="alipay" id="alipay-disabled" value="no" <?php echo ($wo['config']['alipay'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="alipay-disabled" class="m-l-20">Disabled</label>
+                          </div>
                         </div> 
                         <br>
                         <br>
@@ -180,14 +167,14 @@
                         <br>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Stripe API Secret Key <small>Your Stripe secret key that starts with sk_</small></label>
                                 <input type="text" id="stripe_secret" name="stripe_secret" class="form-control" value="<?php echo $wo['config']['stripe_secret'];?>">
-                                <label class="form-label">Stripe API Secret Key <small>Your Stripe secret key that starts with sk_</small></label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Stripe Publishable Key <small>Your Stripe publishable key that starts with pk_</small></label>
                                 <input type="text" id="stripe_id" name="stripe_id" class="form-control" value="<?php echo $wo['config']['stripe_id'];?>">
-                                <label class="form-label">Stripe Publishable Key <small>Your Stripe publishable key that starts with pk_</small></label>
                             </div>
                         </div>
                         <br>
@@ -197,64 +184,32 @@
                     </form>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Local bank payment</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success bank-settings-alert"></div>
-                    <form class="bank-settings" method="POST">
-                        <label for="bank_payment">Bank Payment Method </label>
-                        <div class="form-group">
-                            <input type="radio" name="bank_payment" id="bank_payment-enabled" value="yes" <?php echo ($wo['config']['bank_payment'] == 'yes') ? 'checked': '';?>>
-                            <label for="bank_payment-enabled">Enabled</label>
-                            <input type="radio" name="bank_payment" id="bank_payment-disabled" value="no" <?php echo ($wo['config']['bank_payment'] == 'no') ? 'checked': '';?>>
-                            <label for="bank_payment-disabled" class="m-l-20">Disabled</label>
-                        </div> 
-                        <div class="form-group form-float">
-                            <div class="form-line focused">
-                                <textarea name="bank_description" id="bank_description" class="form-control" cols="30" rows="5"><?php echo $wo['config']['bank_description'];?>
-                                </textarea>
-                                <label class="form-label">Bank Description</label>
-                            </div>
-                        </div>
-                        <div class="form-group form-float">
-                            <div class="form-line focused">
-                                <textarea name="bank_transfer_note" id="bank_transfer_note" class="form-control" cols="30" rows="5"><?php echo $wo['config']['bank_transfer_note'];?></textarea>
-                                <label class="form-label">Bank transfer note</label>
-                            </div>
-                        </div>
-                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-6 col-md-6 pull-right">
-            <div class="card">
-                <div class="header">
-                    <h2>2Checkout payment</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success checkout-settings-alert"></div>
+                <div class="card-body">
+                  <h6 class="card-title">2Checkout payment</h6>
+                    <div class="checkout-settings-alert"></div>
                     <form class="checkout-settings" method="POST">
                         <label for="checkout_payment">2Checkout Payment Method </label>
                         <div class="form-group">
-                            <input type="radio" name="checkout_payment" id="checkout_payment-enabled" value="yes" <?php echo ($wo['config']['checkout_payment'] == 'yes') ? 'checked': '';?>>
-                            <label for="checkout_payment-enabled">Enabled</label>
-                            <input type="radio" name="checkout_payment" id="checkout_payment-disabled" value="no" <?php echo ($wo['config']['checkout_payment'] == 'no') ? 'checked': '';?>>
-                            <label for="checkout_payment-disabled" class="m-l-20">Disabled</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="checkout_payment" id="checkout_payment-enabled" value="yes" <?php echo ($wo['config']['checkout_payment'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="checkout_payment-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="checkout_payment" id="checkout_payment-disabled" value="no" <?php echo ($wo['config']['checkout_payment'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="checkout_payment-disabled" class="m-l-20">Disabled</label>
+                          </div>
                         </div>
                         <label for="checkout_mode">2Checkout Mode</label>
                         <div class="form-group">
-                            <input type="radio" name="checkout_mode" id="checkout_mode-enabled" value="live" <?php echo ($wo['config']['checkout_mode'] == 'live') ? 'checked': '';?>>
-                            <label for="checkout_mode-enabled">Live</label>
-                            <input type="radio" name="checkout_mode" id="checkout_mode-disabled" value="sandbox" <?php echo ($wo['config']['checkout_mode'] == 'sandbox') ? 'checked': '';?>>
-                            <label for="checkout_mode-disabled" class="m-l-20">SandBox</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="checkout_mode" id="checkout_mode-enabled" value="live" <?php echo ($wo['config']['checkout_mode'] == 'live') ? 'checked': '';?>>
+                            <label class="form-check-label" for="checkout_mode-enabled">Live</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="checkout_mode" id="checkout_mode-disabled" value="sandbox" <?php echo ($wo['config']['checkout_mode'] == 'sandbox') ? 'checked': '';?>>
+                            <label class="form-check-label" for="checkout_mode-disabled" class="m-l-20">SandBox</label>
+                          </div>
                         </div> 
                         <br>
                         <label for="2checkout_currency">2Checkout Currency</label>
@@ -363,20 +318,67 @@
                         <br>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Seller ID</label>
                                 <input type="text" id="checkout_seller_id" name="checkout_seller_id" class="form-control" value="<?php echo $wo['config']['checkout_seller_id'];?>">
-                                <label class="form-label">Seller ID</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Publishable Key</label>
                                 <input type="text" id="checkout_publishable_key" name="checkout_publishable_key" class="form-control" value="<?php echo $wo['config']['checkout_publishable_key'];?>">
-                                <label class="form-label">Publishable Key</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Private Key</label>
                                 <input type="text" id="checkout_private_key" name="checkout_private_key" class="form-control" value="<?php echo $wo['config']['checkout_private_key'];?>">
-                                <label class="form-label">Private Key</label>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Cashfree payment</h6>
+                    <div class="cashfree-settings-alert"></div>
+                    <form class="cashfree-settings" method="POST">
+                        <label for="cashfree_payment">Cashfree Payment Method </label>
+                        <div class="form-group">
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cashfree_payment" id="cashfree_payment-enabled" value="yes" <?php echo ($wo['config']['cashfree_payment'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="cashfree_payment-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cashfree_payment" id="cashfree_payment-disabled" value="no" <?php echo ($wo['config']['cashfree_payment'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="cashfree_payment-disabled" class="m-l-20">Disabled</label>
+                          </div>
+                        </div>
+                        <label for="cashfree_mode">Cashfree Mode</label>
+                        <div class="form-group">
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cashfree_mode" id="cashfree_mode-enabled" value="sandBox" <?php echo ($wo['config']['cashfree_mode'] == 'sandBox') ? 'checked': '';?>>
+                            <label class="form-check-label" for="cashfree_mode-enabled">SandBox</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="cashfree_mode" id="cashfree_mode-disabled" value="live" <?php echo ($wo['config']['cashfree_mode'] == 'live') ? 'checked': '';?>>
+                            <label class="form-check-label" for="cashfree_mode-disabled" class="m-l-20">Live</label>
+                          </div>
+                        </div> 
+                        <div class="clearfix"></div>
+                        <br>
+                        <br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                              <label class="form-label">Client Id</label>
+                                <input type="text" id="cashfree_client_key" name="cashfree_client_key" class="form-control" value="<?php echo $wo['config']['cashfree_client_key'];?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                              <label class="form-label">Client Secret</label>
+                                <input type="text" id="cashfree_secret_key" name="cashfree_secret_key" class="form-control" value="<?php echo $wo['config']['cashfree_secret_key'];?>">
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -386,28 +388,100 @@
             </div>
         </div>
 
-        <div class="col-lg-6 col-md-6 pull-left">
+
+        <div class="col-lg-6 col-md-6">
             <div class="card">
-                <div class="header">
-                    <h2>Paystack payment</h2>
+                <div class="card-body">
+                  <h6 class="card-title">Bitcoin payment Settings</h6>
+                    <div class="bitcoin-settings-alert"></div>
+                    <form class="bitcoin-settings" method="POST">
+                       <label for="bitcoin">Bitcoin Payment Method </label>
+                        <div class="form-group">
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="bitcoin" id="bitcoin-enabled" value="yes" <?php echo ($wo['config']['bitcoin'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="bitcoin-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="bitcoin" id="bitcoin-disabled" value="no" <?php echo ($wo['config']['bitcoin'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="bitcoin-disabled" class="m-l-20">Disabled</label>
+                          </div>
+                        </div>
+                        <p>You can register merchant account : <a href="https://www.coinpayments.net" target="_blank">coinpayments.net</a></p>
+                        <br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                              <label class="form-label">Coinpayments API Secret Key <small>Your coinpayments secret key</small></label>
+                                <input type="text" id="coinpayments_secret" name="coinpayments_secret" class="form-control" value="<?php echo $wo['config']['coinpayments_secret'];?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                              <label class="form-label">Coinpayments Publishable Key <small>Your coinpayments Merchant ID</small></label>
+                                <input type="text" id="coinpayments_id" name="coinpayments_id" class="form-control" value="<?php echo $wo['config']['coinpayments_id'];?>">
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
                 </div>
-                <div class="body">
-                    <div class="alert alert-success paystack-settings-alert"></div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Local bank payment</h6>
+                    <div class="bank-settings-alert"></div>
+                    <form class="bank-settings" method="POST">
+                        <label for="bank_payment">Bank Payment Method </label>
+                        <div class="form-group">
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="bank_payment" id="bank_payment-enabled" value="yes" <?php echo ($wo['config']['bank_payment'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="bank_payment-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="bank_payment" id="bank_payment-disabled" value="no" <?php echo ($wo['config']['bank_payment'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="bank_payment-disabled" class="m-l-20">Disabled</label>
+                          </div>
+                        </div> 
+                        <div class="form-group form-float">
+                            <div class="form-line focused">
+                              <label class="form-label">Bank Description</label>
+                                <textarea name="bank_description" id="bank_description" class="form-control" cols="30" rows="5"><?php echo $wo['config']['bank_description'];?>
+                                </textarea>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line focused">
+                              <label class="form-label">Bank transfer note</label>
+                                <textarea name="bank_transfer_note" id="bank_transfer_note" class="form-control" cols="30" rows="5"><?php echo $wo['config']['bank_transfer_note'];?></textarea>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Paystack payment</h6>
+                    <div class="paystack-settings-alert"></div>
                     <form class="paystack-settings" method="POST">
                         <label for="paystack_payment">Paystack Payment Method </label>
                         <div class="form-group">
-                            <input type="radio" name="paystack_payment" id="paystack_payment-enabled" value="yes" <?php echo ($wo['config']['paystack_payment'] == 'yes') ? 'checked': '';?>>
-                            <label for="paystack_payment-enabled">Enabled</label>
-                            <input type="radio" name="paystack_payment" id="paystack_payment-disabled" value="no" <?php echo ($wo['config']['paystack_payment'] == 'no') ? 'checked': '';?>>
-                            <label for="paystack_payment-disabled" class="m-l-20">Disabled</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paystack_payment" id="paystack_payment-enabled" value="yes" <?php echo ($wo['config']['paystack_payment'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paystack_payment-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paystack_payment" id="paystack_payment-disabled" value="no" <?php echo ($wo['config']['paystack_payment'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paystack_payment-disabled" class="m-l-20">Disabled</label>
+                          </div>
                         </div>
                         <div class="clearfix"></div>
                         <br>
                         <br>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Secret Key</label>
                                 <input type="text" id="paystack_secret_key" name="paystack_secret_key" class="form-control" value="<?php echo $wo['config']['paystack_secret_key'];?>">
-                                <label class="form-label">Secret Key</label>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -415,78 +489,35 @@
                     </form>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-6 col-md-6 pull-left">
             <div class="card">
-                <div class="header">
-                    <h2>Cashfree payment</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success cashfree-settings-alert"></div>
-                    <form class="cashfree-settings" method="POST">
-                        <label for="cashfree_payment">Cashfree Payment Method </label>
-                        <div class="form-group">
-                            <input type="radio" name="cashfree_payment" id="cashfree_payment-enabled" value="yes" <?php echo ($wo['config']['cashfree_payment'] == 'yes') ? 'checked': '';?>>
-                            <label for="cashfree_payment-enabled">Enabled</label>
-                            <input type="radio" name="cashfree_payment" id="cashfree_payment-disabled" value="no" <?php echo ($wo['config']['cashfree_payment'] == 'no') ? 'checked': '';?>>
-                            <label for="cashfree_payment-disabled" class="m-l-20">Disabled</label>
-                        </div>
-                        <label for="cashfree_mode">Cashfree Mode</label>
-                        <div class="form-group">
-                            <input type="radio" name="cashfree_mode" id="cashfree_mode-enabled" value="sandBox" <?php echo ($wo['config']['cashfree_mode'] == 'sandBox') ? 'checked': '';?>>
-                            <label for="cashfree_mode-enabled">SandBox</label>
-                            <input type="radio" name="cashfree_mode" id="cashfree_mode-disabled" value="live" <?php echo ($wo['config']['cashfree_mode'] == 'live') ? 'checked': '';?>>
-                            <label for="cashfree_mode-disabled" class="m-l-20">Live</label>
-                        </div> 
-                        <div class="clearfix"></div>
-                        <br>
-                        <br>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="cashfree_client_key" name="cashfree_client_key" class="form-control" value="<?php echo $wo['config']['cashfree_client_key'];?>">
-                                <label class="form-label">Client Id</label>
-                            </div>
-                        </div>
-                        <div class="form-group form-float">
-                            <div class="form-line">
-                                <input type="text" id="cashfree_secret_key" name="cashfree_secret_key" class="form-control" value="<?php echo $wo['config']['cashfree_secret_key'];?>">
-                                <label class="form-label">Client Secret</label>
-                            </div>
-                        </div>
-                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6 col-md-6 pull-right">
-            <div class="card">
-                <div class="header">
-                    <h2>Razorpay payment</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success razorpay-settings-alert"></div>
+                <div class="card-body">
+                  <h6 class="card-title">Razorpay payment</h6>
+                    <div class="razorpay-settings-alert"></div>
                     <form class="razorpay-settings" method="POST">
                         <label for="razorpay_payment">Razorpay Payment Method </label>
                         <div class="form-group">
-                            <input type="radio" name="razorpay_payment" id="razorpay_payment-enabled" value="yes" <?php echo ($wo['config']['razorpay_payment'] == 'yes') ? 'checked': '';?>>
-                            <label for="razorpay_payment-enabled">Enabled</label>
-                            <input type="radio" name="razorpay_payment" id="razorpay_payment-disabled" value="no" <?php echo ($wo['config']['razorpay_payment'] == 'no') ? 'checked': '';?>>
-                            <label for="razorpay_payment-disabled" class="m-l-20">Disabled</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="razorpay_payment" id="razorpay_payment-enabled" value="yes" <?php echo ($wo['config']['razorpay_payment'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="razorpay_payment-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="razorpay_payment" id="razorpay_payment-disabled" value="no" <?php echo ($wo['config']['razorpay_payment'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="razorpay_payment-disabled" class="m-l-20">Disabled</label>
+                          </div>
                         </div>
                         <div class="clearfix"></div>
                         <br>
                         <br>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Key Id</label>
                                 <input type="text" id="razorpay_key_id" name="razorpay_key_id" class="form-control" value="<?php echo $wo['config']['razorpay_key_id'];?>">
-                                <label class="form-label">Key Id</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Key Secret</label>
                                 <input type="text" id="razorpay_key_secret" name="razorpay_key_secret" class="form-control" value="<?php echo $wo['config']['razorpay_key_secret'];?>">
-                                <label class="form-label">Key Secret</label>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -494,42 +525,46 @@
                     </form>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-6 col-md-6 pull-left">
-            <div class="card">
-                <div class="header">
-                    <h2>Paysera payment</h2>
-                </div>
-                <div class="body">
-                    <div class="alert alert-success paysera-settings-alert"></div>
+			<div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Paysera payment</h6>
+                    <div class="paysera-settings-alert"></div>
                     <form class="paysera-settings" method="POST">
                         <label for="paysera_payment">Paysera Payment Method </label>
                         <div class="form-group">
-                            <input type="radio" name="paysera_payment" id="paysera_payment-enabled" value="yes" <?php echo ($wo['config']['paysera_payment'] == 'yes') ? 'checked': '';?>>
-                            <label for="paysera_payment-enabled">Enabled</label>
-                            <input type="radio" name="paysera_payment" id="paysera_payment-disabled" value="no" <?php echo ($wo['config']['paysera_payment'] == 'no') ? 'checked': '';?>>
-                            <label for="paysera_payment-disabled" class="m-l-20">Disabled</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paysera_payment" id="paysera_payment-enabled" value="yes" <?php echo ($wo['config']['paysera_payment'] == 'yes') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paysera_payment-enabled">Enabled</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paysera_payment" id="paysera_payment-disabled" value="no" <?php echo ($wo['config']['paysera_payment'] == 'no') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paysera_payment-disabled" class="m-l-20">Disabled</label>
+                          </div>
                         </div>
                         <label for="paysera_mode">Paysera Mode</label>
                         <div class="form-group">
-                            <input type="radio" name="paysera_mode" id="paysera_mode-enabled" value="0" <?php echo ($wo['config']['paysera_mode'] == '0') ? 'checked': '';?>>
-                            <label for="paysera_mode-enabled">Live</label>
-                            <input type="radio" name="paysera_mode" id="paysera_mode-disabled" value="1" <?php echo ($wo['config']['paysera_mode'] == '1') ? 'checked': '';?>>
-                            <label for="paysera_mode-disabled" class="m-l-20">SandBox</label>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paysera_mode" id="paysera_mode-enabled" value="0" <?php echo ($wo['config']['paysera_mode'] == '0') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paysera_mode-enabled">Live</label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="paysera_mode" id="paysera_mode-disabled" value="1" <?php echo ($wo['config']['paysera_mode'] == '1') ? 'checked': '';?>>
+                            <label class="form-check-label" for="paysera_mode-disabled" class="m-l-20">SandBox</label>
+                          </div>
                         </div> 
                         <div class="clearfix"></div>
                         <br>
                         <br>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Project Id</label>
                                 <input type="text" id="paysera_project_id" name="paysera_project_id" class="form-control" value="<?php echo $wo['config']['paysera_project_id'];?>">
-                                <label class="form-label">Project Id</label>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
+                              <label class="form-label">Sign Password</label>
                                 <input type="text" id="paysera_sign_password" name="paysera_sign_password" class="form-control" value="<?php echo $wo['config']['paysera_sign_password'];?>">
-                                <label class="form-label">Sign Password</label>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -552,7 +587,7 @@ $(function() {
             if (data.status == 200) {
                 form_paysera_settings.find('.waves-effect').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.paysera-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.paysera-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.paysera-settings-alert').empty();
                 }, 2000);
@@ -570,7 +605,7 @@ $(function() {
             if (data.status == 200) {
                 form_razorpay_settings.find('.waves-effect').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.razorpay-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.razorpay-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.razorpay-settings-alert').empty();
                 }, 2000);
@@ -588,7 +623,7 @@ $(function() {
             if (data.status == 200) {
                 form_cashfree_settings.find('.waves-effect').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.cashfree-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.cashfree-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.cashfree-settings-alert').empty();
                 }, 2000);
@@ -606,7 +641,7 @@ $(function() {
             if (data.status == 200) {
                 form_bitcoin_settings.find('.waves-effect').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.bitcoin-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.bitcoin-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.bitcoin-settings-alert').empty();
                 }, 2000);
@@ -625,7 +660,7 @@ var form_paypal_settings = $('form.paypal-settings');
             if (data.status == 200) {
                 form_paypal_settings.find('.waves-effect').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.paypal-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.paypal-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.paypal-settings-alert').empty();
                 }, 2000);
@@ -645,7 +680,7 @@ var form_paypal_settings = $('form.paypal-settings');
             if (data.status == 200) {
                 form_checkout_settings.find('.waves-effect').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.checkout-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.checkout-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.checkout-settings-alert').empty();
                 }, 2000);
@@ -663,7 +698,7 @@ var form_paypal_settings = $('form.paypal-settings');
             if (data.status == 200) {
                 form_checkout_settings.find('.waves-effect').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.paystack-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.paystack-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.paystack-settings-alert').empty();
                 }, 2000);
@@ -682,7 +717,7 @@ var form_paypal_settings = $('form.paypal-settings');
             if (data.status == 200) {
                 form_payment_settings.find('.waves-effect').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.payment-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.payment-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.payment-settings-alert').empty();
                 }, 2000);
@@ -700,7 +735,7 @@ var form_paypal_settings = $('form.paypal-settings');
             if (data.status == 200) {
                 form_bank_settings.find('.waves-effect').text('Save');
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.bank-settings-alert').html('<i class="fa fa-check"></i> Settings updated successfully');
+                $('.bank-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
                 setTimeout(function () {
                     $('.bank-settings-alert').empty();
                 }, 2000);

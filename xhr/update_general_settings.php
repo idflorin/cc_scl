@@ -223,6 +223,14 @@ if ($f == "update_general_settings") {
                             'pro_time' => $time,
                             'wallet' => $wallet
                         );
+                        if ($Userdata['avatar_org'] == 'upload/photos/f-avatar.jpg' || $Userdata['avatar_org'] == 'upload/photos/d-avatar.jpg') {
+                            if ($gender == 'female') {
+                                $Update_data['avatar'] = 'upload/photos/f-avatar.jpg';
+                            }
+                            elseif ($gender == 'male') {
+                                $Update_data['avatar'] = 'upload/photos/d-avatar.jpg';
+                            }
+                        }
                         if (!empty($_POST['weather_unit']) && in_array($_POST['weather_unit'], array('uk','us'))) {
                             $Update_data['weather_unit'] = Wo_Secure($_POST['weather_unit']);
                         }

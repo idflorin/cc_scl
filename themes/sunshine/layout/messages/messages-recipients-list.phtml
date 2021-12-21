@@ -8,7 +8,7 @@ $message_count = Wo_CountMessages(array(
 (<?php echo Wo_Time_Elapsed_String($wo['recipient']['lastseen']); ?>)">
 	<span class="msg_ava_name" style="cursor:pointer;color:#555;">
 		<div class="<?php echo Wo_RightToLeft('pull-right');?>">
-			<span class="new-message-alert <?php echo ($message_count == 0) ? 'hidden' : ''; ?>"><?php echo $message_count; ?></span>
+			<span class="new-message-alert <?php echo ($message_count == 0) ? 'hidden' : ''; ?>"></span>
 		</div>
 		<div class="avatar <?php echo Wo_RightToLeft('pull-left');?>">
 			<img alt="<?php echo $wo['recipient']['name']; ?> Profile Picture" src="<?php echo $wo['recipient']['avatar'];?>">

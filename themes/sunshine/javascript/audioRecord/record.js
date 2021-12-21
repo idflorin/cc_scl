@@ -342,17 +342,34 @@ function Wo_RegisterTabMessageRecord(dataForm,id,type = ''){
            }, false);
            return xhr;
         }
-    }).done(function(data) {
-      if(data.status == 200){
-        $('form.'+form_class+id).find('input.message-record').val('');   
-        $('form.'+form_class+id).find('input.media-name').val('');
+    }).done(function (data) {
+      if (data.status == 200) {
         $('form.'+form_class+id).find('.loading').addClass('hidden');
+        $('form.' + form_class + id).find('input.message-record').val('');
+        $('form.' + form_class + id).find('input.media-name').val('');
+        $('form.' + form_class + id).find('.ball-pulse').fadeOut(100);;
         Wo_stopRecording();
         Wo_CleanRecordNodes();
         Wo_StopLocalStream();
-        $('form.'+form_class+id).find('input.message-record').val(data.url);
-        $('form.'+form_class+id).find('input.media-name').val(data.name);
-        $('form.'+form_class+id).submit();
+        $('form.' + form_class + id).find('input.message-record').val(data.url);
+        $('form.' + form_class + id).find('input.media-name').val(data.name);
+        var color = $('.chat-sending-form-' + id + ' #color').val();
+        if (node_socket_flow === "1") {
+          socket.emit("private_message", {
+            to_id: id,
+            from_id: _getCookie("user_id"),
+            msg: "",
+            color: color,
+            mediaFilename: data.url,
+            mediaName: data.name,
+            record: true,
+            isSticker: false
+          })
+        }
+        else {
+          $('form.' + form_class + id).submit();
+        }
+        console.log("Done")
       }
     });
   }
@@ -397,13 +414,32 @@ function Wo_RegisterMessage(dataForm){
         Wo_StopLocalStream();
         $("#message-record-file").val(data.url);
         $("#message-record-name").val(data.name);
+        if (node_socket_flow === "1") {
+          socket.emit("private_message_page", {
+            to_id: $("#users-message.active").find(".messages-recipients-list").attr("id").substr("messages-recipient-".length),
+            from_id: _getCookie("user_id"),
+            msg: "",
+            color: $(".send-button").css("background-color"),
+            mediaFilename: data.url,
+            mediaName: data.name,
+            record: true,
+            isSticker: false
+          })
+        } else {
         $('form.sendMessages').submit();
+        }
+        console.log("Done")
       }
     });
   }
 }
 
 function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
+   if (!text) {
+    text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
+  }
+  
+  
   if(event.keyCode == 13 && event.shiftKey == 0 && recording_node == "comm") {
     Wo_stopRecording(); 
     if (recorder) { 
@@ -449,7 +485,7 @@ function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
 
 function Wo_RegisterComment2(post_id, user_id, page_id, type) {
   text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
-  if(recording_node == "comm") {
+  //if(recording_node == "comm") {
     Wo_stopRecording(); 
     if (recorder) { 
       recorder.exportWAV(function(blob){
@@ -489,7 +525,7 @@ function Wo_RegisterComment2(post_id, user_id, page_id, type) {
         $('#charsLeft_'+post_id).text($('#charsLeft_'+post_id).attr('data_num'));
         Wo_InsertComment(dataForm,post_id);
     }
-  }
+  //}
 }
 
 function Wo_InsertComment(dataForm,post_id){
