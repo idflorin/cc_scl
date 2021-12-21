@@ -97,7 +97,7 @@ $fields = Wo_GetWelcomeFileds();
 							<?php endif ?>
 						</div>
 					</div>
-					<?php if (isset($_GET['invite'])): ?>
+					<?php if (isset($_GET['invite']) && (Wo_IsAdminInvitationExists($_GET['invite']) || Wo_IsUserInvitationExists($_GET['invite']))): ?>
 						<input type="text" class="hidden" value="<?php echo $_GET['invite']; ?>" name="invited">
 					<?php endif; ?>
 				</form>

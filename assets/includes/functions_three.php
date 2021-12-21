@@ -4909,7 +4909,7 @@ function Wo_AddPageAdmin($user_id = false, $page_id = false) {
     $page_id = Wo_Secure($page_id);
     $code    = false;
     $page    = Wo_PageData($page_id);
-    if ($wo['user']['id'] != $page['user_id'] && !Wo_IsPageAdminExists($wo['user']['id'], $page_id)) {
+    if ($wo['user']['id'] != $page['user_id'] && !Wo_IsPageAdminExists($wo['user']['id'], $page_id) && !Wo_IsAdmin() && !Wo_IsModerator()) {
         return false;
     }
     if (Wo_IsPageAdminExists($user_id, $page_id)) {
@@ -6969,7 +6969,7 @@ function Wo_GetOfferById($offer_id)
             $offer->offer_text = $offer->discount_amount.''.$offer->currency.' Off';
         }
         if ($offer->discount_type == 'buy_get_discount' && !empty($offer->discount_percent) && !empty($offer->buy) && !empty($offer->get_price)) {
-            $offer->offer_text = $wo['lang']['buy'].' '.$offer->buy.' '.$wo['lang']['get'].' '.$offer->get_price.' / '.$offer->discount_percent.' Off';
+            $offer->offer_text = $wo['lang']['buy'].' '.$offer->buy.' '.$wo['lang']['get'].' '.$offer->get_price.' / %'.$offer->discount_percent.' Off';
         }
         if ($offer->discount_type == 'spend_get_off' && !empty($offer->spend) && !empty($offer->amount_off)) {
             $offer->offer_text = $wo['lang']['spend'].' '.$offer->spend.''.$offer->currency.' '.$wo['lang']['get'].' '.$offer->amount_off.''.$offer->currency.' Off';
@@ -7494,4 +7494,121 @@ function Wo_CheckAnonymous($id,$type)
         return false;
     }
     return $fetched_data['count'];
+}
+function StartCloudRecording($vendor,$region,$bucket,$accessKey,$secretKey,$cname,$uid,$post_id)
+{
+    global $sqlConnect, $wo,$db;
+    $post_id = Wo_Secure($post_id);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://api.agora.io/v1/apps/".$wo['config']['agora_app_id']."/cloud_recording/acquire");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic '.base64_encode($wo['config']['agora_customer_id'].":".$wo['config']['agora_customer_certificate']),'Content-Type: application/json;charset=utf-8'));
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($ch, CURLOPT_POSTFIELDS,'{
+      "cname": "'.$cname.'",
+      "uid": "'.$uid.'",
+      "clientRequest":{
+      }
+    }');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response  = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response);
+    $resourceId = $data->resourceId;
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://api.agora.io/v1/apps/".$wo['config']['agora_app_id']."/cloud_recording/resourceid/".$resourceId."/mode/mix/start");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic '.base64_encode($wo['config']['agora_customer_id'].":".$wo['config']['agora_customer_certificate']),'Content-Type: application/json;charset=utf-8'));
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($ch, CURLOPT_POSTFIELDS,'{
+    "cname":"'.$cname.'",
+    "uid":"'.$uid.'",
+    "clientRequest":{
+        "recordingConfig":{
+            "channelType":1,
+            "streamTypes":2,
+            "audioProfile":1,
+            "videoStreamType":1,
+            "maxIdleTime":120,
+            "transcodingConfig":{
+                "width":480,
+                "height":720,
+                "fps":24,
+                "bitrate":800,
+                "maxResolutionUid":"1",
+                "mixedVideoLayout":1
+                }
+            },
+        "storageConfig":{
+            "vendor":'.$vendor.',
+            "region":'.$region.',
+            "bucket":"'.$bucket.'",
+            "accessKey":"'.$accessKey.'",
+            "secretKey":"'.$secretKey.'",
+            "fileNamePrefix": [
+                "upload",
+                "videos",
+                "'.date('Y').'",
+                "'.date('m').'"
+              ]
+        }   
+    }
+} ');
+    // curl_setopt($ch, CURLOPT_POSTFIELDS,'{
+    //     "cname":"'.$cname.'",
+    //     "uid":"'.$uid.'",
+    //     "clientRequest":{
+    //         "recordingConfig": {
+    //             "maxIdleTime": 30,
+    //             "streamTypes": 2,
+    //             "channelType": 1, 
+    //             "videoStreamType": 1, 
+    //             "subscribeUidGroup": 0,
+    //             "maxIdleTime": 30000
+    //         },
+    //         "storageConfig":{
+    //             "vendor":'.$vendor.',
+    //             "region":'.$region.',
+    //             "bucket":"'.$bucket.'",
+    //             "accessKey":"'.$accessKey.'",
+    //             "secretKey":"'.$secretKey.'"
+    //         }   
+    //     }
+    // } 
+    // ');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response  = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response);
+    if (!empty($data->sid) && !empty($resourceId)) {
+        $db->where('id',$post_id)->update(T_POSTS,array('agora_resource_id' => $resourceId,
+                                                        'agora_sid' => $data->sid));
+    }
+    return true;
+}
+function StopCloudRecording($data)
+{
+    global $sqlConnect, $wo,$db;
+    if (empty($data) || $wo['config']['agora_live_video'] != 1 || empty($data['resourceId']) || empty($data['sid']) || empty($data['cname']) || empty($data['uid']) || empty($data['post_id'])) {
+        return false;
+    }
+    $post_id = Wo_Secure($data['post_id']);
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://api.agora.io/v1/apps/".$wo['config']['agora_app_id']."/cloud_recording/resourceid/".$data['resourceId']."/sid/".$data['sid']."/mode/mix/stop");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Authorization: Basic '.base64_encode($wo['config']['agora_customer_id'].":".$wo['config']['agora_customer_certificate']),'Content-Type: application/json;charset=utf-8'));
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($ch, CURLOPT_POSTFIELDS,'{
+      "cname": "'.$data['cname'].'",
+      "uid": "'.$data['uid'].'",
+      "clientRequest":{
+      }
+    }');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response  = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response);
+    if (!empty($data) && !empty($data->serverResponse) && !empty($data->serverResponse->fileList)) {
+        $db->where('id',$post_id)->update(T_POSTS,array('postFile' => $data->serverResponse->fileList));
+    }
+    return true;
 }

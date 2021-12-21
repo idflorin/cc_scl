@@ -131,6 +131,7 @@ if ($f == 'messages') {
 
 
             if ($wo['user']['message_privacy'] != 2) {
+                
                 if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0 && Wo_CheckMainSession($hash_id) === true) {
                     $html          = '';
                     $media         = '';

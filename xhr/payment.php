@@ -1,6 +1,6 @@
 <?php 
 if ($f == 'payment') {
-    if (!isset($_GET['success'], $_GET['paymentId'], $_GET['PayerID'])) {
+    if (!isset($_GET['success'], $_GET['paymentId'], $_GET['PayerID']) && !isset($_GET['token'])) {
         header("Location: " . Wo_SeoLink('index.php?link1=oops'));
         exit();
     }
@@ -46,7 +46,12 @@ if ($f == 'payment') {
             exit();
         }
         $pro_type = $_GET['pro_type'];
-        $payment  = Wo_CheckPayment($_GET['paymentId'], $_GET['PayerID']);
+        if ($wo['config']['recurring_payment'] == 'off') {
+            $payment  = Wo_CheckPayment($_GET['paymentId'], $_GET['PayerID']);
+        }
+        else{
+            $payment  = Wo_CheckPayment(0, 0, $_GET['token']);
+        }
         if (is_array($payment)) {
             if (isset($payment['name'])) {
                 if ($payment['name'] == 'PAYMENT_ALREADY_DONE' || $payment['name'] == 'MAX_NUMBER_OF_PAYMENT_ATTEMPTS_EXCEEDED') {

@@ -31,7 +31,7 @@ if ($page_info['is_page_onwer'] == 1) {
    $avatar = $user_info['avatar'];
    $name = $user_info['name'].' ('.$page_info['page_name'].')';
 }
-
+$wo['page_message']['message']['text'] = Wo_Emo($wo['page_message']['message']['text']);
 ?>
 <li>
    <div class="notification-list messages-list <?php echo $unread_class;?>" onclick="<?php echo $message_event ?>">

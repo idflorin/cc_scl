@@ -1,5 +1,5 @@
 <?php
-$tab_style = 'block';
+$tab_style = '';
 $tab_style_height = '';
 if (isset($_SESSION['open_chat'])) {
   if($_SESSION['open_chat'] == 0) {
@@ -217,6 +217,10 @@ if (isset($_SESSION['open_chat'])) {
 	</div>
 </div>
 <script type="text/javascript">
+function Wo_ShowMessageOptions(id) {
+    $('.deleteMessage').hide();
+    $('#messageId_' + id).find('.deleteMessage').show();
+}
 $("#edit_group_chat_avatar_").change(function(event) {
 	$("#wow_fcov_img_holder_edit").html("<img src='" + window.URL.createObjectURL(this.files[0]) + "' alt='Picture'>")
 });
@@ -560,6 +564,19 @@ function Wo_CloseChat(id, type) {
     tab_type = {f: 'chat',s: 'close_page',id:id};
   }
   $.get(Wo_Ajax_Requests_File(),tab_type);
+}
+function Wo_DeleteChatMessage(message_id) {
+  $.get(Wo_Ajax_Requests_File(), {
+    f:'messages',
+    s:'delete_message',
+    message_id: message_id
+  }, function (data) {
+    if(data.status == 200) {
+      $('#messageId_' + message_id).slideUp(200, function () {
+        $(this).remove();
+      });
+    }
+  });
 }
  
 function Wo_ShareChatFile(id) {

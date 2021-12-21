@@ -1571,6 +1571,9 @@ function Wo_IsPageOnwer($page_id) {
     if (empty($user_id) || !is_numeric($user_id) || $user_id < 0) {
         return false;
     }
+    if (Wo_IsAdmin() || Wo_IsModerator()) {
+        return true;
+    }
     $query = mysqli_query($sqlConnect, " SELECT COUNT(`user_id`) FROM " . T_PAGES . " WHERE `page_id` = {$page_id} AND `user_id` = {$user_id} AND `active` = '1'");
     return (Wo_Sql_Result($query, '0') == 1 || Wo_IsPageAdminExists($user_id,$page_id)) ? true : false;
 }
@@ -1637,6 +1640,9 @@ function Wo_IsCanPageUpdate($page_id,$page)
     }
     if (empty($page_id) || !is_numeric($page_id) || $page_id < 0 || empty($page) || !in_array($page, $array)) {
         return false;
+    }
+    if (Wo_IsAdmin() || Wo_IsModerator()) {
+        return true;
     }
     $user_id = $wo['user']['id'];
     $page = Wo_Secure($page);
@@ -2145,6 +2151,8 @@ function Wo_DeletePage($page_id = 0) {
     $query_one .= mysqli_query($sqlConnect, "DELETE FROM " . T_VERIFICATION_REQUESTS . " WHERE `page_id` = {$page_id}");
     $query_one .= mysqli_query($sqlConnect, "DELETE FROM " . T_PAGE_ADMINS . " WHERE `page_id` = {$page_id}");
     $query_one .= mysqli_query($sqlConnect, "DELETE FROM " . T_PAGE_RATING . " WHERE `page_id` = {$page_id}");
+    @mysqli_query($sqlConnect, "DELETE FROM " . T_MESSAGES . " WHERE `page_id` = {$page_id}");
+    @mysqli_query($sqlConnect, "DELETE FROM " . T_U_CHATS . " WHERE `page_id` = {$page_id}");
     $jobs = $db->where('page_id',$page_id)->get(T_JOB);
     if (!empty($jobs)) {
         foreach ($jobs as $key => $job) {
@@ -4286,7 +4294,7 @@ function Wo_GetPageInvites($page_id) {
     $data      = array();
     $page_id   = Wo_Secure($page_id);
     $user_id   = Wo_Secure($wo['user']['user_id']);
-    $query_one = mysqli_query($sqlConnect, "SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `active` = '1' AND `following_id` NOT IN (SELECT `invited_id` FROM " . T_PAGES_INVAITES . " WHERE `page_id` = {$page_id}) AND `following_id` NOT IN (SELECT `user_id` FROM " . T_PAGES_LIKES . " WHERE `page_id` = {$page_id})");
+    $query_one = mysqli_query($sqlConnect, "SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `active` = '1' AND `following_id` NOT IN (SELECT `invited_id` FROM " . T_PAGES_INVAITES . " WHERE `page_id` = {$page_id}) AND `following_id` NOT IN (SELECT `user_id` FROM " . T_PAGES_LIKES . " WHERE `page_id` = {$page_id}) AND `following_id` NOT IN (SELECT `user_id` FROM " . T_PAGES . " WHERE `page_id` = {$page_id})");
     while ($fetched_data = mysqli_fetch_assoc($query_one)) {
         $data[] = Wo_UserData($fetched_data['following_id']);
     }
@@ -4856,7 +4864,7 @@ function Wo_SendSMSMessage($to, $message) {
         //Sender ID,While using route4 sender id should be 6 characters long.
         $senderId = uniqid();
         //Define route 
-        $route = "default";
+        $route = "4";
         //Prepare you post parameters
         $postData = array(
             'authkey' => $authKey,
@@ -5075,15 +5083,15 @@ function Wo_PayPal($type = 'week', $type2 = '') {
         );
     }
     else{
-        $p_type = 'Year';
+        $p_type = 'YEAR';
         if ($type == 'week') {
-            $p_type = 'Week';
+            $p_type = 'WEEK';
         }
         if ($type == 'month') {
-            $p_type = 'Month';
+            $p_type = 'MONTH';
         }
         if ($type == 'year') {
-            $p_type = 'Year';
+            $p_type = 'YEAR';
         }
         $plan = new \PayPal\Api\Plan();
         $plan->setName('Purchase pro package user'.$wo['user']['id'])
@@ -5197,7 +5205,7 @@ function Wo_PayPal($type = 'week', $type2 = '') {
 
     return $data;
 }
-function Wo_CheckPayment($paymentId, $PayerID) {
+function Wo_CheckPayment($paymentId, $PayerID,$token = '') {
     global $wo;
     if ($wo['config']['pro'] == 0) {
         return false;
@@ -6310,10 +6318,10 @@ function Wo_GetReactionsTypes($type = 'page')
             if ($type == 'page') {
 
                 if (!empty($fetched_data['wowonder_icon'])) {
-                    $fetched_data['wowonder_icon'] = Wo_GetMedia($fetched_data['wowonder_icon']);
-                    $explode2  = @end(explode('.', $fetched_data['wowonder_icon']));
-                    $explode3  = @explode('.', $fetched_data['wowonder_icon']);
-                    $fetched_data['wowonder_small_icon'] = $explode3[0] . '_small.' . $explode2;
+                    $fetched_data['wowonder_icon'] = $fetched_data['wowonder_small_icon'] = Wo_GetMedia($fetched_data['wowonder_icon']);
+                    // $explode2  = @end(explode('.', $fetched_data['wowonder_icon']));
+                    // $explode3  = @explode('.', $fetched_data['wowonder_icon']);
+                    // $fetched_data['wowonder_small_icon'] = $explode3[0] . '_small.' . $explode2;
                     $fetched_data['is_html'] = 0;
                 }
                 elseif (!file_exists('./themes/' . $wo['config']['theme'] . '/reaction/like-sm.png')) {
@@ -6340,10 +6348,10 @@ function Wo_GetReactionsTypes($type = 'page')
                 }
 
                 if (!empty($fetched_data['sunshine_icon'])) {
-                    $fetched_data['sunshine_icon'] = Wo_GetMedia($fetched_data['sunshine_icon']);
-                    $explode2  = @end(explode('.', $fetched_data['sunshine_icon']));
-                    $explode3  = @explode('.', $fetched_data['sunshine_icon']);
-                    $fetched_data['sunshine_small_icon'] = $explode3[0] . '_small.' . $explode2;
+                    $fetched_data['sunshine_icon'] = $fetched_data['sunshine_small_icon'] = Wo_GetMedia($fetched_data['sunshine_icon']);
+                    // $explode2  = @end(explode('.', $fetched_data['sunshine_icon']));
+                    // $explode3  = @explode('.', $fetched_data['sunshine_icon']);
+                    // $fetched_data['sunshine_small_icon'] = $explode3[0] . '_small.' . $explode2;
                 }
                 elseif (file_exists('./themes/' . $wo['config']['theme'] . '/reaction/like-sm.png')) {
                     if ($fetched_data['id'] == 1) {
@@ -6375,10 +6383,10 @@ function Wo_GetReactionsTypes($type = 'page')
             else{
 
                 if (!empty($fetched_data['wowonder_icon'])) {
-                    $fetched_data['wowonder_icon'] = Wo_GetMedia($fetched_data['wowonder_icon']);
-                    $explode2  = @end(explode('.', $fetched_data['wowonder_icon']));
-                    $explode3  = @explode('.', $fetched_data['wowonder_icon']);
-                    $fetched_data['wowonder_small_icon'] = $explode3[0] . '_small.' . $explode2;
+                    $fetched_data['wowonder_icon'] = $fetched_data['wowonder_small_icon'] = Wo_GetMedia($fetched_data['wowonder_icon']);
+                    // $explode2  = @end(explode('.', $fetched_data['wowonder_icon']));
+                    // $explode3  = @explode('.', $fetched_data['wowonder_icon']);
+                    // $fetched_data['wowonder_small_icon'] = $explode3[0] . '_small.' . $explode2;
                     $fetched_data['is_html'] = 0;
                 }
                 else {
@@ -6405,10 +6413,10 @@ function Wo_GetReactionsTypes($type = 'page')
                 }
 
                 if (!empty($fetched_data['sunshine_icon'])) {
-                    $fetched_data['sunshine_icon'] = Wo_GetMedia($fetched_data['sunshine_icon']);
-                    $explode2  = @end(explode('.', $fetched_data['sunshine_icon']));
-                    $explode3  = @explode('.', $fetched_data['sunshine_icon']);
-                    $fetched_data['sunshine_small_icon'] = $explode3[0] . '_small.' . $explode2;
+                    $fetched_data['sunshine_icon'] = $fetched_data['sunshine_small_icon'] = Wo_GetMedia($fetched_data['sunshine_icon']);
+                    // $explode2  = @end(explode('.', $fetched_data['sunshine_icon']));
+                    // $explode3  = @explode('.', $fetched_data['sunshine_icon']);
+                    // $fetched_data['sunshine_small_icon'] = $explode3[0] . '_small.' . $explode2;
                 }
                 else {
                     if ($fetched_data['id'] == 1) {

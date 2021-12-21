@@ -223,6 +223,13 @@ if (!empty($_GET['user']) && empty($_GET['page'])) {
 </div>
 
 <script type="text/javascript">
+var hash = $('.main_session').val();
+$.ajaxSetup({ 
+data: {
+    hash: hash
+},
+cache: false 
+});
 function MarkAsReadAll() {
 	$.post(Wo_Ajax_Requests_File() + '?f=mark_as_read', function(data, textStatus, xhr) {
 		Wo_UpdateUsers();
@@ -402,7 +409,8 @@ function Wo_GetMessagesUsers(query) {
   }, function (data) {
     if(data.status == 200) {
       if(data.html.length == 0) {
-        $('.messages-users-list').find('.messages-chat-list').html('<span class="center-text"><?php $wo["lang"]["no_result"];?></span>');
+        //$('.messages-users-list').find('.messages-chat-list').html('<span class="center-text"><?php $wo["lang"]["no_result"];?></span>');
+        $('.messages-users-list').find('.messages-chat-list').html('<span class="no-online-users center-text empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><?php echo $wo['lang']['no_result']; ?></span>');
 
       } else {
         $('.messages-users-list').find('.messages-chat-list').html(data.html);
@@ -426,7 +434,7 @@ function Wo_UpdateUsers() {
       $('.messages-users-list').find('.messages-chat-list').html(data.html);
     }
     else{
-      $('.messages-users-list').find('.messages-chat-list').html('<span class="no-online-users center-text"><?php echo $wo['lang']['no_users_found']; ?></span>');
+      $('.messages-users-list').find('.messages-chat-list').html('<span class="no-online-users center-text empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg><?php echo $wo['lang']['no_users_found']; ?></span>');
     }
   });
 }

@@ -96,8 +96,12 @@ if ($f == 'cashfree') {
 			 }
 			 $signature = hash_hmac('sha256', $signatureData, $secretKey,true);
 			 $signature = base64_encode($signature);
+			 $cashfree_link = 'https://test.cashfree.com/billpay/checkout/post/submit';
+			 if ($wo['config']['cashfree_mode'] == 'live') {
+			 	$cashfree_link = 'https://www.cashfree.com/checkout/post/submit';
+			 }
 
-			$form = '<form id="redirectForm" method="post" action="https://test.cashfree.com/billpay/checkout/post/submit"><input type="hidden" name="appId" value="'.$wo['config']['cashfree_client_key'].'"/><input type="hidden" name="orderId" value="order'.$order_id.'"/><input type="hidden" name="orderAmount" value="'.$price.'"/><input type="hidden" name="orderCurrency" value="INR"/><input type="hidden" name="orderNote" value=""/><input type="hidden" name="customerName" value="'.$name.'"/><input type="hidden" name="customerEmail" value="'.$email.'"/><input type="hidden" name="customerPhone" value="'.$phone.'"/><input type="hidden" name="returnUrl" value="'.$callback_url.'"/><input type="hidden" name="notifyUrl" value="'.$callback_url.'"/><input type="hidden" name="signature" value="'.$signature.'"/></form>';
+			$form = '<form id="redirectForm" method="post" action="'.$cashfree_link.'"><input type="hidden" name="appId" value="'.$wo['config']['cashfree_client_key'].'"/><input type="hidden" name="orderId" value="order'.$order_id.'"/><input type="hidden" name="orderAmount" value="'.$price.'"/><input type="hidden" name="orderCurrency" value="INR"/><input type="hidden" name="orderNote" value=""/><input type="hidden" name="customerName" value="'.$name.'"/><input type="hidden" name="customerEmail" value="'.$email.'"/><input type="hidden" name="customerPhone" value="'.$phone.'"/><input type="hidden" name="returnUrl" value="'.$callback_url.'"/><input type="hidden" name="notifyUrl" value="'.$callback_url.'"/><input type="hidden" name="signature" value="'.$signature.'"/></form>';
 			$data['status'] = 200;
 			$data['html'] = $form;
 			header("Content-type: application/json");
@@ -280,6 +284,10 @@ if ($f == 'cashfree') {
     }
 
     if ($s == 'wallet') {
+    	if (empty($_POST['txStatus']) || $_POST['txStatus'] != 'SUCCESS') {
+    		header("Location: " . Wo_SeoLink('index.php?link1=oops'));
+	        exit();
+    	}
     	$orderId = $_POST["orderId"];
 		$orderAmount = $_POST["orderAmount"];
 		$referenceId = $_POST["referenceId"];

@@ -180,6 +180,9 @@ if ($type == 'page') {
         }
     }
 }
+if (!empty($_GET['type']) && in_array($_GET['type'], array('activities','mutual_friends','following','followers','videos','photos','likes','groups','family_list','requests'))) {
+    $name = $name ." | ".Wo_Secure($_GET['type']);
+}
 $wo['description'] = $about;
 $wo['keywords']    = '';
 $wo['page']        = $type;

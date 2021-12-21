@@ -264,13 +264,6 @@
                             <input type="radio" name="bank_withdrawal_system" id="bank_withdrawal_system-disabled" value="0" <?php echo ($wo['config']['bank_withdrawal_system'] == 0) ? 'checked': '';?>>
                             <label for="bank_withdrawal_system-disabled" class="m-l-20">Disabled</label>
                         </div>
-                        <label for="weather_widget">Weather Widget</label>
-                        <div class="form-group">
-                            <input type="radio" name="weather_widget" id="weather_widget-enabled" value="1" <?php echo ($wo['config']['weather_widget'] == 1) ? 'checked': '';?>>
-                            <label for="weather_widget-enabled">Enabled</label>
-                            <input type="radio" name="weather_widget" id="weather_widget-disabled" value="0" <?php echo ($wo['config']['weather_widget'] == 0) ? 'checked': '';?>>
-                            <label for="weather_widget-disabled" class="m-l-20">Disabled</label>
-                        </div>
 
                         <label for="notify_new_post">Notification When User Create New Post</label>
                         <div class="form-group">
@@ -279,10 +272,30 @@
                             <input type="radio" name="notify_new_post" id="notify_new_post-disabled" value="0" <?php echo ($wo['config']['notify_new_post'] == 0) ? 'checked': '';?>>
                             <label for="notify_new_post-disabled" class="m-l-20">Disabled</label>
                         </div>
+
+                        <label for="weather_widget">Weather Widget</label>
+                        <div class="form-group">
+                            <input type="radio" name="weather_widget" id="weather_widget-enabled" value="1" <?php echo ($wo['config']['weather_widget'] == 1) ? 'checked': '';?>>
+                            <label for="weather_widget-enabled">Enabled</label>
+                            <input type="radio" name="weather_widget" id="weather_widget-disabled" value="0" <?php echo ($wo['config']['weather_widget'] == 0) ? 'checked': '';?>>
+                            <label for="weather_widget-disabled" class="m-l-20">Disabled</label>
+                        </div>
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <input type="text" id="weather_key" name="weather_key" class="form-control" value="<?php echo $wo['config']['weather_key']?>">
-                                <label class="form-label">Weather Widget Key</label>
+                                <label class="form-label">Yahoo Weather App Id</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="yahoo_consumer_key" name="yahoo_consumer_key" class="form-control" value="<?php echo $wo['config']['yahoo_consumer_key']?>">
+                                <label class="form-label">Yahoo Weather Consumer Key</label>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="yahoo_consumer_secret" name="yahoo_consumer_secret" class="form-control" value="<?php echo $wo['config']['yahoo_consumer_secret']?>">
+                                <label class="form-label">Yahoo Weather Consumer Secret</label>
                             </div>
                         </div>
 

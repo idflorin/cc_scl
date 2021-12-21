@@ -3,7 +3,11 @@ if ($wo['loggedin'] == false) {
   header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
   exit();
 }
-if ($wo['config']['live_video'] != 1 || empty($wo['config']['live_token']) || empty($wo['config']['live_account_id'])) {
+if ($wo['config']['live_video'] != 1) {
+	header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
+    exit();
+}
+if ($wo['config']['agora_live_video'] != 1 && $wo['config']['millicast_live_video'] != 1) {
 	header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
     exit();
 }

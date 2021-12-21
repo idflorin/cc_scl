@@ -154,7 +154,7 @@
               Wo_Delay(function(){
                 $("#pro_upload_file").modal('hide');
               },3000);
-              $('form.chat-sending-form-<?php echo $wo['chat']['recipient']['user_id'];?>').find('.ball-pulse').fadeOut(100);
+              $('form.chat-sending-form-<?php echo $wo['chat']['group']['group_id'];?>').find('.ball-pulse').fadeOut(100);
             }
             $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('#sendMessasgeFile').val('');
             $(".chat_group_<?php echo $wo['chat']['group']['group_id'];?>").find('textarea').val('');

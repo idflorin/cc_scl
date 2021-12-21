@@ -40,7 +40,7 @@ a,button{outline:0!important}
 .blog-com-wrapper .blog-comlist-container .blog-comment-item .blog-comment-item-img,.movies-com-wrapper .movies-comlist-container .movies-comment-item .movies-comment-item-img{overflow:hidden;padding:0;margin:0;height:45px;width:45px}
 .blog-com-wrapper .blog-comlist-container .blog-comment-item .blog-comment-item-body h5 span,.movies-com-wrapper .movies-comlist-container .movies-comment-item .movies-comment-item-body h5 span{font-size:12px;color:#aaa;margin-top:0;display:inline}
 .blog-com-wrapper .blog-comlist-container .blog-comment-item .blog-comment-item-body p,.movies-com-wrapper .movies-comlist-container .movies-comment-item .movies-comment-item-body p{overflow:hidden;padding-right:0;font-size:13px;color:#777;font-family:Hind,sans-serif}
-.blog-com-wrapper .blog-comlist-container .blog-comment-item .blog-comment-item-body div,.movies-com-wrapper .movies-comlist-container .movies-comment-item .movies-comment-item-body div{/*width:100%;*//*overflow:hidden;*/color:#888;font-size:12px}
+.blog-com-wrapper .blog-comlist-container .blog-comment-item .blog-comment-item-body > div,.movies-com-wrapper .movies-comlist-container .movies-comment-item .movies-comment-item-body div{/*width:100%;*//*overflow:hidden;*/color:#888;font-size:12px;position: relative;}
 .movies-com-wrapper .movies-com-top{width:100%;overflow:hidden;margin:20px 0}
 .blog-com-wrapper .blog-com-box,.movies-com-wrapper .movies-com-box{margin-right:0;padding-right:0;display:block;overflow:hidden}
 .blog-com-wrapper .blog-com-box .blog-com-box-act,.movies-com-wrapper .movies-com-box .movies-com-box-act{width:100%;overflow:hidden;height:35px;background-color:#fff;padding-top:5px}
@@ -770,7 +770,7 @@ table.setting-table .pending{color:red}
 .chat-container .wo_chat_tabs li a:hover {background-color: #ececec !important;}
 .chat-container .wo_chat_tabs li.active a {background: #f0e3e3 !important;cursor: pointer !important;}
 .chat-container .wo_chat_tabs li a svg {width: 20px;height: 20px;margin-top: -2px;}
-.online-content-toggler {max-height:40%;overflow-y: auto;-webkit-flex: 1 auto;-ms-flex: 1 auto;flex: 1 auto;flex-grow: 1;}
+.online-content-toggler {max-height:40%;overflow-y: auto;-webkit-flex: 1 auto;-ms-flex: 1 auto;flex: 1 auto;flex-grow: 1;display: none;}
 .online-content-toggler .empty_state {font-size: 14px;}
 .online-content-toggler .empty_state svg {width: 50px;height: 50px;margin: 0 auto 10px;}
 .chat-opacity {width: 250px;position: fixed;height: 100%;display: none;background-color: rgba(255, 255, 255, 0.3);z-index: 2;backdrop-filter: blur(6px);top: 45px;right: 0;align-items: center;justify-content: center;}
@@ -814,7 +814,7 @@ table.setting-table .pending{color:red}
 .chat-messages-wrapper .incoming p .hash{color:#333!important}
 .chat-messages-wrapper .outgoing .message-media a{color:#fff}
 .chat-messages-wrapper .messages-wrapper{border:none;padding:1px 5px 3px}
-.chat-messages-wrapper .incoming, .chat-messages-wrapper .outgoing {max-width:75%;}
+.chat-messages-wrapper .incoming, .chat-messages-wrapper .outgoing {max-width:75%;position: relative;}
 .chat-messages-wrapper .message-group_owner {font-weight: 500;font-family: "Roboto", sans-serif;font-size: 12px;margin: 3px 1px 2px;}
 .chat-messages-wrapper .message-group_owner a {text-decoration: none;}
 .chat-messages-wrapper .incoming .message-text, .chat-messages-wrapper .outgoing .message-text {border-radius:15px;padding: 6px 10px;font-size: 13px;line-height: 16px;color:#4b4f56;background-color:#e8e8e8;}
@@ -887,6 +887,7 @@ table.setting-table .pending{color:red}
 .activity-container img{width:50px}
 .activity-container .activity{border-bottom:1px solid #f5f5f4}
 .activity-container .activity img{width:35px!important;height:35px;overflow:hidden}
+.activity-container .activity .inline_post_count_emoji > img {width: 16px !important;height: 16px;}
 .second-user-color{color:#333}
 .pin-icon,.sop-icon{position:absolute;width:auto;color:#f9b340}
 .sop-icon{right:15px;top:15px;font-size:25px}
@@ -1645,7 +1646,7 @@ hr.style-two{border:0;height:1px;background-image:linear-gradient(to right,rgba(
 .wow_read_blog_hdr_img_innr .postMeta--author-avatar img {width: 35px;height: 35px;}
 .wow_read_blog_hdr_img_innr .postMeta--author-text a {font-weight: 500;font-size: 15px;color: white;text-decoration: none;}
 .wow_read_blog_hdr_img_innr .postMeta--author-text time {display: block;font-size: 13px;}
-.wow_read_blog_row {margin: -50px 0 0;padding: 0 15px;position: relative;z-index: 15;}
+.wow_read_blog_row {margin: -50px 0 0;padding: 0 15px;position: relative;z-index: 9;}
 .no-padding-left{padding-left:0!important}
 .no-padding-both{padding:0!important}
 .search-artiles-form{padding:0 10px;margin-bottom:30px}
@@ -3050,6 +3051,7 @@ to {background-position: top right  }
 .who_react_modal {display: flex;align-items: center;margin: -4px 0;}
 .who_react_modal > span {display: flex;padding: 5px;height: 28px;margin: 0 0 0 10px;}
 .who_react_modal > span .inline_act_emoji {transform: scale(1.2);}
+.who_react_modal > span .inline_post_emoji .reaction > img {width: 22px;height: 22px;}
 .who_react_to_this_user {display: flex;align-items: center;padding: 10px 7px;border-bottom: 1px solid #eaeaea;}
 .who_react_to_this_user:last-child {border: 0;}
 .who_react_to_this_user .who_react_to_this_user_info {display: flex;align-items: center}
@@ -3134,6 +3136,9 @@ svg {vertical-align: middle;}
 .text-sender-container .deleteMessage{position:absolute;top:50%;left:-18px;cursor:pointer;color:#888;display:none;transform:translate(0,-50%)}
 .text-sender-container .deleteMessage.right{left:auto!important;right:-18px}
 .text-sender-container .deleteMessage svg.feather{margin-top:-3px;width:15px;height:15px}
+.chat-messages-wrapper .deleteMessage{position:absolute;top:50%;left:-18px;cursor:pointer;color:#888;display:none;transform:translate(0,-50%)}
+.chat-messages-wrapper .deleteMessage.right{left:auto!important;right:-18px}
+.chat-messages-wrapper .deleteMessage svg.feather{margin-top:-3px;width:15px;height:15px}
 .text-sender-container .time{margin-top: 4px;font-size: 13px;font-weight: 500;}
 .text-sender-container .message-model{width: 85%;max-width: 500px;font-size: 15px;padding: 0;position: relative;line-height: 1.4;}
 .text-sender-container .message-model .message{padding: 15px;margin-left: auto;display: table;line-height: 1.4;margin-top: 0;position: relative;background: #f5f5f5;border-radius: 2em;}
@@ -3536,7 +3541,7 @@ svg {vertical-align: middle;}
 .wow_forum_sections table tr:hover {background: rgba(0,0,0,.01);}
 .wow_forum_sections table tr:first-child {border: 0;}
 .wow_forum_sections table .topic_icon {width: 3% !important;}
-.wow_forum_sections table .forum-meta-d.titles {width: 43%;}
+.wow_forum_sections table .forum-meta-d.titles {width: 43%;word-break: break-word;}
 .wow_forum_sections table .forum-meta-d.posts {width: 6%;padding-right: 65px !important;}
 .wow_forum_sections table .forum-meta-d.topics {width: 6%;padding-right: 20px !important;}
 .wow_forum_sections table .forum-meta-d.small {width: 16%;padding: 10px !important;}
@@ -3742,7 +3747,7 @@ svg {vertical-align: middle;}
 .wow_go_live_cont .liv_vid_cont {height: 100%;}
 .wow_go_live_cont .empty_state {margin: 0;display: flex;flex-direction: column;justify-content: center;height: calc(100vh - 45px);color: rgba(255, 255, 255, 0.8);}
 .wow_go_live_cont .empty_state svg {opacity: 1;background-color: #4a4a4a;}
-.wow_liv_counter {position: absolute;left: 20px;top: 20px;background-color: rgba(0, 0, 0, 0.7);border-radius: 4px;box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);min-width: 60px;line-height: 30px;font-size: 12px;font-weight: 500;color: #03a9f4;font-family: "Roboto",sans-serif;text-align: center;padding: 0 10px;}
+.wow_liv_counter {z-index: 9; position: absolute;left: 20px;top: 20px;background-color: rgba(0, 0, 0, 0.7);border-radius: 4px;box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);min-width: 60px;line-height: 30px;font-size: 12px;font-weight: 500;color: #03a9f4;font-family: "Roboto",sans-serif;text-align: center;padding: 0 10px;}
 .wow_liv_comments_feed {position: absolute;bottom: 0;width: 100%;left: 0;right: 0;background: linear-gradient(rgba(0, 0, 0, 0), black);padding: 120px 15px 10px;}
 .wow_go_live_btn, .wow_end_live_btn {width: auto;border-radius: 4px;box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);min-width: 105px;line-height: 42px;height: auto;bottom: auto;right: 50px;left: auto;top: 20px;transform: none;color: #fff;}
 .live_comments {padding: 10px 0;text-align: initial;}
@@ -3906,7 +3911,7 @@ footer .footer-wrapper{display:block}
 @media (max-width:800px) {
 .blog-cat-img img,.blog-ls-img img{margin-bottom:15px}
 .post-youtube iframe{height:280px}
-.wo_imagecombo_lbox .story-img{margin-right:0;margin-left:0;width:100%;height:calc(100% - 350px)}
+.wo_imagecombo_lbox .story-img{margin-right:0;margin-left:0;width:100%;height:calc(100% - 220px)}
 .wo_imagecombo_lbox .comment-section{width:100%;position:relative}
 .wo_imagecombo_lbox{overflow-y:auto;height: 100%;}
 .wo_imagecombo_lbox .lightbox-post-footer.post-comments .lighbox.comment-textarea {height: 40px;}
@@ -4066,6 +4071,28 @@ to{opacity:1;margin-top:0}
 .wow_mini_wallets_btns {margin: 15px auto 0;}
 .wow_read_blog_hdr_img img {height: 450px;}
 .wow_read_blog_hdr_img_innr .read-blog-info-user .views, .wow_read_blog_hdr_img_innr .read-blog-info-user .middot {display: none;}
+.wow_grpage_setts .wow_sett_content {
+	padding: 70px 10px 10px;
+}
+.wow_grpage_setts .setting-well .profile-style {
+	width: 100%;
+}
+#wo_msg_right_prt .text-sender-container .sendMessages .input-group {
+	padding: 0px 5px;
+}
+#wo_msg_right_prt .text-sender-container .sendMessages .input-group .input-group-btn {
+    margin-left: 5px;
+}
+#wo_msg_right_prt .msg_write_combo .message-option-btns {
+	margin: 0;
+}
+.text-sender-container .msg_usr_info_top_list .msg_usr_cht_usr_data a {
+    white-space: nowrap;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
 }
 
 @media (max-width:570px) {

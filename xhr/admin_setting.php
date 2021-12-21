@@ -848,6 +848,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 if (in_array($key, $langs)) {
                     $key   = Wo_Secure($key);
                     $value = Wo_Secure($value);
+                    $value = mysqli_real_escape_string($sqlConnect,$value);
                     $query = mysqli_query($sqlConnect, "UPDATE " . T_LANGS . " SET `{$key}` = '{$value}' WHERE `lang_key` = '{$lang_key}'");
                     if ($query) {
                         $data['status'] = 200;
@@ -1489,6 +1490,32 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         }
                     }
                 }
+                if ($key == 'millicast_live_video') {
+                    if ($value == 1) {
+                        if ($wo['config']['agora_live_video'] == 1) {
+                            $saveSetting = Wo_SaveConfig('agora_live_video', 0);
+                        }
+                        $saveSetting = Wo_SaveConfig('live_video', 1);
+                    }
+                    else{
+                        if ($wo['config']['agora_live_video'] != 1) {
+                            $saveSetting = Wo_SaveConfig('live_video', 0);
+                        }
+                    }
+                }
+                if ($key == 'agora_live_video') {
+                    if ($value == 1) {
+                        if ($wo['config']['millicast_live_video'] == 1) {
+                            $saveSetting = Wo_SaveConfig('millicast_live_video', 0);
+                        }
+                        $saveSetting = Wo_SaveConfig('live_video', 1);
+                    }
+                    else{
+                        if ($wo['config']['millicast_live_video'] != 1) {
+                            $saveSetting = Wo_SaveConfig('live_video', 0);
+                        }
+                    }
+                }
 
                 
                 
@@ -1706,6 +1733,58 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                             'delete' => 'no'
                         ));
                     }
+                } else {
+                    $data['status'] = 300;
+                }
+            } else {
+                $data['status'] = 500;
+            }
+        }
+        catch (Exception $e) {
+            $data['status']  = 400;
+            $data['message'] = $e->getMessage();
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'test_s3_2') {
+        include_once('assets/libraries/s3/aws-autoloader.php');
+        try {
+            $s3Client = S3Client::factory(array(
+                'version' => 'latest',
+                'region' => $wo['config']['region_2'],
+                'credentials' => array(
+                    'key' => $wo['config']['amazone_s3_key_2'],
+                    'secret' => $wo['config']['amazone_s3_s_key_2']
+                )
+            ));
+            $buckets  = $s3Client->listBuckets();
+            $result   = $s3Client->putBucketCors(array(
+                'Bucket' => $wo['config']['bucket_name_2'], // REQUIRED
+                'CORSConfiguration' => array( // REQUIRED
+                    'CORSRules' => array( // REQUIRED
+                        array(
+                            'AllowedHeaders' => array(
+                                'Authorization'
+                            ),
+                            'AllowedMethods' => array(
+                                'POST',
+                                'GET',
+                                'PUT'
+                            ), // REQUIRED
+                            'AllowedOrigins' => array(
+                                '*'
+                            ), // REQUIRED
+                            'ExposeHeaders' => array(),
+                            'MaxAgeSeconds' => 3000
+                        )
+                    )
+                )
+            ));
+            if (!empty($buckets)) {
+                if ($s3Client->doesBucketExist($wo['config']['bucket_name_2'])) {
+                    $data['status'] = 200;
                 } else {
                     $data['status'] = 300;
                 }
@@ -3155,7 +3234,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                     $data['message'] = 'Error in connection';
                 }
             } catch (Exception $e) {
-                $data['message'] = $e;
+                $data['message'] = "".$e;
                 // maybe invalid private key ?
                 // print $e;
                 // exit();

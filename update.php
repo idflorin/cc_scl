@@ -54,6 +54,312 @@ if (!empty($_POST['query'])) {
     exit();
 }
 if (!empty($_POST['update_langs'])) {
+    $data  = array();
+    $query = mysqli_query($sqlConnect, "SHOW COLUMNS FROM `Wo_Langs`");
+    while ($fetched_data = mysqli_fetch_assoc($query)) {
+        $data[] = $fetched_data['Field'];
+    }
+    unset($data[0]);
+    unset($data[1]);
+    unset($data[2]);
+    function Wo_UpdateLangs($lang, $key, $value) {
+        global $sqlConnect;
+        $update_query         = "UPDATE Wo_Langs SET `{lang}` = '{lang_text}' WHERE `lang_key` = '{lang_key}'";
+        $update_replace_array = array(
+            "{lang}",
+            "{lang_text}",
+            "{lang_key}"
+        );
+        return str_replace($update_replace_array, array(
+            $lang,
+            Wo_Secure($value),
+            $key
+        ), $update_query);
+    }
+    $lang_update_queries = array();
+    foreach ($data as $key => $value) {
+        $value = ($value);
+        if ($value == 'arabic') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'كانون الثاني');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'شهر فبراير');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'مارس');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'أبريل');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'مايو');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'يونيو');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'يوليو');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'أغسطس');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'سبتمبر');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'اكتوبر');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'شهر نوفمبر');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'ديسمبر');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'إشعارات');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'البدء');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'يرجى تمكين الموقع في المتصفح لعرض الطقس الحالي.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'الوصول إلى الموقع الخاص بك هو معطل. تمكينه على المتصفح الخاص بك إذا كنت تريد أن ترى الناس من حولك.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'الأحد');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'الإثنين');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'الثلاثاء');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'الأربعاء');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'الخميس');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'يوم الجمعة');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'يوم السبت');
+        } else if ($value == 'dutch') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'januari');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'februari');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'maart');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'april');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'mei');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'juni');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'juli');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'augustus');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'september');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'oktober');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'november');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'december');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'meldingen');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Begin');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'Activeer locatie op uw browser om de actuele weergegevens te bekijken.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'De toegang tot uw locatie is uitgeschakeld. Schakel het op uw browser als u wilt mensen om je heen te zien.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'zondag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'maandag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'dinsdag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'woensdag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'donderdag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'vrijdag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'zaterdag');
+        } else if ($value == 'french') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'janvier');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'février');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'Mars');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'avril');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'Mai');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'juin');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'juillet');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'août');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'septembre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'octobre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'novembre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'décembre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'notifications');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Commencer');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'S\'il vous plaît activer adresse de votre navigateur pour afficher la météo actuelle.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'L\'accès à votre emplacement est désactivé. Activez-le sur votre navigateur si vous voulez voir les gens autour de vous.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'dimanche');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'Lundi');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'Mardi');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'Mercredi');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'Jeudi');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'Vendredi');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'samedi');
+        } else if ($value == 'german') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'Januar');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'Februar');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'März');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'April');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'Kann');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'Juni');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'Juli');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'August');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'September');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'Oktober');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'November');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'Dezember');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'Benachrichtigungen');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Loslegen');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'Bitte aktivieren Sie diese Position auf Ihrem Browser aktuelles Wetter anzuzeigen.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'Zugriff auf Ihren Standort ist deaktiviert. Aktivieren Sie es auf Ihrem Browser, wenn du um dich herum zu sehen, die Leute wollen.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'Sonntag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'Montag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'Dienstag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'Mittwoch');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'Donnerstag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'Freitag');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'Samstag');
+        } else if ($value == 'italian') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'gennaio');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'febbraio');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'marzo');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'aprile');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'Maggio');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'giugno');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'luglio');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'agosto');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'settembre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'ottobre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'novembre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'dicembre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'notifiche');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Iniziare');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'Si prega di abilitare posizione sul tuo browser per visualizzare meteo.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'L\'accesso alla tua posizione è Disabilitato. Attiva sul vostro browser, se volete vedere persone intorno a voi.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'Domenica');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'Lunedi');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'martedì');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'mercoledì');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'giovedi');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'Venerdì');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'Sabato');
+        } else if ($value == 'portuguese') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'janeiro');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'fevereiro');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'marcha');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'abril');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'Maio');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'Junho');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'Julho');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'agosto');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'setembro');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'Outubro');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'novembro');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'dezembro');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'notificações');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Iniciar');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'Ative o local em seu navegador para ver o tempo atual.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'Acesso à sua localização está desativada. Ativá-lo no seu navegador se você quiser ver as pessoas ao seu redor.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'domingo');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'Segunda-feira');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'terça');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'quarta-feira');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'quinta-feira');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'Sexta-feira');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'sábado');
+        } else if ($value == 'russian') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'январь');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'февраль');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'марш');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'апреля');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'май');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'июнь');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'июль');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'августейший');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'сентябрь');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'октября');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'ноябрь');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'Декабрь');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'Уведомления');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Начать');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'Пожалуйста, включите местоположение в вашем браузере для просмотра текущей погоды.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'Доступ к вашему местоположению отключен. Включите его в вашем браузере, если вы хотите, чтобы видеть, что люди вокруг вас.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'Воскресенье');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'понедельник');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'вторник');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'среда');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'Четверг');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'пятница');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'суббота');
+        } else if ($value == 'spanish') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'enero');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'febrero');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'marzo');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'abril');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'Mayo');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'junio');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'julio');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'agosto');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'septiembre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'octubre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'noviembre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'diciembre');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'Notificaciones');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Empezar');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'Por favor, activa ubicación en su navegador para ver tiempo actual.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'El acceso a su ubicación es Desactivado. Activarlo en su navegador si desea ver a las personas que le rodean.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'domingo');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'lunes');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'martes');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'miércoles');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'jueves');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'viernes');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'sábado');
+        } else if ($value == 'turkish') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'Ocak');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'Şubat');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'Mart');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'Nisan');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'Mayıs');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'Haziran');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'Temmuz');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'Ağustos');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'Eylül');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'Ekim');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'Kasım');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'Aralık');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'Bildirimler');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Başlamak');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'Şu anki hava durumunu görüntülemek için tarayıcınızda konum özelliğini etkinleştirmek edin.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'Bulunduğunuz yere erişim Devre Dışı. çevrenizdeki insanları görmek istiyorsanız tarayıcınızda etkinleştirin.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'Pazar');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'Pazartesi');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'Salı');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'Çarşamba');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'Perşembe');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'Cuma');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'Cumartesi');
+        } else if ($value == 'english') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'January');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'February');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'March');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'April');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'May');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'June');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'July');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'August');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'September');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'October');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'November');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'December');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'Notifications');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Get Started');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'Please enable location on your browser to view current weather.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'Access to your location is Disabled. Enable it on your browser if you want to see people around you.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'Sunday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'Monday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'Tuesday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'Wednesday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'Thursday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'Friday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'Saturday');
+        } else if ($value != 'english') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'january', 'January');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'february', 'February');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'march', 'March');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'april', 'April');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'may', 'May');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'june', 'June');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'july', 'July');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'august', 'August');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'september', 'September');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'october', 'October');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'november', 'November');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'december', 'December');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'notifications_single', 'Notifications');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'get_started', 'Get Started');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_weather_loc', 'Please enable location on your browser to view current weather.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'enable_friend_loc', 'Access to your location is Disabled. Enable it on your browser if you want to see people around you.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'sunday', 'Sunday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'monday', 'Monday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'tuesday', 'Tuesday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'wednesday', 'Wednesday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'thursday', 'Thursday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'friday', 'Friday');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'saturday', 'Saturday');
+        }
+    }
+    if (!empty($lang_update_queries)) {
+        foreach ($lang_update_queries as $key => $query) {
+            $sql = mysqli_query($sqlConnect, $query);
+        }
+    }
+    $games = $db->get(T_GAMES);
+    if (!empty($games)) {
+        foreach ($games as $key => $value) {
+            if (!Wo_IsUrl($value->game_link)) {
+                $db->where('id', $value->id)->update(T_GAMES, array(
+                    'game_link' => 'https://www.miniclip.com/games/' . $value->game_link . '/en/webgame.php'
+                ));
+            }
+        }
+    }
     $name = md5(microtime()) . '_updated.php';
     rename('update.php', $name);
 }
@@ -120,12 +426,15 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
                <div class="wo_install_wiz">
                  <?php if ($updated == false) { ?>
                   <div>
-                     <h2 class="light">Update to v3.0.1 </span></h2>
+                     <h2 class="light">Update to v3.0.2 </span></h2>
                      <div class="setting-well">
                         <h4>Changelog</h4>
                         <ul class="wo_update_changelog">
-                                <li> [Fixed] 10+ bugs.</li>
+                                <li> [Added] Agora Live Streaming. </li>
+                                <li> [Added] Few more APIs. </li>
+                                <li> [Fixed] 40+ reported bugs.</li>
                                 <li> [Fixed] bugs in API.</li>
+                                <li> [Improved] Load speed.</li>
                         </ul>
                         <p class="hide_print">Note: The update process might take few minutes.</p>
                         <p class="hide_print">Important: If you got any fail queries, please copy them, open a support ticket and send us the details.</p>
@@ -166,7 +475,44 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
 </html>
 <script>  
 var queries = [
-    "UPDATE `Wo_Config` SET `value` = '3.0.1' WHERE `name` = 'version';",
+    "UPDATE `Wo_Config` SET `value` = '3.0.2' WHERE `name` = 'version';",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'agora_app_id', '');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'agora_live_video', '0');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'millicast_live_video', '0');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'agora_customer_id', '');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'agora_customer_certificate', '');",
+    "ALTER TABLE `Wo_Posts` ADD `agora_resource_id` TEXT NULL DEFAULT NULL AFTER `live_ended`, ADD `agora_sid` VARCHAR(500) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' AFTER `agora_resource_id`;",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'yahoo_consumer_key', '');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'yahoo_consumer_secret', '');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'cashfree_mode', 'sandBox');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'amazone_s3_2', '0');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'bucket_name_2', '');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'amazone_s3_key_2', '');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'amazone_s3_s_key_2', '');",
+    "INSERT INTO `Wo_Config` (`id`, `name`, `value`) VALUES (NULL, 'region_2', 'eu-west-1');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'january');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'february');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'march');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'april');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'may');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'june');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'july');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'august');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'september');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'october');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'november');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'december');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'notifications_single');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'get_started');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'enable_weather_loc');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'enable_friend_loc');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'sunday');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'monday');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'tuesday');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'wednesday');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'thursday');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'friday');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'saturday');",
 ];
 $('#input_code').bind("paste keyup input propertychange", function(e) {
     if (isPurchaseCode($(this).val())) {

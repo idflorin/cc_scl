@@ -157,6 +157,13 @@ document.addEventListener("msfullscreenchange", function() {
 function loadposts() {
 	$("#posts-laoded").load(Wo_Ajax_Requests_File() + '?f=load_posts', function enter() {
 		Wo_FinishBar();
+		window.fbAsyncInit = function() {
+		  FB.init({
+			appId      : '374255706379985',
+			xfbml      : true,
+			version    : 'v3.2'
+		  });
+		};
 	  	$(".post-description p, .product-description").each(function(index, el) {
 	  		$(this).readmore({
 		      speed: 75,

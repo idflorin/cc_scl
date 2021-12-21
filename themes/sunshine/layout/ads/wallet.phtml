@@ -335,7 +335,7 @@ function SignatureRazorpay() {
 		$('#paystack_btn').html("<?php echo($wo['lang']['please_wait']) ?>");
 	    $('#paystack_btn').attr('disabled','true');
 		email = $('#paystack_wallet_email').val();
-		amount = $('#amount').val();
+		amount = $('#amount').val() * 100;
 		$.post(Wo_Ajax_Requests_File() + '?f=paystack&s=initialize', {type:'wallet',email:email,amount:amount}, function(data) {
 			if (data.status == 200) {
 				window.location.href = data.url;

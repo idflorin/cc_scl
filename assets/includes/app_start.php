@@ -2,6 +2,7 @@
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
 error_reporting(0);
+header('Cache-Control: max-age=846000');
 
 @ini_set('max_execution_time', 0);
 require_once('config.php');
@@ -79,6 +80,13 @@ if (!empty($config['bucket_name'])) {
     $s3_site_url = str_replace('{bucket}', $config['bucket_name'], $s3_site_url);
 }
 $config['s3_site_url'] = $s3_site_url;
+
+$s3_site_url_2         = 'https://test.s3.amazonaws.com';
+if (!empty($config['bucket_name_2'])) {
+    $s3_site_url_2 = "https://{bucket}.s3.amazonaws.com";
+    $s3_site_url_2 = str_replace('{bucket}', $config['bucket_name_2'], $s3_site_url_2);
+}
+$config['s3_site_url_2'] = $s3_site_url_2;
 
 
 $wo['config']              = $config;
@@ -906,18 +914,7 @@ if ($wo['loggedin'] == true && $wo['user']['is_pro']) {
         $mysql_query = mysqli_query($sqlConnect, "UPDATE " . T_POSTS . " SET `boosted` = '0' WHERE `page_id` IN (SELECT `page_id` FROM " . T_PAGES . " WHERE `user_id` = {$user_id})");
     }
 }
-if ($wo['config']['live_video_save'] == 0) {
-    try {
-        $posts = $db->where('live_time','0','!=')->where('live_time',time() - 11,'<=')->get(T_POSTS);
-        foreach ($posts as $key => $post) {
-            $db->where('post_id',$post->id)->delete(T_POSTS);
-            $db->where('parent_id',$post->id)->delete(T_POSTS);
-        }
-    } catch (Exception $e) {
-        
-    }
-    
-}
+
 
 $wo['stripe_currency'] = array('USD','EUR','AUD','BRL','CAD','CZK','DKK','HKD','HUF','ILS','JPY','MYR','MXN','TWD','NZD','NOK','PHP','PLN','RUB','SGD','SEK','CHF','THB','GBP');
 $wo['paypal_currency'] = array('USD','EUR','AUD','BRL','CAD','CZK','DKK','HKD','HUF','INR','ILS','JPY','MYR','MXN','TWD','NZD','NOK','PHP','PLN','GBP','RUB','SGD','SEK','CHF','THB');

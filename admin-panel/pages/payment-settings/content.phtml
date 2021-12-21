@@ -113,7 +113,7 @@
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <input type="text" id="coinpayments_id" name="coinpayments_id" class="form-control" value="<?php echo $wo['config']['coinpayments_id'];?>">
-                                <label class="form-label">Coinpayments Publishable Key <small>Your coinpayments publishable key</small></label>
+                                <label class="form-label">Coinpayments Publishable Key <small>Your coinpayments Merchant ID</small></label>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -431,6 +431,13 @@
                             <input type="radio" name="cashfree_payment" id="cashfree_payment-disabled" value="no" <?php echo ($wo['config']['cashfree_payment'] == 'no') ? 'checked': '';?>>
                             <label for="cashfree_payment-disabled" class="m-l-20">Disabled</label>
                         </div>
+                        <label for="cashfree_mode">Cashfree Mode</label>
+                        <div class="form-group">
+                            <input type="radio" name="cashfree_mode" id="cashfree_mode-enabled" value="sandBox" <?php echo ($wo['config']['cashfree_mode'] == 'sandBox') ? 'checked': '';?>>
+                            <label for="cashfree_mode-enabled">SandBox</label>
+                            <input type="radio" name="cashfree_mode" id="cashfree_mode-disabled" value="live" <?php echo ($wo['config']['cashfree_mode'] == 'live') ? 'checked': '';?>>
+                            <label for="cashfree_mode-disabled" class="m-l-20">Live</label>
+                        </div> 
                         <div class="clearfix"></div>
                         <br>
                         <br>

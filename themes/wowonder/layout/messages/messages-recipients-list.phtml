@@ -29,7 +29,7 @@ if (!empty($message['from_id'])) {
 		<span class="msg_ava_name">
 			<span class="messages-user-name"><?php echo $wo['recipient']['name']; ?></span>
 		</span>
-		<p class="<?php echo ($message_count == 0) ? '' : 'new_msg_active_list'; ?>"> <?php echo $message['text']; ?></p>
+		<p class="<?php echo ($message_count == 0) ? '' : 'new_msg_active_list'; ?>"> <?php echo !empty($message['text']) ? $message['text'] : ''; ?></p>
 	</div>
 	<div class="clear"></div>
 </div>

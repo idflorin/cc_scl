@@ -955,6 +955,8 @@ function Wo_DeleteUser($user_id) {
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_POKES . " WHERE `received_user_id` = '{$user_id}' OR `send_user_id` = '{$user_id}'");
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_USERGIFTS . " WHERE `from` = '{$user_id}' OR `to` = '{$user_id}'");
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_STORY_SEEN . " WHERE `user_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_REFUND . " WHERE `user_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_INVITAION_LINKS . " WHERE `user_id` = '{$user_id}'");
     if ($query_one) {
         $send_message_data       = array(
             'from_email' => $wo['config']['siteEmail'],
@@ -990,7 +992,7 @@ function Wo_UpdateUserData($user_id, $update_data, $unverify = false) {
             return false;
         }
     }
-    if (!empty($update_data['admin'])) {
+    if (!empty($update_data['admin']) && $update_data['admin'] == 1) {
         if ($is_admin === false) {
             return false;
         }
@@ -3081,8 +3083,9 @@ function Wo_GetMessages($data = array(), $limit = 50) {
     $query = mysqli_query($sqlConnect, $query_one);
     while ($fetched_data = mysqli_fetch_assoc($query)) {
         $fetched_data['messageUser'] = Wo_UserData($fetched_data['from_id']);
+        $fetched_data['or_text']        = $fetched_data['text'];
         $fetched_data['text']        = Wo_Markup($fetched_data['text']);
-        //$fetched_data['text']        = Wo_Emo($fetched_data['text']);
+        $fetched_data['text']        = Wo_Emo($fetched_data['text']);
         $fetched_data['onwer']       = ($fetched_data['messageUser']['user_id'] == $wo['user']['user_id']) ? 1 : 0;
         if (!empty($fetched_data['stickers']) && !Wo_IsUrl($fetched_data['stickers'])) {
             $fetched_data['stickers'] = Wo_GetMedia($fetched_data['stickers']);
@@ -4291,6 +4294,7 @@ function Wo_ShareFile($data = array(), $type = 0, $crop = true) {
 }
 function Wo_DisplaySharedFile($media, $placement = '', $cache = false) {
     global $wo, $sqlConnect, $db;
+    $orginal = $media['filename'];
     $wo['media']['filename']    = Wo_GetMedia($media['filename']);
     $wo['media']['video_thumb'] = ((!empty($media['postFileThumb'])) ? Wo_GetMedia($media['postFileThumb']) : '');
     $wo['media']['name']        = Wo_Secure($media['name']);
@@ -4359,7 +4363,7 @@ function Wo_DisplaySharedFile($media, $placement = '', $cache = false) {
         if (empty($file)) {
             $file .= '<i class="fa ' . $icon_size . ' fa-file-o"></i> ' . $wo['media']['name'];
         }
-        if ($file_extension == 'mp4' || $file_extension == 'mkv' || $file_extension == 'avi' || $file_extension == 'webm' || $file_extension == 'mov') {
+        if ($file_extension == 'mp4' || $file_extension == 'mkv' || $file_extension == 'avi' || $file_extension == 'webm' || $file_extension == 'mov' || $file_extension == 'm3u8') {
             if ($placement == 'message' || $placement == 'chat') {
                 $media_file .= Wo_LoadPage('players/chat-video');
             } 
@@ -4399,8 +4403,15 @@ function Wo_DisplaySharedFile($media, $placement = '', $cache = false) {
                         Wo_RegisterAdView($video_ad->id);
                     }
                 }
+                if ($file_extension == 'm3u8') {
+                    $wo['media']['filename'] = $wo['config']['s3_site_url_2'] . '/' . $orginal;
+                    $media_file       .= Wo_LoadPage('players/videojs');
+                }
+                else{
+                    $media_file       .= Wo_LoadPage('players/video');
+                }
 
-                $media_file       .= Wo_LoadPage('players/video');
+                
             }
         }
         $last_file_view = '';
@@ -4730,7 +4741,9 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         $re_data['postType'] = 'post';
     }
     if (!empty($re_data['page_id'])) {
-        $re_data['user_id'] = 0;
+        if (Wo_IsPageOnwer($re_data['page_id'])) {
+            $re_data['user_id'] = 0;
+        }
     }
     $fields  = '`' . implode('`, `', array_keys($re_data)) . '`';
     $data    = '\'' . implode('\', \'', $re_data) . '\'';
@@ -4836,7 +4849,15 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
         return false;
     }
     if (!empty($fetched_data['page_id'])) {
-        $fetched_data['publisher'] = Wo_PageData($fetched_data['page_id']);
+        if (empty($fetched_data['user_id'])) {
+            $fetched_data['publisher'] = Wo_PageData($fetched_data['page_id']);
+            $fetched_data['page_info'] = array();
+        }
+        else{
+            $fetched_data['publisher'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['page_info'] = Wo_PageData($fetched_data['page_id']);
+        }
+        
     } else {
         $fetched_data['publisher'] = Wo_UserData($fetched_data['user_id']);
     }
@@ -5442,6 +5463,11 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
     if ($wo['config']['post_approval'] == 1) {
         $query_text .= " AND `active` = '1' ";
     }
+    else{
+        if ($wo['config']['blog_approval'] == 1) {
+            $query_text .= " AND `active` = '1' ";
+        }
+    }
     if (empty($data['limit']) or !is_numeric($data['limit']) or $data['limit'] < 1) {
         $data['limit'] = 5;
     }
@@ -5535,7 +5561,7 @@ function Wo_GetPosts($data = array('filter_by' => 'all', 'after_post_id' => 0, '
 
 
 function Wo_DeletePost($post_id = 0,$type = '') {
-    global $wo, $sqlConnect, $cache,$db;
+    global $wo, $sqlConnect, $cache;
     if ($post_id < 1 || empty($post_id) || !is_numeric($post_id)) {
         return false;
     }
@@ -5546,7 +5572,9 @@ function Wo_DeletePost($post_id = 0,$type = '') {
     $post_id = Wo_Secure($post_id);
     $query   = mysqli_query($sqlConnect, "SELECT `id`, `user_id`, `recipient_id`, `page_id`, `postFile`, `postType`, `postText`, `postLinkImage`, `multi_image`, `album_name`,`parent_id`,`blog_id`,`job_id`,`postRecord` FROM " . T_POSTS . " WHERE `id` = {$post_id} AND (`user_id` = {$user_id} OR `recipient_id` = {$user_id} OR `page_id` IN (SELECT `page_id` FROM " . T_PAGES . " WHERE `user_id` = {$user_id}) OR `group_id` IN (SELECT `id` FROM " . T_GROUPS . " WHERE `user_id` = {$user_id}) OR `page_id` IN (SELECT `page_id` FROM " . T_PAGE_ADMINS . " WHERE `user_id` = {$user_id}))");
     $is_me = mysqli_num_rows($query);
-    $post_info = $db->where('id',$post_id)->getOne(T_POSTS);
+
+    $row = mysqli_query($sqlConnect, "SELECT * FROM " . T_POSTS . " WHERE `id` = '{$post_id}'");
+    $fetched_data = mysqli_fetch_assoc($row);
     if ($is_me > 0 || (Wo_IsAdmin() || Wo_IsModerator()) || $type == 'shared') {
 
 
@@ -5564,38 +5592,47 @@ function Wo_DeletePost($post_id = 0,$type = '') {
         
         // delete shared posts
         //if (!empty($post_info->parent_id)) {
-            $db->where('parent_id',$post_id)->delete(T_POSTS);
+        mysqli_query($sqlConnect, "DELETE FROM " . T_POSTS . " WHERE `parent_id` = {$post_id}");
         //}
         // delete shared posts 
 
         $is_this_post_shared = Wo_IsThisPostShared($post_id);
         $is_post_shared = Wo_IsPostShared($post_id);
-        $fetched_data = mysqli_fetch_assoc($query);
+        //$fetched_data = mysqli_fetch_assoc($query);
         if ($fetched_data['postType'] == 'profile_picture' || $fetched_data['postType'] == 'profile_picture_deleted' || $fetched_data['postType'] == 'profile_cover_picture') {
             $query_delete_3 = mysqli_query($sqlConnect, "UPDATE " . T_POSTS . " SET `postType` = 'profile_picture_deleted' WHERE `id` = '" . $fetched_data['id'] . "'");
             return true;
         }
-        if (!empty($post_info->job_id)) {
-            $job = $db->where('id',$post_info->job_id)->getOne(T_JOB);
+        if (!empty($fetched_data['job_id'])) {
+            $job_id = $fetched_data['job_id'];
+            $row = mysqli_query($sqlConnect, "SELECT * FROM " . T_JOB . " WHERE `id` = '{$job_id}'");
+            $job = mysqli_fetch_assoc($row);
+            //$job = $db->where('id',$post_info->job_id)->getOne(T_JOB);
             if (!empty($job)) {
-                if ($job->image_type != 'cover') {
-                    @unlink($job->image);
-                    Wo_DeleteFromToS3($job->image);
+                if ($job['image_type'] != 'cover') {
+                    @unlink($job['image']);
+                    Wo_DeleteFromToS3($job['image']);
                 }
                 
             }
-            $db->where('id',$post_info->job_id)->delete(T_JOB);
-            $db->where('job_id',$post_info->job_id)->delete(T_JOB_APPLY);
+            mysqli_query($sqlConnect, "DELETE FROM " . T_JOB . " WHERE `id` = {$job_id}");
+            mysqli_query($sqlConnect, "DELETE FROM " . T_JOB_APPLY . " WHERE `job_id` = {$job_id}");
+            // $db->where('id',$post_info->job_id)->delete(T_JOB);
+            // $db->where('job_id',$post_info->job_id)->delete(T_JOB_APPLY);
         }
-        if (!empty($post_info->offer_id)) {
-            $offer = $db->where('id',$post_info->offer_id)->getOne(T_OFFER);
+        if (!empty($fetched_data['offer_id'])) {
+            $offer_id = $fetched_data['offer_id'];
+            $row = mysqli_query($sqlConnect, "SELECT * FROM " . T_OFFER . " WHERE `id` = '{$offer_id}'");
+            $offer = mysqli_fetch_assoc($row);
+            //$offer = $db->where('id',$post_info->offer_id)->getOne(T_OFFER);
             if (!empty($offer)) {
-                if (!empty($offer->image)) {
-                    @unlink($offer->image);
-                    Wo_DeleteFromToS3($offer->image);
+                if (!empty($offer['image'])) {
+                    @unlink($offer['image']);
+                    Wo_DeleteFromToS3($offer['image']);
                 }
             }
-            $db->where('id',$post_info->offer_id)->delete(T_OFFER);
+            mysqli_query($sqlConnect, "DELETE FROM " . T_OFFER . " WHERE `id` = {$offer_id}");
+            //$db->where('id',$post_info->offer_id)->delete(T_OFFER);
         }
         if (!empty($fetched_data['postText'])) {
             $hashtag_regex = '/(#\[([0-9]+)\])/i';
@@ -5617,7 +5654,7 @@ function Wo_DeletePost($post_id = 0,$type = '') {
             }
         }
         if (!empty($fetched_data['blog_id']) && $fetched_data['blog_id'] > 0) {
-            Wo_DeleteMyBlog($fetched_data['blog_id']);
+            //Wo_DeleteMyBlog($fetched_data['blog_id']);
         }
 
         if (isset($fetched_data['postFile']) && !empty($fetched_data['postFile'])) {
@@ -5679,7 +5716,7 @@ function Wo_DeletePost($post_id = 0,$type = '') {
             }
         }
         if ($is_me > 0 || (Wo_IsAdmin() || Wo_IsModerator())) {
-            Wo_RegisterPoint($post_id, "createpost", "-",$post_info->user_id);
+            Wo_RegisterPoint($post_id, "createpost", "-",$fetched_data['user_id']);
         }
         $query_delete = mysqli_query($sqlConnect, "DELETE FROM " . T_POSTS . " WHERE `id` = {$post_id}");
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_POSTS . " WHERE `post_id` = {$post_id}");
@@ -5698,6 +5735,7 @@ function Wo_DeletePost($post_id = 0,$type = '') {
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_VOTES . " WHERE `post_id` = {$post_id}");
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_HIDDEN_POSTS . " WHERE `post_id` = {$post_id}");
         $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_REACTIONS . " WHERE `post_id` = '{$post_id}'");
+        $query_delete .= mysqli_query($sqlConnect, "DELETE FROM " . T_LIVE_SUB . " WHERE `post_id` = '{$post_id}'");
 
         
 

@@ -9,7 +9,7 @@ if ($f == 're_cover') {
            $full_url_image       = $wo['user']['cover'];
            $default_image        = explode('.', $wo['user']['cover_org']);
            $default_image        = $default_image[0] . '_full.' . $default_image[1];
-           $get_default_image    = file_put_contents($default_image, file_get_contents($default_image));
+           $get_default_image    = file_put_contents($default_image, fetchDataFromURL(Wo_GetMedia($default_image)));
            $image_type           = $_POST['image_type'];
            $default_cover_width  = 1120;
            $default_cover_height = 276;

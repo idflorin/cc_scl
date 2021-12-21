@@ -195,7 +195,7 @@
               <a href="<?php echo $wo['story']['post_url']; ?>" class="pointer"><span style="color: #666;"><?php echo strtolower($wo['lang']['post']); ?></span></a>
             </span>
             <?php endif; ?>
-         <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name'])) { ?>
+         <?php if ($wo['config']['live_video'] == 1 && !empty($wo['story']['stream_name'])) { ?>
          <span><span style="color: #666;"><?php echo ($wo['story']['is_still_live'] ? $wo['lang']['is_live'] : $wo['lang']['was_live']); ?></span></span>
       <?php } ?>
 
@@ -762,7 +762,7 @@
             ?>
         </div>
         <?php } ?>
-        <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name'])) { ?>
+        <?php if ($wo['config']['live_video'] == 1 && !empty($wo['story']['stream_name'])) { ?>
 			<div class="post-file" <?php echo $wo['story']['is_still_live'] ? 'style="/*height: 440px;*/"' : ''; ?> id="fullsizeimg">
 				<?php if ($wo['story']['is_still_live']) { ?>
 					<div class="embed-responsive embed-responsive-4by3">

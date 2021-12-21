@@ -623,7 +623,7 @@ table tr {outline: 0;}
 .sun_forum_sections table tr:hover {background: rgba(0,0,0,.01);}
 .sun_forum_sections table tr:first-child {border: 0;}
 .sun_forum_sections table .topic_icon {width: 3% !important;}
-.sun_forum_sections table .forum-meta-d.titles {width: 43%;}
+.sun_forum_sections table .forum-meta-d.titles {width: 43%;word-break: break-word;}
 .sun_forum_sections table .forum-meta-d.posts {width: 6%;padding-right: 65px !important;}
 .sun_forum_sections table .forum-meta-d.topics {width: 6%;padding-right: 20px !important;}
 .sun_forum_sections table .forum-meta-d.small {width: 16%;padding: 10px !important;}
@@ -1015,9 +1015,10 @@ table tr {outline: 0;}
 .wo_chat_tabs li a svg {margin-top: -2px;width: 20px;height: 20px;}
 .online-content-toggler {margin-bottom: 0;min-height: calc(100% - 278px);max-height: calc(100% - 278px);position: relative;overflow-y: scroll;margin-right: -17px;}
 .chat-opacity {	position: absolute;width: 100%;top: 0;right: 0;bottom: 0;left: 0;margin: 0;/*height: calc(100% + 40px);*/background-color: rgba(246, 246, 246, 0.9);}
-.chat-opacity .text-center {height: 100%;}
-.chat-opacity .text-center .empty_state {vertical-align: middle;color: #565656;}
-.chat-opacity .text-center .empty_state span {background-color: #efefef;}
+.chat-opacity .text-center {height: 100%;display: -webkit-box;display: -webkit-flex;display: -ms-flexbox;display: flex;-webkit-box-align: center;-webkit-align-items: center;-ms-flex-align: center;align-items: center;}
+.chat-opacity .text-center .empty_state {color: #565656;display: block;}
+.chat-opacity .text-center .empty_state span {background-color: transparent;display: block;}
+.chat-opacity .text-center .empty_state svg.feather {display: block;margin: 0 auto 15px;width: 34px;height: 34px;}
 .recipient-chat-user {margin-top: 12px;margin-bottom: 12px;padding: 0 13px;}
 .recipient-chat-user .chat-user-text {color: #333;font-size: 12px;font-weight: normal;}
 .recipient-chat-user .chat-user-text img {max-width: 35px;border-radius: 5px;height: 35px;object-fit: cover;}
@@ -1342,7 +1343,7 @@ svg {vertical-align: middle;}
 .wow_go_live_cont .liv_vid_cont {height: 100%;}
 .wow_go_live_cont .empty_state {margin: 0;display: flex;flex-direction: column;justify-content: center;height: calc(100vh - 45px);color: rgba(255, 255, 255, 0.8);align-items: center;}
 .wow_go_live_cont .empty_state svg {opacity: 1;background-color: #4a4a4a;color: white;border-radius: 50%;padding: 12px;width: 60px;height: 60px;}
-.wow_liv_counter {position: absolute;left: 20px;top: 20px;background-color: rgba(0, 0, 0, 0.7);border-radius: 4px;box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);min-width: 60px;line-height: 30px;font-size: 12px;font-weight: 500;color: #03a9f4;font-family: "Roboto",sans-serif;text-align: center;padding: 0 10px;}
+.wow_liv_counter {z-index: 2; position: absolute;left: 20px;top: 20px;background-color: rgba(0, 0, 0, 0.7);border-radius: 4px;box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);min-width: 60px;line-height: 30px;font-size: 12px;font-weight: 500;color: #03a9f4;font-family: "Roboto",sans-serif;text-align: center;padding: 0 10px;}
 .wow_liv_comments_feed {position: absolute;bottom: 0;width: 100%;left: 0;right: 0;background: linear-gradient(rgba(0, 0, 0, 0), black);padding: 120px 15px 10px;}
 .wow_go_live_btn, .wow_end_live_btn {width: auto;border-radius: 4px;box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);min-width: 105px;line-height: 42px;height: auto;bottom: auto;right: 50px;left: auto;top: 20px;transform: none;color: #fff;border: 0;font-family: "Lato",sans-serif;font-size: 14px;font-weight: 600;}
 .wow_go_live_btn svg, .wow_end_live_btn svg {width: 17px;height: 17px;margin: -2px 3px 0 0;}

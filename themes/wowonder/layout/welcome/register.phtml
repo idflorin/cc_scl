@@ -97,7 +97,8 @@ $fields = Wo_GetWelcomeFileds();
 						<p><?php echo $wo['lang']['already_have_account']?> <a class="dec" href="<?php echo $wo['config']['site_url'];?>"><?php echo $wo['lang']['login']?></a></p>
 					</div>
 				</div>
-				<?php if (isset($_GET['invite'])): ?>
+				<?php
+				 if (isset($_GET['invite']) && (Wo_IsAdminInvitationExists($_GET['invite']) || Wo_IsUserInvitationExists($_GET['invite']))): ?>
 					<input type="text" class="hidden" value="<?php echo $_GET['invite']; ?>" name="invited">
 				<?php endif; ?>
 			</form>

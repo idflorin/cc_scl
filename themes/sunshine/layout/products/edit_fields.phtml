@@ -20,7 +20,7 @@
 			<?php
 			} else {
 			if ($wo['field']['type'] == 'textbox') { ?>
-            <input id="fid_<?php echo $wo['field']['id'];?>" name="fid_<?php echo $wo['field']['id'];?>" type="text" class="form-control input-md" placeholder="<?php echo $wo['field']['name']; ?>" <?php echo $required ?>>
+            <input id="fid_<?php echo $wo['field']['id'];?>" name="fid_<?php echo $wo['field']['id'];?>" type="text" class="form-control input-md" placeholder="<?php echo $wo['field']['name']; ?>" value="<?php echo $wo['product']['fid_'.$wo['field']['id']] ?>" <?php echo $required ?>>
 			<?php } else if ($wo['field']['type'] == 'textarea') { ?>
             <textarea class="form-control" id="fid_<?php echo $wo['field']['id'];?>" name="fid_<?php echo $wo['field']['id'];?>" cols="20" rows="3" placeholder="<?php echo $wo['field']['name']; ?>" <?php echo $required ?>><?php echo $wo['product']['fid_'.$wo['field']['id']]; ?></textarea>
 			<?php } } ?>

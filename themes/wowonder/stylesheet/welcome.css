@@ -40,3 +40,5 @@
 /*Password Check*/
 .helper-text {display: none;margin-top: 6px;font-size: 12px;line-height: 18px;}
 .helper-text li.valid {color: #1aac20;}
+
+.wow_forgot_choice .login__ {flex-wrap: wrap;}

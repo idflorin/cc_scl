@@ -34,12 +34,14 @@ $(function () {
   $('#blog-comment').autogrow({vertical: true, horizontal: false, height: 200});
   var api = $('#api').val();
   var hash = $('.main_session').val();
-  $.ajaxSetup({ 
+  setTimeout(function (argument) {
+    $.ajaxSetup({ 
     data: {
         hash: hash
     },
     cache: false 
   });
+  },1000)
   $(document).on("click",".mfp-arrow",function(event) {
     Wo_StoryProgress();
   });
@@ -1725,7 +1727,7 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
       console.log(data);
       //document.location = data.url;
     });
-    return false;
+    //return false;
   }
   placement = 1;
   if ($('.chat-wrapper').length == 1) {
@@ -3295,7 +3297,7 @@ $(window).on('load', function() {
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_reaction', post_id: post_id}, function (data) {
       if(data.status == 200) {
         $('.reactions-box-container-'+post_id).toggle();
-        $('.post-reactions-icons-'+post_id).html("");
+        $('.post-reactions-icons-'+post_id).html(data.reactions);
         $('.status-reaction-'+post_id).removeClass("active-like");
         $('.status-reaction-'+post_id).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-up"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg> ' + data.like_lang).css({"color": "inherit"});
       }

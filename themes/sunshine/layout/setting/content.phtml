@@ -156,7 +156,10 @@ if ($wo['setting']['user_id'] == $wo['user']['user_id']) {
 }
 if ($wo['config']['affiliate_system'] == 1) {
   $pages_array[] = 'affiliates';
-  $pages_array[] = 'payments';
+  
+}
+if ($wo['config']['affiliate_system'] == 1 || $wo['config']['point_allow_withdrawal'] == 1 || $wo['config']['funding_system'] == 1) {
+	$pages_array[] = 'payments';
 }
 if (!empty($_GET['page'])) {
    if (in_array($_GET['page'], $pages_array)) {

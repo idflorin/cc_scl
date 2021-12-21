@@ -6,6 +6,7 @@ $orginal_txt                 = array(
     "{user}",
     "{post}"
 );
+$wo['activity']['color'] = '';
 if ($wo['activity']['activity_type'] == 'following' || $wo['activity']['activity_type'] == 'friend') {
    $wo['activity']['following']  = Wo_UserData($wo['activity']['follow_id']);
    $post_publisher              = '<a class="second-user-color" data-ajax="?link1=timeline&u=' . $wo['activity']['following']['username'] . '" href="' . $wo['activity']['following']['url'] . '">' . $wo['activity']['following']['name'] . '</a>';

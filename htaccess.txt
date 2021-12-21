@@ -41,6 +41,8 @@ RewriteRule ^confirm-sms-password(/?|)$ index.php?link1=confirm-sms-password [QS
 RewriteRule ^forgot-password(/?|)$ index.php?link1=forgot-password [QSA,L]
 RewriteRule ^activate(/?|)$ index.php?link1=activate [QSA]
 RewriteRule ^pages(/?|)$ index.php?link1=pages [QSA]
+RewriteRule ^liked-pages(/?|)$ index.php?link1=liked-pages [QSA]
+RewriteRule ^joined_groups(/?|)$ index.php?link1=joined_groups [QSA]
 RewriteRule ^suggested-pages(/?|)$ index.php?link1=suggested-pages [QSA]
 RewriteRule ^groups(/?|)$ index.php?link1=groups [QSA]
 RewriteRule ^suggested-groups(/?|)$ index.php?link1=suggested-groups [QSA]
@@ -66,6 +68,7 @@ RewriteRule ^new-product(/?|)$ index.php?link1=new-product [NC,QSA]
 RewriteRule ^edit-product/([A-Za-z0-9_]+)$ index.php?link1=edit-product&id=$1 [NC,QSA]
 RewriteRule ^products(/?|)$ index.php?link1=products [NC,QSA]
 RewriteRule ^products/([A-Za-z0-9_-]+)$ index.php?link1=products&c_id=$1 [QSA]
+RewriteRule ^products/([A-Za-z0-9_-]+)/([A-Za-z0-9_-]+)$ index.php?link1=products&c_id=$1&sub_id=$2 [QSA]
 RewriteRule ^my-products(/?|)$ index.php?link1=my-products [QSA]
 RewriteRule ^site-pages/(.*)$ index.php?link1=site-pages&page_name=$1 [NC,QSA]
 RewriteRule ^blogs(/?|)$ index.php?link1=blogs [NC,QSA]
@@ -87,6 +90,13 @@ RewriteRule ^my_funding$ index.php?link1=my_funding [NC,QSA]
 RewriteRule ^create_funding$ index.php?link1=create_funding [NC,QSA]
 RewriteRule ^edit_fund/(.*)$ index.php?link1=edit_fund&id=$1 [NC,QSA]
 RewriteRule ^show_fund/(.*)$ index.php?link1=show_fund&id=$1 [NC,QSA]
+RewriteRule ^live$ index.php?link1=live [NC,QSA]
+RewriteRule ^memories$ index.php?link1=memories [NC,QSA]
+RewriteRule ^offers$ index.php?link1=offers [NC,QSA]
+RewriteRule ^nearby_shops$ index.php?link1=nearby_shops [NC,QSA]
+RewriteRule ^nearby_business$ index.php?link1=nearby_business [NC,QSA]
+RewriteRule ^refund$ index.php?link1=refund [NC,QSA]
+RewriteRule ^advertise$ index.php?link1=advertise [NC,QSA]
 
 RewriteRule ^wonderful$ index.php?theme=wonderful [NC,QSA]
 RewriteRule ^wowonder$ index.php?theme=wowonder [NC,QSA]
@@ -218,6 +228,14 @@ ExpiresByType application/pdf "access plus 1 month"
 ExpiresByType text/x-javascript "access plus 1 month"
 ExpiresByType application/x-shockwave-flash "access plus 1 month"
 ExpiresByType image/x-icon "access plus 1 year"
-ExpiresDefault "access plus 2 days"
+ExpiresDefault "access plus 1 month"
 </IfModule>
 ## EXPIRES CACHING ##
+
+<ifModule mod_headers.c>
+  Header unset Connection
+  Header set Connection keep-alive
+
+  Header unset Keep-Alive
+  Header set Keep-Alive timeout=100,max=500
+</ifModule>

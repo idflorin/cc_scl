@@ -1,6 +1,9 @@
 <?php 
 if ($f == 'pages') {
     if ($s == 'create_page') {
+        if (!empty($_POST['page_name']) && ($_POST['page_name'] == 'wowonder' || $_POST['page_name'] == 'sunshine' || $_POST['page_name'] == $wo['config']['theme']) ) {
+            $_POST['page_name'] = "";
+        }
         if (empty($_POST['page_name']) || empty($_POST['page_title']) || empty(Wo_Secure($_POST['page_title'])) || Wo_CheckSession($hash_id) === false) {
             $errors[] = $error_icon . $wo['lang']['please_check_details'];
         } else {
@@ -180,6 +183,9 @@ if ($f == 'pages') {
         }
     }
     if ($s == 'update_general_settings') {
+        if (!empty($_POST['page_name']) && ($_POST['page_name'] == 'wowonder' || $_POST['page_name'] == 'sunshine' || $_POST['page_name'] == $wo['config']['theme']) ) {
+            $_POST['page_name'] = "";
+        }
         if (!empty($_POST['page_id']) && Wo_CheckSession($hash_id) === true) {
             $PageData = Wo_PageData($_POST['page_id']);
             if (empty($_POST['page_name']) OR empty($_POST['page_category']) OR empty($_POST['page_title']) OR empty(Wo_Secure($_POST['page_title']))) {

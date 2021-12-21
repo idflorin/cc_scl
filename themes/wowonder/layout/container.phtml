@@ -270,6 +270,11 @@
            var box = $('#contnet');
            var ISAPI = $('#ISAPI').val();
            $(document).on('click', 'a[data-ajax]', function(e) {
+            if ($('#live_post_id').length > 0) {
+                  DeleteLive();
+                  window.location = $(this).attr('href');
+                  return false;
+            }
             Wo_CloseLightbox();
               $('body').removeAttr('no-more-posts');
               if ($('.postText').length) {
@@ -388,6 +393,37 @@
            });
        }); 
       <?php } ?>
+      function RunLiveAgora(channelName,DIV_ID) {
+  var agoraAppId = '<?php echo($wo['config']['agora_app_id']) ?>'; 
+  var token = null;
+
+  var client = AgoraRTC.createClient({mode: 'live', codec: 'vp8'}); 
+  client.init(agoraAppId, function () {
+
+
+      client.setClientRole('audience', function() {
+    }, function(e) {
+    });
+    
+    client.join(token, channelName, 0, function(uid) {
+    }, function(err) {
+    });
+    }, function (err) {
+    });
+
+    client.on('stream-added', function (evt) {
+    var stream = evt.stream;
+    var streamId = stream.getId();
+    
+    client.subscribe(stream, function (err) {
+    });
+  });
+  client.on('stream-subscribed', function (evt) {
+    var remoteStream = evt.stream;
+    remoteStream.play(DIV_ID);
+    $('#player_'+remoteStream.getId()).addClass('embed-responsive-item');
+  });
+}
       </script>
       <?php echo (!empty($wo['config']['googleAnalytics'])) ? $wo['config']['googleAnalytics'] : ''; ?>
       
@@ -406,6 +442,18 @@
     <meta name="google-signin-client_id" content="<?php echo $wo['config']['googleAppId']?>">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <?php endif; ?>
+    <?php if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id'])) { ?>
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/agora.js"></script>
+    <?php } ?>
+    <?php if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['config']['agora_customer_id']) && !empty($wo['config']['agora_customer_certificate'])) { ?>
+      <link href="<?php echo $wo['config']['theme_url'];?>/player/Video/video-js.css" rel="stylesheet" />
+
+      <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+      <script src="<?php echo $wo['config']['theme_url'];?>/player/Video/videojs-ie8.min.js"></script>
+      <script src="<?php echo $wo['config']['theme_url'];?>/player/Video/video.js"></script>
+    <?php } ?>
+    <script crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+    
    </head>
    
    <body <?php if ($wo['config']['chatSystem'] == 0) { ?> chat-off="true" <?php } ?>>
@@ -432,7 +480,7 @@
          <div class="ad-placement-header-footer">
             <?php 
                $header_ad = Wo_GetAd('header', false);
-               if($wo['page'] != 'admin' && $wo['page'] != 'welcome' && $wo['page'] != 'messages' && !empty($header_ad) && $wo['page'] != 'video-api') {
+               if($wo['page'] != 'admin' && $wo['page'] != 'welcome' && $wo['page'] != 'messages' && $wo['page'] != '404' && !empty($header_ad) && $wo['page'] != 'video-api') {
                  $timeline_ads = ($wo['page'] == 'timeline' || $wo['page'] == 'page' || $wo['page'] == 'group')  ? 'style="margin-top: 20px;"' : '';
                  echo '<div class="contnet" ' . $timeline_ads . '>' . $header_ad . '</div>';
                } 
@@ -441,7 +489,7 @@
          <div id="contnet"><?php echo $wo['content'];?></div> 
          <?php 
             $footer_ad = Wo_GetAd('footer', false);
-            if($wo['page'] != 'admin' && $wo['page'] != 'welcome' && $wo['page'] != 'messages' && !empty($footer_ad)) {
+            if($wo['page'] != 'admin' && $wo['page'] != 'welcome' && $wo['page'] != 'messages' && $wo['page'] != '404' && !empty($footer_ad)) {
               echo '<div class="contnet">' . $footer_ad . '</div>';
             } 
             ?>
@@ -760,5 +808,6 @@
     <?php } } ?>
     <div class="modal fade sun_modal" id="apply-job-modal" role="dialog">
     </div>
+    
    </body>
 </html>

@@ -44,6 +44,7 @@ if (!empty($_GET['ref']) && $wo['loggedin'] == false && !isset($_COOKIE['src']))
         }
     }
 }
+
 if (!isset($_COOKIE['src'])) {
     @setcookie('src', '1', time() + 31556926, '/');
 }
@@ -527,6 +528,9 @@ if ($wo['config']['membership_system'] == 1) {
                 case 'unusual-login':
                     include('sources/unusual-login.php');
                     break;
+                case 'terms':
+                    include('sources/term.php');
+                    break;
             }
         }
     }
@@ -600,6 +604,9 @@ if ($wo['config']['membership_system'] == 1) {
                 break;
             case 'unusual-login':
                 include('sources/unusual-login.php');
+                break;
+            case 'terms':
+                include('sources/term.php');
                 break;
         }
     }

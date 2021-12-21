@@ -825,7 +825,8 @@ if ($f == 'posts') {
             if (Wo_DeleteReactions($_GET['post_id'])) {
                 $data = array(
                     'status' => 200,
-                    'like_lang' => $wo['lang']['like']
+                    'like_lang' => $wo['lang']['like'],
+                    'reactions' => Wo_GetPostReactions($_GET['post_id'])
                 );
             }
         }

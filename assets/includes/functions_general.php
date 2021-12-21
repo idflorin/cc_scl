@@ -1448,7 +1448,7 @@ function Wo_DeleteFromToS3($filename, $config = array()) {
     
     
     
-    if ($wo['config']['amazone_s3'] == 0 && $wo['config']['ftp_upload'] == 0 && $wo['config']['spaces'] == 0 && $wo['config']['cloud_upload'] == 0) {
+    if ($wo['config']['amazone_s3'] == 0 && $wo['config']['ftp_upload'] == 0 && $wo['config']['spaces'] == 0 && $wo['config']['cloud_upload'] == 0 && $wo['config']['amazone_s3_2'] == 0) {
         return false;
     }
     if ($wo['config']['ftp_upload'] == 1) {
@@ -1526,6 +1526,28 @@ function Wo_DeleteFromToS3($filename, $config = array()) {
             // print $e;
             // exit();
             return false;
+        }
+    }
+
+    if ($wo['config']['amazone_s3_2'] == 1) {
+        include_once('assets/libraries/s3/aws-autoloader.php');
+        if (empty($wo['config']['amazone_s3_key_2']) || empty($wo['config']['amazone_s3_s_key_2']) || empty($wo['config']['region_2']) || empty($wo['config']['bucket_name_2'])) {
+            return false;
+        }
+        $s3 = new S3Client([
+            'version'     => 'latest',
+            'region'      => $wo['config']['region_2'],
+            'credentials' => [
+                'key'    => $wo['config']['amazone_s3_key_2'],
+                'secret' => $wo['config']['amazone_s3_s_key_2'],
+            ]
+        ]);
+        $s3->deleteObject([
+            'Bucket' => $wo['config']['bucket_name_2'],
+            'Key'    => $filename,
+        ]);
+        if (!$s3->doesObjectExist($wo['config']['bucket_name_2'], $filename)) {
+            return true;
         }
     }
 }

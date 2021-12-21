@@ -287,7 +287,7 @@
 		</div>
 		<?php if ($wo['loggedin'] == true && count($stories) > 0) {  ?>
 			<div class="load-more pointer" id="load-more-posts" onclick="Wo_GetMorePosts();">
-				<span class="btn btn-default"><i class="fa fa-chevron-circle-down progress-icon" data-icon="chevron-circle-down"></i> <?php echo $wo['lang']['load_more_posts']; ?><span>
+				<span class="btn btn-default"><i class="fa fa-chevron-circle-down progress-icon" data-icon="chevron-circle-down"></i> &nbsp;<?php echo $wo['lang']['load_more_posts']; ?><span>
 			</div>
 		<?php } } ?>
 		<div id="load-more-filter">
@@ -428,11 +428,20 @@
 				if (!empty($fields)) {
 					foreach ($fields as $key => $wo['field']) { 
 						if (!empty($wo['page_profile']['fid_'.$wo['field']['id']])) {
+							$text = $wo['page_profile']['fid_'.$wo['field']['id']];
+							if ($wo['field']['type'] == 'selectbox') {
+							     $options = @explode(',', $wo['field']['options']);
+								foreach ($options as $key => $value) {
+									if ($key + 1 == $wo['page_profile']['fid_'.$wo['field']['id']]) {
+										$text = $options[$key];
+									}
+								}						
+							}
 
 						?>
 						<li class="list-group-item">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="feather"><path fill="currentColor" d="M5.5,7A1.5,1.5 0 0,1 4,5.5A1.5,1.5 0 0,1 5.5,4A1.5,1.5 0 0,1 7,5.5A1.5,1.5 0 0,1 5.5,7M21.41,11.58L12.41,2.58C12.05,2.22 11.55,2 11,2H4C2.89,2 2,2.89 2,4V11C2,11.55 2.22,12.05 2.59,12.41L11.58,21.41C11.95,21.77 12.45,22 13,22C13.55,22 14.05,21.77 14.41,21.41L21.41,14.41C21.78,14.05 22,13.55 22,13C22,12.44 21.77,11.94 21.41,11.58Z"></path></svg>
-							<?php echo $wo['page_profile']['fid_'.$wo['field']['id']]; ?>
+							<?php echo $text; ?>
 						</li>
 			<?php } } } ?>
 			
@@ -672,7 +681,7 @@
 						</div>
 						<div class="th-alert">
 							<div class="create-article-form">
-								<div class="main prv-img pointer" id="select-img" data-block="thumdrop-zone">
+								<div class="main prv-img pointer" id="select-img-2" data-block="thumdrop-zone">
 									<div class="thumbnail-rendderer">
 										<div>
 											<h4 class="bold"><?php echo $wo['lang']['drop_img_here']; ?></h4>
@@ -696,7 +705,7 @@
 							<div class="clear"></div>
 						</div>
 					</div>
-					<input type="file" class="hidden" id="thumbnail" name="thumbnail" accept="image/*">
+					<input type="file" class="hidden" id="thumbnail-2" name="thumbnail" accept="image/*">
 					<input type="hidden" name="page_id" id="page_id" class="form-control input-md" value="<?php echo $wo['page_profile']['page_id'];?>">
 					<input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
 				</div>
@@ -711,6 +720,12 @@
 <?php } ?>
 <!-- JS Pages functions -->
 <script>
+	$("#select-img-2").click(function(event) {
+      $("#thumbnail-2").click()
+    });
+    $("#thumbnail-2").change(function(event) {
+      $(".prv-img").html("<img src='" + window.URL.createObjectURL(this.files[0]) + "' alt='Picture'>");
+    });
 	$.getScript('https://cdn.jsdelivr.net/npm/jquery-ui-timepicker-addon@1.6.3/dist/jquery-ui-timepicker-addon.min.js', function(data, textStatus) {
 		$( ".date1" ).datepicker({ dateFormat: 'yy-mm-dd', minDate: '+1day',prevText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" /></svg>',nextText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" /></svg>'});
       $( ".time1" ).timepicker();
@@ -907,7 +922,8 @@ $(function () {
     success: function (data) {
     	$('.profile_cover').fadeIn(100);
       if(data.status == 200) {
-        $('[id^=cover-image]').attr("src", data.img);
+      	$('.user-cover').find('img').attr("src", data.img);
+        //$('[id^=cover-image]').attr("src", data.img);
       }
       $('.user-cover-uploading-container,.user-cover-uploading-progress').fadeOut(200);
     }

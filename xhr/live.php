@@ -5,15 +5,40 @@ if ($f == 'live') {
     		$data['message'] = $error_icon . $wo['lang']['please_check_details'];
     	}
     	else{
+            $postPrivacy = 0;
+            $privacy_array = array(
+                '0',
+                '1',
+                '2',
+                '3',
+                '4'
+            );
+            if (!empty($_COOKIE['post_privacy']) && in_array($_COOKIE['post_privacy'], $privacy_array)) {
+                $postPrivacy = Wo_Secure($_COOKIE['post_privacy']);
+            }
     		$post_id = $db->insert(T_POSTS,array('user_id' => $wo['user']['id'],
 		    	                                 'postText' => '',
                                                  'postType' => 'live',
-                                                 'postPrivacy' => 0,
+                                                 'postPrivacy' => $postPrivacy,
                                                  'stream_name' => Wo_Secure($_POST['stream_name']),
                                                  'time' => time()));
     		$db->where('id',$post_id)->update(T_POSTS,array('post_id' => $post_id));
             Wo_RunInBackground(array('status' => 200,
                                      'post_id' => $post_id));
+
+            if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['config']['agora_customer_id']) && !empty($wo['config']['agora_customer_certificate']) && $wo['config']['live_video_save'] == 1) {
+
+                if ($wo['config']['amazone_s3_2'] == 1 && !empty($wo['config']['bucket_name_2']) && !empty($wo['config']['amazone_s3_key_2']) && !empty($wo['config']['amazone_s3_s_key_2']) && !empty($wo['config']['region_2'])) {
+
+                    $region_array = array('us-east-1' => 0,'us-east-2' => 1,'us-west-1' => 2,'us-west-2' => 3,'eu-west-1' => 4,'eu-west-2' => 5,'eu-west-3' => 6,'eu-central-1' => 7,'ap-southeast-1' => 8,'ap-southeast-2' => 9,'ap-northeast-1' => 10,'ap-northeast-2' => 11,'sa-east-1' => 12,'ca-central-1' => 13,'ap-south-1' => 14,'cn-north-1' => 15,'us-gov-west-1' => 17);
+
+                    if (in_array(strtolower($wo['config']['region_2']),array_keys($region_array) )) {
+
+                        StartCloudRecording(1,$region_array[strtolower($wo['config']['region_2'])],$wo['config']['bucket_name_2'],$wo['config']['amazone_s3_key_2'],$wo['config']['amazone_s3_s_key_2'],$_POST['stream_name'],explode('_', $_POST['stream_name'])[2],$post_id);
+                    }
+                    
+                }
+            }
             Wo_notifyUsersLive($post_id);
             $data['status'] = 200;
             $data['post_id'] = $post_id;
@@ -47,6 +72,7 @@ if ($f == 'live') {
                     //}
     				$comments = $db->where('post_id',$post_id)->where('text','','!=')->get(T_COMMENTS);
     				$html = '';
+                    $count = 0;
     				foreach ($comments as $key => $value) {
     					if (!empty($value->text)) {
     						$wo['comment'] = Wo_GetPostComment($value->id);
@@ -59,7 +85,7 @@ if ($f == 'live') {
     				}
 
 
-                    $count = 0;
+                    
                     $word = $wo['lang']['offline'];
                     if (!empty($post_data->live_time) && $post_data->live_time >= (time() - 10)) {
                         //$db->where('post_id',$post_id)->where('time',time()-6,'<')->update(T_LIVE_SUB,array('is_watching' => 0));
@@ -108,14 +134,21 @@ if ($f == 'live') {
                     if (!empty($post_data) && $post_data->live_time >= (time() - 10)){
                         $still_live = 'live';
                     }
-                    
-                    Wo_RunInBackground(array(
+                    $data = array(
                         'status' => 200,
                         'html' => $html,
                         'count' => $count,
                         'word' => $word,
                         'still_live' => $still_live
-                    ));
+                    );
+                    
+                    // Wo_RunInBackground(array(
+                    //     'status' => 200,
+                    //     'html' => $html,
+                    //     'count' => $count,
+                    //     'word' => $word,
+                    //     'still_live' => $still_live
+                    // ));
                     
                     if ($wo['user']['id'] == $post_data->user_id) {
                         if ($_POST['page'] == 'live') {
@@ -146,6 +179,7 @@ if ($f == 'live') {
     		}
     		else{
     			$data['message'] = $error_icon . $wo['lang']['please_check_details'];
+                $data['removed'] = 'yes';
     		}
     	}
     	else{
@@ -159,8 +193,29 @@ if ($f == 'live') {
         if (!empty($_POST['post_id']) && is_numeric($_POST['post_id']) && $_POST['post_id'] > 0) {
             $db->where('post_id',Wo_Secure($_POST['post_id']))->where('user_id',$wo['user']['id'])->update(T_POSTS,array('live_ended' => 1));
             if ($wo['config']['live_video_save'] == 0) {
-                $db->where('post_id',Wo_Secure($_POST['post_id']))->where('user_id',$wo['user']['id'])->delete(T_POSTS);
-                $db->where('parent_id',Wo_Secure($_POST['post_id']))->delete(T_POSTS);
+                // $db->where('post_id',Wo_Secure($_POST['post_id']))->where('user_id',$wo['user']['id'])->delete(T_POSTS);
+                // $db->where('parent_id',Wo_Secure($_POST['post_id']))->delete(T_POSTS);
+
+                Wo_DeletePost(Wo_Secure($_POST['post_id']));
+            }
+            else{
+                if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['config']['agora_customer_id']) && !empty($wo['config']['agora_customer_certificate']) && $wo['config']['live_video_save'] == 1) {
+                    $post = $db->where('post_id',Wo_Secure($_POST['post_id']))->getOne(T_POSTS);
+                    if (!empty($post)) {
+                        StopCloudRecording(array('resourceId' => $post->agora_resource_id,
+                                                 'sid' => $post->agora_sid,
+                                                 'cname' => $post->stream_name,
+                                                 'post_id' => $post->post_id,
+                                                 'uid' => explode('_', $post->stream_name)[2]));
+                    }
+                }
+                if ($wo['config']['agora_live_video'] == 1 && $wo['config']['amazone_s3_2'] != 1) {
+                    try {
+                        Wo_DeletePost(Wo_Secure($_POST['post_id']));
+                    } catch (Exception $e) {
+                        
+                    }
+                }
             }
         }
     }

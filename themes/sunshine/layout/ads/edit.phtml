@@ -50,8 +50,8 @@
 					</div>
 					
 					<div class="sun_input mb0">
-						<textarea id="description" name="description" rows="4" placeholder="<?php echo $wo['lang']['description']?>"><?php echo $wo['ad-data']['description']; ?></textarea>
-						<label for="description"><?php echo $wo['lang']['description']?></label>
+						<textarea id="description" name="description" rows="4" placeholder="<?php echo $wo['lang']['description']?>"><?php echo strip_tags($wo['ad-data']['description']); ?></textarea>
+						<label for="description"><?php echo $wo['lang']['description'] ?></label>
 					</div>
 				</div>
 			</div>

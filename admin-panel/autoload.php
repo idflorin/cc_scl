@@ -139,6 +139,43 @@ if (empty($page_loaded)) {
     header("Location: " . Wo_SeoLink('index.php?link1=admin-cp'));
     exit();
 }
+if ($wo['config']['live_video'] == 1) {
+
+    if ($wo['config']['live_video_save'] == 0) {
+        try {
+            $posts = $db->where('live_time','0','!=')->where('live_time',time() - 11,'<=')->get(T_POSTS);
+            foreach ($posts as $key => $post) {
+                if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['config']['agora_customer_id']) && !empty($wo['config']['agora_customer_certificate']) && $wo['config']['live_video_save'] == 1) {
+                    StopCloudRecording(array('resourceId' => $post->agora_resource_id,
+                                             'sid' => $post->agora_sid,
+                                             'cname' => $post->stream_name,
+                                             'post_id' => $post->post_id,
+                                             'uid' => explode('_', $post->stream_name)[2]));
+                }
+                Wo_DeletePost(Wo_Secure($post->id));
+                // $db->where('post_id',$post->id)->delete(T_POSTS);
+                // $db->where('parent_id',$post->id)->delete(T_POSTS);
+            }
+        } catch (Exception $e) {
+            
+        }
+        
+    }
+    else{
+        if ($wo['config']['agora_live_video'] == 1 && $wo['config']['amazone_s3_2'] != 1) {
+            try {
+            $posts = $db->where('live_time','0','!=')->where('live_time',time() - 11,'<=')->get(T_POSTS);
+            foreach ($posts as $key => $post) {
+                Wo_DeletePost(Wo_Secure($post->id));
+                // $db->where('post_id',$post->id)->delete(T_POSTS);
+                // $db->where('parent_id',$post->id)->delete(T_POSTS);
+            }
+        } catch (Exception $e) {
+            
+        }
+        }
+    }
+}
 
 ?>
 <!DOCTYPE html>
@@ -278,6 +315,9 @@ if (empty($page_loaded)) {
                             <li <?php echo ($page == 'amazon-settings') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('amazon-settings'); ?>">Storage Settings</a>
                             </li>
+                            <li <?php echo ($page == 'live') ? 'class="active"' : ''; ?>>
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('live'); ?>">Live Stream Settings</a>
+                            </li>
                             <li <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts' || $page == 'manage-reactions') ? 'class="active"' : ''; ?>>
                                 <a href="javascript:void(0);" class="menu-toggle">Posts</a>
                                 <ul class="ml-menu">
@@ -301,9 +341,7 @@ if (empty($page_loaded)) {
                             <!-- <li <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts' || $page == 'manage-reactions') ? 'class="active"' : ''; ?>>
                                 <a href="<?php echo Wo_LoadAdminLinkSettings('post-settings'); ?>">Post Settings</a>
                             </li> -->
-                            <li <?php echo ($page == 'live') ? 'class="active"' : ''; ?>>
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('live'); ?>">Live Settings</a>
-                            </li>
+                            
                         </ul>
                     </li>
                     <?php } ?>

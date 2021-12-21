@@ -124,6 +124,7 @@ if (empty($error_code)) {
 	        $timezone = new DateTimeZone($wo['user']['timezone']);
 	        $messages = array();
 	        foreach ($message_info as $key => $message) {
+                $message['text'] = Wo_Markup($message['or_text']);
 	        	$message['time_text'] = Wo_Time_Elapsed_String($message['time']);
                 $message_po           = 'left';
                 if ($message['from_id'] == $wo['user']['user_id']) {

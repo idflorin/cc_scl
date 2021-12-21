@@ -710,7 +710,7 @@ if (!empty($wo['story']['parent_id'])) {
          </span>
          <?php endif; ?>
          <?php endif; ?>
-         <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name'])) { ?>
+         <?php if ($wo['config']['live_video'] == 1 && !empty($wo['story']['stream_name'])) { ?>
          <span><span style="color: #666;" class="was_live_text_<?php echo($wo['story']['id']) ?>"><?php echo ($wo['story']['is_still_live'] ? $wo['lang']['is_live'] : $wo['lang']['was_live']); ?></span></span>
       <?php } ?>
          <?php if ($wo['story']['recipient_exists'] == true) {  ?>
@@ -755,6 +755,17 @@ if (!empty($wo['story']['parent_id'])) {
          <span class="user-popover" data-type="<?php echo $wo['story']['group_recipient']['type']; ?>" data-id='<?php echo $wo['story']['group_recipient']['id']; ?>'>
          <a href="<?php echo $wo['story']['group_recipient']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['group_recipient']['username']; ?>">
          <b><?php echo $wo['story']['group_recipient']['name']; ?></b>
+         </a>
+         </span>
+         <?php } ?>
+
+         <?php if (!empty($wo['story']['page_info']) && $wo['page'] != 'page') {  ?>
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
+         </svg>
+         <span class="user-popover" data-type="<?php echo $wo['story']['page_info']['type']; ?>" data-id='<?php echo $wo['story']['page_info']['id']; ?>'>
+         <a href="<?php echo $wo['story']['page_info']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['page_info']['username']; ?>">
+         <b><?php echo $wo['story']['page_info']['name']; ?></b>
          </a>
          </span>
          <?php } ?>

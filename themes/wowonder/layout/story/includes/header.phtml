@@ -240,6 +240,7 @@ if (!empty($wo['story']['parent_id'])) {
          </a>
          </span>
          <?php } ?>
+         
          <?php if (!empty($wo['story']['album_name']) && empty($wo['story']['shared_from'])) {  ?>
          <small class="small-text"><?php echo $wo['lang']['added_new_photos_to'];?> <b><a href="<?php echo $wo['story']['url']; ?>" data-ajax="?link1=post&id=<?php echo $wo['story']['id'];?>"><?php echo $wo['story']['album_name']; ?></a></b></small>
          <?php } ?>
@@ -777,7 +778,7 @@ if (!empty($wo['story']['parent_id'])) {
          <a href="<?php echo $wo['story']['post_url']; ?>" class="pointer"><span style="color: #666;"><?php echo strtolower($wo['lang']['post']); ?></span></a>
          </span>
          <?php endif; ?>
-         <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['live_token']) && !empty($wo['config']['live_account_id']) && !empty($wo['story']['stream_name'])) { ?>
+         <?php if ($wo['config']['live_video'] == 1 && !empty($wo['story']['stream_name'])) { ?>
          <span><span style="color: #666;" class="was_live_text_<?php echo($wo['story']['id']) ?>"><?php echo ($wo['story']['is_still_live'] ? $wo['lang']['is_live'] : $wo['lang']['was_live']); ?></span></span>
       <?php } ?>
          <?php if ($wo['story']['recipient_exists'] == true) {  ?>
@@ -817,6 +818,14 @@ if (!empty($wo['story']['parent_id'])) {
          <span class="user-popover" data-type="<?php echo $wo['story']['group_recipient']['type']; ?>" data-id='<?php echo $wo['story']['group_recipient']['id']; ?>'>
          <a href="<?php echo $wo['story']['group_recipient']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['group_recipient']['username']; ?>">
          <b><?php echo $wo['story']['group_recipient']['name']; ?></b>
+         </a>
+         </span>
+         <?php } ?>
+         <?php if (!empty($wo['story']['page_info']) && $wo['page'] != 'page') {  ?>
+         <i class="fa fa-arrow-right"></i>
+         <span class="user-popover" data-type="<?php echo $wo['story']['page_info']['type']; ?>" data-id='<?php echo $wo['story']['page_info']['id']; ?>'>
+         <a href="<?php echo $wo['story']['page_info']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['page_info']['username']; ?>">
+         <b><?php echo $wo['story']['page_info']['name']; ?></b>
          </a>
          </span>
          <?php } ?>
