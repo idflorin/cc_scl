@@ -28,10 +28,21 @@ $fields = Wo_GetWelcomeFileds();
 				<div class="errors"></div>
 				<div class="regest_frst_step">
 					<p class="title"><?php echo $wo['lang']['sign_up']?></p>
+					<?php if ($wo['config']['auto_username'] == 1) { ?>
+					<div class="wow_form_fields">
+						<label for="first_name"><?php echo $wo['lang']['first_name']?></label>
+						<input id="first_name" name="first_name" type="text" autocomplete="off" autofocus>
+					</div>
+					<div class="wow_form_fields">
+						<label for="last_name"><?php echo $wo['lang']['last_name']?></label>
+						<input id="last_name" name="last_name" type="text" autocomplete="off" autofocus>
+					</div>
+				<?php }else{ ?>
 					<div class="wow_form_fields">
 						<label for="username"><?php echo $wo['lang']['username']?></label>
 						<input id="username" name="username" type="text" autocomplete="off" autofocus>
 					</div>
+				<?php } ?>
 					<div class="wow_form_fields">
 						<label for="email"><?php echo $wo['lang']['email_address']?></label>
 						<input id="email" name="email" type="email" />
@@ -743,6 +754,11 @@ $(function() {
 	        }
 	    });
       } else if (data.status == 300) {
+      	<?php if ($wo['config']['sms_or_email'] == 'sms'){ ?>
+      		if (data.location) {
+      			window.location.href = data.location;
+      		}
+      	<?php } ?>
         $.get(Wo_Ajax_Requests_File() + '?f=get_payment_method&type=' + type, function (data) {
 	        if (data.status == 200) {
 	          	$('#pay-modal').html(data.html);
@@ -984,7 +1000,7 @@ function Wo_CheckOutCard(type, description, amount, payment_type) {
 	} else if (type == 4) {
 		img = 'vip';
 	}
-	if (payment_type != 'bank_payment') {
+	if (payment_type != 'bank_payment' && payment_type != 'bitcoin') {
 		var stripe = Stripe('<?php echo $wo['config']['stripe_id'];?>');
 		$.post(Wo_Ajax_Requests_File() + '?f=stripe&s=session', {amount: amount,type:'pro',pro_type:type,payment_type:payment_type}, function(data, textStatus, xhr) {
 			if (data.status == 200) {

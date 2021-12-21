@@ -102,6 +102,9 @@ jQuery(document).ready(function ($) {
       else {
         return false;
       }
+      if (_SELF.parents('form').length > 0 && _SELF.parents('form').find('#color').length > 0) {
+        _SELF.find('[fill]').attr('fill', _SELF.parents('form').find('#color').val());
+      }
     }, 500);
 
   });
@@ -149,14 +152,14 @@ function Wo_CreateUserMedia() {
     console.log('Could not get input or something went wrong: ' + e);
   });
 }
-function Wo_CleanRecordNodes() {
+function Wo_CleanRecordNodes(color = "#cf8283") {
   $(".record-comment-audio").each(function (index, el) {
     $(el).html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mic" color="#009da0"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>').attr('data-record', '0');
     $('[data-comment-rtime="' + $(el).attr('id') + '"]').text('00:00').addClass('hidden');
   });
 
   $(".record-chat-audio").each(function (index, el) {
-    $(el).html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264.02 264.02"><linearGradient x1="19.28%" y1="86.72%" x2="88.05%" y2="12.24%" id="recod_grad"><stop offset="0" stop-color="#cf8283"/><stop offset=".0208" stop-color="#cb7273"/><stop offset=".2931" stop-color="#bb6263"/><stop offset=".5538" stop-color="#b6595a"/><stop offset=".7956" stop-color="#bc5d5e"/><stop offset="1" stop-color="#a84849"/></linearGradient><g> <path fill="url(#recod_grad)" d="M210.506,126.764c-4.143,0-7.5,3.358-7.5,7.5c0,17.302-8.038,34.335-22.052,46.73 c-13.11,11.596-30.349,18.247-47.297,18.247h-3.295c-16.947,0-34.186-6.65-47.296-18.247 c-14.015-12.395-22.052-29.427-22.052-46.73c0-4.142-3.357-7.5-7.5-7.5s-7.5,3.358-7.5,7.5c0,21.598,9.883,42.726,27.114,57.966 c14.314,12.662,32.764,20.413,51.381,21.773v35.017H89.675c-4.143,0-7.5,3.358-7.5,7.5c0,4.142,3.357,7.5,7.5,7.5h84.667 c4.143,0,7.5-3.358,7.5-7.5c0-4.142-3.357-7.5-7.5-7.5H139.51v-35.017c18.617-1.361,37.067-9.112,51.382-21.773 c17.232-15.241,27.114-36.369,27.114-57.966C218.006,130.122,214.648,126.764,210.506,126.764z"/> <path fill="url(#recod_grad)" d="M130.421,184.938h3.18c30.021,0,56.357-24.364,56.357-52.14v-80.66 C189.957,24.364,163.622,0,133.6,0h-3.18c-30.022,0-56.357,24.364-56.357,52.138v80.66 C74.063,160.573,100.398,184.938,130.421,184.938z M89.063,52.138C89.063,32.701,108.776,15,130.421,15h3.18 c21.645,0,41.357,17.701,41.357,37.138v80.66c0,19.438-19.712,37.14-41.357,37.14h-3.18c-21.644,0-41.357-17.702-41.357-37.14 V52.138z"/> </g></svg>').attr('data-record', '0');
+    $(el).html('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 264.02 264.02"><linearGradient x1="19.28%" y1="86.72%" x2="88.05%" y2="12.24%" id="recod_grad"><stop offset="0" stop-color="'+color+'"/><stop offset=".0208" stop-color="'+color+'"/><stop offset=".2931" stop-color="'+color+'"/><stop offset=".5538" stop-color="'+color+'"/><stop offset=".7956" stop-color="'+color+'"/><stop offset="1" stop-color="'+color+'"/></linearGradient><g> <path fill="'+color+'" d="M210.506,126.764c-4.143,0-7.5,3.358-7.5,7.5c0,17.302-8.038,34.335-22.052,46.73 c-13.11,11.596-30.349,18.247-47.297,18.247h-3.295c-16.947,0-34.186-6.65-47.296-18.247 c-14.015-12.395-22.052-29.427-22.052-46.73c0-4.142-3.357-7.5-7.5-7.5s-7.5,3.358-7.5,7.5c0,21.598,9.883,42.726,27.114,57.966 c14.314,12.662,32.764,20.413,51.381,21.773v35.017H89.675c-4.143,0-7.5,3.358-7.5,7.5c0,4.142,3.357,7.5,7.5,7.5h84.667 c4.143,0,7.5-3.358,7.5-7.5c0-4.142-3.357-7.5-7.5-7.5H139.51v-35.017c18.617-1.361,37.067-9.112,51.382-21.773 c17.232-15.241,27.114-36.369,27.114-57.966C218.006,130.122,214.648,126.764,210.506,126.764z"/> <path fill="url(#recod_grad)" d="M130.421,184.938h3.18c30.021,0,56.357-24.364,56.357-52.14v-80.66 C189.957,24.364,163.622,0,133.6,0h-3.18c-30.022,0-56.357,24.364-56.357,52.138v80.66 C74.063,160.573,100.398,184.938,130.421,184.938z M89.063,52.138C89.063,32.701,108.776,15,130.421,15h3.18 c21.645,0,41.357,17.701,41.357,37.138v80.66c0,19.438-19.712,37.14-41.357,37.14h-3.18c-21.644,0-41.357-17.702-41.357-37.14 V52.138z"/> </g></svg>').attr('data-record', '0');
     $('[data-chat-rtime="' + $(el).attr('data-chat-tab') + '"]').text('00:00').addClass('hidden');
   });
 
@@ -347,7 +350,11 @@ function Wo_RegisterTabMessageRecord(dataForm, id, type = '') {
         $('form.' + form_class + id).find('input.media-name').val('');
         $('form.' + form_class + id).find('.ball-pulse').fadeOut(100);;
         Wo_stopRecording();
-        Wo_CleanRecordNodes();
+        var color = '';
+        if ($('form.' + form_class + id).find('#color').length > 0) {
+          color = $('form.' + form_class + id).find('#color').val();
+        }
+        Wo_CleanRecordNodes(color);
         Wo_StopLocalStream();
         $('form.' + form_class + id).find('input.message-record').val(data.url);
         $('form.' + form_class + id).find('input.media-name').val(data.name);
@@ -431,7 +438,9 @@ function Wo_RegisterMessage(dataForm) {
   }
 }
 
-function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
+function Wo_RegisterComment(text, post_id, user_id, event, page_id, type,gif_url = '') {
+  $('.chat-box-stickers-cont').html('');
+  $('#gif-form-'+post_id).slideUp(200);
   if (!text) {
     text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
   }
@@ -452,6 +461,7 @@ function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
         dataForm.append('user_id', user_id);
         dataForm.append('page_id', page_id);
         dataForm.append('comment_image', comment_image);
+        dataForm.append('gif_url', gif_url);
         if (blob.size > 50) {
           var fileName = (new Date).toISOString().replace(/:|\./g, '-');
           var file = new File([blob], 'wo-' + fileName + '.wav', { type: 'audio/wav' });
@@ -474,13 +484,16 @@ function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
       dataForm.append('user_id', user_id);
       dataForm.append('page_id', page_id);
       dataForm.append('comment_image', comment_image);
+      dataForm.append('gif_url', gif_url);
       $('#charsLeft_' + post_id).text($('#charsLeft_' + post_id).attr('data_num'));
       Wo_InsertComment(dataForm, post_id);
     }
   }
 }
 
-function Wo_RegisterComment2(post_id, user_id, page_id, type) {
+function Wo_RegisterComment2(post_id, user_id, page_id, type,gif_url = '') {
+  $('.chat-box-stickers-cont').html('');
+  $('#gif-form-'+post_id).slideUp(200);
   text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
   //if (recording_node == "comm") {
     Wo_stopRecording();
@@ -497,6 +510,7 @@ function Wo_RegisterComment2(post_id, user_id, page_id, type) {
         dataForm.append('user_id', user_id);
         dataForm.append('page_id', page_id);
         dataForm.append('comment_image', comment_image);
+        dataForm.append('gif_url', gif_url);
         if (blob.size > 50) {
           var fileName = (new Date).toISOString().replace(/:|\./g, '-');
           var file = new File([blob], 'wo-' + fileName + '.wav', { type: 'audio/wav' });
@@ -519,6 +533,7 @@ function Wo_RegisterComment2(post_id, user_id, page_id, type) {
       dataForm.append('user_id', user_id);
       dataForm.append('page_id', page_id);
       dataForm.append('comment_image', comment_image);
+      dataForm.append('gif_url', gif_url);
       $('#charsLeft_' + post_id).text($('#charsLeft_' + post_id).attr('data_num'));
       Wo_InsertComment(dataForm, post_id);
     }

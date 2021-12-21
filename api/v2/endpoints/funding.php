@@ -310,6 +310,27 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                         foreach ($non_allowed as $key4 => $value4) {
                           unset($recent_donations[$key]['user_data'][$value4]);
                         }
+                        $recent_donations[$key]['user_data']['is_following'] = 0;
+                        $recent_donations[$key]['user_data']['can_follow'] = 0;
+                        if (Wo_IsFollowing($recent_donations[$key]['user_data']['user_id'], $wo['user']['user_id'])) {
+                            $recent_donations[$key]['user_data']['is_following'] = 1;
+                            $recent_donations[$key]['user_data']['can_follow'] = 1;
+                        } else {
+                            if (Wo_IsFollowRequested($recent_donations[$key]['user_data']['user_id'], $wo['user']['user_id'])) {
+                                $recent_donations[$key]['user_data']['is_following'] = 2;
+                                $recent_donations[$key]['user_data']['can_follow'] = 1;
+                            } else {
+                                if ($recent_donations[$key]['user_data']['follow_privacy'] == 1) {
+                                    if (Wo_IsFollowing($wo['user']['user_id'], $recent_donations[$key]['user_data']['user_id'])) {
+                                        $recent_donations[$key]['user_data']['is_following'] = 0;
+                                        $recent_donations[$key]['user_data']['can_follow'] = 1;
+                                    }
+                                } else if ($recent_donations[$key]['user_data']['follow_privacy'] == 0) {
+                                    $recent_donations[$key]['user_data']['can_follow'] = 1;
+                                }
+                            }
+                        }
+                        $recent_donations[$key]['user_data']['is_following_me'] = (Wo_IsFollowing( $wo['user']['user_id'], $recent_donations[$key]['user_data']['user_id'])) ? 1 : 0;
                     }
                 }
                 else{

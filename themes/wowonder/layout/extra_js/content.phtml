@@ -146,7 +146,64 @@ function Wo_RegisterReactionLike(element,reaction_icon,is_html){
     });
 }
 
+function Wo_RegisterStoryReaction(element,reaction_icon,is_html) {
+  var reaction = parseInt($(element).attr('data-reaction-id'));
+  var post_id = $(element).attr('data-post-id');
+  var path = "<?php echo $wo['config']['theme_url']?>";
+  var lang = $(element).attr('data-reaction-lang');
+  if (!post_id || !reaction) {
+    return false;
+  }
+  $('.like-story-lightbox').addClass('active');
+  $.get(Wo_Ajax_Requests_File(), {f: 'status', s: 'register_reaction', story_id: post_id, reaction: reaction}, function (data) {
+    if(data.status == 200) {
+      <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
+  if ($('#react_'+post_id).attr('data_react') == 0) {
+    //socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "added" });
+  }
+  <?php } ?>
+      $('.post-reactions-icons-'+post_id).html(data.reactions);
+      
+    }
+    if (data.can_send == 1) {
+      Wo_SendMessages();
+    }
+    //$('#react_'+post_id).attr('data_react','1');
+  });
+}
 
+function Wo_RegisterMessageReaction(element,reaction_icon,is_html) {
+  var reaction = parseInt($(element).attr('data-reaction-id'));
+  var post_id = $(element).attr('data-post-id');
+  var path = "<?php echo $wo['config']['theme_url']?>";
+  var lang = $(element).attr('data-reaction-lang');
+  if (!post_id || !reaction) {
+    return false;
+  }
+   <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
+    socket.emit("register_reaction", {
+        type: 'messages',
+        id: post_id,
+        reaction: reaction,
+        user_id: _getCookie("user_id")
+      })
+    
+  <?php }else{ ?>
+    $.get(Wo_Ajax_Requests_File(), {f: 'messages', s: 'register_reaction', message_id: post_id, reaction: reaction}, function (data) {
+        if(data.status == 200) {
+          $('.post-reactions-icons-m-'+post_id).html(data.reactions);
+		  $('.mess_margin_b-'+post_id).addClass('margin-active');
+        }
+        if (data.can_send == 1) {
+          Wo_SendMessages();
+        }
+        //$('#react_'+post_id).attr('data_react','1');
+      });
+
+  <?php } ?>
+  $('.reactions-box-container-'+post_id).fadeOut(50);
+      
+}
 function Wo_RegisterReaction(element,reaction_icon,is_html){
     var reaction = parseInt($(element).attr('data-reaction-id'));
     var post_id = $(element).attr('data-post-id');
@@ -914,7 +971,38 @@ function Wo_LiveComment(text,event,post_id,insert = 0) {
 
   }
 }
-
+function Wo_ReplyChatMessage(chat_id,id) {
+  $('.message_reply_id_'+chat_id).val(id);
+  $('.message_reply_text_'+chat_id+' span').find('.reply_content').remove();
+  if ($("#message_text_reply_"+id).length > 0 && $("#message_text_reply_"+id).html() != '') {
+    $('.message_reply_text_'+chat_id+' span').prepend('<p class="reply_content">'+$("#message_text_reply_"+id).html()+'</p>')
+  }
+  else if($('#message_media_reply_'+id).length > 0 && $('#message_media_reply_'+id).find('img').length > 0){
+    $('.message_reply_text_'+chat_id+' span').prepend('<div class="message-user-image pull-left reply_content"><img src="'+$('#message_media_reply_'+id).find('img').attr('src')+'" alt="User image"></div>')
+  }
+  $('.message_reply_text_'+chat_id).fadeIn(50);
+}
+function Wo_ClearReplyChatMessage(chat_id) {
+  $('.message_reply_id_'+chat_id).val(0);
+  $('.message_reply_text_'+chat_id).find('.reply_content').remove();
+  $('.message_reply_text_'+chat_id).fadeOut(50);
+}
+function Wo_ReplyMessage(id) {
+  $('.message_reply_id').val(id);
+  $('.message_reply_text span').find('.reply_content').remove();
+  if ($("#message_text_reply_"+id).length > 0 && $("#message_text_reply_"+id).html() != '') {
+    $('.message_reply_text span').prepend('<p class="reply_content">'+$("#message_text_reply_"+id).html()+'</p>')
+  }
+  else if($('#message_media_reply_'+id).length > 0 && $('#message_media_reply_'+id).find('img').length > 0){
+    $('.message_reply_text span').prepend('<div class="message-user-image reply_content"><img src="'+$('#message_media_reply_'+id).find('img').attr('src')+'" alt="User image"></div>')
+  }
+  $('.message_reply_text').fadeIn(50);
+}
+function Wo_ClearReplyMessage() {
+  $('.message_reply_id').val(0);
+  $('.message_reply_text').find('.reply_content').remove();
+  $('.message_reply_text').fadeOut(50);
+}
 $(window).on('load', function() {
   //reactions
   $('body').delegate('.wo-reaction-post','mouseenter', function() {
@@ -924,6 +1012,32 @@ $(window).on('load', function() {
           $('.reactions-box-container-'+id).fadeIn(50);
       }
     }, 300);
+  });
+  $('body').delegate('.like-story-lightbox','click', function() {
+    var id = $( this ).attr( 'data-story-id' );
+    setTimeout( function () {
+      $('.reactions-box-story-container-'+id).fadeIn(50);
+    }, 300);
+  });
+  $('body').delegate('.like-story-lightbox','mouseleave', function() {
+    var id = $( this ).attr( 'data-story-id' );
+      setTimeout( function () {
+          $('.reactions-box-story-container-'+id).fadeOut(50);
+    }, 1000);
+  });
+  $('body').delegate('.messages-reactions','click', function() {
+    var id = $( this ).attr( 'data-message-id' );
+    setTimeout( function () {
+      $('.reactions-box-container-'+id).fadeIn(50);
+    }, 300);
+  });
+  $('body').delegate('.messages-reactions','mouseleave', function() {
+    var id = $( this ).attr( 'data-message-id' );
+      setTimeout( function () {
+        if ($('.reactions-box-container-'+id + ':hover').length == 0) {
+          $('.reactions-box-container-'+id).fadeOut(50);
+        }
+    }, 500);
   });
 
   $('body').delegate('.wo-reaction-post','mouseleave', function() {
@@ -1134,6 +1248,18 @@ $(window).on('load', function() {
   });
 
 });
-
-
+function ProcessingVideo(id) {
+  $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'processing_video', post_id: id}, function (data) {
+    $('.processing_alert_'+id).remove();
+  });
+}
+function SendSeen(recipient_id) {
+  var chat_container = $('.chat-tab').find('.chat_main_'+recipient_id);
+  var last_id = chat_container.find('.messages-text:last').attr('data-message-id');
+    <?php if ($wo['config']['node_socket_flow'] == "1"){ ?>
+      socket.emit("seen_messages", {user_id: _getCookie("user_id"), recipient_id: recipient_id,message_id: last_id}, (data)=>{})
+    <?php }else{ ?>
+      $.post( Wo_Ajax_Requests_File() + '?f=chat&s=seen&hash=' + $('.main_session').val(), {recipient_id: recipient_id}, function(data, textStatus, xhr) {});
+    <?php } ?>
+}
 </script>

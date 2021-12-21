@@ -238,13 +238,32 @@ if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 &
 			
 
          <div class="image-comment">
-          <div class="pull-right">
+			<div class="pull-right">
             &nbsp;<button type="button" onclick="Wo_RegisterReply2(<?php echo $wo['comment']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>)" class="btn btn-file" title="<?php echo $wo['lang']['post']; ?>">
 				<svg fill="#009da0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="feather feather-user-plus">
                   <path d="M3.741 1.408l18.462 10.154a.5.5 0 0 1 0 .876L3.741 22.592A.5.5 0 0 1 3 22.154V1.846a.5.5 0 0 1 .741-.438zM5 13v6.617L18.85 12 5 4.383V11h5v2H5z"/>
                </svg>
 			</button>
          </div>
+          <?php if ($wo['config']['stickers'] == 1){ ?>
+               <span role="button" aria-expanded="false" style="text-decoration: none;cursor: pointer;" onclick="ShowCommentGif(<?php echo $wo['comment']['id']; ?>,'reply')">
+                  <span class="btn btn-file btngif">
+                     <svg fill="#009da0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="feather feather-user-plus">
+                        <path d="M11,8H13V16H11V8M7.67,8H4.33C3.53,8 3,8.67 3,9.33V14.67C3,15.33 3.53,16 4.33,16H7.67C8.47,16 9,15.33 9,14.67V12H7V14H5V10H9V9.33C9,8.67 8.47,8 7.67,8M21,10V8H15V16H17V14H19.5V12H17V10H21Z"/>
+                     </svg>
+                  </span>
+               </span>
+               <?php $stickers_system = Wo_GetAllStickers(50000);
+            if( count( $stickers_system ) > 0 ){ ?>
+               <span role="button" aria-expanded="false" style="text-decoration: none;cursor: pointer;" class="sticker-form-<?php echo $wo['story']['id']; ?>" onclick="ShowCommentStickers(<?php echo $wo['comment']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>,'')">
+                  <span class="btn btn-file btngif">
+                     <svg fill="#009da0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="feather feather-user-plus">
+                        <path d="M5.5,2C3.56,2 2,3.56 2,5.5V18.5C2,20.44 3.56,22 5.5,22H16L22,16V5.5C22,3.56 20.44,2 18.5,2H5.5M5.75,4H18.25A1.75,1.75 0 0,1 20,5.75V15H18.5C16.56,15 15,16.56 15,18.5V20H5.75A1.75,1.75 0 0,1 4,18.25V5.75A1.75,1.75 0 0,1 5.75,4M14.44,6.77C14.28,6.77 14.12,6.79 13.97,6.83C13.03,7.09 12.5,8.05 12.74,9C12.79,9.15 12.86,9.3 12.95,9.44L16.18,8.56C16.18,8.39 16.16,8.22 16.12,8.05C15.91,7.3 15.22,6.77 14.44,6.77M8.17,8.5C8,8.5 7.85,8.5 7.7,8.55C6.77,8.81 6.22,9.77 6.47,10.7C6.5,10.86 6.59,11 6.68,11.16L9.91,10.28C9.91,10.11 9.89,9.94 9.85,9.78C9.64,9 8.95,8.5 8.17,8.5M16.72,11.26L7.59,13.77C8.91,15.3 11,15.94 12.95,15.41C14.9,14.87 16.36,13.25 16.72,11.26Z"/>
+                     </svg>
+                  </span>
+               </span>
+               <?php }} ?>
+          
           <span data-toggle="dropdown" role="button" aria-expanded="false" style="text-decoration: none;cursor: pointer;" onclick="load_ajax_reply_emojii('<?php echo $wo["comment"]["id"];?>','<?php echo $wo['config']['theme_url'];?>/emoji/');" class="emo-comment2" >
             <span class="btn btn-file">
                <svg fill="#009da0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" class="feather feather-user-plus">
@@ -269,9 +288,34 @@ if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 &
                   </svg>
                </span>
             </div>
+            
 
          </div>
 		 </div>
+     <?php if ($wo['config']['stickers'] == 1): ?>
+         <div id="gif-form-<?php echo $wo['comment']['id']; ?>" style="display: none;" class="gif_post_comment">
+            <div class="gif_post_reply_innr" id="publisher-box-stickers-<?php echo $wo['comment']['id']; ?>">
+               <input type="text" class="form-control" style="border: none;" placeholder="<?php echo $wo['lang']['search'] ?> GIFs" onkeyup="SearchForGif(this.value,<?php echo $wo['comment']['id']; ?>,'reply')">
+               <div id="publisher-box-stickers-cont-<?php echo $wo['comment']['id']; ?>" class="gif_post_comment_gif"></div>
+            </div>
+         </div>
+         <div id="sticker-form-<?php echo $wo['comment']['id']; ?>" style="display: none;">
+            <div class="sticker_post_reply_innr" id="publisher-box-stickers-<?php echo $wo['comment']['id']; ?>">
+               <div id="publisher-box-sticker-cont-<?php echo $wo['comment']['id']; ?>" class="chat-box-stickers-cont">
+                  <?php 
+                     //$stickers_system = Wo_GetAllStickers(50000);
+                     if( count( $stickers_system ) > 0 ){
+                        foreach ($stickers_system as $wo['stickerlist']) {
+                           echo '<img alt="gif" src="'. Wo_GetMedia( $wo['stickerlist']['media_file'] ).'" data-gif="'.Wo_GetMedia( $wo['stickerlist']['media_file'] ).'" onclick="Wo_PostCommentSticker_'.$wo['comment']['id'].'(this);" autoplay loop>';
+                        }
+                     } else {
+                        echo '<div class="empty_state" style="margin: 15px 0 0;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5.5,2C3.56,2 2,3.56 2,5.5V18.5C2,20.44 3.56,22 5.5,22H16L22,16V5.5C22,3.56 20.44,2 18.5,2H5.5M5.75,4H18.25A1.75,1.75 0 0,1 20,5.75V15H18.5C16.56,15 15,16.56 15,18.5V20H5.75A1.75,1.75 0 0,1 4,18.25V5.75A1.75,1.75 0 0,1 5.75,4M14.44,6.77C14.28,6.77 14.12,6.79 13.97,6.83C13.03,7.09 12.5,8.05 12.74,9C12.79,9.15 12.86,9.3 12.95,9.44L16.18,8.56C16.18,8.39 16.16,8.22 16.12,8.05C15.91,7.3 15.22,6.77 14.44,6.77M8.17,8.5C8,8.5 7.85,8.5 7.7,8.55C6.77,8.81 6.22,9.77 6.47,10.7C6.5,10.86 6.59,11 6.68,11.16L9.91,10.28C9.91,10.11 9.89,9.94 9.85,9.78C9.64,9 8.95,8.5 8.17,8.5M16.72,11.26L7.59,13.77C8.91,15.3 11,15.94 12.95,15.41C14.9,14.87 16.36,13.25 16.72,11.26Z"></path></svg> '. $wo['lang']['no_result'] .'</div>';
+                     }
+                  ?>
+               </div>
+            </div>
+         </div>
+      <?php endif ?>
 <div class="comment-reply-image-<?php echo $wo['comment']['id']; ?> comment-image-con"></div>
       <div class="clear"></div>
 
@@ -284,6 +328,12 @@ if ($wo['config']['shout_box_system'] == 1 && $wo['story']['postPrivacy'] == 4 &
    </div>
    <?php echo Wo_LoadPage('modals/delete-comment');?>
    <script>
+    function Wo_PostReplyCommentGif_<?php echo $wo['comment']['id']; ?>(self,id) {
+      Wo_RegisterReply2(<?php echo $wo['comment']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>,'',$(self).attr('src'));
+   }
+    function Wo_PostReplyCommentSticker_<?php echo $wo['comment']['id']; ?>(self,id) {
+      Wo_RegisterReply2(<?php echo $wo['comment']['id']; ?>,<?php echo $wo['story']['publisher']['user_id']; ?>, <?php echo (!empty($wo['story']['publisher']['page_id'])) ? $wo['story']['publisher']['page_id'] : '0'; ?>,'',$(self).attr('src'));
+   }
    $(function () {
    $("#comment_<?php echo $wo['comment']['id'];?> .comment-text").readmore({
    speed: 75,

@@ -18,11 +18,24 @@ $fields = Wo_GetWelcomeFileds();
 							<div class="loading hidden"></div>
 						</div>
 						<div class="sun_input_holder">
+							<?php if ($wo['config']['auto_username'] == 1) { ?>
 							<div class="sun_input">
+								<input name="first_name" type="text" id="first_name" placeholder="<?php echo $wo['lang']['first_name'];?>" autofocus />
+								<label for="first_name"><?php echo $wo['lang']['first_name']?></label>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+							</div>
+							<div class="sun_input">
+								<input name="last_name" type="text" id="last_name" placeholder="<?php echo $wo['lang']['last_name'];?>" autofocus />
+								<label for="last_name"><?php echo $wo['lang']['last_name']?></label>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+							</div>
+					    <?php }else{ ?>
+					    	<div class="sun_input">
 								<input name="username" type="text" id="username" placeholder="<?php echo $wo['lang']['username'];?>" autofocus />
 								<label for="username"><?php echo $wo['lang']['username']?></label>
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
 							</div>
+					    <?php } ?>
 							<div class="sun_input">
 								<input name="email" type="email" id="email_address" placeholder="<?php echo $wo['lang']['email_address'];?>" />
 								<label for="email_address"><?php echo $wo['lang']['email_address']?></label>
@@ -753,6 +766,11 @@ $(function() {
 	    });
 
       } else if (data.status == 300) {
+      	<?php if ($wo['config']['sms_or_email'] == 'sms'){ ?>
+      		if (data.location) {
+      			window.location.href = data.location;
+      		}
+      	<?php } ?>
         $.get(Wo_Ajax_Requests_File() + '?f=get_payment_method&type=' + type, function (data) {
 	        if (data.status == 200) {
 	          	$('#pay-modal').html(data.html);
@@ -996,7 +1014,7 @@ function Wo_CheckOutCard(type, description, amount, payment_type) {
 	} else if (type == 4) {
 		img = 'vip';
 	}
-	if (payment_type != 'bank_payment' && payment_type != 'checkout') {
+	if (payment_type != 'bank_payment' && payment_type != 'checkout' && payment_type != 'bitcoin') {
 		var stripe = Stripe('<?php echo $wo['config']['stripe_id'];?>');
 		$.post(Wo_Ajax_Requests_File() + '?f=stripe&s=session', {amount: amount,type:'pro',pro_type:type,payment_type:payment_type}, function(data, textStatus, xhr) {
 			if (data.status == 200) {

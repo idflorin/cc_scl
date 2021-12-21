@@ -15,7 +15,8 @@ if ($f == 'recoversms') {
         $message           = $wo['lang']['confirmation_code_is'] . ": {$random_activation}";
         $user_id           = Wo_UserIdFromPhoneNumber($_POST['recoverphone']);
         $code              = md5(rand(111, 999) . time());
-        $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}', `email_code` = '$code' WHERE `user_id` = {$user_id}");
+        $time = time() + (60 * 60 * 12);
+        $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}', `email_code` = '$code' , `time_code_sent` = '".$time."' WHERE `user_id` = {$user_id}");
         if ($query) {
             if (Wo_SendSMSMessage($_POST['recoverphone'], $message) === true) {
                 $data = array(

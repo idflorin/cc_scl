@@ -107,6 +107,18 @@ if ($f == 'posts') {
             exit();
 
         }
+        elseif (preg_match('~([A-Za-z0-9]+)\/(.*)\/(?:t\.\d+/)?(\d+)~i', $_POST['url']) || preg_match('~fb.watch\/(.*)~', $_POST['url'])) {
+            $output = array(
+                'title' => '',
+                'images' => array(
+                ),
+                'content' => '',
+                'url' => $_POST["url"],
+                'facebook' => 'yes'
+            );
+            echo json_encode($output);
+            exit();
+        }
         else if (isset($_POST["url"])) {
             $page_title = '';
             $image_urls = array();
@@ -216,6 +228,7 @@ if ($f == 'posts') {
         $event_id      = 0;
         $invalid_file  = false;
         $errors        = false;
+        $ffmpeg_convert_video        = '';
         $image_array   = array();
         $blur          = 0;
         if (Wo_CheckSession($hash_id) === false) {
@@ -270,23 +283,56 @@ if ($f == 'posts') {
                 }
             }
         }
+        
+        $not_video = true;
         if (isset($_FILES['postVideo']['name']) && empty($mediaFilename)) {
+            $mimeType = mime_content_type($_FILES['postVideo']['tmp_name']);
+            $fileType = explode('/', $mimeType)[0]; // video|image
+            if ($fileType === 'video' && Wo_IsFfmpegFileAllowed($_FILES['postVideo']['name']) && !Wo_IsVideoNotAllowedMime($_FILES["postVideo"]["type"])) {
+                $not_video = false;
+            }
             if ($_FILES['postVideo']['size'] > $wo['config']['maxUpload']) {
                 $invalid_file = 1;
-            } else if (Wo_IsFileAllowed($_FILES['postVideo']['name']) == false) {
+            } else if (Wo_IsFileAllowed($_FILES['postVideo']['name']) == false && $wo['config']['ffmpeg_system'] != 'on') {
                 $invalid_file = 2;
+            } elseif ($wo['config']['ffmpeg_system'] == 'on' && $not_video) {
+                 $invalid_file = 2;
             } else {
                 $fileInfo = array(
                     'file' => $_FILES["postVideo"]["tmp_name"],
                     'name' => $_FILES['postVideo']['name'],
                     'size' => $_FILES["postVideo"]["size"],
                     'type' => $_FILES["postVideo"]["type"],
-                    'types' => 'mp4,m4v,webm,flv,mov,mpeg'
                 );
+                if ($wo['config']['ffmpeg_system'] != 'on') {
+                    $fileInfo['types'] = 'mp4,m4v,webm,flv,mov,mpeg,mkv';
+                }
+                if ($wo['config']['ffmpeg_system'] == 'on') {
+                    if ($not_video == false) {
+                        $fileInfo['is_video'] = 1;
+                    }
+                    $amazone_s3 = $wo['config']['amazone_s3'];
+                    $ftp_upload = $wo['config']['ftp_upload'];
+                    $spaces = $wo['config']['spaces'];
+                    $cloud_upload = $wo['config']['cloud_upload'];
+                    $wo['config']['amazone_s3'] = 0;
+                    $wo['config']['ftp_upload'] = 0;
+                    $wo['config']['spaces'] = 0;
+                    $wo['config']['cloud_upload'] = 0;
+                }
                 $media    = Wo_ShareFile($fileInfo);
+                if ($wo['config']['ffmpeg_system'] == 'on') {
+                    $wo['config']['amazone_s3'] = $amazone_s3;
+                    $wo['config']['ftp_upload'] = $ftp_upload;
+                    $wo['config']['spaces'] = $spaces;
+                    $wo['config']['cloud_upload'] = $cloud_upload;
+                }
                 if (!empty($media)) {
                     $mediaFilename = $media['filename'];
                     $mediaName     = $media['name'];
+                    if (!empty($mediaFilename) && $wo['config']['ffmpeg_system'] == 'on') {
+                        $ffmpeg_convert_video = $mediaFilename;
+                    }
                     $img_types     = array(
                         'image/png',
                         'image/jpeg',
@@ -305,6 +351,7 @@ if ($f == 'posts') {
                                 'height' => 295
                             )
                         );
+                        
                         $media    = Wo_ShareFile($fileInfo);
                         if (!empty($media)) {
                             $video_thumb = $media['filename'];
@@ -554,7 +601,7 @@ if ($f == 'posts') {
             );
             $post_data['send_notify'] = '';
             if ($wo['config']['notify_new_post'] == 1) {
-                if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && empty($wo['story']['event_id']) && $wo['story']['postPrivacy'] < 3) {
+                if (!empty($wo['story']) && empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && empty($wo['story']['event_id']) && $wo['story']['postPrivacy'] < 3) {
                     $post_data['send_notify'] = time();
                 }
             }
@@ -576,7 +623,51 @@ if ($f == 'posts') {
             if (!empty($_POST['post_color']) && !empty($post_text) && empty($_POST['postRecord']) && empty($mediaFilename) && empty($mediaName) && empty($post_map) && empty($url_title) && empty($url_content) && empty($url_link) && empty($import_url_image) && empty($album_name) && empty($multi) && empty($video_thumb) && empty($post_data['postPhoto'])) {
                 $post_data['color_id'] = Wo_Secure($_POST['post_color']);
             }
-            $id = Wo_RegisterPost($post_data);
+            if (!empty($ffmpeg_convert_video)) {
+                $ffmpeg_b                   = $wo['config']['ffmpeg_binary_file'];
+                $video_file_full_path = dirname(__DIR__).'/'.$ffmpeg_convert_video;
+                $video_info     = shell_exec("$ffmpeg_b -i ".$video_file_full_path." 2>&1");
+                $re = '/[0-9]{3}+x[0-9]{3}/m';
+                preg_match_all($re, $video_info,$min_str);
+                $resolution = 0;
+                if (!empty($min_str) && !empty($min_str[0]) && !empty($min_str[0][0])) {
+                    $substr = substr($video_info, strpos($video_info, $min_str[0][0])-3,15);
+                    $re = '/[0-9]+x[0-9]+/m';
+                    preg_match_all($re, $substr,$resolutions);
+                    if (!empty($resolutions) && !empty($resolutions[0]) && !empty($resolutions[0][0])) {
+                        $resolution = substr($resolutions[0][0], 0,strpos($resolutions[0][0], 'x'));
+                    }
+                }
+                $ret = array('status' => 300);
+                if ($resolution >= 640 || $resolution == 0) {
+                    $ret = array('status' => 300,
+                                 'update' => '1');
+                }
+                ob_end_clean();
+                header("Content-Encoding: none");
+                header("Connection: close");
+                ignore_user_abort();
+                ob_start();
+                header('Content-Type: application/json');
+                echo json_encode($ret);
+                $size = ob_get_length();
+                header("Content-Length: $size");
+                ob_end_flush();
+                flush();
+                session_write_close();
+                if (is_callable('fastcgi_finish_request')) {
+                    fastcgi_finish_request();
+                }
+                //Wo_RunInBackground($ret);
+                $id = FFMPEGUpload(array('filename' => $ffmpeg_convert_video,
+                                         'id' => $id,
+                                         'video_thumb' => $video_thumb,
+                                         'post_data' => $post_data));
+
+            }
+            else{
+                $id = Wo_RegisterPost($post_data);
+            }
             if ($id) {
                 Wo_CleanCache();
                 Wo_UpdateUserDetails($wo['user'], true, false, false, true);
@@ -654,8 +745,22 @@ if ($f == 'posts') {
                             $data['send_notify'] = 'yes';
                         }
                     }
-
-                    Wo_RunInBackground($data);
+                    ob_end_clean();
+                    header("Content-Encoding: none");
+                    header("Connection: close");
+                    ignore_user_abort();
+                    ob_start();
+                    header('Content-Type: application/json');
+                    echo json_encode($data);
+                    $size = ob_get_length();
+                    header("Content-Length: $size");
+                    ob_end_flush();
+                    flush();
+                    session_write_close();
+                    if (is_callable('fastcgi_finish_request')) {
+                        fastcgi_finish_request();
+                    }
+                    //Wo_RunInBackground($data);
                     // if ($wo['config']['notify_new_post'] == 1) {
                     //     if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && empty($wo['story']['event_id']) && $wo['story']['postPrivacy'] < 3) {
                     //         $post_id = $wo['story']['id'];
@@ -675,6 +780,9 @@ if ($f == 'posts') {
                     // }
                 } 
             } else {
+                if ($invalid_file == false) {
+                    $invalid_file = 2;
+                }
                 $data = array(
                     'status' => 400,
                     'invalid_file' => $invalid_file
@@ -695,7 +803,22 @@ if ($f == 'posts') {
     }
     if ($s == 'send_notify' && Wo_CheckMainSession($hash_id) === true) {
         if (!empty($_POST['post_id']) && is_numeric($_POST['post_id']) && $_POST['post_id'] > 0) {
-            Wo_RunInBackground(array('status' => 200));
+            //Wo_RunInBackground();
+            ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array('status' => 200));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
             $wo['story'] = $db->where('id',Wo_Secure($_POST['post_id']))->where('user_id',$wo['user']['id'])->getOne(T_POSTS);
             if ($wo['config']['notify_new_post'] == 1 && !empty($wo['story']->send_notify)) {
                 if (empty($wo['story']->page_id) && empty($wo['story']->group_id) && empty($wo['story']->event_id) && $wo['story']->postPrivacy < 3) {
@@ -1254,6 +1377,9 @@ if ($f == 'posts') {
                     unset($_SESSION['file']);
                 }
             }
+            if (!empty($_POST['gif_url'])) {
+                $comment_image = Wo_ImportImageFromUrl($_POST['gif_url']);
+            }
             if (empty($comment_image) && empty($_POST['text']) && empty($_POST['audio-filename'])) {
                 header("Content-type: application/json");
                 echo json_encode($data);
@@ -1333,6 +1459,7 @@ if ($f == 'posts') {
         exit();
     }
     if ($s == 'register_reply') {
+
         if (!empty($_POST['comment_id']) && isset($_POST['text']) && Wo_CheckMainSession($hash_id) === true) {
             $html    = '';
             $page_id = '';
@@ -1345,6 +1472,9 @@ if ($f == 'posts') {
                     $comment_image = $_POST['comment_image'];
                     unset($_SESSION['file']);
                 }
+            }
+            if (!empty($_POST['gif_url'])) {
+                $comment_image = Wo_ImportImageFromUrl($_POST['gif_url']);
             }
             $C_Data      = array(
                 'user_id' => Wo_Secure($wo['user']['user_id']),
@@ -2085,6 +2215,16 @@ if ($f == 'posts') {
         if (Wo_SharePost($post_id, $owner)) {
             $data['status'] = 200;
         }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'processing_video' && isset($_GET['post_id']) && !empty($_GET['post_id']) && is_numeric($_GET['post_id'])) {
+        $data    = array(
+            'status' => 200
+        );
+        $post_id = Wo_Secure($_GET['post_id']);
+        $db->where('id',$post_id)->where('user_id',$wo['user']['id'])->update(T_POSTS,array('processing' => 0));
         header("Content-type: application/json");
         echo json_encode($data);
         exit();

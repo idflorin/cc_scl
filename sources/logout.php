@@ -14,5 +14,5 @@ if (isset($_COOKIE['user_id'])) {
 } 
 $_SESSION = array();
 unset($_SESSION);
-header("Location: " . $wo['config']['site_url']);
+header("Location: " . $wo['config']['site_url']."/?cache=".time());
 exit();

@@ -11,6 +11,7 @@ namespace Twilio\Rest\IpMessaging\V2\Service\User;
 
 use Twilio\Exceptions\TwilioException;
 use Twilio\InstanceResource;
+use Twilio\Options;
 use Twilio\Values;
 use Twilio\Version;
 
@@ -31,20 +32,17 @@ class UserChannelInstance extends InstanceResource {
     /**
      * Initialize the UserChannelInstance
      *
-     * @param \Twilio\Version $version Version that contains the resource
+     * @param Version $version Version that contains the resource
      * @param mixed[] $payload The response payload
-     * @param string $serviceSid The SID of the Service that the resource is
-     *                           associated with
-     * @param string $userSid The SID of the User the User Channel belongs to
-     * @param string $channelSid The SID of the Channel that has the User Channel
-     *                           to fetch
-     * @return \Twilio\Rest\IpMessaging\V2\Service\User\UserChannelInstance
+     * @param string $serviceSid The service_sid
+     * @param string $userSid The user_sid
+     * @param string $channelSid The channel_sid
      */
-    public function __construct(Version $version, array $payload, $serviceSid, $userSid, $channelSid = null) {
+    public function __construct(Version $version, array $payload, string $serviceSid, string $userSid, string $channelSid = null) {
         parent::__construct($version);
 
         // Marshaled Properties
-        $this->properties = array(
+        $this->properties = [
             'accountSid' => Values::array_get($payload, 'account_sid'),
             'serviceSid' => Values::array_get($payload, 'service_sid'),
             'channelSid' => Values::array_get($payload, 'channel_sid'),
@@ -56,24 +54,22 @@ class UserChannelInstance extends InstanceResource {
             'links' => Values::array_get($payload, 'links'),
             'url' => Values::array_get($payload, 'url'),
             'notificationLevel' => Values::array_get($payload, 'notification_level'),
-        );
+        ];
 
-        $this->solution = array(
+        $this->solution = [
             'serviceSid' => $serviceSid,
             'userSid' => $userSid,
             'channelSid' => $channelSid ?: $this->properties['channelSid'],
-        );
+        ];
     }
 
     /**
      * Generate an instance context for the instance, the context is capable of
      * performing various actions.  All instance actions are proxied to the context
      *
-     * @return \Twilio\Rest\IpMessaging\V2\Service\User\UserChannelContext Context
-     *                                                                     for this
-     *                                                                     UserChannelInstance
+     * @return UserChannelContext Context for this UserChannelInstance
      */
-    protected function proxy() {
+    protected function proxy(): UserChannelContext {
         if (!$this->context) {
             $this->context = new UserChannelContext(
                 $this->version,
@@ -87,25 +83,34 @@ class UserChannelInstance extends InstanceResource {
     }
 
     /**
-     * Fetch a UserChannelInstance
+     * Fetch the UserChannelInstance
      *
      * @return UserChannelInstance Fetched UserChannelInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
+    public function fetch(): UserChannelInstance {
         return $this->proxy()->fetch();
+    }
+
+    /**
+     * Delete the UserChannelInstance
+     *
+     * @return bool True if delete succeeds, false otherwise
+     * @throws TwilioException When an HTTP error occurs.
+     */
+    public function delete(): bool {
+        return $this->proxy()->delete();
     }
 
     /**
      * Update the UserChannelInstance
      *
-     * @param string $notificationLevel The push notification level to assign to
-     *                                  the User Channel
+     * @param array|Options $options Optional Arguments
      * @return UserChannelInstance Updated UserChannelInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function update($notificationLevel) {
-        return $this->proxy()->update($notificationLevel);
+    public function update(array $options = []): UserChannelInstance {
+        return $this->proxy()->update($options);
     }
 
     /**
@@ -115,13 +120,13 @@ class UserChannelInstance extends InstanceResource {
      * @return mixed The requested property
      * @throws TwilioException For unknown properties
      */
-    public function __get($name) {
-        if (array_key_exists($name, $this->properties)) {
+    public function __get(string $name) {
+        if (\array_key_exists($name, $this->properties)) {
             return $this->properties[$name];
         }
 
-        if (property_exists($this, '_' . $name)) {
-            $method = 'get' . ucfirst($name);
+        if (\property_exists($this, '_' . $name)) {
+            $method = 'get' . \ucfirst($name);
             return $this->$method();
         }
 
@@ -133,11 +138,11 @@ class UserChannelInstance extends InstanceResource {
      *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.IpMessaging.V2.UserChannelInstance ' . implode(' ', $context) . ']';
+        return '[Twilio.IpMessaging.V2.UserChannelInstance ' . \implode(' ', $context) . ']';
     }
 }

@@ -144,6 +144,25 @@ if (!empty($_GET['user']) && empty($_GET['page'])) {
 					</div>
 					<form method="post" class="sendMessages" enctype="multipart/form-data">
 						<div class="input-group">
+							<?php 
+								$story_id = 0;
+								if (!empty($_GET['story_id']) && is_numeric($_GET['story_id']) && $_GET['story_id'] > 0) {
+									$story_id = Wo_Secure($_GET['story_id']);
+									$story = $db->where('id',$story_id)->getOne(T_USER_STORY);
+								} 
+								if (!empty($story)) {
+									$story->thumbnail = Wo_GetMedia($story->thumbnail);
+							?>
+								<input type="hidden" id="story_id" name="story_id" value="<?php echo($story->id) ?>" />
+								<div class="message_reply_story_text">
+									<?php echo $wo['lang']['replying_story']; ?>:&nbsp;<div class="message-user-image"><img src="<?php echo($story->thumbnail) ?>" alt="User image"></div>
+									<svg onclick="$('.message_reply_story_text').remove();$('#story_id').val('0');" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z" /></svg>
+								</div>
+							<?php } ?>
+							<div class="message_reply_text" style="display: none;">
+								<?php echo $wo['lang']['replying_to']; ?>:&nbsp;<span></span>
+								<svg onclick="Wo_ClearReplyMessage()" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="pointer"><path fill="currentColor" d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z" /></svg>
+							</div>
 							<div class="msg_write_combo">
 								<span class="message-option-btns">
 									<span class="btn btn-file MS-File">
@@ -230,6 +249,7 @@ if (!empty($_GET['user']) && empty($_GET['page'])) {
 								</button>
 							</span>
 						</div>
+						
 						<input type="hidden" id="user-id" name="user_id" value="0" />
 						<input type="hidden" id="messages-group-id" name="group_id" value="0" />
 						<input type="hidden" id="messages-page-id" name="page_id" value="0" />
@@ -557,14 +577,21 @@ $(function () {
         }
       if(sending_text!="" || sending_text.trim()!=""){
         if($('[data-target="#groups-message"]').attr("aria-expanded") === "true"){
+        	message_reply_id = $('.message_reply_id').val();
+        	story_id = $('#story_id').val();
             socket.emit("group_message_page", {
               group_id: $('#messages-group-id').val(), 
               from_id: _getCookie("user_id"),
               username: '<?php echo $wo['user']['username']; ?>',
               msg: sending_text,
               color: rgb2hex($(".send-button").css("background-color")),
-              isSticker: false
+              isSticker: false,
+              message_reply_id: message_reply_id,
+              story_id: story_id
             },  (data)=>{
+            	$('#story_id').val('0');
+		    	$('.message_reply_story_text').remove();
+		    	Wo_ClearReplyMessage();
             if (data.status == 200) {
             $("#message-record-file").val('');
             $("#message-record-name").val('');
@@ -578,6 +605,11 @@ $(function () {
               $(".no-messages").hide();
               $(".messages-container").append(data.html);
             }
+            if (message_reply_id != 0) {
+            	// $('.message').last().append($('#message_text_reply_'+message_reply_id)[0].outerHTML);
+	            // $('.message').last().append($('#message_media_reply_'+message_reply_id)[0].outerHTML);
+            }
+	            
             var user_id_ = $('#user-id').val();
             $('body').attr('sending-' + user_id_, false);
             $('form.sendMessages').clearForm();
@@ -626,14 +658,22 @@ $(function () {
         })
         }
         else {
+        	message_reply_id = $('.message_reply_id').val();
+        	story_id = $('#story_id').val();
           socket.emit("private_message_page", {
             to_id: chat_number, 
             from_id: _getCookie("user_id"),
             username: '<?php echo $wo['user']['username']; ?>',
             msg: sending_text,
             color: rgb2hex($(".send-button").css("background-color")),
-            isSticker: false
+            isSticker: false,
+            message_reply_id: message_reply_id,
+              story_id: story_id
           },  (data)=>{
+          	$('.message-seen').hide();
+          	$('#story_id').val('0');
+	    	$('.message_reply_story_text').remove();
+	    	Wo_ClearReplyMessage();
           if (data.status == 200) {
           $("#message-record-file").val('');
           $("#message-record-name").val('');
@@ -647,6 +687,10 @@ $(function () {
             $(".no-messages").hide();
             $(".messages-container").append(data.html);
           }
+          if (message_reply_id != 0) {
+	          // $('.message').last().append($('#message_text_reply_'+message_reply_id)[0].outerHTML);
+	          // $('.message').last().append($('#message_media_reply_'+message_reply_id)[0].outerHTML);
+	      }
           var user_id_ = $('#user-id').val();
           $('body').attr('sending-' + user_id_, false);
           $('form.sendMessages').clearForm();
@@ -729,6 +773,9 @@ $(function () {
       }
     },
     success: function (data) {
+    	$('#story_id').val('0');
+    	$('.message_reply_story_text').remove();
+    	Wo_ClearReplyMessage();
       if(data.status == 200) {
         $("#message-record-file").val('');
         $("#message-record-name").val('');
@@ -794,6 +841,9 @@ $(function () {
         })
       }
       else{
+      	chat_number = $('#user-id').val();
+      	var dom = $($.parseHTML(data.html));
+      var mediaId = dom.find(".messages-wrapper").attr("data-message-id");
       socket.emit("private_message_page", {
         to_id: chat_number, 
         from_id: _getCookie("user_id"),
@@ -838,6 +888,9 @@ $(function () {
       }
     },
     success: function (data) {
+    	$('#story_id').val('0');
+    	$('.message_reply_story_text').remove();
+    	Wo_ClearReplyMessage();
       if(data.status == 200) {
       	$('#user_post_count').text(data.posts_count);
     	$('#user_message_count').text(data.messages_count);
@@ -1030,6 +1083,12 @@ function Wo_DeleteConversation(user_id) {
 }
 
 function Wo_GetUserMessages(user_id, user_name, userlink) {
+	var old_user = $('#user-id').val();
+	Wo_ClearReplyMessage();
+	if ($('#user-id').val() > 0 && $('#user-id').val() != user_id) {
+		$('#story_id').val('0');
+    	$('.message_reply_story_text').remove();
+	}
 	if ($('#user-id').val() > 0) {
 		Wo_DeleteTyping($('#user-id').val());
 	}
@@ -1100,11 +1159,16 @@ function Wo_GetUserMessages(user_id, user_name, userlink) {
               }, 200);
               }, 1000);
       }
+      <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+      	var last_id = $('.messages-text:last').attr('data-message-id');
+        socket.emit("seen_messages", {user_id: _getCookie("user_id"), recipient_id: user_id,message_id: last_id,current_user_id: "<?php echo($wo['user']['id']) ?>"}, (data)=>{})
+		<?php } ?>
+
       <?php if ($wo['config']['message_seen'] == 1) { ?>
          Wo_getMessageSeen();
       <?php } ?>
       $('.emo-message').fadeIn(200);
-      <?php if ($wo['config']['video_chat'] == 1) {
+      <?php if ($wo['config']['video_chat'] == 1 && ($wo['config']['twilio_video_chat'] == 1 || $wo['config']['agora_chat_video'] == 1)) {
       	if ($wo['config']['Who_call'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin()) {}
 		else{
        ?>
@@ -1118,7 +1182,7 @@ function Wo_GetUserMessages(user_id, user_name, userlink) {
       $('#video-button').html(video_call);
 	  $('#video-button-right').html(video_call_right);
       <?php } } ?>
-      <?php if ($wo['config']['audio_chat'] == 1) {
+      <?php if ($wo['config']['audio_chat'] == 1 && ($wo['config']['twilio_video_chat'] == 1 || $wo['config']['agora_chat_video'] == 1)) {
       	if ($wo['config']['Who_call'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin()) {}
 		else{
        ?>
@@ -1139,6 +1203,9 @@ function Wo_GetUserMessages(user_id, user_name, userlink) {
 }
 
 function Wo_GetGroupMessages(group_id, group_name) {
+	Wo_ClearReplyMessage();
+	$('#story_id').val('0');
+    $('.message_reply_story_text').remove();
 	if ($('#user-id').val() > 0) {
 		Wo_DeleteTyping($('#user-id').val());
 	}
@@ -1232,6 +1299,9 @@ function Wo_DeleteGroupChat(id = false){
 
 
 function Wo_GetPageMessages(page_id, page_user_id,page_name,user_id) {
+	Wo_ClearReplyMessage();
+	$('#story_id').val('0');
+    $('.message_reply_story_text').remove();
 	if ($('#user-id').val() > 0) {
 		Wo_DeleteTyping($('#user-id').val());
 	}
@@ -1302,6 +1372,7 @@ function Wo_getNewMessages() {
   {
     ?>
   socket.on("private_message_page", (data)=>{
+  	$('.message-seen').hide();
        user_id = $('#user-id').val();
        group_id = $('#messages-group-id').val();
        page_id = $('#messages-page-id').val();
@@ -1343,6 +1414,8 @@ function Wo_getNewMessages() {
               }
             }
           }
+          var last_id = $('.messages-text:last').attr('data-message-id');
+          socket.emit("seen_messages", {user_id: _getCookie("user_id"), recipient_id: user_id,message_id: last_id}, (data)=>{})
         }
       });
       socket.on("group_message_page", (data)=>{
@@ -1400,6 +1473,12 @@ function Wo_getNewMessages() {
       to_id: to_id,
       message_id: message_id
     }, function (data) {
+    	if (data.reactions) {
+	      	for (var i = data.reactions.length - 1; i >= 0; i--) {
+	      		$('.post-reactions-icons-m-'+data.reactions[i].id).html(data.reactions[i].reactions);
+	      		
+	      	}
+	      }
     	if ( data.is_typing == 200) {
       $('.message-contnaier:last').find('.message-typing').html('<img class="user-avatar-left" src="' + data.img + '" alt="Profile Picture"><div id="loading"> <img class="typing" src="' + data.typing + '"></div>').fadeIn(300);
       setTimeout(function(){
@@ -1747,6 +1826,9 @@ function Wo_ShareFile() {
       }
     },
     success: function (data) {
+    	$('#story_id').val('0');
+    	$('.message_reply_story_text').remove();
+    	Wo_ClearReplyMessage();
       if(data.status == 200) {
         $("#message-record-file").val('');
         $("#message-record-name").val('');

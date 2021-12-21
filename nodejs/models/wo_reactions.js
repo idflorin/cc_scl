@@ -28,12 +28,18 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true,
       defaultValue: 0
     },
+    message_id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      allowNull: true,
+      defaultValue: 0
+    },
     reaction: {
       type: DataTypes.STRING(50),
       allowNull: true
     }
   }, {
     sequelize,
+    timestamps: false,
     tableName: 'Wo_Reactions'
   });
 };

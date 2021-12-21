@@ -8,7 +8,8 @@ $required_fields =  array(
                         'get',
                         'get_my',
                         'add_to_my',
-                        'search'
+                        'search',
+                        'popular'
                     );
 
 $limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);
@@ -58,6 +59,13 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_code    = 5;
             $error_message = 'query can not be empty';
         }
+    }
+    if ($_POST['type'] == 'popular') {
+        $games = Wo_GetPopularGames($limit,$offset);
+        $response_data = array(
+                    'api_status' => 200,
+                    'data' => $games
+                );
     }
 
 }

@@ -10,6 +10,17 @@ if ($f == 'register') {
         setcookie('user_id', null, -1);
         setcookie('user_id', null, -1,'/');
     }
+    if ($wo['config']['auto_username'] == 1) {
+        $_POST['username'] = time().rand(111111,999999);
+        if (empty($_POST['first_name']) || empty($_POST['last_name'])) {
+            $errors = $error_icon . $wo['lang']['first_name_last_name_empty'];
+            header("Content-type: application/json");
+            echo json_encode(array(
+                'errors' => $errors
+            ));
+            exit();
+        }
+    }
     $fields = Wo_GetWelcomeFileds();
     if (empty($_POST['email']) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['confirm_password']) || empty($_POST['gender'])) {
         $errors = $error_icon . $wo['lang']['please_check_details'];
@@ -117,6 +128,15 @@ if ($f == 'register') {
             'active' => Wo_Secure($activate),
             'birthday' => '0000-00-00'
         );
+        if ($wo['config']['auto_username'] == 1) {
+            if (!empty($_POST['first_name'])) {
+                $re_data['first_name'] = Wo_Secure($_POST['first_name']);
+            }
+            if (!empty($_POST['last_name'])) {
+                $re_data['last_name'] = Wo_Secure($_POST['last_name']);
+            }
+        }
+            
         if ($gender == 'female') {
             $re_data['avatar'] = "upload/photos/f-avatar.jpg";
         }
@@ -152,15 +172,24 @@ if ($f == 'register') {
         }
         
         if ($register === true) {
-            if (!empty($wo['config']['auto_friend_users'])) {
-                $autoFollow = Wo_AutoFollow(Wo_UserIdFromUsername($_POST['username']));
+            if ($activate == 1 || ($wo['config']['sms_or_email'] == 'mail' && $activate != 1)) { 
+                if ($wo['config']['auto_username'] == 1) {
+                    $r_id = Wo_UserIdFromUsername($_POST['username']);
+                    $_POST['username'] = $_POST['username']."_".$r_id;
+                    $db->where('user_id',$r_id)->update(T_USERS,array('username' => $_POST['username']));
+                }
+                
+                if (!empty($wo['config']['auto_friend_users'])) {
+                    $autoFollow = Wo_AutoFollow(Wo_UserIdFromUsername($_POST['username']));
+                }
+                if (!empty($wo['config']['auto_page_like'])) {
+                    Wo_AutoPageLike(Wo_UserIdFromUsername($_POST['username']));
+                }
+                if (!empty($wo['config']['auto_group_join'])) {
+                    Wo_AutoGroupJoin(Wo_UserIdFromUsername($_POST['username']));
+                }
             }
-            if (!empty($wo['config']['auto_page_like'])) {
-                Wo_AutoPageLike(Wo_UserIdFromUsername($_POST['username']));
-            }
-            if (!empty($wo['config']['auto_group_join'])) {
-                Wo_AutoGroupJoin(Wo_UserIdFromUsername($_POST['username']));
-            }
+                
             if ($activate == 1) {
                 $data  = array(
                     'status' => 200,
@@ -193,11 +222,11 @@ if ($f == 'register') {
                 );
                 $send              = Wo_SendMessage($send_message_data);
                 $errors            = $success_icon . $wo['lang']['successfully_joined_verify_label'];
-                if ($wo['config']['membership_system'] == 1) {
-                    $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
-                    $_SESSION['user_id'] = $session;
-                    setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
-                }
+                // if ($wo['config']['membership_system'] == 1) {
+                //     $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
+                //     $_SESSION['user_id'] = $session;
+                //     setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
+                // }
             } else if ($wo['config']['sms_or_email'] == 'sms' && !empty($_POST['phone_num'])) {
                 $random_activation = Wo_Secure(rand(11111, 99999));
                 $message           = "Your confirmation code is: {$random_activation}";
@@ -205,17 +234,22 @@ if ($f == 'register') {
                 //if ($query) {
                     if (Wo_SendSMSMessage($_POST['phone_num'], $message) === true) {
                         $register = Wo_RegisterUser($re_data, $in_code);
+                        if ($wo['config']['auto_username'] == 1) {
+                            $r_id = Wo_UserIdFromUsername($_POST['username']);
+                            $_POST['username'] = $_POST['username']."_".$r_id;
+                            $db->where('user_id',$r_id)->update(T_USERS,array('username' => $_POST['username']));
+                        }
                         $user_id           = Wo_UserIdFromUsername($_POST['username']);
                         $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
                         $data = array(
                             'status' => 300,
                             'location' => Wo_SeoLink('index.php?link1=confirm-sms?code=' . $code)
                         );
-                        if ($wo['config']['membership_system'] == 1) {
-                            $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
-                            $_SESSION['user_id'] = $session;
-                            setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
-                        }
+                        // if ($wo['config']['membership_system'] == 1) {
+                        //     $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
+                        //     $_SESSION['user_id'] = $session;
+                        //     setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
+                        // }
                     } else {
                         $errors = $error_icon . $wo['lang']['failed_to_send_code_email'];
                     }

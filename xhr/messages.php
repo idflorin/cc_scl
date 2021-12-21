@@ -131,6 +131,8 @@ if ($f == 'messages') {
 
 
             if ($wo['user']['message_privacy'] != 2) {
+                $reply_id = 0;
+                $story_id = 0;
                 
                 if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0 && Wo_CheckMainSession($hash_id) === true) {
                     $html          = '';
@@ -176,6 +178,19 @@ if ($f == 'messages') {
                     if (!empty($user_data) && $user_data['message_privacy'] == 1 && Wo_IsFollowing($wo['user']['user_id'], $_POST['user_id']) === false) {
                         exit();
                     }
+                    if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
+                        $reply_id = Wo_Secure($_POST['reply_id']);
+                    }
+                    if (!empty($_POST['story_id']) && is_numeric($_POST['story_id']) && $_POST['story_id'] > 0) {
+                        $story_id = Wo_Secure($_POST['story_id']);
+                        $story = $db->where('user_id',Wo_Secure($_POST['user_id']))->where('id',$story_id)->getValue(T_USER_STORY,'COUNT(*)');
+                        if ($story > 0) {
+                            $story_id = Wo_Secure($_POST['story_id']);
+                        }
+                        else{
+                            $story_id = 0;
+                        }
+                    }
                     $messages = Wo_RegisterMessage(array(
                         'from_id' => Wo_Secure($wo['user']['user_id']),
                         'to_id' => Wo_Secure($_POST['user_id']),
@@ -183,8 +198,11 @@ if ($f == 'messages') {
                         'media' => Wo_Secure($mediaFilename),
                         'mediaFileName' => Wo_Secure($mediaName),
                         'time' => time(),
-                        'stickers' => $sticker
+                        'stickers' => $sticker,
+                        'reply_id' => $reply_id,
+                        'story_id' => $story_id
                     ));
+                    
                     if ($messages > 0) {
                         $messages = Wo_GetMessages(array(
                             'message_id' => $messages,
@@ -264,13 +282,17 @@ if ($f == 'messages') {
                         $mediaFilename = $_POST['record-file'];
                         $mediaName     = $_POST['record-name'];
                     }
+                    if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
+                        $reply_id = Wo_Secure($_POST['reply_id']);
+                    }
                     $message_id = Wo_RegisterGroupMessage(array(
                         'from_id' => Wo_Secure($wo['user']['user_id']),
                         'group_id' => Wo_Secure($_POST['group_id']),
                         'text' => Wo_Secure($_POST['textSendMessage']),
                         'media' => Wo_Secure($mediaFilename),
                         'mediaFileName' => Wo_Secure($mediaName),
-                        'time' => time()
+                        'time' => time(),
+                        'reply_id' => $reply_id
                     ));
                     if ($message_id > 0) {
                         @Wo_UpdateGChat(Wo_Secure($_POST['group_id']), array(
@@ -340,6 +362,9 @@ if ($f == 'messages') {
                                 $to_id = Wo_Secure($_POST['to_id']);
                             }
                         }
+                        if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
+                            $reply_id = Wo_Secure($_POST['reply_id']);
+                        }
                         $last_id = Wo_RegisterPageMessage(array(
                             'from_id' => Wo_Secure($wo['user']['user_id']),
                             'page_id' => Wo_Secure($_POST['page_id']),
@@ -347,7 +372,8 @@ if ($f == 'messages') {
                             'text' => Wo_Secure($_POST['textSendMessage']),
                             'media' => Wo_Secure($mediaFilename),
                             'mediaFileName' => Wo_Secure($mediaName),
-                            'time' => time()
+                            'time' => time(),
+                            'reply_id' => $reply_id
                         ));
                         if ($last_id && $last_id > 0) {
 
@@ -541,6 +567,7 @@ if ($f == 'messages') {
     if ($s == 'get_new_messages') {
         $html                        = '';
         $data['update_group_status'] = Wo_CheckLastGroupAction();
+        $reactions = array();
         if (isset($_GET['user_id']) && is_numeric($_GET['user_id']) && $_GET['user_id'] > 0 && Wo_CheckMainSession($hash_id) === true) {
             $user_id = Wo_Secure($_GET['user_id']);
             if (!empty($user_id)) {
@@ -573,6 +600,13 @@ if ($f == 'messages') {
                         $data['typing']    = $wo['config']['theme_url'] . '/img/loading_dots.gif';
                     }
                 }
+                
+                $reacted_messages = $db->where("message_id IN (SELECT m.id FROM ".T_MESSAGES." m WHERE (m.from_id = '".$user_id."' AND m.to_id = '".$wo['user']['user_id']."') OR (m.from_id = '".$wo['user']['user_id']."' AND m.to_id = '".$user_id."'))")->orderBy("id","Desc")->get(T_REACTIONS,20);
+                foreach ($reacted_messages as $key => $value) {
+                    $reactions[] = array('id' => $value->message_id,
+                                         'reactions' => Wo_GetPostReactions($value->message_id,'message'));
+                }
+                
             }
         } else if (isset($_GET['group_id']) && is_numeric($_GET['group_id']) && $_GET['group_id'] > 0 && Wo_CheckMainSession($hash_id) === true) {
             $group_id = Wo_Secure($_GET['group_id']);
@@ -592,6 +626,11 @@ if ($f == 'messages') {
                         'html' => $html
                     );
                     @Wo_UpdateGChatLastSeen($group_id);
+                }
+                $reacted_messages = $db->where("message_id IN (SELECT m.id FROM ".T_MESSAGES." m WHERE (m.group_id = '".$group_id."'))")->orderBy("id","Desc")->get(T_REACTIONS,20);
+                foreach ($reacted_messages as $key => $value) {
+                    $reactions[] = array('id' => $value->message_id,
+                                         'reactions' => Wo_GetPostReactions($value->message_id,'message'));
                 }
             }
         }
@@ -619,6 +658,11 @@ if ($f == 'messages') {
                             'html' => $html
                         );
             }
+            $reacted_messages = $db->where("message_id IN (SELECT m.id FROM ".T_MESSAGES." m WHERE (m.page_id = '".$page_id."' AND m.to_id = '".$wo['user']['user_id']."') OR (m.page_id = '".$page_id."' AND m.from_id = '".$wo['user']['user_id']."'))")->orderBy("id","Desc")->get(T_REACTIONS,20);
+            foreach ($reacted_messages as $key => $value) {
+                $reactions[] = array('id' => $value->message_id,
+                                     'reactions' => Wo_GetPostReactions($value->message_id,'message'));
+            }
 
             
 
@@ -626,6 +670,10 @@ if ($f == 'messages') {
         if (!empty($user_id)) {
             $data['color'] = Wo_GetChatColor($wo['user']['user_id'], $user_id);
         }
+        if (!empty($reactions)) {
+            $data['reactions'] = $reactions;
+        }
+
         header("Content-type: application/json");
         echo json_encode($data);
         exit();
@@ -699,6 +747,45 @@ if ($f == 'messages') {
                         'seen' => $seen['seen']
                     );
                 }
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'register_reaction') {
+        $data = array('status' => 400);
+        $reactions_types = array_keys($wo['reactions_types']);
+        if (!empty($_GET['message_id']) && is_numeric($_GET['message_id']) && $_GET['message_id'] > 0 && !empty($_GET['reaction']) && in_array($_GET['reaction'], $reactions_types)) {
+            $message_id = Wo_Secure($_GET['message_id']);
+            $message = $db->where('id',$message_id)->getOne(T_MESSAGES);
+            if (!empty($message)) {
+                $is_reacted = $db->where('user_id',$wo['user']['user_id'])->where('message_id',$message_id)->getValue(T_REACTIONS,'COUNT(*)');
+                if ($is_reacted > 0) {
+                    $db->where('user_id',$wo['user']['user_id'])->where('message_id',$message_id)->delete(T_REACTIONS);
+                }
+                $db->insert(T_REACTIONS,array('user_id' => $wo['user']['id'],
+                                                   'message_id' => $message_id,
+                                                   'reaction' => Wo_Secure($_GET['reaction'])));
+                // $text           = 'message';
+                // $type2          = Wo_Secure($_GET['reaction']);
+                // $notification_data_array = array(
+                //     'recipient_id' => $message->from_id,
+                //     'type' => 'reaction',
+                //     'text' => $text,
+                //     'type2' => $type2,
+                //     'url' => 'index.php?link1=messages&user=' . $message->to_id
+                // );
+                // Wo_RegisterNotification($notification_data_array);
+                $data = array(
+                    'status' => 200,
+                    'reactions' => Wo_GetPostReactions($message_id,'message'),
+                    'like_lang' => $wo['lang']['liked']
+                );
+                if (Wo_CanSenEmails()) {
+                    $data['can_send'] = 1;
+                }
+                $data['dislike'] = 0;
             }
         }
         header("Content-type: application/json");

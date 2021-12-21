@@ -90,6 +90,63 @@ if (!empty($_POST['recipient_id']) && is_numeric($_POST['recipient_id']) && $_PO
                         $message['time_text'] = $time->format('H:i');
                     }
                 }
+
+                if (!empty($message['reply'])) {
+                    if (empty($message['reply']['stickers'])) {
+                        $message['reply']['stickers'] = '';
+                    }
+                    $message['reply']['time_text'] = Wo_Time_Elapsed_String($message['reply']['time']);
+                    $message_po  = 'left';
+                    if ($message['reply']['from_id'] == $user_id) {
+                        $message_po  = 'right';
+                    }
+                    
+                    $message['reply']['position']  = $message_po;
+                    $message['reply']['type']      = Wo_GetFilePosition($message['reply']['media']);
+                    if (!empty($message['reply']['stickers']) && strpos($message['reply']['stickers'], '.gif') !== false) {
+                        $message['reply']['type'] = 'gif';
+                    }
+                    if ($message['reply']['type_two'] == 'contact') {
+                        $message['reply']['type']   = 'contact';
+                    }
+                    $message['reply']['type']     = $message_po . '_' . $message['reply']['type'];
+                    $message['reply']['product']     = null;
+                    if (!empty($message['reply']['product_id'])) {
+                        $message['reply']['type']     = $message_po . '_product';
+                        $message['reply']['product'] = Wo_GetProduct($message['reply']['product_id']);
+                    }
+                    $message['reply']['file_size'] = 0;
+                    if (!empty($message['reply']['media'])) {
+                        $message['reply']['file_size'] = '0MB';
+                        if (file_exists($message['reply']['file_size'])) {
+                            $message['reply']['file_size'] = Wo_SizeFormat(filesize($message['reply']['media']));
+                        }
+                        $message['reply']['media']     = Wo_GetMedia($message['reply']['media']);
+                    }
+                    if (!empty($message['reply']['time'])) {
+                        $time_today  = time() - 86400;
+                        if ($message['reply']['time'] < $time_today) {
+                            $message['reply']['time_text'] = date('m.d.y', $message['reply']['time']);
+                        } else {
+                            $time = new DateTime('now', $timezone);
+                            $time->setTimestamp($message['reply']['time']);
+                            $message['reply']['time_text'] = $time->format('H:i');
+                        }
+                    }
+                }
+                if (!empty($message['story'])) {
+                    foreach ($non_allowed as $key => $value) {
+                       unset($message['story']['user_data'][$value]);
+                    }
+                    if (!empty($message['story']['thumb']['filename'])) {
+                        $message['story']['thumbnail'] = $message['story']['thumb']['filename'];
+                        unset($message['story']['thumb']);
+                    } else {
+                        $message['story']['thumbnail'] = $message['story']['user_data']['avatar'];
+                    }
+                    $message['story']['time_text'] = Wo_Time_Elapsed_String($message['story']['posted']);
+                    $message['story']['view_count'] = $db->where('story_id',$message['story']['id'])->where('user_id',$message['story']['user_id'],'!=')->getValue(T_STORY_SEEN,'COUNT(*)');
+                }
                 array_push($json_success_data, $message);
             }
             $send_messages_to_phones = Wo_MessagesPushNotifier();
@@ -97,10 +154,12 @@ if (!empty($_POST['recipient_id']) && is_numeric($_POST['recipient_id']) && $_PO
 			$check_typing = Wo_IsTyping($recipient_id);
 			if ($check_typing) {
 			    $typing = 1;
-			} 
+			}
+            $is_recording = $db->where('follower_id',$wo['user']['id'])->where('following_id',$recipient_id)->where('is_typing',2)->getValue(T_FOLLOWERS,"COUNT(*)");
             $response_data = array('api_status' => 200,
             	                   'messages' => $json_success_data,
-            	                   'typing' => $typing);
+            	                   'typing' => $typing,
+                                   'is_recording' => $is_recording);
 
         }
         else{

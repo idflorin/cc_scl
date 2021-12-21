@@ -61,8 +61,9 @@ $(function () {
     $('body').scrollTop(0);
   });
   
+    intervalUpdates = setTimeout(Wo_intervalUpdates, 6000);
     if (node_socket_flow == "0") {
-      intervalUpdates = setTimeout(Wo_intervalUpdates, 6000);
+      
       //setTimeout(Wo_UpdateLastSeen, 40000);
       setTimeout(Wo_IsLogged, 30000);
     }
@@ -350,9 +351,11 @@ function Wo_intervalUpdates(force_update = 0) {
      ajax_request['hashtagName'] = $('#hashtagName').val();
   }
   $.get(Wo_Ajax_Requests_File(), ajax_request, function (data) {
-    if (node_socket_flow == "0") {
+    if (node_socket_flow == "0" || force_update == 1) {
           clearTimeout(intervalUpdates);
-          intervalUpdates = setTimeout(Wo_intervalUpdates, 5000);
+          intervalUpdates = setTimeout(function () {
+            Wo_intervalUpdates(force_update);
+          } , 5000);
       }
     if (hash_posts == true) {
         if (data.count_num > 0) {
@@ -470,7 +473,12 @@ function Wo_intervalUpdates(force_update = 0) {
         $( '.modal-backdrop' ).remove();
         $( 'body' ).removeClass( "modal-open" );
     }
-  });
+  }).fail(function() {
+      clearTimeout(intervalUpdates);
+          intervalUpdates = setTimeout(function () {
+            Wo_intervalUpdates(force_update);
+          } , 5000);
+    });
 }
 }
 function RemoveNotification(obj) {
@@ -619,9 +627,10 @@ function Wo_GetMorePosts() {
   }
   
   if ($('body').attr('no-more-posts')) {
-      $.get(Wo_Ajax_Requests_File(), {f: 'get_no_posts_name'}, function (data3) {
-          $('#load-more-posts').html('<div class="white-loading list-group"><div class="cs-loader"><div class="no-more-posts-to-show">' + data3.name + '</div></div>');
-      });
+      $('#load-more-posts').html('<div class="white-loading list-group"><div class="cs-loader"><div class="no-more-posts-to-show">' + $('#get_no_posts_name').val() + '</div></div>');
+      // $.get(Wo_Ajax_Requests_File(), {f: 'get_no_posts_name'}, function (data3) {
+      //     $('#load-more-posts').html('<div class="white-loading list-group"><div class="cs-loader"><div class="no-more-posts-to-show">' + data3.name + '</div></div>');
+      // });
       $('#load-more-posts').show();
       $('.loading-status').remove();
       scrolled = 0;
@@ -650,9 +659,10 @@ function Wo_GetMorePosts() {
     }, function (data) {
       if (data.length == 0) {
         $('body').attr('no-more-posts', "true");
-        $.get(Wo_Ajax_Requests_File(), {f: 'get_no_posts_name'}, function (data3) {
-            $('#load-more-posts').html('<div class="white-loading list-group"><div class="cs-loader"><div class="no-more-posts-to-show">' + data3.name + '</div></div>');
-        });
+        $('#load-more-posts').html('<div class="white-loading list-group"><div class="cs-loader"><div class="no-more-posts-to-show">' + $('#get_no_posts_name').val() + '</div></div>');
+        // $.get(Wo_Ajax_Requests_File(), {f: 'get_no_posts_name'}, function (data3) {
+        //     $('#load-more-posts').html('<div class="white-loading list-group"><div class="cs-loader"><div class="no-more-posts-to-show">' + data3.name + '</div></div>');
+        // });
        } else {
         if (data != 'Please login or signup to continue.') {
             $('body').removeAttr('no-more-posts');
@@ -1416,7 +1426,14 @@ function Wo_ClosePostReactedUsers(post_id) {
 
 // open post Reacted users
 function Wo_OpenPostReactedUsers(post_id, type,col) {
+  if (col != 'story') {
   $('body').append('<div class="lightbox-container"><div class="lightbox-backgrond" onclick="Wo_CloseLightbox();"></div><div class="lb-preloader" style="display:block"><svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg></div></div>');
+  }
+  if (col == 'story') {
+    $('.width_').css('width', $('.width_').css('width'));
+    value = $('.story_lightbox').attr('data-post-id');
+    $('.story_lightbox').addClass('dont_close_story_'+value);
+  }
   $('.reacted_users_load_more').css('display', 'inline');
   $.get(Wo_Ajax_Requests_File(), {
     f: 'posts',
@@ -1426,9 +1443,11 @@ function Wo_OpenPostReactedUsers(post_id, type,col) {
     col:col
   }, function (data) {
     if(data.status == 200) {
-      setTimeout(function () {
-        $('.lightbox-container').remove();
-      },100);
+      if (col != 'story') {
+        setTimeout(function () {
+          $('.lightbox-container').remove();
+        },100);
+      }
       //$('#views_info_title').html(data.title);
       if(data.html.length == 0) {
         $('.reacted_users_load_more').attr('data-type', '');
@@ -1737,7 +1756,8 @@ function Wo_DeleteFollowRequest(user_id) {
     following_id: user_id
   }, function (data) {
     if(data.status == 200) {
-      main_container.find('.accept-btns').html(data.html);
+      main_container.remove();
+      //main_container.find('.accept-btns').html(data.html);
     }
   });
 }
@@ -1773,8 +1793,10 @@ function Wo_UpdatePostPrivacy(post_id, privacy_type, event) {
 }
 
 // open chat tab
-function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_user_id = 0) {
-  if ($(".chat_"+recipient_id).length > 0) {
+function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_user_id = 0,story_id = 0) {
+  if ($(".chat_"+recipient_id).length > 0 && story_id == 0) {
+    SendSeen(recipient_id);
+    $('.chat_'+recipient_id).find('.online-toggle').attr('style', '');
     return false;
   }
 
@@ -1784,12 +1806,16 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
   if (group_id == null) {
     group_id = 0;
   }
+  if (story_id != 0) {
+    Wo_CloseLightbox();
+  }
    
   if(node_socket_flow === "0"){
   $.get(Wo_Ajax_Requests_File(), {
     f: 'chat',
     s: 'is_chat_on',
-    recipient_id: recipient_id
+    recipient_id: recipient_id,
+    story_id: story_id
   }, function (data) {
     length = 0;
     if ($('body').attr('chat-off')) {
@@ -1815,7 +1841,8 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
     $.get(Wo_Ajax_Requests_File(), {
       f: 'chat',
       s: 'close_chat',
-      recipient_id: recipient_id
+      recipient_id: recipient_id,
+      story_id: story_id
     }, function (data) {
       document.location = data.url;
     });
@@ -1849,7 +1876,8 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
     placement:placement,
     group_id:group_id,
     page_id:page_id,
-    page_user_id:page_user_id
+    page_user_id:page_user_id,
+    story_id:story_id
   }, function (data) {
     if(data.status == 200) {
       if ($('.chat-wrapper').length == 3) {
@@ -2273,7 +2301,9 @@ function Wo_RegisterReply(text, comment_id, user_id, event, page_id, type) {
   }
 }
 // register post comment
-function Wo_RegisterReply2(comment_id, user_id, page_id, type) {
+function Wo_RegisterReply2(comment_id, user_id, page_id, type,gif_url = '') {
+  $('.chat-box-stickers-cont').html('');
+  $('#gif-form-'+comment_id).slideUp(200);
     comment_wrapper = $('[id=comment_' + comment_id + ']');
     text = $('#comment_'+comment_id).find('.comment-reply-textarea').val();
     reply_textarea = comment_wrapper.find('.comment-replies');
@@ -2284,7 +2314,7 @@ function Wo_RegisterReply2(comment_id, user_id, page_id, type) {
     if (comment_src_image.length > 0) {
       comment_image = comment_src_image.val();
     }      
-    if(text == '' && comment_image == '') {
+    if(text == '' && comment_image == '' && gif_url == '') {
       return false;
     }
     $.post(Wo_Ajax_Requests_File() + '?f=posts&s=register_reply', {
@@ -2292,7 +2322,8 @@ function Wo_RegisterReply2(comment_id, user_id, page_id, type) {
       text: text,
       user_id: user_id,
       page_id: page_id,
-      comment_image: comment_image
+      comment_image: comment_image,
+      gif_url: gif_url
     }, function (data) {
       if (node_socket_flow == "1") {
           socket.emit("comment_notification", { comment_id: comment_id, user_id: _getCookie("user_id"), type: "added", for: "replies" });
@@ -2354,6 +2385,7 @@ function Wo_RemoveAlbumImage(post_id, id) {
       $('#post-' + post_id).find('#image-' + id).fadeOut(200, function () {
         $(this).remove();
       });
+      $('div[data_image_parent="image-' + post_id + '"]').remove();
     }
   });
 }
@@ -3570,5 +3602,162 @@ function Wo_progressIconLoader(e){e.each(function(){return progress_icon_elem=$(
  * Licensed under the MIT license
  *
  * Debounce function from http://davidwalsh.name/javascript-debounce-function
- */
-!function(t){"function"==typeof define&&define.amd?define(["jquery"],t):"object"==typeof exports?module.exports=t(require("jquery")):t(jQuery)}(function(t){"use strict";function e(t,e,i){var o;return function(){var n=this,a=arguments,s=function(){o=null,i||t.apply(n,a)},r=i&&!o;clearTimeout(o),o=setTimeout(s,e),r&&t.apply(n,a)}}function i(t){var e=++h;return String(null==t?"rmjs-":t)+e}function o(t){var e=t.clone().css({height:"auto",width:t.width(),maxHeight:"none",overflow:"hidden"}).insertAfter(t),i=e.outerHeight(),o=parseInt(e.css({maxHeight:""}).css("max-height").replace(/[^-\d\.]/g,""),10),n=t.data("defaultHeight");e.remove();var a=o||t.data("collapsedHeight")||n;t.data({expandedHeight:i,maxHeight:o,collapsedHeight:a}).css({maxHeight:"none"})}function n(t){if(!d[t.selector]){var e=" ";t.embedCSS&&""!==t.blockCSS&&(e+=t.selector+" + [data-readmore-toggle], "+t.selector+"[data-readmore]{"+t.blockCSS+"}"),e+=t.selector+"[data-readmore]{transition: height "+t.speed+"ms;overflow: hidden;}",function(t,e){var i=t.createElement("style");i.type="text/css",i.styleSheet?i.styleSheet.cssText=e:i.appendChild(t.createTextNode(e)),t.getElementsByTagName("head")[0].appendChild(i)}(document,e),d[t.selector]=!0}}function a(e,i){this.element=e,this.options=t.extend({},r,i),n(this.options),this._defaults=r,this._name=s,this.init(),window.addEventListener?(window.addEventListener("load",c),window.addEventListener("resize",c)):(window.attachEvent("load",c),window.attachEvent("resize",c))}var s="readmore",r={speed:100,collapsedHeight:200,heightMargin:16,moreLink:'<a href="#">Read More</a>',lessLink:'<a href="#">Close</a>',embedCSS:!0,blockCSS:"display: block; width: 100%;",startOpen:!1,blockProcessed:function(){},beforeToggle:function(){},afterToggle:function(){}},d={},h=0,c=e(function(){t("[data-readmore]").each(function(){var e=t(this),i="true"===e.attr("aria-expanded");o(e),e.css({height:e.data(i?"expandedHeight":"collapsedHeight")})})},100);a.prototype={init:function(){var e=t(this.element);e.data({defaultHeight:this.options.collapsedHeight,heightMargin:this.options.heightMargin}),o(e);var n=e.data("collapsedHeight"),a=e.data("heightMargin");if(e.outerHeight(!0)<=n+a)return this.options.blockProcessed&&"function"==typeof this.options.blockProcessed&&this.options.blockProcessed(e,!1),!0;var s=e.attr("id")||i(),r=this.options.startOpen?this.options.lessLink:this.options.moreLink;e.attr({"data-readmore":"","aria-expanded":this.options.startOpen,id:s}),e.after(t(r).on("click",function(t){return function(i){t.toggle(this,e[0],i)}}(this)).attr({"data-readmore-toggle":s,"aria-controls":s})),this.options.startOpen||e.css({height:n}),this.options.blockProcessed&&"function"==typeof this.options.blockProcessed&&this.options.blockProcessed(e,!0)},toggle:function(e,i,o){o&&o.preventDefault(),e||(e=t('[aria-controls="'+this.element.id+'"]')[0]),i||(i=this.element);var n=t(i),a="",s="",r=!1,d=n.data("collapsedHeight");n.height()<=d?(a=n.data("expandedHeight")+"px",s="lessLink",r=!0):(a=d,s="moreLink"),this.options.beforeToggle&&"function"==typeof this.options.beforeToggle&&this.options.beforeToggle(e,n,!r),n.css({height:a}),n.on("transitionend",function(i){return function(){i.options.afterToggle&&"function"==typeof i.options.afterToggle&&i.options.afterToggle(e,n,r),t(this).attr({"aria-expanded":r}).off("transitionend")}}(this)),t(e).replaceWith(t(this.options[s]).on("click",function(t){return function(e){t.toggle(this,i,e)}}(this)).attr({"data-readmore-toggle":n.attr("id"),"aria-controls":n.attr("id")}))},destroy:function(){t(this.element).each(function(){var e=t(this);e.attr({"data-readmore":null,"aria-expanded":null}).css({maxHeight:"",height:""}).next("[data-readmore-toggle]").remove(),e.removeData()})}},t.fn.readmore=function(e){var i=arguments,o=this.selector;return e=e||{},"object"==typeof e?this.each(function(){if(t.data(this,"plugin_"+s)){var i=t.data(this,"plugin_"+s);i.destroy.apply(i)}e.selector=o,t.data(this,"plugin_"+s,new a(this,e))}):"string"==typeof e&&"_"!==e[0]&&"init"!==e?this.each(function(){var o=t.data(this,"plugin_"+s);o instanceof a&&"function"==typeof o[e]&&o[e].apply(o,Array.prototype.slice.call(i,1))}):void 0}});
+ */!(function (t) {
+    "function" == typeof define && define.amd ? define(["jquery"], t) : "object" == typeof exports ? (module.exports = t(require("jquery"))) : t(jQuery);
+})(function (t) {
+    "use strict";
+    function e(t, e, i) {
+        var o;
+        return function () {
+            var n = this,
+                a = arguments,
+                s = function () {
+                    (o = null), i || t.apply(n, a);
+                },
+                r = i && !o;
+            clearTimeout(o), (o = setTimeout(s, e)), r && t.apply(n, a);
+        };
+    }
+    function i(t) {
+        var e = ++h;
+        return String(null == t ? "rmjs-" : t) + e;
+    }
+    function o(t) {
+        var e = t.clone().css({ height: "auto", width: t.width(), maxHeight: "none", overflow: "hidden" }).insertAfter(t),
+            i = e.outerHeight(),
+            o = parseInt(
+                e
+                    .css({ maxHeight: "" })
+                    .css("max-height")
+                    .replace(/[^-\d\.]/g, ""),
+                10
+            ),
+            n = t.data("defaultHeight");
+        e.remove();
+        var a = o || t.data("collapsedHeight") || n;
+        t.data({ expandedHeight: i, maxHeight: o, collapsedHeight: a }).css({ maxHeight: "none" });
+    }
+    function n(t) {
+        if (!d[t.selector]) {
+            var e = " ";
+            t.embedCSS && "" !== t.blockCSS && (e += t.selector + " + [data-readmore-toggle], " + t.selector + "[data-readmore]{" + t.blockCSS + "}"),
+                (e += t.selector + "[data-readmore]{transition: height " + t.speed + "ms;overflow: hidden;}"),
+                (function (t, e) {
+                    var i = t.createElement("style");
+                    (i.type = "text/css"), i.styleSheet ? (i.styleSheet.cssText = e) : i.appendChild(t.createTextNode(e)), t.getElementsByTagName("head")[0].appendChild(i);
+                })(document, e),
+                (d[t.selector] = !0);
+        }
+    }
+    function a(e, i) {
+        (this.element = e),
+            (this.options = t.extend({}, r, i)),
+            n(this.options),
+            (this._defaults = r),
+            (this._name = s),
+            this.init(),
+            window.addEventListener ? (window.addEventListener("load", c), window.addEventListener("resize", c)) : (window.attachEvent("load", c), window.attachEvent("resize", c));
+    }
+    var s = "readmore",
+        r = {
+            speed: 100,
+            collapsedHeight: 200,
+            heightMargin: 16,
+            moreLink: '<a href="#">Read More</a>',
+            lessLink: '<a href="#">Close</a>',
+            embedCSS: !0,
+            blockCSS: "display: block; width: 100%;",
+            startOpen: !1,
+            blockProcessed: function () {},
+            beforeToggle: function () {},
+            afterToggle: function () {},
+        },
+        d = {},
+        h = 0,
+        c = e(function () {
+        }, 100);
+    (a.prototype = {
+        init: function () {
+            var e = t(this.element);
+            e.data({ defaultHeight: this.options.collapsedHeight, heightMargin: this.options.heightMargin }), o(e);
+            var n = e.data("collapsedHeight"),
+                a = e.data("heightMargin");
+            if (e.outerHeight(!0) <= n + a) return this.options.blockProcessed && "function" == typeof this.options.blockProcessed && this.options.blockProcessed(e, !1), !0;
+            var s = e.attr("id") || i(),
+                r = this.options.startOpen ? this.options.lessLink : this.options.moreLink;
+            e.attr({ "data-readmore": "", "aria-expanded": this.options.startOpen, id: s }),
+                e.after(
+                    t(r)
+                        .on(
+                            "click",
+                            (function (t) {
+                                return function (i) {
+                                    t.toggle(this, e[0], i);
+                                };
+                            })(this)
+                        )
+                        .attr({ "data-readmore-toggle": s, "aria-controls": s })
+                ),
+                this.options.startOpen || e.css({ height: n }),
+                this.options.blockProcessed && "function" == typeof this.options.blockProcessed && this.options.blockProcessed(e, !0);
+        },
+        toggle: function (e, i, o) {
+            o && o.preventDefault(), e || (e = t('[aria-controls="' + this.element.id + '"]')[0]), i || (i = this.element);
+            var n = t(i),
+                a = "",
+                s = "",
+                r = !1,
+                d = n.data("collapsedHeight");
+            n.height() <= d ? ((a = n.data("expandedHeight") + "px"), (s = "lessLink"), (r = !0)) : ((a = d), (s = "moreLink")),
+                this.options.beforeToggle && "function" == typeof this.options.beforeToggle && this.options.beforeToggle(e, n, !r),
+                n.css({ height: a }),
+                n.on(
+                    "transitionend",
+                    (function (i) {
+                        return function () {
+                            i.options.afterToggle && "function" == typeof i.options.afterToggle && i.options.afterToggle(e, n, r), t(this).attr({ "aria-expanded": r }).off("transitionend");
+                        };
+                    })(this)
+                ),
+                t(e).replaceWith(
+                    t(this.options[s])
+                        .on(
+                            "click",
+                            (function (t) {
+                                return function (e) {
+                                    t.toggle(this, i, e);
+                                };
+                            })(this)
+                        )
+                        .attr({ "data-readmore-toggle": n.attr("id"), "aria-controls": n.attr("id") })
+                );
+        },
+        destroy: function () {
+            t(this.element).each(function () {
+                var e = t(this);
+                e.attr({ "data-readmore": null, "aria-expanded": null }).css({ maxHeight: "", height: "" }).next("[data-readmore-toggle]").remove(), e.removeData();
+            });
+        },
+    }),
+        (t.fn.readmore = function (e) {
+            var i = arguments,
+                o = this.selector;
+            return (
+                (e = e || {}),
+                "object" == typeof e
+                    ? this.each(function () {
+                          if (t.data(this, "plugin_" + s)) {
+                              var i = t.data(this, "plugin_" + s);
+                              i.destroy.apply(i);
+                          }
+                          (e.selector = o), t.data(this, "plugin_" + s, new a(this, e));
+                      })
+                    : "string" == typeof e && "_" !== e[0] && "init" !== e
+                    ? this.each(function () {
+                          var o = t.data(this, "plugin_" + s);
+                          o instanceof a && "function" == typeof o[e] && o[e].apply(o, Array.prototype.slice.call(i, 1));
+                      })
+                    : void 0
+            );
+        });
+});

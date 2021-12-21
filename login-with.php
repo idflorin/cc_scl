@@ -16,7 +16,11 @@ $types = array(
     'Twitter',
     'LinkedIn',
     'Vkontakte',
-    'Instagram'
+    'Instagram',
+    'QQ',
+    'WeChat',
+    'Discord',
+    'Mailru'
 );
 if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
     $provider = Wo_Secure($_GET['provider']);
@@ -55,6 +59,22 @@ if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
             } else if ($provider == 'Instagram') {
                 $notfound_email     = 'in_';
                 $notfound_email_com = '@instagram.com';
+                $name = $user_profile->displayName;
+            } else if ($provider == 'QQ') {
+                $notfound_email     = 'qq_';
+                $notfound_email_com = '@qq.com';
+                $name = $user_profile->displayName;
+            } else if ($provider == 'WeChat') {
+                $notfound_email     = 'wechat_';
+                $notfound_email_com = '@wechat.com';
+                $name = $user_profile->displayName;
+            } else if ($provider == 'Discord') {
+                $notfound_email     = 'discord_';
+                $notfound_email_com = '@discord.com';
+                $name = $user_profile->displayName;
+            } else if ($provider == 'Mailru') {
+                $notfound_email     = 'mailru_';
+                $notfound_email_com = '@mailru.com';
                 $name = $user_profile->displayName;
             }
             $user_name  = $notfound_email . $user_profile->identifier;
@@ -119,6 +139,18 @@ if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
                 }
                 if ($provider == 'Instagram') {
                     $re_data['instagram']   = Wo_Secure($user_profile->username);
+                }
+                if ($provider == 'QQ') {
+                    $re_data['qq']   = Wo_Secure($social_url);
+                }
+                if ($provider == 'WeChat') {
+                    $re_data['wechat']   = Wo_Secure($social_url);
+                }
+                if ($provider == 'Discord') {
+                    $re_data['discord']   = Wo_Secure($social_url);
+                }
+                if ($provider == 'Mailru') {
+                    $re_data['mailru']   = Wo_Secure($social_url);
                 }
                 if (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 0) {
                     $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);

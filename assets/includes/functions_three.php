@@ -1562,7 +1562,7 @@ function Wo_DeleteMyBlog($id = 0) {
     return $sql_query_one;
 }
 function Wo_GetArticle($id = 0) {
-    global $sqlConnect, $wo;
+    global $sqlConnect, $wo,$db;
     if (empty($id)) {
         return false;
     }
@@ -1593,6 +1593,13 @@ function Wo_GetArticle($id = 0) {
             }
             if (!empty($wo['blog_categories'][$fetched_data['category']])) {
                 $fetched_data['category_name'] = $wo['blog_categories'][$fetched_data['category']];
+            }
+            if ($wo['config']['second_post_button'] == 'reaction') {
+                $post = $db->where('blog_id',$fetched_data['id'])->getOne(T_POSTS);
+                if (!empty($post)) {
+                    $fetched_data['reaction'] = Wo_GetPostReactionsTypes($post->id);
+                }
+                    
             }
         }
         return $fetched_data;
@@ -2593,6 +2600,34 @@ function Wo_NotificationWebPushNotifier() {
                     $send_array['notification']['notification_content']     = $sql_get_notification_for_push['type_text'];
                     $send_array['notification']['notification_data']['url'] = $sql_get_notification_for_push['url'];
                     $send_array['notification']['notification_data']['post_id'] = $sql_get_notification_for_push['post_id'];
+                    if (!empty($sql_get_notification_for_push['reply_id'])) {
+                        $send_array['notification']['notification_data']['reply_id'] = $sql_get_notification_for_push['reply_id'];
+                    }
+                    if (!empty($sql_get_notification_for_push['comment_id'])) {
+                        $send_array['notification']['notification_data']['comment_id'] = $sql_get_notification_for_push['comment_id'];
+                    }
+                    if (!empty($sql_get_notification_for_push['page_id'])) {
+                        $send_array['notification']['notification_data']['page_id'] = $sql_get_notification_for_push['page_id'];
+                    }
+                    if (!empty($sql_get_notification_for_push['group_id'])) {
+                        $send_array['notification']['notification_data']['group_id'] = $sql_get_notification_for_push['group_id'];
+                    }
+                    if (!empty($sql_get_notification_for_push['group_chat_id'])) {
+                        $send_array['notification']['notification_data']['group_chat_id'] = $sql_get_notification_for_push['group_chat_id'];
+                    }
+                    if (!empty($sql_get_notification_for_push['event_id'])) {
+                        $send_array['notification']['notification_data']['event_id'] = $sql_get_notification_for_push['event_id'];
+                    }
+                    if (!empty($sql_get_notification_for_push['thread_id'])) {
+                        $send_array['notification']['notification_data']['thread_id'] = $sql_get_notification_for_push['thread_id'];
+                    }
+                    if (!empty($sql_get_notification_for_push['blog_id'])) {
+                        $send_array['notification']['notification_data']['blog_id'] = $sql_get_notification_for_push['blog_id'];
+                    }
+                    if (!empty($sql_get_notification_for_push['story_id'])) {
+                        $send_array['notification']['notification_data']['story_id'] = $sql_get_notification_for_push['story_id'];
+                    }
+                    
                     $send_array['notification']['notification_data']['type'] = $sql_get_notification_for_push['type'];
 
                     if ($wo['config']['android_push_native'] == 1 && !empty($to_data['android_n_device_id'])) {
@@ -2628,7 +2663,7 @@ function Wo_NotificationWebPushNotifier() {
 }
 
 function Wo_MessagesPushNotifier() {
-    global $sqlConnect, $wo;
+    global $sqlConnect, $wo,$db;
     if ($wo['loggedin'] == false) {
         return false;
     }
@@ -2646,47 +2681,86 @@ function Wo_MessagesPushNotifier() {
             if (!in_array($sql_get_messages_for_push['to_id'], $to_ids)) {
                 $get_session_data = Wo_GetSessionDataFromUserID($sql_get_messages_for_push['to_id']);
                 if (empty($get_session_data)) {
-                    $message_id = $sql_get_messages_for_push['id'];
-                    $to_id      = $sql_get_messages_for_push['to_id'];
-                    $to_data    = Wo_UserData($sql_get_messages_for_push['to_id']);
-                    if (!empty($to_data['android_m_device_id']) && $wo['config']['android_push_messages'] != 0) {
-                        $send_array = array(
-                            'send_to' => array(
-                                $to_data['android_m_device_id']
-                            ),
-                            'notification' => array(
-                                'notification_content' => $sql_get_messages_for_push['text'],
-                                'notification_title' => $wo['user']['name'],
-                                'notification_image' => $wo['user']['avatar'],
-                                'notification_data' => array(
-                                    'user_id' => $user_id
-                                )
-                            )
-                        );
-                        $send       = Wo_SendPushNotification($send_array,'android_messenger');
-                        if ($send) {
-                            $query_get_messages_for_push = mysqli_query($sqlConnect, "UPDATE " . T_MESSAGES . " SET `notification_id` = '$send' WHERE `id` = '$message_id'");
+                    $send_notify = true;
+                    if (!empty($sql_get_messages_for_push['page_id'])) {
+                        $chat_type = 'page';
+                        $chat = $db->where('user_id',$sql_get_messages_for_push['to_id'])->where('page_id',$sql_get_messages_for_push['page_id'])->getOne(T_U_CHATS);
+                    }
+                    elseif (!empty($sql_get_messages_for_push['group_id'])) {
+                        $chat_type = 'group';
+                        $chat = $db->where('group_id',$sql_get_messages_for_push['group_id'])->getOne(T_GROUP_CHAT);
+                    }
+                    else{
+                        $chat_type = 'user';
+                        $chat = $db->where('user_id',$sql_get_messages_for_push['to_id'])->getOne(T_U_CHATS);
+                    }
+                    if (!empty($chat)) {
+                        if ($chat_type == 'group') {
+                            $db->where('chat_id',$chat->group_id);
+                        }
+                        else{
+                            $db->where('chat_id',$chat->id);
+                        }
+                        $mute = $db->where('type',$chat_type)->getOne(T_MUTE);
+                        if (!empty($mute) && $mute->notify == 'no') {
+                            $send_notify = false;
+                        }
+                        if ($mute->archive == 'yes') {
+                            $db->where('id',$mute->id)->update(T_MUTE,array('archive' => 'no'));
                         }
                     }
-                    if (!empty($to_data['ios_m_device_id']) && $wo['config']['ios_push_messages'] != 0) {
-                        $send_array = array(
-                            'send_to' => array(
-                                $to_data['ios_m_device_id']
-                            ),
-                            'notification' => array(
-                                'notification_content' => $sql_get_messages_for_push['text'],
-                                'notification_title' => $wo['user']['name'],
-                                'notification_image' => $wo['user']['avatar'],
-                                'notification_data' => array(
-                                    'user_id' => $user_id
+                    if ($send_notify) {
+                        $message_id = $sql_get_messages_for_push['id'];
+                        $to_id      = $sql_get_messages_for_push['to_id'];
+                        $to_data    = Wo_UserData($sql_get_messages_for_push['to_id']);
+                        $notification_data = array('user_id' => $user_id);
+                        if (!empty($sql_get_messages_for_push['group_id'])) {
+                            $notification_data['group_id'] = $sql_get_messages_for_push['group_id'];
+                            $notification_data['type'] = 'group';
+                        }
+                        elseif (!empty($sql_get_messages_for_push['page_id'])) {
+                            $notification_data['page_id'] = $sql_get_messages_for_push['page_id'];
+                            $notification_data['type'] = 'page';
+                        }
+                        else{
+                            $notification_data['type'] = 'user';
+                        }
+                        if (!empty($to_data['android_m_device_id']) && $wo['config']['android_push_messages'] != 0) {
+                            $send_array = array(
+                                'send_to' => array(
+                                    $to_data['android_m_device_id']
+                                ),
+                                'notification' => array(
+                                    'notification_content' => $sql_get_messages_for_push['text'],
+                                    'notification_title' => $wo['user']['name'],
+                                    'notification_image' => $wo['user']['avatar'],
+                                    'notification_data' => $notification_data
                                 )
-                            )
-                        );
-                        $send       = Wo_SendPushNotification($send_array,'ios_messenger');
-                        if ($send) {
-                            $query_get_messages_for_push = mysqli_query($sqlConnect, "UPDATE " . T_MESSAGES . " SET `notification_id` = '$send' WHERE `id` = '$message_id'");
+                            );
+                            $send       = Wo_SendPushNotification($send_array,'android_messenger');
+                            if ($send) {
+                                $query_get_messages_for_push = mysqli_query($sqlConnect, "UPDATE " . T_MESSAGES . " SET `notification_id` = '$send' WHERE `id` = '$message_id'");
+                            }
+                        }
+                        if (!empty($to_data['ios_m_device_id']) && $wo['config']['ios_push_messages'] != 0) {
+                            $send_array = array(
+                                'send_to' => array(
+                                    $to_data['ios_m_device_id']
+                                ),
+                                'notification' => array(
+                                    'notification_content' => $sql_get_messages_for_push['text'],
+                                    'notification_title' => $wo['user']['name'],
+                                    'notification_image' => $wo['user']['avatar'],
+                                    'notification_data' => $notification_data
+                                )
+                            );
+                            $send       = Wo_SendPushNotification($send_array,'ios_messenger');
+                            if ($send) {
+                                $query_get_messages_for_push = mysqli_query($sqlConnect, "UPDATE " . T_MESSAGES . " SET `notification_id` = '$send' WHERE `id` = '$message_id'");
+                            }
                         }
                     }
+                        
                     $query_get_messages_for_push = mysqli_query($sqlConnect, "UPDATE " . T_MESSAGES . " SET `sent_push` = '1' WHERE `from_id` = '$user_id' AND `to_id` = '$to_id' AND `sent_push` = '0'");
                 }
             }
@@ -4533,7 +4607,7 @@ function Wo_InsertUserStoryMedia($registration_data = array()) {
     return $query;
 }
 function Wo_GetStroies($args = array()) {
-    global $sqlConnect, $wo;
+    global $sqlConnect, $wo,$db;
     if ($wo['loggedin'] == false) {
         return false;
     }
@@ -4569,6 +4643,7 @@ function Wo_GetStroies($args = array()) {
             $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
             $fetched_data['videos']    = Wo_GetStoryMedia($fetched_data['id'], 'video');
             $fetched_data['is_owner']  = ($fetched_data['user_id'] == $wo['user']['id'] || Wo_IsAdmin() || Wo_IsModerator()) ? true : false;
+            $fetched_data['reaction'] = Wo_GetPostReactionsTypes($fetched_data['id'],'story');
             $data[]                    = $fetched_data;
         }
     }
@@ -4625,10 +4700,15 @@ function Wo_DeleteStatus($id) {
     }
     if (count($data) > 0) {
         foreach ($data as $key => $path) {
+            $explode2 = @end(explode('.', $path));
+            $explode3 = @explode('.', $path);
+            $media_2  = $explode3[0] . '_small.' . $explode2;
             if (file_exists($path)) {
                 @unlink($path);
+                @unlink(trim($media_2));
             } else if($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1){
                 @Wo_DeleteFromToS3($path);
+                @Wo_DeleteFromToS3($media_2);
             }
         }
     }
@@ -5514,30 +5594,7 @@ function Wo_AddGChatPart($group_id = false, $user_id = false) {
     }
     return $code;
 }
-function Wo_IsReportExists($id = false, $type = 'user') {
-    global $sqlConnect, $wo;
-    if ($wo['loggedin'] == false || !$id || !$type) {
-        return false;
-    }
-    $id    = Wo_Secure($id);
-    $type  = Wo_Secure($type);
-    $user  = $wo['user']['id'];
-    $match = null;
-    if ($type == 'user') {
-        $sql       = " SELECT `id` FROM " . T_REPORTS . " WHERE `profile_id` = {$id} AND `user_id` = {$user}";
-        $data_rows = mysqli_query($sqlConnect, $sql);
-        $match     = mysqli_num_rows($data_rows) > 0;
-    } else if ($type == 'page') {
-        $sql       = " SELECT `id` FROM " . T_REPORTS . " WHERE `page_id` = {$id} AND `user_id` = {$user}";
-        $data_rows = mysqli_query($sqlConnect, $sql);
-        $match     = mysqli_num_rows($data_rows) > 0;
-    } else if ($type == 'group') {
-        $sql       = " SELECT `id` FROM " . T_REPORTS . " WHERE `group_id` = {$id} AND `user_id` = {$user}";
-        $data_rows = mysqli_query($sqlConnect, $sql);
-        $match     = mysqli_num_rows($data_rows) > 0;
-    }
-    return $match;
-}
+
 function Wo_ReportUser($user = false, $text = '') {
     global $sqlConnect, $wo,$db;
     if ($wo['loggedin'] == false || !$user) {
@@ -5569,7 +5626,7 @@ function Wo_ReportUser($user = false, $text = '') {
     return $code;
 }
 function Wo_ReportPage($page = false, $text = '') {
-    global $sqlConnect, $wo;
+    global $sqlConnect, $wo,$db;
     if ($wo['loggedin'] == false || !$page) {
         return false;
     }
@@ -5604,7 +5661,7 @@ function Wo_ReportPage($page = false, $text = '') {
     return $code;
 }
 function Wo_ReportGroup($group = false, $text = '') {
-    global $sqlConnect, $wo;
+    global $sqlConnect, $wo,$db;
     if ($wo['loggedin'] == false || !$group) {
         return false;
     }
@@ -7485,6 +7542,7 @@ function Wo_GetNearbyBusiness($args = array()) {
         while ($fetched_data = mysqli_fetch_assoc($query)) {
             $fetched_data['page_data']        = Wo_PageData($fetched_data['page_id']);
             $fetched_data['job']          =  Wo_GetJobById($fetched_data['job_id']);
+            $fetched_data['job']['full_image']          =  Wo_GetMedia($fetched_data['job']['image']);
             $data[] = $fetched_data;
             
         }
@@ -7839,7 +7897,7 @@ function Wo_CheckAnonymous($id,$type)
         return $fetched_data['count'];
     }
 }
-function StartCloudRecording($vendor,$region,$bucket,$accessKey,$secretKey,$cname,$uid,$post_id)
+function StartCloudRecording($vendor,$region,$bucket,$accessKey,$secretKey,$cname,$uid,$post_id,$token)
 {
     global $sqlConnect, $wo,$db;
     $post_id = Wo_Secure($post_id);
@@ -7867,6 +7925,7 @@ function StartCloudRecording($vendor,$region,$bucket,$accessKey,$secretKey,$cnam
     "cname":"'.$cname.'",
     "uid":"'.$uid.'",
     "clientRequest":{
+        "token":"'.$token.'",
         "recordingConfig":{
             "channelType":1,
             "streamTypes":2,
@@ -7945,15 +8004,20 @@ function StopCloudRecording($data)
       "cname": "'.$data['cname'].'",
       "uid": "'.$data['uid'].'",
       "clientRequest":{
+        "token":"'.$data['token'].'"
       }
     }');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response  = curl_exec($ch);
     curl_close($ch);
-    $data = json_decode($response);
-    if (!empty($data) && !empty($data->serverResponse) && !empty($data->serverResponse->fileList)) {
-        $db->where('id',$post_id)->update(T_POSTS,array('postFile' => $data->serverResponse->fileList));
+    $data2 = json_decode($response);
+    if (!empty($data2) && !empty($data2->serverResponse) && !empty($data2->serverResponse->fileList)) {
+        $db->where('id',$post_id)->update(T_POSTS,array('postFile' => $data2->serverResponse->fileList));
     }
+    // else{
+    //     $file = "upload/videos/".date('Y')."/".date('m')."/".$data['sid']."_".$data['cname'].".m3u8";
+    //     $db->where('id',$post_id)->update(T_POSTS,array('postFile' => $file));
+    // }
     return true;
 }
 function GetVideoTime($first,$second)
@@ -8007,4 +8071,213 @@ function getPageFromPath($path = '') {
         }
     }
     return $data;
+}
+function GetBroadcastChatById($id,$user_id = 0)
+{
+    global $wo, $sqlConnect,$db;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (empty($id) || !is_numeric($id) || $id < 1) {
+        return false;
+    }
+    if (!empty($user_id) && is_numeric($user_id) && $user_id > 0) {
+        $user_id = Wo_Secure($user_id);
+    }
+    else{
+        $user_id = $wo['user']['id'];
+    }
+    $broadcast = $db->where('id',Wo_Secure($id))->where('user_id',$user_id)->getOne(T_CAST);
+    if (!empty($broadcast)) {
+        $broadcast->org_image = $broadcast->image;
+        $broadcast->image = Wo_GetMedia($broadcast->image);
+        $broadcast->users = array();
+        $users = $db->where('broadcast_id',$broadcast->id)->get(T_CAST_USERS);
+        foreach ($users as $key => $value) {
+            $broadcast->users[] = Wo_UserData($value->user_id);
+        }
+        return $broadcast;
+    }
+    return false;
+}
+function GetBroadcastChatByUserId($user_id = 0,$limit = 10,$offset = 0)
+{
+    global $wo, $sqlConnect,$db;
+    if ($wo['loggedin'] == false) {
+        return false;
+    }
+    if (!empty($user_id) && is_numeric($user_id) && $user_id > 0) {
+        $user_id = Wo_Secure($user_id);
+    }
+    else{
+        $user_id = $wo['user']['id'];
+    }
+    $data = array();
+    if (!empty($offset) && is_numeric($offset) && $offset > 0) {
+        $db->where('time',Wo_Secure($offset),'<');
+    }
+    $limit = Wo_Secure($limit);
+    $broadcast = $db->where('user_id',$user_id)->orderBy('time','DESC')->get(T_CAST,$limit);
+    if (!empty($broadcast)) {
+        foreach ($broadcast as $key => $value) {
+            $data[] = GetBroadcastChatById($value->id);
+        }
+    }
+    return $data;
+}
+function FFMPEGUpload($data)
+{
+    global $wo, $sqlConnect,$db;
+    if ($wo['loggedin'] == false || $wo['config']['ffmpeg_system'] != 'on' || empty($data) || empty($data['post_data']) || empty($data['filename'])) {
+        return false;
+    }
+    $ffmpeg_b                   = $wo['config']['ffmpeg_binary_file'];
+    if (!file_exists('upload/videos/' . date('Y'))) {
+        @mkdir('upload/videos/' . date('Y'), 0777, true);
+    }
+    if (!file_exists('upload/videos/' . date('Y') . '/' . date('m'))) {
+        @mkdir('upload/videos/' . date('Y') . '/' . date('m'), 0777, true);
+    }
+    if (!file_exists('upload/photos/' . date('Y'))) {
+        @mkdir('upload/photos/' . date('Y'), 0777, true);
+    }
+    if (!file_exists('upload/photos/' . date('Y') . '/' . date('m'))) {
+        @mkdir('upload/photos/' . date('Y') . '/' . date('m'), 0777, true);
+    }
+    $explode_video = explode('_video', $data['filename']);
+    $video_file_full_path = dirname(dirname(__DIR__)).'/'.$data['filename'];
+    $dir         = dirname(dirname(__DIR__));
+    $video_path_240 = $explode_video[0] . "_video_240p_converted.mp4";
+    $video_path_360 = $explode_video[0] . "_video_360p_converted.mp4";
+    $video_path_480 = $explode_video[0] . "_video_480p_converted.mp4";
+    $video_path_720 = $explode_video[0] . "_video_720p_converted.mp4";
+    $video_path_1080 = $explode_video[0] . "_video_1080p_converted.mp4";
+    $video_path_2048 = $explode_video[0] . "_video_2048p_converted.mp4";
+    $video_path_4096 = $explode_video[0] . "_video_4096p_converted.mp4";
+    $video_output_full_path_240 = $dir . "/".$video_path_240;
+    $video_output_full_path_360 = $dir . "/".$video_path_360;
+    $video_output_full_path_480 = $dir . "/".$video_path_480;
+    $video_output_full_path_720 = $dir . "/".$video_path_720;
+    $video_output_full_path_1080 = $dir . "/".$video_path_1080;
+    $video_output_full_path_2048 = $dir . "/".$video_path_2048;
+    $video_output_full_path_4096 = $dir . "/".$video_path_4096;
+    $video_info     = shell_exec("$ffmpeg_b -i ".$video_file_full_path." 2>&1");
+    $re = '/[0-9]{3}+x[0-9]{3}/m';
+    preg_match_all($re, $video_info,$min_str);
+    $resolution = 0;
+    if (!empty($min_str) && !empty($min_str[0]) && !empty($min_str[0][0])) {
+        $substr = substr($video_info, strpos($video_info, $min_str[0][0])-3,15);
+        $re = '/[0-9]+x[0-9]+/m';
+        preg_match_all($re, $substr,$resolutions);
+        if (!empty($resolutions) && !empty($resolutions[0]) && !empty($resolutions[0][0])) {
+            $resolution = substr($resolutions[0][0], 0,strpos($resolutions[0][0], 'x'));
+        }
+    }
+    $ptrn     = '/Duration: ([0-9]{2}):([0-9]{2}):([^ ,])+/';
+    $time     = 1;
+    if (preg_match($ptrn, $video_info, $matches)) {
+        $time = str_replace("Duration: ", "", $matches[0]);
+        $time_breakdown = explode(":", $time);
+        $time = round(($time_breakdown[0]*60*60) + ($time_breakdown[1]*60) + $time_breakdown[2]);
+    }
+    if ($time > 1) {
+        $time = (int) ($time / 2);
+    }
+    
+
+    $shell     = shell_exec("$ffmpeg_b -y -i $video_file_full_path -vcodec libx264 -preset ".$wo['config']['convert_speed']." -filter:v scale=426:-2 -crf 26 $video_output_full_path_240 2>&1");
+    $data['post_data']['postFile'] = $video_path_240;
+    $data['id'] = Wo_RegisterPost($data['post_data']);
+
+    if (file_exists($video_output_full_path_240)) {
+        if ($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) {
+            $upload_s3 = Wo_UploadToS3($video_path_240);
+        }
+        $processing = 0;
+        if ($resolution >= 640 || $resolution == 0) {
+            $processing = 1;
+        }
+        $db->where('id',$data['id'])->update(T_POSTS,array('240p' => 1,
+                                                           'processing' => $processing));
+        $notification_data_array = array(
+            'recipient_id' => $wo['user']['user_id'],
+            'type' => 'admin_notification',
+            'time' => time(),
+            'url' => 'index.php?link1=post&id=' . $data['id'],
+            'text' => $wo['lang']['video_ready_to_view'],
+            'type2' => 'ffmpeg'
+        );
+        $db->insert(T_NOTIFICATION,$notification_data_array);
+    }
+    if (empty($data['video_thumb'])) {
+        $uniq_id = rand(1111,9999);
+        $hash     = sha1(time() + time() - rand(9999,9999)) . Wo_GenerateKey();
+
+        $file_thumb    = "upload/photos/" . date('Y') . '/' . date('m')."/$hash.video_thumb_$uniq_id" . ".jpeg";
+        $thumb    = $dir ."/".$file_thumb;
+        shell_exec("$ffmpeg_b -ss \"$time\" -i $video_file_full_path -vframes 1 -f mjpeg $thumb 2<&1");
+        if ($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) {
+            $upload_s3 = Wo_UploadToS3($file_thumb);
+        }
+        $db->where('id',$data['id'])->update(T_POSTS,array('postFileThumb' => $file_thumb));
+    }
+
+    if ($resolution >= 640 || $resolution == 0) {
+        $shell = shell_exec("$ffmpeg_b -y -i $video_file_full_path -vcodec libx264 -preset ".$wo['config']['convert_speed']." -filter:v scale=640:-2 -crf 26 $video_output_full_path_360 2>&1");
+        if (file_exists($video_output_full_path_360)) {
+            if ($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) {
+                $upload_s3 = Wo_UploadToS3($video_path_360);
+            }
+            $db->where('id',$data['id'])->update(T_POSTS,array('360p' => 1));
+            
+        }
+    }
+    if ($resolution >= 854 || $resolution == 0) {
+        $shell     = shell_exec("$ffmpeg_b -y -i $video_file_full_path -vcodec libx264 -preset ".$wo['config']['convert_speed']." -filter:v scale=854:-2 -crf 26 $video_output_full_path_480 2>&1");
+        if (file_exists($video_output_full_path_480)) {
+            if ($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) {
+                $upload_s3 = Wo_UploadToS3($video_path_480);
+            }
+            $db->where('id',$data['id'])->update(T_POSTS,array('480p' => 1));
+        }
+    }
+    if ($resolution >= 1280 || $resolution == 0) {
+        $shell     = shell_exec("$ffmpeg_b -y -i $video_file_full_path -vcodec libx264 -preset ".$wo['config']['convert_speed']." -filter:v scale=1280:-2 -crf 26 $video_output_full_path_720 2>&1");
+        if (file_exists($video_output_full_path_720)) {
+            if ($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) {
+                $upload_s3 = Wo_UploadToS3($video_path_720);
+            }
+            $db->where('id',$data['id'])->update(T_POSTS,array('720p' => 1));
+        }
+    }
+    if ($resolution >= 1920 || $resolution == 0) {
+        $shell     = shell_exec("$ffmpeg_b -y -i $video_file_full_path -vcodec libx264 -preset ".$wo['config']['convert_speed']." -filter:v scale=1920:-2 -crf 26 $video_output_full_path_1080 2>&1");
+        if (file_exists($video_output_full_path_1080)) {
+            if ($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) {
+                $upload_s3 = Wo_UploadToS3($video_path_1080);
+            }
+            $db->where('id',$data['id'])->update(T_POSTS,array('1080p' => 1));
+        }
+    }
+    if ($resolution >= 2048 || $resolution == 0) {
+        $shell     = shell_exec("$ffmpeg_b -y -i $video_file_full_path -vcodec libx264 -preset ".$wo['config']['convert_speed']." -filter:v scale=2048:-2 -crf 26 $video_output_full_path_2048 2>&1");
+        if (file_exists($video_output_full_path_2048)) {
+            if ($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) {
+                $upload_s3 = Wo_UploadToS3($video_path_2048);
+            }
+            $db->where('id',$data['id'])->update(T_POSTS,array('2048p' => 1));
+        }
+    }
+    if ($resolution >= 3840 || $resolution == 0) {
+        $shell     = shell_exec("$ffmpeg_b -y -i $video_file_full_path -vcodec libx264 -preset ".$wo['config']['convert_speed']." -filter:v scale=3840:-2 -crf 26 $video_output_full_path_4096 2>&1");
+        if (file_exists($video_output_full_path_4096)) {
+            if ($wo['config']['amazone_s3'] == 1 || $wo['config']['ftp_upload'] == 1 || $wo['config']['spaces'] == 1 || $wo['config']['cloud_upload'] == 1) {
+                $upload_s3 = Wo_UploadToS3($video_path_4096);
+            }
+            $db->where('id',$data['id'])->update(T_POSTS,array('4096p' => 1));
+        }
+    }
+    $db->where('id',$data['id'])->update(T_POSTS,array('processing' => 0));
+    @unlink($video_file_full_path);
+    return $data['id'];
 }

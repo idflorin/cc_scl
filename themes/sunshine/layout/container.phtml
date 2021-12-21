@@ -172,7 +172,7 @@
       <?php if ($wo['page'] == 'welcome') { ?>
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/welcome.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
       <?php } else { ?>
-      <script src="//media.twiliocdn.com/sdk/js/video/v1/twilio-video.min.js?version=<?php echo $wo['config']['version']; ?>"></script>
+      <script src="//media.twiliocdn.com/sdk/js/video/releases/2.8.0/twilio-video.min.js"></script>
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/style.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
 	  <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/theme-style.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
       <?php } ?>
@@ -409,9 +409,9 @@
            });
        }); 
       <?php } ?>
-      function RunLiveAgora(channelName,DIV_ID) {
+      function RunLiveAgora(channelName,DIV_ID,token) {
   var agoraAppId = '<?php echo($wo['config']['agora_app_id']) ?>'; 
-  var token = null;
+  var token = token;
 
   var client = AgoraRTC.createClient({mode: 'live', codec: 'vp8'}); 
   client.init(agoraAppId, function () {
@@ -421,7 +421,7 @@
     }, function(e) {
     });
     
-    client.join(token, channelName, 0, function(uid) {
+    client.join(token, channelName, <?php echo rand(100,999999); ?>, function(uid) {
     }, function(err) {
     });
     }, function (err) {
@@ -458,7 +458,7 @@
     <meta name="google-signin-client_id" content="<?php echo $wo['config']['googleAppId']?>">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <?php endif; ?>
-    <?php if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id'])) { ?>
+    <?php if ($wo['config']['agora_live_video'] == 1 || $wo['config']['agora_chat_video'] == 1) { ?>
       <script src="<?php echo $wo['config']['theme_url'];?>/javascript/agora.js"></script>
     <?php } ?>
     <?php if ($wo['config']['live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['config']['agora_customer_id']) && !empty($wo['config']['agora_customer_certificate'])) { ?>
@@ -529,6 +529,39 @@
             });
           }, 3000);
         })
+        socket.on("lastseen", (data) => {
+            //$('.messages-text[data-message-id='+data.message_id+']').length > 0
+            if (data.message_id && data.user_id) {
+                  var chat_container = $('.chat-tab').find('#chat_' + data.user_id);
+                  if ($('#messageId_'+data.message_id).length > 0) {
+                        
+                        if (chat_container.length > 0) {
+                              chat_container.find('.message-seen').hide();
+                              
+                        }
+                        else{
+                              $('.message-seen').hide();
+                        }
+                        $('#messageId_'+data.message_id).find('.message-seen').hide().html('<i class="fa fa-check"></i> <?php echo $wo["lang"]["seen"];?> (<span class="ajax-time" title="' + data.time + '">' + data.seen + '</span>)').fadeIn(300);
+                        if (chat_container.length > 0) {
+                              //chat_container.find('.online-toggle').attr('style', 'background: #a84849;');
+                              setTimeout(function(){
+                                 chat_container.find('.chat-messages-wrapper').scrollTop(chat_container.find('.chat-messages-wrapper')[0].scrollHeight);
+                              }, 100);
+                        }
+                        else{
+                              $(".messages-container").animate({
+                                  scrollTop: $('.messages-container')[0].scrollHeight
+                              }, 200);
+                        }
+                  }  
+            }
+          })
+        socket.on("register_reaction", (data) => {
+              if(data.status == 200) {
+                  $('.post-reactions-icons-m-'+data.id).html(data.reactions);
+              }
+          });
         socket.on("on_user_loggedin", (data) => {
             $('#chat_' + data.user_id).find('.chat-tab-status').addClass('active');
             $("#online_" + data.user_id).find('svg path').attr('fill', '#60d465');
@@ -638,6 +671,7 @@
           }
         })
         socket.on("private_message", (data)=>{
+          $('#chat_' + data.sender).find('.online-toggle').attr('style', 'background: '+data.color+' !important;');
           var chat_container = $('.chat-tab').find('.chat_main_' + data.id);
           if (chat_container.length > 0) {
                 chat_container.find('.chat-messages-wrapper').find("div[class*='message-seen']").empty();
@@ -695,6 +729,7 @@
    </head>
    
    <body <?php if ($wo['config']['chatSystem'] == 0) { ?> chat-off="true" <?php } ?>>
+      <input type="hidden" id="get_no_posts_name" value="<?php echo($wo['lang']['no_more_posts']); ?>">
       <?php $loadPage = Wo_LoadPage('thirdparty/theme-changer'); echo (!empty($loadPage)) ? $loadPage : '';?>
 		<div id="focus-overlay"></div>
       <input type="hidden" class="main_session" value="<?php echo Wo_CreateMainSession();?>">
@@ -843,6 +878,91 @@
       
       <!-- End 'Audio FILES' -->
       <script>
+      <?php if ($wo['loggedin'] == true) {
+            $havevideo = $db->where('user_id',$wo['user']['id'])->where('processing',1)->getValue(T_POSTS,'COUNT(*)');
+            if ($havevideo > 0) { ?>
+                  intervalUpdates = setTimeout(function(){ Wo_intervalUpdates(1); }, 6000);
+      <?php   } } ?>
+      let f = navigator.userAgent.search("Firefox");
+      if (f > -1) {
+            $('.header-brand').attr('href', "<?php echo $wo['config']['site_url']."/?cache=".time(); ?>");
+      }
+            function ShowCommentGif(id,type) {
+            $( ".gif_post_comment" ).each(function( index ) {
+               if ($( this ).attr('id') != 'gif-form-'+id) {
+                  $( this ).slideUp();
+               }
+            });
+            $('#gif-form-'+id).slideToggle(200);
+            $('.gif_post_comment_gif').html('');
+         }
+         function SearchForGif(keyword,id = 0,type = '') {
+            $('#publisher-box-stickers-cont-'+id).empty();
+            Wo_Delay(function(){
+                $.ajax({
+                  url: 'https://api.giphy.com/v1/gifs/search?',
+                  type: 'GET',
+                  dataType: 'json',
+                  data: {q:keyword,api_key:'<?php echo $wo['config']['giphy_api'];?>', limit: 20},
+                })
+                .done(function(data) {
+                  if (data.meta.status == 200 && data.data.length > 0) {
+                    var appended = false;
+                    for (var i = 0; i < data.data.length; i++) {
+                        appended = true;
+                        if (appended == true) {
+                          appended = false;
+                          if (type == 'story') {
+                             $('#publisher-box-stickers-cont-'+id).append($('<img alt="gif" src="'+data.data[i].images.fixed_height_small.url+'" data-gif="' + data.data[i].images.fixed_height.url + '" onclick="Wo_PostCommentGif_'+id+'(this,'+id+')" autoplay loop>'));
+                         }
+                         else{
+                           $('#publisher-box-stickers-cont-'+id).append($('<img alt="gif" src="'+data.data[i].images.fixed_height_small.url+'" data-gif="' + data.data[i].images.fixed_height.url + '" onclick="Wo_PostReplyCommentGif_'+id+'(this,'+id+')" autoplay loop>'));
+                         }
+                          appended = true;
+                        }
+                    }
+                    var images = 0;
+                    Wo_ElementLoad($('img[alt=gif]'), function(){
+                      images++;
+                    });
+                    if (data.data.length == images || images >= 5) {
+                     
+                    }
+                  }
+                  else{
+                     $('#publisher-box-stickers-cont-'+id).html('<p class="no_gifs_found"><i class="fa fa-frown-o"></i> <?php echo $wo['lang']['no_result']; ?></p>');
+                  }
+                })
+                .fail(function() {
+                  console.log("error");
+                })
+              },100);
+         }
+         function ShowCommentStickers(id,type) {
+            $('.gif_post_comment').slideUp(200);
+            $('.gif_post_comment_gif').html('');
+           $('#sticker-form-'+id).slideToggle(200);
+           $('.chat-box-stickers-cont').empty();
+           functionName = "Wo_PostReplyCommentSticker_"+id+"(this,"+id+");";
+           if (type == 'story') {
+            functionName = "Wo_PostCommentSticker_"+id+"(this,"+id+");";
+           }
+           
+           <?php 
+           $html = "";
+              $stickers_system = Wo_GetAllStickers(50000);
+              if( count( $stickers_system ) > 0 ){
+                 foreach ($stickers_system as $wo['stickerlist']) {
+                    $html .= '<img alt="gif" src="'. Wo_GetMedia( $wo['stickerlist']['media_file'] ).'" data-gif="'.Wo_GetMedia( $wo['stickerlist']['media_file'] ).'" onclick="\'+functionName+\'" autoplay loop>';
+                 }
+              } else {
+                 $html .= '<div class="empty_state" style="margin: 15px 0 0;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M5.5,2C3.56,2 2,3.56 2,5.5V18.5C2,20.44 3.56,22 5.5,22H16L22,16V5.5C22,3.56 20.44,2 18.5,2H5.5M5.75,4H18.25A1.75,1.75 0 0,1 20,5.75V15H18.5C16.56,15 15,16.56 15,18.5V20H5.75A1.75,1.75 0 0,1 4,18.25V5.75A1.75,1.75 0 0,1 5.75,4M14.44,6.77C14.28,6.77 14.12,6.79 13.97,6.83C13.03,7.09 12.5,8.05 12.74,9C12.79,9.15 12.86,9.3 12.95,9.44L16.18,8.56C16.18,8.39 16.16,8.22 16.12,8.05C15.91,7.3 15.22,6.77 14.44,6.77M8.17,8.5C8,8.5 7.85,8.5 7.7,8.55C6.77,8.81 6.22,9.77 6.47,10.7C6.5,10.86 6.59,11 6.68,11.16L9.91,10.28C9.91,10.11 9.89,9.94 9.85,9.78C9.64,9 8.95,8.5 8.17,8.5M16.72,11.26L7.59,13.77C8.91,15.3 11,15.94 12.95,15.41C14.9,14.87 16.36,13.25 16.72,11.26Z"></path></svg> '. $wo['lang']['no_result'] .'</div>';
+              }
+           ?>
+           sticker = '<?php echo($html); ?>';
+           $('#publisher-box-sticker-cont-'+id).html(sticker);
+
+         }
         $(window).on("popstate", function (e) {
           location.reload();
       });
@@ -894,6 +1014,27 @@
 		<?php if ($wo['config']['user_status'] == 1) { ?>
             <!-- // NEW STORY -->
       <script type="text/javascript">
+          $(document).on('mouseover', '.story_lightbox', function(event) {
+                $('.width_').css('width', $('.width_').css('width'));
+                value = $(this).attr('data-post-id');
+                $(this).addClass('dont_close_story_'+value);
+          });
+          $(document).on('mouseleave', '.story_lightbox', function(event) {
+                Wo_Delay(function(){
+                    if ($('#users-reacted-modal').is(':hidden')) {
+                  value = $(this).attr('data-post-id');
+                   $(this).removeClass('dont_close_story_'+value);
+                     setTimeout(function(){
+                             $('.width_').css('width', '100%');
+                     }, 700);
+                     Wo_Delay(function(){
+                             if ($('.dont_close_story_'+value).length == 0) {
+                               $('.story_lightbox').find('.next-btn').click();
+                             }
+                     }, 10000);
+                  }
+            }, 500);
+          });
           $(document).on('click', '.story-image-wrapper', function(event) {
           event.preventDefault();
           $('#contnet').append('<div class="lightbox-container"><div class="lightbox-backgrond" onclick="Wo_CloseLightbox();"></div><div class="lb-preloader" style="display:block"><svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg></div></div>');
@@ -1064,6 +1205,53 @@
               }
             });
           }
+      }
+        function Get_CurrentStory(story_id,story_type = '') {
+            
+            Wo_CloseLightbox();
+            $('#contnet').append('<div class="lightbox-container"><div class="lightbox-backgrond" onclick="Wo_CloseLightbox();"></div><div class="lb-preloader" style="display:block"><svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="6" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg></div></div>');
+            $.post(Wo_Ajax_Requests_File() + '?f=view_story_by_id', {story_id: story_id,type:'current',story_type:story_type}, function(data, textStatus, xhr) {
+              if (data.status == 200) {
+                  user_id = $(this).attr('data_story_user_id');
+               if (node_socket_flow == "1") {
+               socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "added" });
+            }
+                document.body.style.overflow = 'hidden';
+                  $('.lightbox-container').html(data.html);
+                  video_story = $('#video_story').attr('data-story-video');
+                if ($('[data-story-video='+video_story+']').length == 0) {
+                    $('.width_').addClass('load');
+                    setTimeout(function(){
+                        $('.width_').css('width', '100%');
+                  }, 200);
+                    Wo_Delay(function(){
+                      value = $('.user_story_').attr('id');
+                        if ($('.dont_close_story_'+value).length == 0) {
+                          if (story_type == 'user') {
+                            if ($('.lightpost-'+data.story_id).length > 0) {
+                              Get_NextStory(data.story_id);
+                            }
+                      }
+                      else{
+                        if ($('.lightpost-'+data.story_id).length > 0) {
+                          Get_NextStory(data.story_id,'friends');
+                        }
+                      }
+                        }
+                  }, 10000);
+                }
+              }
+              else{
+                if (story_type == 'user') {
+                  if($('.unseen_story').length > 0){
+                    $('.unseen_story').addClass('seen_story');
+                    $('.unseen_story').removeClass('unseen_story');
+
+                  }
+                }
+                Wo_CloseLightbox();
+              }
+            });
       }
     </script>
       <!-- // NEW STORY -->

@@ -79,6 +79,17 @@
                                 <label class="form-check-label" for="profile_privacy-disabled" class="m-l-20">Disabled</label>
                             </div>
                         </div>
+                        <label for="auto_username">Auto Username On Register</label>
+                        <div class="form-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="auto_username" id="auto_username-enabled" value="1" <?php echo ($wo['config']['auto_username'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="auto_username-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="auto_username" id="auto_username-disabled" value="0" <?php echo ($wo['config']['auto_username'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="auto_username-disabled" class="m-l-20">Disabled</label>
+                            </div>
+                        </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                     </form>

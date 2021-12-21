@@ -50,6 +50,16 @@ if (!empty($wo['notification']['type'])) {
         }else if( $wo['notification']['text'] == "replay" ){
             $wo['notification']['type_text'] .= $wo['lang']['reacted_to_your_replay'];
         }
+        elseif ($wo['notification']['text'] == "story") {
+            $wo['notification']['type_text'] .= $wo['lang']['reacted_to_your_story'];
+            $wo['notification']['type'] = "story_reaction";
+            $wo['notification']['url']       = $wo['notification']['url']; 
+        }
+        elseif ($wo['notification']['text'] == "message") {
+            $wo['notification']['type_text'] .= $wo['lang']['reacted_to_your_message'];
+            $wo['notification']['type'] = "message_reaction";
+            $wo['notification']['url']       = $wo['notification']['url']; 
+        }
         if (!empty($wo['reactions_types'][$notificationType2]['sunshine_small_icon'])) {
             $wo['notification']['icon'] .= "<div class='inline_post_count_emoji'><img src='{$wo['reactions_types'][$notificationType2]['sunshine_small_icon']}' alt=\"" . $wo['reactions_types'][$notificationType2]['name'] . "\"></div></span>";
         }
@@ -242,7 +252,7 @@ if (!empty($wo['notification']['type'])) {
     if ($wo['notification']['type'] == 'admin_notification') {
         $theme                                    = $wo['config']['theme'];
         $wo['notification']['type_text']          = $wo['notification']['text'];
-        if ($wo['notification']['type2'] != 'no_name' && $wo['notification']['type2'] != 'approve_post'  && $wo['notification']['type2'] != 'approve_blog' ) {
+        if ($wo['notification']['type2'] != 'no_name' && $wo['notification']['type2'] != 'approve_post'  && $wo['notification']['type2'] != 'approve_blog'  && $wo['notification']['type2'] != 'ffmpeg' ) {
             $wo['notification']['url']                = $wo['notification']['full_link']; 
             $wo['notification']['ajax_url']           = $wo['notification']['full_link']; 
             $wo['notification']['wo_url']             = false; 
@@ -356,17 +366,26 @@ if ($wo['notification']['type2'] == 'anonymous') {
     $wo['notification']['notifier']['name']   = $wo['lang']['anonymous']; 
     $wo['notification']['notifier']['avatar'] = Wo_GetMedia('upload/photos/incognito.png');
 }
+if ($wo['notification']['type2'] == 'ffmpeg') {
+    $post_id = @end(explode('/', $wo['notification']['url']));
+    if (!empty($post_id)) {
+        $post = Wo_PostData($post_id);
+        if (!empty($post) && !empty($post['postFileThumb'])) {
+            $wo['notification']['notifier']['avatar'] = Wo_GetMedia($post['postFileThumb']);
+        }
+    }
+}
 ?>
 
 <li>
-   <div class="notification-list <?php echo $unread_class;?> <?php if ($wo['notification']['type'] == 'viewed_story') { $wo['notification']['url'] = 'javascript:void(0)' ?> see_all_stories<?php } ?>" <?php if ($wo['notification']['type'] == 'viewed_story') { ?> data_story_user_id="<?php echo $wo['notification']['recipient_id']?>" data_story_type="user" <?php } ?>>
-      <a href="<?php echo $wo['notification']['url']; ?>" title="<?php echo $wo['notification']['notifier']['name']; ?>" <?php if (!isset($wo['notification']['wo_url']) && $wo['notification']['type'] != 'viewed_story'): ?> data-ajax="<?php echo $wo['notification']['ajax_url'];?>" <?php endif; ?>>
+   <div class="notification-list <?php echo $unread_class;?> <?php if ($wo['notification']['type'] == 'viewed_story' || $wo['notification']['type'] == 'story_reaction') { $wo['notification']['url'] = 'javascript:void(0)' ?> see_all_stories<?php } ?>" <?php if ($wo['notification']['type'] == 'viewed_story' || $wo['notification']['type'] == 'story_reaction') { ?> data_story_user_id="<?php echo $wo['notification']['recipient_id']?>" data_story_type="user" <?php } ?>>
+      <a href="<?php echo $wo['notification']['url']; ?>" title="<?php echo $wo['notification']['notifier']['name']; ?>" <?php if (!isset($wo['notification']['wo_url']) && $wo['notification']['type'] != 'viewed_story' && $wo['notification']['type'] != 'story_reaction' && $wo['notification']['type'] != 'message_reaction'): ?> data-ajax="<?php echo $wo['notification']['ajax_url'];?>" <?php endif; ?>>
          <div class="notification-user-avatar <?php echo Wo_RightToLeft('pull-left');?>">
             <img src="<?php echo $wo['notification']['notifier']['avatar']; ?>" alt="<?php echo $wo['notification']['notifier']['name']; ?> Profile picture">
          </div>
          <div class="notification-text">
             <span class="main-color">
-            <?php if ($wo['notification']['type2'] != 'no_name') {
+            <?php if ($wo['notification']['type2'] != 'no_name' && $wo['notification']['type2'] != 'ffmpeg') {
                 echo $wo['notification']['notifier']['name'];
             }
              ?>

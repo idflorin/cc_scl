@@ -18,6 +18,8 @@ if ($f == "update-blog") {
             }
         }
         if (empty($error)) {
+            $_POST['blog_tags'] = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_POST['blog_tags']);
+            $_POST['blog_tags'] = strip_tags($_POST['blog_tags']);
             $_POST['blog_content'] = preg_replace($wo['regx_attr'], '', $_POST['blog_content']);
             $registration_data = array(
                 'user' => $wo['user']['id'],

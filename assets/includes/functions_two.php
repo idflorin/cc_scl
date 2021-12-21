@@ -1009,6 +1009,9 @@ function Wo_RegisterTyping($recipient_id, $isTyping = 1) {
     if ($isTyping == 0) {
         $typing = 0;
     }
+    elseif ($isTyping == 2) {
+        $typing = 2;
+    }
     if (Wo_IsFollowing($user_id, $recipient_id) === false) {
         return false;
     }
@@ -1891,6 +1894,7 @@ function Wo_PageData($page_id = 0) {
     $fetched_data['rating']   = Wo_PageRating($fetched_data['page_id']);
     $fetched_data['category'] = '';
     $fetched_data['page_sub_category'] = '';
+    $fetched_data['is_reported'] = Wo_IsReportExists($fetched_data['page_id'], 'page');
     if (!empty($wo['page_categories'][$fetched_data['page_category']])) {
         $fetched_data['category'] = $wo['page_categories'][$fetched_data['page_category']];
     }
@@ -2666,6 +2670,7 @@ function Wo_GroupData($group_id = 0) {
     $fetched_data['type']        = 'group';
     $fetched_data['username']    = $fetched_data['group_name'];
     $fetched_data['category']    = $wo['group_categories'][$fetched_data['category']];
+    $fetched_data['is_reported'] = Wo_IsReportExists($fetched_data['id'], 'group');
     $fetched_data['group_sub_category'] = '';
     if (!empty($fetched_data['sub_category']) && !empty($wo['group_sub_categories'][$fetched_data['category_id']])) {
         foreach ($wo['group_sub_categories'][$fetched_data['category_id']] as $key => $value) {
@@ -2683,6 +2688,16 @@ function Wo_GroupData($group_id = 0) {
             }
         }
     }
+    if (Wo_IsJoinRequested($fetched_data['group_id'])) {
+        $fetched_data['is_group_joined'] = 2;
+    }
+    elseif (Wo_IsGroupJoined($fetched_data['group_id'])) {
+        $fetched_data['is_group_joined'] = 1;
+    }
+    else{
+        $fetched_data['is_group_joined'] = 0;
+    }
+    $fetched_data['members_count'] = Wo_CountGroupMembers($fetched_data['group_id']);
 
     
     return $fetched_data;
@@ -4025,6 +4040,10 @@ function Wo_DeleteImageFromAlbum($post_id, $id) {
     }
     $delete_query = mysqli_query($sqlConnect, "DELETE FROM " . T_ALBUMS_MEDIA . " WHERE `post_id` = {$post_id} AND `id` = {$id}");
     if ($delete_query) {
+        $delete_query_2 = mysqli_query($sqlConnect, "SELECT `id` FROM " . T_ALBUMS_MEDIA . " WHERE `post_id` = {$post_id}");
+        if (mysqli_num_rows($delete_query_2) == 0) {
+            $delete_post = Wo_DeletePost($post_id);
+        }
         return true;
     }
 }
@@ -5201,7 +5220,7 @@ function Wo_SendMessage($data = array()) {
         $mail->Host        = $wo['config']['smtp_host']; // Specify main and backup SMTP servers
         $mail->SMTPAuth    = true; // Enable SMTP authentication
         $mail->Username    = $wo['config']['smtp_username']; // SMTP username
-        $mail->Password    = $wo['config']['smtp_password']; // SMTP password
+        $mail->Password    = openssl_decrypt($wo['config']['smtp_password'], "AES-128-ECB", 'mysecretkey1234'); // SMTP password
         $mail->SMTPSecure  = $wo['config']['smtp_encryption']; // Enable TLS encryption, `ssl` also accepted
         $mail->Port        = $wo['config']['smtp_port'];
         $mail->SMTPOptions = array(
@@ -6377,6 +6396,16 @@ function Wo_CheckCallAnswer($id = 0) {
             return false;
         }
     }
+    else{
+        $query = mysqli_query($sqlConnect, "SELECT * FROM " . T_AGORA . "  WHERE `id` = '{$id}' AND `active` = '1' AND `declined` = '0'");
+        if (mysqli_num_rows($query)) {
+            if (mysqli_num_rows($query) > 0) {
+                $sql        = mysqli_fetch_assoc($query);
+                $sql['url'] = $wo['config']['site_url'] . '/video-call/' . $sql['room_name'];
+                return $sql;
+            }
+        }
+    }
     return false;
         
 }
@@ -6394,8 +6423,15 @@ function Wo_CheckAudioCallAnswer($id = 0) {
     if (mysqli_num_rows($query) > 0) {
         return true;
     } else {
-        return false;
+        $query = mysqli_query($sqlConnect, "SELECT * FROM " . T_AGORA . "  WHERE `id` = '{$id}' AND `active` = '1' AND `declined` = '0' AND `type` = 'audio'");
+        if (mysqli_num_rows($query)) {
+            if (mysqli_num_rows($query) > 0) {
+                return true;
+            }
+        }
     }
+    return false;
+
 }
 function Wo_CheckAudioCallAnswerDeclined($id = 0) {
     global $sqlConnect, $wo;
@@ -6406,7 +6442,11 @@ function Wo_CheckAudioCallAnswerDeclined($id = 0) {
         return false;
     }
     $id    = Wo_Secure($id);
-    $query = mysqli_query($sqlConnect, "SELECT COUNT(`id`) FROM " . T_AUDIO_CALLES . " WHERE `id` = '{$id}' AND `declined` = '1'");
+    if ($wo['config']['agora_chat_video'] == 1) {
+        $query = mysqli_query($sqlConnect, "SELECT COUNT(`id`) FROM " . T_AGORA . " WHERE `id` = '{$id}' AND `declined` = '1'");
+    }else {
+        $query = mysqli_query($sqlConnect, "SELECT COUNT(`id`) FROM " . T_AUDIO_CALLES . " WHERE `id` = '{$id}' AND `declined` = '1'");
+    }
     return (Wo_Sql_Result($query, 0) == 1) ? true : false;
 }
 function Wo_CheckCallAnswerDeclined($id = 0) {
@@ -6418,7 +6458,12 @@ function Wo_CheckCallAnswerDeclined($id = 0) {
         return false;
     }
     $id    = Wo_Secure($id);
-    $query = mysqli_query($sqlConnect, "SELECT COUNT(`id`) FROM " . T_VIDEOS_CALLES . " WHERE `id` = '{$id}' AND `declined` = '1'");
+    if ($wo['config']['agora_chat_video'] == 1) {
+        $query = mysqli_query($sqlConnect, "SELECT COUNT(`id`) FROM " . T_AGORA . " WHERE `id` = '{$id}' AND `declined` = '1'");
+    }
+    else{
+        $query = mysqli_query($sqlConnect, "SELECT COUNT(`id`) FROM " . T_VIDEOS_CALLES . " WHERE `id` = '{$id}' AND `declined` = '1'");
+    }
     return (Wo_Sql_Result($query, 0) == 1) ? true : false;
 }
 
@@ -6468,8 +6513,20 @@ function Wo_CheckFroInCalls($type = 'video') {
             }
             $sql['url'] = $wo['config']['site_url'] . '/video-call/' . $sql['id'];
             return $sql;
-        } else {
-            return false;
+        }
+    }
+    else{
+        $table   = T_AGORA;
+        $query = mysqli_query($sqlConnect, "SELECT * FROM {$table}  WHERE `to_id` = '{$user_id}' AND `time` > '$time' AND `active` = '0' AND `declined` = 0 AND `type` = '".$type."'");
+        if (mysqli_num_rows($query)) {
+            if (mysqli_num_rows($query) > 0) {
+                $sql = mysqli_fetch_assoc($query);
+                if (Wo_IsBlocked($sql['from_id'])) {
+                    return false;
+                }
+                $sql['url'] = $wo['config']['site_url'] . '/video-call/' . $sql['room_name'];
+                return $sql;
+            }
         }
     }
     return false;
@@ -6511,6 +6568,16 @@ function Wo_GetAllDataFromCallID($id = 0) {
             return $sql;
         } else {
             return false;
+        }
+    }
+    else{
+        $query = mysqli_query($sqlConnect, "SELECT * FROM " . T_AGORA . " WHERE `id` = '{$id}'");
+        if (mysqli_num_rows($query)) {
+            if (mysqli_num_rows($query) > 0) {
+                $sql        = mysqli_fetch_assoc($query);
+                $sql['url'] = $wo['config']['site_url'] . '/video-call/' . $sql['id'];
+                return $sql;
+            }
         }
     }
     return false;
@@ -6819,7 +6886,12 @@ function Wo_GetPopularGames($limit = 10, $after = 0) {
     global $wo, $sqlConnect;
 
     $data      = array();
-    $sql = mysqli_query($sqlConnect, "SELECT game_id, COUNT(`user_id`) AS count FROM " . T_GAMES_PLAYERS . " WHERE `active` = '1' GROUP BY `game_id` ORDER BY count DESC LIMIT ".$limit);
+    $q = "";
+    if (!empty($after) && is_numeric($after)) {
+        $after = Wo_Secure($after);
+        $q = " HAVING count < ".$after;
+    }
+    $sql = mysqli_query($sqlConnect, "SELECT game_id, COUNT(`user_id`) AS count FROM " . T_GAMES_PLAYERS . " WHERE `active` = '1' GROUP BY `game_id` ".$q." ORDER BY count DESC LIMIT ".$limit);
     if (mysqli_num_rows($sql)) {
         while ($fetched_data = mysqli_fetch_assoc($sql)) {
             $fetched_data            = Wo_GameData($fetched_data['game_id']);

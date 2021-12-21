@@ -4,7 +4,7 @@
 		<div class="col-md-10 singlecol wo-create-forms">
 			<h3 class="wo_create_form_cover blog">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-				<?php echo $wo['lang']['create_new_funding'];?>
+				<?php echo $wo['lang']['edit_funding'];?>
 				<span class="<?php echo Wo_RightToLeft('pull-right');?>">
 					<a data-ajax="?link1=my_funding" href="<?php echo Wo_SeoLink('index.php?link1=my_funding');?>">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-left"><polyline points="15 18 9 12 15 6"></polyline></svg><?php echo $wo['lang']['my_funding'];?>
@@ -34,6 +34,14 @@
 								<input id="amount" name="amount" type="text" class="form-control input-md" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" value="<?php echo($wo['fund']['amount']) ?>"> 
 							</div>
 						</div>
+						<div class="form-group th-alert">
+							<div class="col-md-12">
+								<div class="main prv-img pointer" id="select-img" data-block="thumdrop-zone">
+									<img src="<?php echo $wo['fund']['image'];?>">
+								</div>
+							</div>
+						</div>
+						<input type="file" class="hidden" id="thumbnail" name="image" accept="image/*">
 					</div>
 					
 					<div class="setting-update-alert" id="funding-alert"></div>
@@ -57,6 +65,37 @@
 <script src="<?php echo $wo['config']['theme_url'];?>/javascript/bootstrap-tagsinput-latest/src/bootstrap-tagsinput.js"></script>
 <script>
 jQuery(document).ready(function($) {
+	var thumb_drop_block = $("[data-block='thumdrop-zone']");
+    if (typeof(window.FileReader) == 'undefined') {
+      thumb_drop_block.find('.thumbnail-rendderer div').text('Drag drop is not supported in your browser!');
+    }
+    else{
+      thumb_drop_block[0].ondragover = function() {
+          thumb_drop_block.addClass('hover');
+          return false;
+      };
+          
+      thumb_drop_block[0].ondragleave = function() {
+          thumb_drop_block.removeClass('hover');
+          return false;
+      };
+
+      thumb_drop_block[0].ondrop = function(event) {
+          event.preventDefault();
+          thumb_drop_block.removeClass('hover');
+          var file = event.dataTransfer.files;
+          $("#thumbnail").prop('files', file);
+          $(".prv-img").html("<img src='" + window.URL.createObjectURL(event.dataTransfer.files[0]) + "' alt='Picture'>")
+      };
+    }
+
+    $("#select-img").click(function(event) {
+      $("#thumbnail").click()
+    });
+
+    $("#thumbnail").change(function(event) {
+      $(".prv-img").html("<img src='" + window.URL.createObjectURL(this.files[0]) + "' alt='Picture'>")
+    });
 
     $('#insert-funding').ajaxForm({
       url: Wo_Ajax_Requests_File() + '?f=funding&s=edit_funding',

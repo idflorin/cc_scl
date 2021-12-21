@@ -1675,6 +1675,24 @@ function Wo_IsFileAllowed($file_name) {
     }
     return true;
 }
+function Wo_IsVideoNotAllowedMime($file_type) {
+    global $wo;
+    $mime_types = explode(',',$wo['config']['ffmpeg_mime_types']);
+    if (!in_array($file_type, $mime_types)) {
+        return true;
+    }
+    return false;
+}
+function Wo_IsFfmpegFileAllowed($file_name) {
+    global $wo;
+    $new_string        = pathinfo($file_name, PATHINFO_FILENAME) . '.' . strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+    $extension_allowed = explode(',', $wo['config']['allowedffmpegExtenstion']);
+    $file_extension    = pathinfo($new_string, PATHINFO_EXTENSION);
+    if(in_array($file_extension, $extension_allowed)){
+        return true;
+    }
+    return false;
+}
 
 function Wo_ShortText($text = "", $len = 100) {
     if (empty($text) || !is_string($text) || !is_numeric($len) || $len < 1) {

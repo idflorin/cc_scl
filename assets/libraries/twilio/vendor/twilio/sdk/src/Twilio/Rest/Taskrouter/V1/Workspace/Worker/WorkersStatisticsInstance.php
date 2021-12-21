@@ -26,33 +26,32 @@ class WorkersStatisticsInstance extends InstanceResource {
     /**
      * Initialize the WorkersStatisticsInstance
      *
-     * @param \Twilio\Version $version Version that contains the resource
+     * @param Version $version Version that contains the resource
      * @param mixed[] $payload The response payload
      * @param string $workspaceSid The SID of the Workspace that contains the Worker
-     * @return \Twilio\Rest\Taskrouter\V1\Workspace\Worker\WorkersStatisticsInstance
      */
-    public function __construct(Version $version, array $payload, $workspaceSid) {
+    public function __construct(Version $version, array $payload, string $workspaceSid) {
         parent::__construct($version);
 
         // Marshaled Properties
-        $this->properties = array(
+        $this->properties = [
             'realtime' => Values::array_get($payload, 'realtime'),
             'cumulative' => Values::array_get($payload, 'cumulative'),
             'accountSid' => Values::array_get($payload, 'account_sid'),
             'workspaceSid' => Values::array_get($payload, 'workspace_sid'),
             'url' => Values::array_get($payload, 'url'),
-        );
+        ];
 
-        $this->solution = array('workspaceSid' => $workspaceSid, );
+        $this->solution = ['workspaceSid' => $workspaceSid, ];
     }
 
     /**
      * Generate an instance context for the instance, the context is capable of
      * performing various actions.  All instance actions are proxied to the context
      *
-     * @return \Twilio\Rest\Taskrouter\V1\Workspace\Worker\WorkersStatisticsContext Context for this WorkersStatisticsInstance
+     * @return WorkersStatisticsContext Context for this WorkersStatisticsInstance
      */
-    protected function proxy() {
+    protected function proxy(): WorkersStatisticsContext {
         if (!$this->context) {
             $this->context = new WorkersStatisticsContext($this->version, $this->solution['workspaceSid']);
         }
@@ -61,13 +60,13 @@ class WorkersStatisticsInstance extends InstanceResource {
     }
 
     /**
-     * Fetch a WorkersStatisticsInstance
+     * Fetch the WorkersStatisticsInstance
      *
      * @param array|Options $options Optional Arguments
      * @return WorkersStatisticsInstance Fetched WorkersStatisticsInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch($options = array()) {
+    public function fetch(array $options = []): WorkersStatisticsInstance {
         return $this->proxy()->fetch($options);
     }
 
@@ -78,13 +77,13 @@ class WorkersStatisticsInstance extends InstanceResource {
      * @return mixed The requested property
      * @throws TwilioException For unknown properties
      */
-    public function __get($name) {
-        if (array_key_exists($name, $this->properties)) {
+    public function __get(string $name) {
+        if (\array_key_exists($name, $this->properties)) {
             return $this->properties[$name];
         }
 
-        if (property_exists($this, '_' . $name)) {
-            $method = 'get' . ucfirst($name);
+        if (\property_exists($this, '_' . $name)) {
+            $method = 'get' . \ucfirst($name);
             return $this->$method();
         }
 
@@ -96,11 +95,11 @@ class WorkersStatisticsInstance extends InstanceResource {
      *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Taskrouter.V1.WorkersStatisticsInstance ' . implode(' ', $context) . ']';
+        return '[Twilio.Taskrouter.V1.WorkersStatisticsInstance ' . \implode(' ', $context) . ']';
     }
 }

@@ -48,6 +48,17 @@ $array = array();
 if (!empty($messages)) {
     foreach ($messages as $value) {
         $value['chat_type'] = 'user';
+        $value['mute'] = array('notify' => 'yes',
+                               'call_chat' => 'yes',
+                               'archive' => 'no',
+                               'pin' => 'no');
+        $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$value['chat_id'])->where('type','user')->getOne(T_MUTE);
+        if (!empty($mute)) {
+            $value['mute']['notify'] = $mute->notify;
+            $value['mute']['call_chat'] = $mute->call_chat;
+            $value['mute']['archive'] = $mute->archive;
+            $value['mute']['pin'] = $mute->pin;
+        }
         $value['last_message'] = Wo_GetMessagesHeader(array('user_id' => $value['user_id']), 'user');
         foreach ($non_allowed as $key5 => $value5) {
             if (!empty($value['last_message']['messageUser'])) {
@@ -108,6 +119,17 @@ if (!empty($messages)) {
 }
 if (!empty($groups)) {
     foreach ($groups as $key => $value) {
+        $value['mute'] = array('notify' => 'yes',
+                               'call_chat' => 'yes',
+                               'archive' => 'no',
+                               'pin' => 'no');
+        $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$value['chat_id'])->where('type','group')->getOne(T_MUTE);
+        if (!empty($mute)) {
+            $value['mute']['notify'] = $mute->notify;
+            $value['mute']['call_chat'] = $mute->call_chat;
+            $value['mute']['archive'] = $mute->archive;
+            $value['mute']['pin'] = $mute->pin;
+        }
     	if (!empty($value['user_data'])) {
             foreach ($non_allowed as $key4 => $value4) {
               unset($value['user_data'][$value4]);
@@ -191,6 +213,18 @@ if (!empty($groups)) {
 if (!empty($pages)) {
     foreach ($pages as $key => $value) {
     	$page = Wo_PageData($value['message']['page_id']);
+        $page['chat_id'] = $value['chat_id'];
+        $page['mute'] = array('notify' => 'yes',
+                               'call_chat' => 'yes',
+                               'archive' => 'no',
+                               'pin' => 'no');
+        $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$value['chat_id'])->where('type','page')->getOne(T_MUTE);
+        if (!empty($mute)) {
+            $page['mute']['notify'] = $mute->notify;
+            $page['mute']['call_chat'] = $mute->call_chat;
+            $page['mute']['archive'] = $mute->archive;
+            $page['mute']['pin'] = $mute->pin;
+        }
         if (!empty($page) && !empty($value['message']) && !empty($value['message']['page_id']) && !empty($value['message']['user_id']) && !empty($value['message']['conversation_user_id'])) {
             $message = Wo_GetPageMessages(array(
                                         'page_id' => $value['message']['page_id'],

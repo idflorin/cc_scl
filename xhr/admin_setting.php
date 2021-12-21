@@ -440,6 +440,88 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'delete_user_articles') {
+        $data['status'] = 400;
+        if (!empty($_GET['user_id'])) {
+            Wo_RunInBackground(array(
+                    'status' => 200
+                ));
+            $user_id = Wo_Secure($_GET['user_id']);
+            $blogs = $db->where('user',$user_id)->get(T_BLOG);
+            if (!empty($blogs)) {
+                foreach ($blogs as $key => $value) {
+                    Wo_DeleteMyBlog($value->id);
+                }
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_user_stories') {
+        $data['status'] = 400;
+        if (!empty($_GET['user_id'])) {
+            Wo_RunInBackground(array(
+                    'status' => 200
+                ));
+            $user_id = Wo_Secure($_GET['user_id']);
+            $info = $db->where('user_id',$user_id)->get(T_USER_STORY);
+            if (!empty($info)) {
+                foreach ($info as $key => $value) {
+                    Wo_DeleteStatus($value->id);
+                }
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_user_messages') {
+        $data['status'] = 400;
+        if (!empty($_GET['user_id'])) {
+            Wo_RunInBackground(array(
+                    'status' => 200
+                ));
+            $my_id = Wo_Secure($_GET['user_id']);
+            $query_one     = "SELECT id FROM " . T_MESSAGES . " WHERE (`to_id` = '{$my_id}') OR (`from_id` = {$my_id})";
+            $sql_query_one = mysqli_query($sqlConnect, $query_one);
+            if (mysqli_num_rows($sql_query_one)) {
+                while ($sql_fetch_one = mysqli_fetch_assoc($sql_query_one)) {
+                    $deleteMessage = Wo_DeleteMessage($sql_fetch_one['id'], '', $my_id);
+                }
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'delete_user_notifications') {
+        $data['status'] = 400;
+        if (!empty($_GET['user_id'])) {
+            Wo_RunInBackground(array(
+                    'status' => 200
+                ));
+            $my_id = Wo_Secure($_GET['user_id']);
+            mysqli_query($sqlConnect, "DELETE FROM " . T_NOTIFICATION . " WHERE `recipient_id` = {$my_id} OR `notifier_id` = {$my_id}");
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'ban_user') {
+        $data['status'] = 400;
+        if (!empty($_GET['user_id'])) {
+            Wo_RunInBackground(array(
+                    'status' => 200
+                ));
+            $user_id = Wo_Secure($_GET['user_id']);
+            $info = $db->where('user_id',$user_id)->getOne(T_USERS);
+            Wo_BanNewIp($info->ip_address);
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
     if ($s == 'delete_multi_users') {
         if (!empty($_POST['ids']) && !empty($_POST['type']) && in_array($_POST['type'], array('activate','deactivate','delete','free','star','hot','ultima','vip'))) {
             foreach ($_POST['ids'] as $key => $value) {
@@ -1075,9 +1157,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                             $update = mysqli_query($sqlConnect, "UPDATE " . T_A_REQUESTS . " SET status = '2' WHERE id = {$id}");
                             if ($update) {
                                 $body              = Wo_LoadPage('emails/payment-declined');
-                                $body              = str_replace('{name}', $get_payment_info['user']['name'], $body);
-                                $body              = str_replace('{amount}', $get_payment_info['amount'], $body);
-                                $body              = str_replace('{site_name}', $config['siteName'], $body);
+                                $body              = str_replace('{{name}}', $get_payment_info['user']['name'], $body);
+                                $body              = str_replace('{{amount}}', $get_payment_info['amount'], $body);
+                                $body              = str_replace('{{site_name}}', $config['siteName'], $body);
                                 $send_message_data = array(
                                     'from_email' => $wo['config']['siteEmail'],
                                     'from_name' => $wo['config']['siteName'],
@@ -1108,9 +1190,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                             $update = mysqli_query($sqlConnect, "UPDATE " . T_A_REQUESTS . " SET status = '2' WHERE id = {$id}");
                             if ($update) {
                                 $body              = Wo_LoadPage('emails/payment-declined');
-                                $body              = str_replace('{name}', $get_payment_info['user']['name'], $body);
-                                $body              = str_replace('{amount}', $get_payment_info['amount'], $body);
-                                $body              = str_replace('{site_name}', $config['siteName'], $body);
+                                $body              = str_replace('{{name}}', $get_payment_info['user']['name'], $body);
+                                $body              = str_replace('{{amount}}', $get_payment_info['amount'], $body);
+                                $body              = str_replace('{{site_name}}', $config['siteName'], $body);
                                 $send_message_data = array(
                                     'from_email' => $wo['config']['siteEmail'],
                                     'from_name' => $wo['config']['siteName'],
@@ -1140,9 +1222,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                             $update = mysqli_query($sqlConnect, "UPDATE " . T_A_REQUESTS . " SET status = '1' WHERE id = {$id}");
                             if ($update) {
                                 $body              = Wo_LoadPage('emails/payment-sent');
-                                $body              = str_replace('{name}', $get_payment_info['user']['name'], $body);
-                                $body              = str_replace('{amount}', $get_payment_info['amount'], $body);
-                                $body              = str_replace('{site_name}', $config['siteName'], $body);
+                                $body              = str_replace('{{name}}', $get_payment_info['user']['name'], $body);
+                                $body              = str_replace('{{amount}}', $get_payment_info['amount'], $body);
+                                $body              = str_replace('{{site_name}}', $config['siteName'], $body);
                                 $send_message_data = array(
                                     'from_email' => $wo['config']['siteEmail'],
                                     'from_name' => $wo['config']['siteName'],
@@ -1619,7 +1701,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             foreach ($_POST as $key => $value) {
                 if (in_array($key, $langs)) {
                     $key   = Wo_Secure($key);
-                    $value = Wo_Secure($value);
+                    //$value = Wo_Secure($value);
                     $value = mysqli_real_escape_string($sqlConnect,$value);
                     $query = mysqli_query($sqlConnect, "UPDATE " . T_LANGS . " SET `{$key}` = '{$value}' WHERE `lang_key` = '{$lang_key}'");
                     if ($query) {
@@ -1881,9 +1963,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 $update = mysqli_query($sqlConnect, "UPDATE " . T_A_REQUESTS . " SET status = '1' WHERE id = {$id}");
                 if ($update) {
                     $body              = Wo_LoadPage('emails/payment-sent');
-                    $body              = str_replace('{name}', $get_payment_info['user']['name'], $body);
-                    $body              = str_replace('{amount}', $get_payment_info['amount'], $body);
-                    $body              = str_replace('{site_name}', $config['siteName'], $body);
+                    $body              = str_replace('{{name}}', $get_payment_info['user']['name'], $body);
+                    $body              = str_replace('{{amount}}', $get_payment_info['amount'], $body);
+                    $body              = str_replace('{{site_name}}', $config['siteName'], $body);
                     $send_message_data = array(
                         'from_email' => $wo['config']['siteEmail'],
                         'from_name' => $wo['config']['siteName'],
@@ -1922,9 +2004,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 $update = mysqli_query($sqlConnect, "UPDATE " . T_A_REQUESTS . " SET status = '2' WHERE id = {$id}");
                 if ($update) {
                     $body              = Wo_LoadPage('emails/payment-declined');
-                    $body              = str_replace('{name}', $get_payment_info['user']['name'], $body);
-                    $body              = str_replace('{amount}', $get_payment_info['amount'], $body);
-                    $body              = str_replace('{site_name}', $config['siteName'], $body);
+                    $body              = str_replace('{{name}}', $get_payment_info['user']['name'], $body);
+                    $body              = str_replace('{{amount}}', $get_payment_info['amount'], $body);
+                    $body              = str_replace('{{site_name}}', $config['siteName'], $body);
                     $send_message_data = array(
                         'from_email' => $wo['config']['siteEmail'],
                         'from_name' => $wo['config']['siteName'],
@@ -2208,6 +2290,21 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'ffmpeg_debug') {
+        $ffmpeg_b                   = $wo['config']['ffmpeg_binary_file'];
+        $video_output_full_path_240 = dirname(__DIR__) . "/admin-panel/videos/test_240p_converted.mp4";
+        @unlink($video_output_full_path_240);
+        $video_file_full_path = dirname(__DIR__) . "/admin-panel/videos/test.mp4";
+        $shell     = shell_exec("$ffmpeg_b -y -i $video_file_full_path -vcodec libx264 -preset ".$wo['config']['convert_speed']." -filter:v scale=426:-2 -crf 26 $video_output_full_path_240 2>&1");
+        if (file_exists($video_output_full_path_240)) {
+            $data['video_url']       = $wo['config']['site_url'].'/admin-panel/videos/test_240p_converted.mp4';
+        }
+        $data['status']       = 200;
+        $data['data']       = $shell;
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
     if ($s == 'update_general_setting' && Wo_CheckSession($hash_id) === true) {
         $saveSetting         = false;
         $delete_follow_table = 0;
@@ -2228,6 +2325,16 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             
         foreach ($_POST as $key => $value) {
             if (isset($wo['config'][$key]) || $key == 'googleAnalytics_en') {
+                if ($key == 'agora_chat_video') {
+                    if ($config['twilio_video_chat'] == 1){
+                        $saveSetting = Wo_SaveConfig('twilio_video_chat', 0);
+                    }
+                }
+                if ($key == 'twilio_video_chat') {
+                    if ($config['agora_chat_video'] == 1){
+                        $saveSetting = Wo_SaveConfig('agora_chat_video', 0);
+                    }
+                }
                 if ($key == 'googleAnalytics_en') {
                     $key   = 'googleAnalytics';
                     $value = base64_decode($value);
@@ -2327,6 +2434,9 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 }
                 if ($key == 'pro_day_limit' && (!is_numeric($value) || $value < 1) ) {
                     $value = 10000;
+                }
+                if ($key == 'smtp_password') {
+                    $value = openssl_encrypt($value, "AES-128-ECB", 'mysecretkey1234');
                 }
                 // if ($key == 'two_factor_type' && $wo['config']['two_factor_type'] != $value) {
                 //     $db->where('two_factor_verified',1)->update(T_USERS,array('two_factor_email_verified' => 0,
@@ -2684,6 +2794,20 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         echo json_encode($data);
         exit();
     }
+    if ($s == 'update_html_emails') {
+        $saveSetting = false;
+        foreach ($_POST as $key => $value) {
+            if ($key != 'hash_id' && in_array($key, array('activate','invite','login_with','notification','payment_declined','payment_approved','recover','unusual_login'))) {
+                $saveSetting = Wo_SaveHTMLEmails($key, base64_decode($value));
+            }
+        }
+        if ($saveSetting === true) {
+            $data['status'] = 200;
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
     if ($s == 'test_message') {
         $send_message_data = array(
             'from_email' => $wo['config']['siteEmail'],
@@ -2772,6 +2896,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         exit();
     }
     if ($s == 'updateTheme' && isset($_POST['theme'])) {
+        $_SESSION['theme'] = '';
         $saveSetting = false;
         foreach ($_POST as $key => $value) {
             if ($key != 'hash_id') {

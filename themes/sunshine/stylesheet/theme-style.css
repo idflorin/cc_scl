@@ -955,7 +955,10 @@ table tr {outline: 0;}
 .sun_comm_addmore > .dropdown-menu > li.rec {transform: translateX(0px);}
 .sun_comm_addmore > .dropdown-menu > li.emo {transform: translateX(35px);}
 .sun_comm_addmore > .dropdown-menu > li.img {transform: translateX(72px);}
-.sun_comm_addmore.open > .dropdown-menu {width: 110px;transition: width .3s;}
+.sun_comm_addmore > .dropdown-menu > li.gif {transform: translateX(108px);}
+.sun_comm_addmore > .dropdown-menu > li.stick {transform: translateX(144px);}
+
+.sun_comm_addmore.open > .dropdown-menu {width: 178px;transition: width .3s;}
 .sun_comm_rec_time {position: absolute;background-color: white;top: -27px;padding: 4px 8px;border-radius: 5px;box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);font-size: 12px;}
 
 /*User Activation*/
@@ -976,7 +979,7 @@ table tr {outline: 0;}
 .wo_imagecombo_lbox.story_lightbox .mfp-wrap {position: absolute;height: 4px;border-radius: 2em;top: 0;right: 0;left: 0;}
 .wo_imagecombo_lbox.story_lightbox .mfp-wrap .mfp_progress_line_ {background-color: rgba(230,231,232,.4);width: 100%;height: 4px;display: block;border-radius: 2em;}
 .wo_imagecombo_lbox.story_lightbox .mfp-wrap .mfp_progress_line_ .load {background-color: #e9ebee;height: 4px;display: block;border-radius: 2em;transition: all 8s;}
-.wo_imagecombo_lbox.story_lightbox .wo_story_header {overflow: hidden;display: flex;align-items: center;padding: 0 10px;margin-top: 4px;height: 61px;position: relative;background: linear-gradient(to bottom, #000, rgba(0, 0, 0, 0.2));z-index: 1;}
+.wo_imagecombo_lbox.story_lightbox .wo_story_header {/*overflow: hidden;*/display: flex;align-items: center;padding: 0 10px;margin-top: 4px;height: 61px;position: relative;background: linear-gradient(to bottom, #000, rgba(0, 0, 0, 0.2));z-index: 1;}
 .wo_imagecombo_lbox.story_lightbox .wo_story_header .wo_stor_h_info {display: flex;align-items: center;}
 .wo_imagecombo_lbox.story_lightbox .wo_story_header .wo_stor_h_info .user-avatar, .wo_imagecombo_lbox.story_lightbox .story_view_list .user-avatar {width: 40px;min-width: 40px;height: 40px;border-radius: 50%;margin-right: 9px;background-color: #353535;}
 .wo_imagecombo_lbox.story_lightbox .wo_story_header .wo_stor_h_info .user-avatar img, .wo_imagecombo_lbox.story_lightbox .story_view_list .user-avatar img {width: 100%;height: 100%;margin: 0;object-fit: cover;}

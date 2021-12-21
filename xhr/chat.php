@@ -117,6 +117,7 @@ if ($f == 'chat') {
                 }
             }
             $data['messages'] = 0;
+            $reactions = array();
             if (!empty($_GET['user_id']) && isset($_GET['message_id'])) {
                 $html    = '';
                 $user_id = Wo_Secure($_GET['user_id']);
@@ -125,7 +126,8 @@ if ($f == 'chat') {
                     $messages = Wo_GetMessages(array(
                         'after_message_id' => $_GET['message_id'],
                         'user_id' => $user_id,
-                        'type' => 'user'
+                        'type' => 'user',
+                        'not_seen' => 1
                     ));
                     if (count($messages) > 0) {
                         $messages_html = '';
@@ -137,6 +139,14 @@ if ($f == 'chat') {
                         $data['messages_html'] = $messages_html;
                         $data['receiver']      = $wo['user']['user_id'];
                         $data['sender']        = $user_id;
+                    }
+                    $reacted_messages = $db->where("message_id IN (SELECT m.id FROM ".T_MESSAGES." m WHERE (m.from_id = '".$user_id."' AND m.to_id = '".$wo['user']['user_id']."') OR (m.from_id = '".$wo['user']['user_id']."' AND m.to_id = '".$user_id."'))")->orderBy("id","Desc")->get(T_REACTIONS,20);
+                    foreach ($reacted_messages as $key => $value) {
+                        $reactions[] = array('id' => $value->message_id,
+                                             'reactions' => Wo_GetPostReactions($value->message_id,'message'));
+                    }
+                    if (!empty($reactions)) {
+                        $data['reactions'] = $reactions;
                     }
                 }
             }
@@ -321,6 +331,10 @@ if ($f == 'chat') {
                             if (isset($recipient['user_id'])) {
                                 $wo['chat']['recipient'] = $recipient;
                                 $wo['chat']['color']     = Wo_GetChatColor($wo['user']['user_id'], $recipient['user_id']);
+                                $wo['chat']['story_id'] = 0;
+                                if (!empty($_GET['story_id']) && is_numeric($_GET['story_id']) && $_GET['story_id'] > 0) {
+                                    $wo['chat']['story_id'] = Wo_Secure($_GET['story_id']);
+                                }
                                 $data                    = array(
                                     'status' => 200,
                                     'html' => Wo_LoadPage('chat/chat-tab')
@@ -448,6 +462,10 @@ if ($f == 'chat') {
         }
     }
     if ($s == 'send_message') {
+        $reply_id = 0;
+        if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
+            $reply_id = Wo_Secure($_POST['reply_id']);
+        }
         if ($wo['config']['who_upload'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin() && (!empty($_FILES['sendMessageFile']) || !empty($_POST['message-record']))) {
             $data['status']       = 500;
             $data['invalid_file'] = 3;
@@ -492,9 +510,22 @@ if ($f == 'chat') {
                     if (!empty($user_data) && $user_data['message_privacy'] == 1 && Wo_IsFollowing($wo['user']['user_id'], $_POST['user_id']) === false) {
                         exit();
                     }
+                    $is_sticker = ((isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && strpos($_POST['chatSticker'], '.gif') !== false && !$mediaFilename && !$mediaName) ? true : false);
                     if (!empty($_POST['chatSticker']) && !strpos($_POST['chatSticker'], '.gif')) {
                         $fileend =  '_sticker_' . rand(111111,999999);
                         $mediaFilename = Wo_ImportImageFromUrl($_POST['chatSticker'], $fileend);
+                        $is_sticker = true;
+                    }
+                    $story_id = 0;
+                    if (!empty($_POST['story_id']) && is_numeric($_POST['story_id']) && $_POST['story_id'] > 0) {
+                        $story_id = Wo_Secure($_POST['story_id']);
+                        $story = $db->where('user_id',Wo_Secure($_POST['user_id']))->where('id',$story_id)->getValue(T_USER_STORY,'COUNT(*)');
+                        if ($story > 0) {
+                            $story_id = Wo_Secure($_POST['story_id']);
+                        }
+                        else{
+                            $story_id = 0;
+                        }
                     }
                     
                     $messages = Wo_RegisterMessage(array(
@@ -504,7 +535,9 @@ if ($f == 'chat') {
                         'media' => Wo_Secure($mediaFilename),
                         'mediaFileName' => Wo_Secure($mediaName),
                         'time' => time(),
-                        'stickers' => (isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && strpos($_POST['chatSticker'], '.gif') !== false && !$mediaFilename && !$mediaName) ? $_POST['chatSticker'] : ''
+                        'stickers' => (isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && strpos($_POST['chatSticker'], '.gif') !== false && !$mediaFilename && !$mediaName) ? $_POST['chatSticker'] : '',
+                        'reply_id' => $reply_id,
+                        'story_id' => $story_id
                     ));
                     if ($messages > 0) {
                         $messages            = Wo_GetMessages(array(
@@ -523,7 +556,7 @@ if ($f == 'chat') {
                             'status' => 200,
                             'html' => $html,
                             'file' => $file,
-                            'stickers' => ((isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && strpos($_POST['chatSticker'], '.gif') !== false && !$mediaFilename && !$mediaName) ? true : false),
+                            'stickers' => $is_sticker,
                             'invalid_file' => $invalid_file
                         );
                         if ($wo['config']['emailNotification'] == 1) {
@@ -594,7 +627,8 @@ if ($f == 'chat') {
                         'text' => Wo_Secure($_POST['textSendMessage']),
                         'media' => Wo_Secure($mediaFilename),
                         'mediaFileName' => Wo_Secure($mediaName),
-                        'time' => time()
+                        'time' => time(),
+                        'reply_id' => $reply_id
                     ));
                     if ($last_id && $last_id > 0) {
                         @Wo_UpdateGChat(Wo_Secure($_GET['group_id']), array(
@@ -676,7 +710,8 @@ if ($f == 'chat') {
                             'media' => Wo_Secure($mediaFilename),
                             'mediaFileName' => Wo_Secure($mediaName),
                             'time' => time(),
-                            'stickers' => (isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && !$mediaFilename && !$mediaName) ? $_POST['chatSticker'] : ''
+                            'stickers' => (isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && !$mediaFilename && !$mediaName) ? $_POST['chatSticker'] : '',
+                            'reply_id' => $reply_id
                         ));
                         if ($last_id && $last_id > 0) {
                             // @Wo_UpdateGChat(Wo_Secure($_GET['page_id']), array(
@@ -812,10 +847,26 @@ if ($f == 'chat') {
                 unset($_SESSION['chat_id']);
             }
         }
-        if (!empty($_GET['recipient_id'])) {
-            $data = array(
-                'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id'])
-            );
+        if (!empty($_GET['recipient_id']) && is_numeric($_GET['recipient_id'])) {
+            if (!empty($_GET['story_id']) && is_numeric($_GET['story_id']) && $_GET['story_id'] > 0) {
+                $story = $db->where('id',Wo_Secure($_GET['story_id']))->getOne(T_USER_STORY);
+                if (!empty($story)) {
+                    $data = array(
+                        'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id'])."?story_id=".$story->id
+                    );
+                }
+                else{
+                    $data = array(
+                        'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id'])
+                    );
+                }
+                
+            }
+            else{
+                $data = array(
+                    'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id'])
+                );
+            }
         }
         header("Content-type: application/json");
         echo json_encode($data);
@@ -851,10 +902,29 @@ if ($f == 'chat') {
                 'chat' => $wo['config']['chatSystem']
             );
         if (!empty($_GET['recipient_id'])) {
-            $data = array(
-                'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id']),
-                'chat' => $wo['config']['chatSystem']
-            );
+            if (!empty($_GET['story_id']) && is_numeric($_GET['story_id']) && $_GET['story_id'] > 0) {
+                $story = $db->where('id',Wo_Secure($_GET['story_id']))->getOne(T_USER_STORY);
+                if (!empty($story)) {
+                    $data = array(
+                        'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id'])."?story_id=".$story->id,
+                        'chat' => $wo['config']['chatSystem']
+                    );
+                }
+                else{
+                    $data = array(
+                        'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id']),
+                        'chat' => $wo['config']['chatSystem']
+                    );
+                }
+                
+            }
+            else{
+                $data = array(
+                    'url' => Wo_SeoLink('index.php?link1=messages&user=' . $_GET['recipient_id']),
+                    'chat' => $wo['config']['chatSystem']
+                );
+            }
+                
         }
         header("Content-type: application/json");
         echo json_encode($data);
@@ -1117,6 +1187,13 @@ if ($f == 'chat') {
             'url' => 'index.php?link1=timeline&u=' . $wo['user']['username']
         );
         Wo_RegisterNotification($notification_data);
+        $data['status'] = 200;
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
+    }
+    if ($s == 'seen' && !empty($_POST['recipient_id']) && is_numeric($_POST['recipient_id']) && $_POST['recipient_id'] > 0) {
+        $db->where('from_id',Wo_Secure($_POST['recipient_id']))->where('to_id',$wo['user']['id'])->update(T_MESSAGES,array('seen' => time()));
         $data['status'] = 200;
         header("Content-type: application/json");
         echo json_encode($data);

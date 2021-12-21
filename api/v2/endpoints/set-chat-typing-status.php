@@ -27,6 +27,9 @@ if (empty($error_code)) {
         $error_message = 'Recipient user not found';
     } else {
     	$typing = ($_POST['status'] == 'typing') ? 1 : 0;
+        if ($_POST['status'] == 'recording') {
+            $typing = 2;
+        }
     	$register = Wo_RegisterTyping($recipient_id, $typing);
     	if ($register) {
     		$response_data = array(

@@ -1,14 +1,17 @@
 <?php 
 if ($f == 'view_story_by_id') {
     $data['status'] = 400;
-    $types = array('next','previous');
+    $types = array('next','previous','current');
     if (!empty($_POST['story_id']) && is_numeric($_POST['story_id']) && $_POST['story_id'] > 0 && !empty($_POST['type']) && in_array($_POST['type'], $types)) {
         $data['story_id'] = 0;
         $main_story = $db->where('id',Wo_Secure($_POST['story_id']))->getOne(T_USER_STORY);
         if (!empty($main_story)) {
             if ($_POST['type'] == 'previous') {
                 $story = $db->where('id',Wo_Secure($_POST['story_id']),'>')->where('user_id',$main_story->user_id)->orderBy('id',"ASC")->getOne(T_USER_STORY);
-                $data['story_id'] = $story->id;
+                if (!empty($story) && !empty($story->id)) {
+                    $data['story_id'] = $story->id;
+                }
+                
                 if (empty($story) && !empty($_POST['story_type']) && $_POST['story_type'] == 'friends') {
                     $all_stories = Wo_GetAllStatus();
                     $next_story_id = 0;
@@ -25,17 +28,22 @@ if ($f == 'view_story_by_id') {
                     }
                 }
             }
-            else{
+            else if($_POST['type'] == 'next'){
 
                 $story = $db->where('id',Wo_Secure($_POST['story_id']),'<')->where('user_id',$main_story->user_id)->orderBy('id',"Desc")->getOne(T_USER_STORY);
-                $data['story_id'] = $story->id;
+                if (!empty($story) && !empty($story->id)) {
+                    $data['story_id'] = $story->id;
+                }
+                
                 if (empty($story) && !empty($_POST['story_type']) && $_POST['story_type'] == 'friends') {
                     $all_stories = Wo_GetAllStatus();
                     $next_story_id = 0;
                     $n_ids = array();
                     for ($i=0; $i < count($all_stories) ; $i++) { 
                         if ($i < count($all_stories) && $all_stories[$i]->user_id == $main_story->user_id) {
-                            $next_story_id = $all_stories[$i+1]->id;
+                            if (!empty($all_stories[$i+1])) {
+                                $next_story_id = $all_stories[$i+1]->id;
+                            }
                             break;
                         }
                     }
@@ -45,7 +53,15 @@ if ($f == 'view_story_by_id') {
                     }
                 }
             }
-            $story_id = $story->id;
+            else{
+                $story = $db->where('id',Wo_Secure($_POST['story_id']))->getOne(T_USER_STORY);
+                if (!empty($story) && !empty($story->id)) {
+                    $data['story_id'] = $story->id;
+                }
+            }
+            if (!empty($story) && !empty($story->id)) {
+                $story_id = $story->id;
+            }
             $wo['story'] = ToArray($story);
             if (!empty($story)) {
                 $story_media = Wo_GetStoryMedia($story_id,'image');

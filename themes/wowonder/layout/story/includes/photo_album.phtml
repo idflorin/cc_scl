@@ -23,14 +23,14 @@ if (count($wo['story']['photo_album']) == 3) {
 echo "<div class='wo_adaptive_media'>";
    foreach ($wo['story']['photo_album'] as $photo) {
       if ($wo['story']['admin'] === true) {
-      $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
+      $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['parent_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
         $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
       }
       $multi_image_function = "Wo_OpenAlbumLightBox(" . $photo['id'] . ", \"album\");";
        if (!empty($photo['parent_id'])) {
          $multi_image_function = "Wo_OpenLightBox(" . $photo['parent_id'] . ", \"album\");";
        }
-      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer' onclick='".$multi_image_function."'></div>";
+      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' data_image_parent='image-" . $photo['parent_id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer' onclick='".$multi_image_function."'></div>";
    }
 
 echo "</div>";
@@ -40,14 +40,14 @@ else if (count($wo['story']['photo_album']) == 4) {
 echo "<div class='wo_adaptive_media_4'>";
    foreach ($wo['story']['photo_album'] as $photo) {
       if ($wo['story']['admin'] === true) {
-      $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
+      $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['parent_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
         $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
       }
       $multi_image_function = "Wo_OpenAlbumLightBox(" . $photo['id'] . ", \"album\");";
        if (!empty($photo['parent_id'])) {
          $multi_image_function = "Wo_OpenLightBox(" . $photo['parent_id'] . ", \"album\");";
        }
-      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer' onclick='".$multi_image_function."'></div>";
+      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' data_image_parent='image-" . $photo['parent_id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer' onclick='".$multi_image_function."'></div>";
    }
 
 echo "</div>";
@@ -57,14 +57,14 @@ else if (count($wo['story']['photo_album']) == 5) {
 echo "<div class='wo_adaptive_media_5'>";
    foreach ($wo['story']['photo_album'] as $photo) {
       if ($wo['story']['admin'] === true) {
-      $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
+      $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['parent_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
         $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
       }
       $multi_image_function = "Wo_OpenAlbumLightBox(" . $photo['id'] . ", \"album\");";
        if (!empty($photo['parent_id'])) {
          $multi_image_function = "Wo_OpenLightBox(" . $photo['parent_id'] . ", \"album\");";
        }
-      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer' onclick='".$multi_image_function."'></div>";
+      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' data_image_parent='image-" . $photo['parent_id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer' onclick='".$multi_image_function."'></div>";
    }
 
 echo "</div>";
@@ -85,23 +85,36 @@ else if (count($wo['story']['photo_album']) > 3) {
     }
     else{
       if ($wo['story']['admin'] === true) {
-        $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
+        $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['parent_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
         $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
       }
-      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file  pointer' onclick='".$multi_image_function."'></div>";
+      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' data_image_parent='image-" . $photo['parent_id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file  pointer' onclick='".$multi_image_function."'></div>";
       }
    }
    foreach (array_slice($wo['story']['photo_album'],3) as $photo) {
       if ($wo['story']['admin'] === true) {
-      $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['post_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
+      $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['parent_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
         $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
       }
       $multi_image_function = "Wo_OpenAlbumLightBox(" . $photo['id'] . ", \"album\");";
      if (!empty($photo['parent_id'])) {
        $multi_image_function = "Wo_OpenLightBox(" . $photo['parent_id'] . ", \"album\");";
      }
-      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer hidden' onclick='".$multi_image_function."'></div>";
+      echo  "<div class='album-image " . $class . "' id='image-" . $photo['id'] . "' data_image_parent='image-" . $photo['parent_id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer hidden' onclick='".$multi_image_function."'></div>";
    }
+}
+elseif (count($wo['story']['photo_album']) == 2) {
+  foreach ($wo['story']['photo_album'] as $photo) {
+      if ($wo['story']['admin'] === true) {
+        $delete = "<span onclick='Wo_RemoveAlbumImage(" . $photo['parent_id'] . "," . $photo['id'] . ");' class='pointer'><i class='fa fa-remove'></i></span>";
+        $onhover = "onmouseover='Wo_ShowDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ")' onmouseleave='Wo_HideDeleteButton(" . $photo['post_id'] . "," . $photo['id'] . ");'";
+      }
+      $multi_image_function = "Wo_OpenAlbumLightBox(" . $photo['id'] . ", \"album\");";
+     if (!empty($photo['parent_id'])) {
+       $multi_image_function = "Wo_OpenLightBox(" . $photo['parent_id'] . ", \"album\");";
+     }
+      echo  "<div style='text-align:center;width: 100%;' class='album-image " . $class . "' id='image-" . $photo['id'] . "' data_image_parent='image-" . $photo['parent_id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer' onclick='".$multi_image_function."'></div>";
+    }
 }
 else{
     foreach ($wo['story']['photo_album'] as $photo) {
@@ -113,7 +126,7 @@ else{
      if (!empty($photo['parent_id'])) {
        $multi_image_function = "Wo_OpenLightBox(" . $photo['parent_id'] . ", \"album\");";
      }
-      echo  "<div style='text-align:center;width: 100%;' class='album-image " . $class . "' id='image-" . $photo['id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer' onclick='".$multi_image_function."'></div>";
+      echo  "<div style='text-align:center;width: 100%;' class='album-image " . $class . "' id='image-" . $photo['id'] . "' data_image_parent='image-" . $photo['parent_id'] . "' {$onhover}>{$delete}<img src='" . Wo_GetMedia($photo['image_org']) . "' alt='image' class='image-file pointer' onclick='".$multi_image_function."'></div>";
     }
 }
 } 

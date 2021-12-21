@@ -26,10 +26,21 @@ $fields = Wo_GetWelcomeFileds();
 			<form id="register" class="fadeInUp animated animated_9" method="post">
 				<p class="title"><?php echo $wo['lang']['sign_up']?></p>
 				<div class="errors"></div>
-				<div class="wow_form_fields">
-					<label for="username"><?php echo $wo['lang']['username']?></label>
-					<input id="username" name="username" type="text" autocomplete="off" autofocus>
-				</div>
+				<?php if ($wo['config']['auto_username'] == 1) { ?>
+					<div class="wow_form_fields">
+						<label for="first_name"><?php echo $wo['lang']['first_name']?></label>
+						<input id="first_name" name="first_name" type="text" autocomplete="off" autofocus>
+					</div>
+					<div class="wow_form_fields">
+						<label for="last_name"><?php echo $wo['lang']['last_name']?></label>
+						<input id="last_name" name="last_name" type="text" autocomplete="off" autofocus>
+					</div>
+				<?php }else{ ?>
+					<div class="wow_form_fields">
+						<label for="username"><?php echo $wo['lang']['username']?></label>
+						<input id="username" name="username" type="text" autocomplete="off" autofocus>
+					</div>
+				<?php } ?>
 				<div class="wow_form_fields">
 					<label for="email"><?php echo $wo['lang']['email_address']?></label>
 					<input id="email" name="email" type="email" />

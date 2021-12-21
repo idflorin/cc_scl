@@ -104,21 +104,30 @@ $(function() {
 	        }
         }
     });
-    tinymce.init({
-      selector: '#announcement_text',
-      height: 270,
-      entity_encoding : "raw",
-      paste_data_images: true,
-      image_advtab: true,
-      toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
-      toolbar2: "print preview media | forecolor backcolor",
-      plugins: [
-          "advlist autolink lists link image charmap print preview hr anchor pagebreak",
-          "searchreplace wordcount visualblocks visualchars code fullscreen",
-          "insertdatetime media nonbreaking save table contextmenu directionality",
-          "template paste textcolor colorpicker textpattern"
-        ],
-  });
+    if (typeof(tinymce) == 'undefined') {
+      var s = document.createElement("script");
+      s.type = "text/javascript";
+      s.src = "<?php echo Wo_LoadAdminLink('vendors/tinymce/js/tinymce/tinymce.min.js'); ?>";
+      $("head").append(s);
+    }
+    setTimeout(function (argument) {
+      tinymce.init({
+        selector: '#announcement_text',
+        height: 270,
+        entity_encoding : "raw",
+        paste_data_images: true,
+        image_advtab: true,
+        toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+        toolbar2: "print preview media | forecolor backcolor",
+        plugins: [
+            "advlist autolink lists link image charmap print preview hr anchor pagebreak",
+            "searchreplace wordcount visualblocks visualchars code fullscreen",
+            "insertdatetime media nonbreaking save table contextmenu directionality",
+            "template paste textcolor colorpicker textpattern"
+          ],
+    });
+    },300);
+    
 });
 
 function Wo_DeleteAnnouncement(id) {

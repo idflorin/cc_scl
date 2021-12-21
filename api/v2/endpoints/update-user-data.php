@@ -26,7 +26,7 @@ foreach ($wo['user'] as $key => $value) {
 		$keys[] = $key;
 	}
 }
-
+$keys[] = 'e_memory';
 $keys = implode(', ', $keys);
 
 if (!empty($user_data['username'])) {
@@ -237,7 +237,7 @@ if (empty($error_code)) {
     }
 	foreach ($user_data as $key => $value) {
 
-		if (!in_array($key, array_keys($wo['user'])) && !in_array($key, $escape)) {
+		if (!in_array($key, array_keys($wo['user'])) && !in_array($key, $escape) && $key != 'e_memory') {
 			$error_code = 1;
 			$error_message = "Key #$key not found, check Wo_Users table to get the correct information, or you can use the following keys: $keys";
 			unset($user_data[$key]);
@@ -251,7 +251,10 @@ elseif (!empty($user_data['two_factor']) && $user_data['two_factor'] == 'on') {
     $user_data['two_factor'] = 1;
 }
 
-if (!is_numeric($_POST['relationship']) || empty($_POST['relationship'])) {
+if (!empty($_POST['relationship'])) {
+    # code...
+}
+else{
     $user_data['relationship_id'] = 0;
     Wo_DeleteMyRelationShip();
 }
@@ -283,7 +286,6 @@ if (!empty($_POST['relationship']) && is_numeric($_POST['relationship']) && $_PO
     }
     $user_data['relationship_id'] = Wo_Secure($_POST['relationship']);
 }
-
 if (empty($error_code)) {
 
     if (isset($_POST['language']) AND !empty($_POST['language'])) {
@@ -299,10 +301,107 @@ if (empty($error_code)) {
         }
     }
 
+    $e_liked             = 0;
+    $e_shared            = 0;
+    $e_wondered          = 0;
+    $e_commented         = 0;
+    $e_followed          = 0;
+    $e_liked_page        = 0;
+    $e_visited           = 0;
+    $e_mentioned         = 0;
+    $e_joined_group      = 0;
+    $e_accepted          = 0;
+    $e_profile_wall_post = 0;
+    $e_memory = 0;
+    $array               = array(
+        '0',
+        '1'
+    );
+    if (!empty($_POST['e_liked'])) {
+        if (in_array($_POST['e_liked'], $array)) {
+            $e_liked = 1;
+        }
+    }
+    if (!empty($_POST['e_shared'])) {
+        if (in_array($_POST['e_shared'], $array)) {
+            $e_shared = 1;
+        }
+    }
+    if (!empty($_POST['e_wondered'])) {
+        if (in_array($_POST['e_wondered'], $array)) {
+            $e_wondered = 1;
+        }
+    }
+    if (!empty($_POST['e_commented'])) {
+        if (in_array($_POST['e_commented'], $array)) {
+            $e_commented = 1;
+        }
+    }
+    if (!empty($_POST['e_followed'])) {
+        if (in_array($_POST['e_followed'], $array)) {
+            $e_followed = 1;
+        }
+    }
+    if (!empty($_POST['e_liked_page'])) {
+        if (in_array($_POST['e_liked_page'], $array)) {
+            $e_liked_page = 1;
+        }
+    }
+    if (!empty($_POST['e_visited'])) {
+        if (in_array($_POST['e_visited'], $array)) {
+            $e_visited = 1;
+        }
+    }
+    if (!empty($_POST['e_mentioned'])) {
+        if (in_array($_POST['e_mentioned'], $array)) {
+            $e_mentioned = 1;
+        }
+    }
+    if (!empty($_POST['e_joined_group'])) {
+        if (in_array($_POST['e_joined_group'], $array)) {
+            $e_joined_group = 1;
+        }
+    }
+    if (!empty($_POST['e_accepted'])) {
+        if (in_array($_POST['e_accepted'], $array)) {
+            $e_accepted = 1;
+        }
+    }
+    if (!empty($_POST['e_profile_wall_post'])) {
+        if (in_array($_POST['e_profile_wall_post'], $array)) {
+            $e_profile_wall_post = 1;
+        }
+    }
+    if (!empty($_POST['e_memory'])) {
+        if (in_array($_POST['e_memory'], $array)) {
+            $e_memory = 1;
+        }
+    }
+    $Update_data = array(
+        'e_liked' => $e_liked,
+        'e_shared' => $e_shared,
+        'e_wondered' => $e_wondered,
+        'e_commented' => $e_commented,
+        'e_followed' => $e_followed,
+        'e_accepted' => $e_accepted,
+        'e_mentioned' => $e_mentioned,
+        'e_joined_group' => $e_joined_group,
+        'e_liked_page' => $e_liked_page,
+        'e_visited' => $e_visited,
+        'e_profile_wall_post' => $e_profile_wall_post,
+        'e_memory' => $e_memory
+    );
+    $Update_data = json_encode($Update_data);
+    $update2 = Wo_UpdateUserData($wo['user']['user_id'], array(
+            'notification_settings' => $Update_data
+        ));
 
-	$update = Wo_UpdateUserData($wo['user']['user_id'], $user_data);
+
+
+	$update = Wo_UpdateUserData($wo['user']['user_id'], $user_data,true);
+
 	$update_last_seen = Wo_LastSeen($wo['user']['user_id']);
-	if ($update) {
+	if ($update || $update2) {
 		$response_data['api_status'] = 200;
 		$response_data['message'] = 'Your profile was updated';
 	}

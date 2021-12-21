@@ -34,6 +34,7 @@ if ($wo['loggedin'] == true) {
 if (!empty($_GET)) {
     foreach ($_GET as $key => $value) {
         $value = preg_replace('/on[^<>=]+=[^<>]*/m', '', $value);
+        $value = preg_replace('/\((.*?)\)/m', '', $value);
         $_GET[$key] = strip_tags($value);
     }
 }

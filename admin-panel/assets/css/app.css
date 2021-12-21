@@ -10298,3 +10298,22 @@ body:not(.horizontal-navigation) .navigation {bottom: 0;}
     95% {left: 120%;}
     to {left: 100%;}
 }
+.pow_link {
+  display: block;
+    background: rgb(0 0 0 / 50%);
+    margin: 20px 20px 0;
+    color: #fff !important;
+    border-radius: 10px;
+    padding: 15px;
+}
+.pow_link p {
+  font-size: 13px;
+    margin: 0 0 7px;
+}
+.pow_link img {
+  width: 100%;
+    max-width: 120px;
+}
+.pow_link b {
+  background: rgb(255 255 255 / 25%);
+}

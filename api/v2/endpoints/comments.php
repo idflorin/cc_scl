@@ -39,13 +39,17 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 
     if ($_POST['type'] == 'create') {
         if (!empty($_POST['post_id']) && is_numeric($_POST['post_id']) && $_POST['post_id'] > 0) {
-            if (!empty($_FILES['image']) || !empty($_POST['text']) || !empty($_FILES['audio'])) {
+            if (!empty($_FILES['image']) || !empty($_POST['text']) || !empty($_FILES['audio']) || !empty($_POST['image_url'])) {
+
                 $page_id = '';
                 if (!empty($_POST['page_id'])) {
                     $page_id = $_POST['page_id'];
                 }
                 $comment_image = '';
                 $record = '';
+                if (!empty($_POST['image_url'])) {
+                    $comment_image = Wo_ImportImageFromUrl($_POST['image_url']);
+                }
 
                 if (isset($_FILES['image']['name'])) {
                     $fileInfo = array(
@@ -71,8 +75,16 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     $record = $media['filename'];
                 }
                 if (empty($comment_image) && empty($_POST['text']) && empty($record)) {
-                    header("Content-type: application/json");
-                    echo json_encode($data);
+                    $error_code    = 5;
+                    $error_message = 'Please check your details.';
+                    $response_data       = array(
+                        'api_status'     => '404',
+                        'errors'         => array(
+                            'error_id'   => $error_code,
+                            'error_text' => $error_message
+                        )
+                    );
+                    echo json_encode($response_data, JSON_PRETTY_PRINT);
                     exit();
                 }
                 $text_comment = '';

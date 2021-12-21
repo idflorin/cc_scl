@@ -22,8 +22,6 @@ use Twilio\Version;
  * @property string $accountSid
  * @property string $edge
  * @property string $direction
- * @property array $gateway
- * @property array $client
  * @property array $carrierEdge
  * @property array $sipEdge
  * @property array $sdkEdge
@@ -33,30 +31,27 @@ class MetricInstance extends InstanceResource {
     /**
      * Initialize the MetricInstance
      *
-     * @param \Twilio\Version $version Version that contains the resource
+     * @param Version $version Version that contains the resource
      * @param mixed[] $payload The response payload
      * @param string $callSid The call_sid
-     * @return \Twilio\Rest\Insights\V1\Call\MetricInstance
      */
-    public function __construct(Version $version, array $payload, $callSid) {
+    public function __construct(Version $version, array $payload, string $callSid) {
         parent::__construct($version);
 
         // Marshaled Properties
-        $this->properties = array(
+        $this->properties = [
             'timestamp' => Values::array_get($payload, 'timestamp'),
             'callSid' => Values::array_get($payload, 'call_sid'),
             'accountSid' => Values::array_get($payload, 'account_sid'),
             'edge' => Values::array_get($payload, 'edge'),
             'direction' => Values::array_get($payload, 'direction'),
-            'gateway' => Values::array_get($payload, 'gateway'),
-            'client' => Values::array_get($payload, 'client'),
             'carrierEdge' => Values::array_get($payload, 'carrier_edge'),
             'sipEdge' => Values::array_get($payload, 'sip_edge'),
             'sdkEdge' => Values::array_get($payload, 'sdk_edge'),
             'clientEdge' => Values::array_get($payload, 'client_edge'),
-        );
+        ];
 
-        $this->solution = array('callSid' => $callSid, );
+        $this->solution = ['callSid' => $callSid, ];
     }
 
     /**
@@ -66,13 +61,13 @@ class MetricInstance extends InstanceResource {
      * @return mixed The requested property
      * @throws TwilioException For unknown properties
      */
-    public function __get($name) {
-        if (array_key_exists($name, $this->properties)) {
+    public function __get(string $name) {
+        if (\array_key_exists($name, $this->properties)) {
             return $this->properties[$name];
         }
 
-        if (property_exists($this, '_' . $name)) {
-            $method = 'get' . ucfirst($name);
+        if (\property_exists($this, '_' . $name)) {
+            $method = 'get' . \ucfirst($name);
             return $this->$method();
         }
 
@@ -84,7 +79,7 @@ class MetricInstance extends InstanceResource {
      *
      * @return string Machine friendly representation
      */
-    public function __toString() {
+    public function __toString(): string {
         return '[Twilio.Insights.V1.MetricInstance]';
     }
 }

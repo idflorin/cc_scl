@@ -434,7 +434,9 @@ function Wo_RegisterMessage(dataForm){
   }
 }
 
-function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
+function Wo_RegisterComment(text, post_id, user_id, event, page_id, type,gif_url = '') {
+  $('.chat-box-stickers-cont').html('');
+  $('#gif-form-'+post_id).slideUp(200);
    if (!text) {
     text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
   }
@@ -455,6 +457,7 @@ function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
         dataForm.append('user_id',            user_id);
         dataForm.append('page_id',            page_id);
         dataForm.append('comment_image',comment_image);
+        dataForm.append('gif_url', gif_url);
         if (blob.size > 50) {
           var fileName   = (new Date).toISOString().replace(/:|\./g, '-');
           var file       = new File([blob], 'wo-' + fileName + '.wav', {type: 'audio/wav'});
@@ -477,13 +480,16 @@ function Wo_RegisterComment(text, post_id, user_id, event, page_id, type) {
         dataForm.append('user_id',            user_id);
         dataForm.append('page_id',            page_id);
         dataForm.append('comment_image',comment_image); 
+        dataForm.append('gif_url', gif_url);
         $('#charsLeft_'+post_id).text($('#charsLeft_'+post_id).attr('data_num'));
         Wo_InsertComment(dataForm,post_id);
     }
   }
 }
 
-function Wo_RegisterComment2(post_id, user_id, page_id, type) {
+function Wo_RegisterComment2(post_id, user_id, page_id, type,gif_url = '') {
+  $('.chat-box-stickers-cont').html('');
+  $('#gif-form-'+post_id).slideUp(200);
   text = $('[id=post-' + post_id + ']').find('.comment-textarea').val();
   //if(recording_node == "comm") {
     Wo_stopRecording(); 
@@ -500,6 +506,7 @@ function Wo_RegisterComment2(post_id, user_id, page_id, type) {
         dataForm.append('user_id',            user_id);
         dataForm.append('page_id',            page_id);
         dataForm.append('comment_image',comment_image);
+        dataForm.append('gif_url', gif_url);
         if (blob.size > 50) {
           var fileName   = (new Date).toISOString().replace(/:|\./g, '-');
           var file       = new File([blob], 'wo-' + fileName + '.wav', {type: 'audio/wav'});
@@ -522,6 +529,7 @@ function Wo_RegisterComment2(post_id, user_id, page_id, type) {
         dataForm.append('user_id',            user_id);
         dataForm.append('page_id',            page_id);
         dataForm.append('comment_image',comment_image); 
+        dataForm.append('gif_url', gif_url);
         $('#charsLeft_'+post_id).text($('#charsLeft_'+post_id).attr('data_num'));
         Wo_InsertComment(dataForm,post_id);
     }

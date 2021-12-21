@@ -16,9 +16,6 @@ use Twilio\Serialize;
 use Twilio\Values;
 use Twilio\Version;
 
-/**
- * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
- */
 class VerificationList extends ListResource {
     /**
      * Construct the VerificationList
@@ -26,32 +23,32 @@ class VerificationList extends ListResource {
      * @param Version $version Version that contains the resource
      * @param string $serviceSid The SID of the Service that the resource is
      *                           associated with
-     * @return \Twilio\Rest\Verify\V2\Service\VerificationList
      */
-    public function __construct(Version $version, $serviceSid) {
+    public function __construct(Version $version, string $serviceSid) {
         parent::__construct($version);
 
         // Path Solution
-        $this->solution = array('serviceSid' => $serviceSid, );
+        $this->solution = ['serviceSid' => $serviceSid, ];
 
-        $this->uri = '/Services/' . rawurlencode($serviceSid) . '/Verifications';
+        $this->uri = '/Services/' . \rawurlencode($serviceSid) . '/Verifications';
     }
 
     /**
-     * Create a new VerificationInstance
+     * Create the VerificationInstance
      *
      * @param string $to The phone number or email to verify
      * @param string $channel The verification method to use
      * @param array|Options $options Optional Arguments
-     * @return VerificationInstance Newly created VerificationInstance
+     * @return VerificationInstance Created VerificationInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function create($to, $channel, $options = array()) {
+    public function create(string $to, string $channel, array $options = []): VerificationInstance {
         $options = new Values($options);
 
-        $data = Values::of(array(
+        $data = Values::of([
             'To' => $to,
             'Channel' => $channel,
+            'CustomFriendlyName' => $options['customFriendlyName'],
             'CustomMessage' => $options['customMessage'],
             'SendDigits' => $options['sendDigits'],
             'Locale' => $options['locale'],
@@ -60,14 +57,10 @@ class VerificationList extends ListResource {
             'Payee' => $options['payee'],
             'RateLimits' => Serialize::jsonObject($options['rateLimits']),
             'ChannelConfiguration' => Serialize::jsonObject($options['channelConfiguration']),
-        ));
+            'AppHash' => $options['appHash'],
+        ]);
 
-        $payload = $this->version->create(
-            'POST',
-            $this->uri,
-            array(),
-            $data
-        );
+        $payload = $this->version->create('POST', $this->uri, [], $data);
 
         return new VerificationInstance($this->version, $payload, $this->solution['serviceSid']);
     }
@@ -76,9 +69,8 @@ class VerificationList extends ListResource {
      * Constructs a VerificationContext
      *
      * @param string $sid The unique string that identifies the resource
-     * @return \Twilio\Rest\Verify\V2\Service\VerificationContext
      */
-    public function getContext($sid) {
+    public function getContext(string $sid): VerificationContext {
         return new VerificationContext($this->version, $this->solution['serviceSid'], $sid);
     }
 
@@ -87,7 +79,7 @@ class VerificationList extends ListResource {
      *
      * @return string Machine friendly representation
      */
-    public function __toString() {
+    public function __toString(): string {
         return '[Twilio.Verify.V2.VerificationList]';
     }
 }

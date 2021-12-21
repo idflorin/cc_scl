@@ -27,6 +27,29 @@ if (empty($error_code)) {
         $error_code    = 6;
         $error_message = 'Recipient user not found';
     } else {
+    	$can_ = 0;
+		$wo['nodejs_send_notification'] = false;
+		if ($wo['loggedin'] == true && $wo['config']['profileVisit'] == 1) {
+		    if ($recipient_data['user_id'] != $wo['user']['user_id'] && $wo['user']['visit_privacy'] == 0) {
+		        if ($wo['config']['pro'] == 1) {
+		            if ($recipient_data['is_pro'] == 1 && in_array($recipient_data['pro_type'], array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$recipient_data['pro_type']]]['profile_visitors'] == 1) {
+		                $can_ = 1;
+		            }
+		        } else {
+		            $can_ = 1;
+		        }
+		        if ($recipient_data['visit_privacy'] == 0 && $can_ == 1) {
+		            $notification_data_array = array(
+		                'recipient_id' => $recipient_data['user_id'],
+		                'type' => 'visited_profile',
+		                'url' => 'index.php?link1=timeline&u=' . $wo['user']['username']
+		            );
+		            $wo['nodejs_send_notification'] = true;
+		            Wo_RegisterNotification($notification_data_array);
+		        }
+		    }
+		}
+
     	$response_data = array('api_status' => 200);
 		$recipient_data_ = Wo_UpdateUserDetails($recipient_data, true, true, true);
         if (is_array($recipient_data_)) {
@@ -65,6 +88,7 @@ if (empty($error_code)) {
 	        $recipient_data['gender_text']        = ($recipient_data['gender'] == 'male') ? $wo['lang']['male'] : $wo['lang']['female'];
         	$recipient_data['lastseen_time_text'] = Wo_Time_Elapsed_String($recipient_data['lastseen']);
         	$recipient_data['is_blocked']         = Wo_IsBlocked($recipient_data['user_id']);
+        	//$recipient_data['notification_settings'] = (Array)json_decode(html_entity_decode($recipient_data['notification_settings']));
         	$response_data['user_data'] = $recipient_data;
 		}
 
@@ -73,6 +97,7 @@ if (empty($error_code)) {
 			$followers = Wo_GetFollowers($recipient_data['user_id'], 'profile', 50);
 			foreach ($followers as $key => $follower) {
 				$follower['is_following'] = (Wo_IsFollowing($follower['user_id'], $wo['user']['user_id'])) ? 1 : 0;
+				//$follower['notification_settings'] = (Array)json_decode(html_entity_decode($follower['notification_settings']));
 				$followers_latest[] = $follower;
 			}
 			$response_data['followers'] = $followers_latest;
@@ -82,6 +107,7 @@ if (empty($error_code)) {
 			$followings = Wo_GetFollowing($recipient_data['user_id'], 'profile', 50);
 			foreach ($followings as $key => $following) {
 				$following['is_following'] = (Wo_IsFollowing($following['user_id'], $wo['user']['user_id'])) ? 1 : 0;
+				//$following['notification_settings'] = (Array)json_decode(html_entity_decode($following['notification_settings']));
 				$followings_latest[] = $following;
 			}
 			$response_data['following'] = $followings_latest;

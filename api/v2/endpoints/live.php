@@ -26,10 +26,15 @@ else{
             if (!empty($_POST['post_privacy']) && in_array($_POST['post_privacy'], $privacy_array)) {
                 $postPrivacy = Wo_Secure($_POST['post_privacy']);
             }
+            $token = null;
+            if (!empty($_POST['token']) && !is_null($_POST['token'])) {
+                $token = Wo_Secure($_POST['token']);
+            }
     		$post_id = $db->insert(T_POSTS,array('user_id' => $wo['user']['id'],
 		    	                                 'postText' => '',
                                                  'postType' => 'live',
                                                  'postPrivacy' => $postPrivacy,
+                                                 'agora_token' => $token,
                                                  'stream_name' => Wo_Secure($_POST['stream_name']),
                                                  'time' => time()));
     		$db->where('id',$post_id)->update(T_POSTS,array('post_id' => $post_id));
@@ -44,7 +49,7 @@ else{
 
                     if (in_array(strtolower($wo['config']['region_2']),array_keys($region_array) )) {
 
-                        StartCloudRecording(1,$region_array[strtolower($wo['config']['region_2'])],$wo['config']['bucket_name_2'],$wo['config']['amazone_s3_key_2'],$wo['config']['amazone_s3_s_key_2'],$_POST['stream_name'],explode('_', $_POST['stream_name'])[2],$post_id);
+                       // StartCloudRecording(1,$region_array[strtolower($wo['config']['region_2'])],$wo['config']['bucket_name_2'],$wo['config']['amazone_s3_key_2'],$wo['config']['amazone_s3_s_key_2'],$_POST['stream_name'],explode('_', $_POST['stream_name'])[2],$post_id);
                     }
                     
                 }
@@ -179,9 +184,22 @@ else{
                     if ($wo['user']['id'] == $post_data->user_id) {
                         if ($_POST['page'] == 'live') {
                             $time = time();
-                            $db->where('id',$post_id)->update(T_POSTS,array('live_time' => $time));
+                            $update_array = array('live_time' => $time);
+                            if (!empty($_POST['resourceId']) && !empty($_POST['sid'])) {
+                                $update_array['agora_resource_id'] = Wo_Secure($_POST['resourceId']);
+                                $update_array['agora_sid'] = Wo_Secure($_POST['sid']);
+                            }
+                            if (!empty($_POST['fileList'])) {
+                                $update_array['postFile'] = Wo_Secure($_POST['fileList']);
+                            }
+                            $db->where('id',$post_id)->update(T_POSTS,$update_array);
                             $db->where('parent_id',$post_id)->update(T_POSTS,array('live_time' => $time));
                         }
+                        // if ($_POST['page'] == 'live') {
+                        //     $time = time();
+                        //     $db->where('id',$post_id)->update(T_POSTS,array('live_time' => $time));
+                        //     $db->where('parent_id',$post_id)->update(T_POSTS,array('live_time' => $time));
+                        // }
                     }
                     else{
                         if (!empty($post_data->live_time) && $post_data->live_time >= (time() - 10) && $_POST['page'] == 'story') {

@@ -92,6 +92,54 @@
                             </div>
                         </div>
 
+                        <label for="qqLogin">QQ</label>
+                        <div class="form-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="qqLogin" id="qqLogin-enabled" value="1" <?php echo ($wo['config']['qqLogin'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="qqLogin-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="qqLogin" id="qqLogin-disabled" value="0" <?php echo ($wo['config']['qqLogin'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="qqLogin-disabled" class="m-l-20">Disabled</label>
+                            </div>
+                        </div>
+
+                        <label for="WeChatLogin">WeChat</label>
+                        <div class="form-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="WeChatLogin" id="WeChatLogin-enabled" value="1" <?php echo ($wo['config']['WeChatLogin'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="WeChatLogin-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="WeChatLogin" id="WeChatLogin-disabled" value="0" <?php echo ($wo['config']['WeChatLogin'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="WeChatLogin-disabled" class="m-l-20">Disabled</label>
+                            </div>
+                        </div>
+
+                        <label for="DiscordLogin">Discord</label>
+                        <div class="form-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="DiscordLogin" id="DiscordLogin-enabled" value="1" <?php echo ($wo['config']['DiscordLogin'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="DiscordLogin-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="DiscordLogin" id="DiscordLogin-disabled" value="0" <?php echo ($wo['config']['DiscordLogin'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="DiscordLogin-disabled" class="m-l-20">Disabled</label>
+                            </div>
+                        </div>
+
+                        <label for="MailruLogin">Mailru</label>
+                        <div class="form-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="MailruLogin" id="MailruLogin-enabled" value="1" <?php echo ($wo['config']['MailruLogin'] == 1) ? 'checked': '';?>>
+                                <label class="form-check-label" for="MailruLogin-enabled">Enabled</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="MailruLogin" id="MailruLogin-disabled" value="0" <?php echo ($wo['config']['MailruLogin'] == 0) ? 'checked': '';?>>
+                                <label class="form-check-label" for="MailruLogin-disabled" class="m-l-20">Disabled</label>
+                            </div>
+                        </div>
+
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                     </form>
@@ -174,6 +222,54 @@
                             <div class="form-line">
                                 <label class="form-label">Instagram APP Key</label>
                                 <input type="text" id="instagramAppkey" name="instagramAppkey" class="form-control" value="<?php echo $wo['config']['instagramAppkey']?>">
+                            </div>
+                        </div><br><br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">QQ APP ID</label>
+                                <input type="text" id="qqAppId" name="qqAppId" class="form-control" value="<?php echo $wo['config']['qqAppId']?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">QQ APP Key</label>
+                                <input type="text" id="qqAppkey" name="qqAppkey" class="form-control" value="<?php echo $wo['config']['qqAppkey']?>">
+                            </div>
+                        </div><br><br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">WeChat APP ID</label>
+                                <input type="text" id="WeChatAppId" name="WeChatAppId" class="form-control" value="<?php echo $wo['config']['WeChatAppId']?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">WeChat APP Key</label>
+                                <input type="text" id="WeChatAppkey" name="WeChatAppkey" class="form-control" value="<?php echo $wo['config']['WeChatAppkey']?>">
+                            </div>
+                        </div><br><br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Discord APP ID</label>
+                                <input type="text" id="DiscordAppId" name="DiscordAppId" class="form-control" value="<?php echo $wo['config']['DiscordAppId']?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Discord APP Key</label>
+                                <input type="text" id="DiscordAppkey" name="DiscordAppkey" class="form-control" value="<?php echo $wo['config']['DiscordAppkey']?>">
+                            </div>
+                        </div><br><br>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Mailru APP ID</label>
+                                <input type="text" id="MailruAppId" name="MailruAppId" class="form-control" value="<?php echo $wo['config']['MailruAppId']?>">
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Mailru APP Key</label>
+                                <input type="text" id="MailruAppkey" name="MailruAppkey" class="form-control" value="<?php echo $wo['config']['MailruAppkey']?>">
                             </div>
                         </div><br><br>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">

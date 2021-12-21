@@ -125,4 +125,9 @@ define('T_OFFER', 'Wo_Offers');
 define('T_BAD_LOGIN', 'Wo_Bad_Login');
 define('T_INVITAION_LINKS', 'Wo_Invitation_Links');
 define('T_LIVE_SUB', 'Wo_Live_Sub_Users');
+define('T_MUTE', 'Wo_Mute');
+define('T_MUTE_STORY', 'Wo_Mute_Story');
+define('T_CAST', 'broadcast');
+define('T_CAST_USERS', 'broadcast_users');
+define('T_HTML_EMAILS', 'Wo_HTML_Emails');
 ?>

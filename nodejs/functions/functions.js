@@ -9,13 +9,13 @@ const wo_userschat = require("../models/wo_userschat");
 let Handlebars = require("handlebars")
 let fs = require("fs")
 
-let audio = fs.readFileSync('./templates/audio.html');
-let chat_audio = fs.readFileSync('./templates/chat-audio.html');
-let chat_video = fs.readFileSync('./templates/chat-video.html');
+let audio;
+let chat_audio;
+let chat_video;
 
-const audioTemplate = Handlebars.compile(audio.toString());
-const chatAudioTemplate = Handlebars.compile(chat_audio.toString());
-const chatVideoTemplate = Handlebars.compile(chat_video.toString());
+let audioTemplate;
+let chatAudioTemplate;
+let chatVideoTemplate;
 
 
 function getAudioTemplate(mediaFileName) {
@@ -37,8 +37,16 @@ function getChatVideoTemplate(mediaFileName) {
     })
 }
 
-
 class FunctionsUtils {
+    async DefineAudioTemplates() {
+        audio = fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/audio.html'));
+        chat_audio = fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/chat-audio.html'));
+        chat_video = fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/chat-video.html'));
+
+        audioTemplate = Handlebars.compile(audio.toString());
+        chatAudioTemplate = Handlebars.compile(chat_audio.toString());
+        chatVideoTemplate = Handlebars.compile(chat_video.toString());
+    }
     async Wo_Markup(ctx, text) {
         let link = true, hashtag = true, mention = true, post_id = 0, comment_id = 0, reply_id = 0
         if (mention) {
@@ -375,10 +383,16 @@ class FunctionsUtils {
 
         let video_thumb = message['postFileThumb'] && message['postFileThumb'] != "" ? await Wo_GetMedia(message['postFileThumb']) : '';
         let media_name = message['mediaFileName'];
-        if (isSticker) {
+        if (isSticker || message['stickers'] != '') {
+            if (message['stickers'] != '') {
+                return '<img src="' + message['stickers'] + '" alt="GIF"></img>'
+            }
             // media_name = message['stickers'];
-            return '<img src="' + message['stickers'] + '" alt="GIF"></img>'
+            return '<img src="' + await this.Wo_GetMedia(ctx, message.media) + '" alt="GIF"></img>'
         }
+        // if (message.media.includes("sticker")) {
+        //     return '<img src="' + await this.Wo_GetMedia(ctx, message.media) + '" alt="GIF"></img>'
+        // }
         let message_type = message['type'];
         let media_storyId = message['id'];
         // let is_video_ad = '';
@@ -955,6 +969,261 @@ class FunctionsUtils {
             })
         }
         return result;
+    }
+    async Wo_GetMessageByID(ctx,id,data) {
+        var message = await ctx.wo_messages.findOne({
+                        where: {
+                            id: id
+                        }
+                    });
+        if (message && message !== undefined) {
+            if (message.text != '') {
+                var link_regex = new RegExp('(http\:\/\/|https\:\/\/|www\.)([^\ ]+)', 'gi');
+                var mention_regex = new RegExp('@([A-Za-z0-9_]+)', 'gi');
+
+                var linkSearch = message.text.match(link_regex)
+                if (linkSearch && linkSearch.length > 0) {
+                    hasHTML = true;
+                    for (var linkSearchOne of linkSearch) {
+                        var matchUrl = striptags(linkSearchOne)
+                        var syntax = '[a]' + escape(matchUrl) + '[/a]'
+                        message.text = message.text.replace(link_regex, syntax)
+                    }
+                }
+                var mentionSearch = message.text.match(mention_regex)
+                if (mentionSearch && mentionSearch.length > 0) {
+                    hasHTML = true;
+                    for (var mentionSearchOne of mentionSearch) {
+                        var mention = await ctx.wo_users.findOne({
+                            where: {
+                                username: mentionSearchOne.substr(1, mentionSearchOne.length)
+                            }
+                        })
+                        if (mention) {
+                            var match_replace = '@[' + mention['user_id'] + ']';
+                            message.text = message.text.replace(mention_regex, match_replace)
+                        }
+                    }
+                }
+
+                var hashTagSearch = message.text.match(/#([^`~!@$%^&*\#()\-+=\\|\/\.,<>?\'\":;{}\[\]* ]+)/gi)
+                if (hashTagSearch && hashTagSearch.length > 0) {
+                    hasHTML = true
+                    for (var hashTagSearchOne of hashTagSearch) {
+                        var hashdata = await this.Wo_GetHashtag(ctx, hashTagSearchOne.substr(1))
+                        var replaceString = '#[' + hashdata['id'] + ']';
+                        message.text = message.text.replace(/#([^`~!@$%^&*\#()\-+=\\|\/\.,<>?\'\":;{}\[\]* ]+)/gi, replaceString)
+                        
+                    }
+                }
+                message.text = await this.Wo_Markup(ctx, message.text);
+            }
+        }
+        return message;
+
+    }
+    async Wo_GetReactionsTypes(ctx,type = 'page') {
+        let result = await ctx.wo_reactions_types.findAll({raw: true})
+        let res = [];
+        result.forEach(element => {
+            element.name = ctx.globallangs[element.name];
+            if (type == 'page') {
+                // console.log(path.resolve('../themes/',ctx.globalconfig["theme"]+'/reaction/like-sm.png'))
+                // if (fs.existsSync(path.resolve('../themes/',ctx.globalconfig["theme"]+'/reaction/like-sm.png'))) {
+                //     console.log('dddddddddd')
+                //     console.log(fs.existsSync('./themes/'))
+                // }
+
+
+                if (element.wowonder_icon && element.wowonder_icon != '' && element.wowonder_icon !== undefined) {
+                    element.wowonder_icon = element.wowonder_small_icon = Wo_GetMedia(element.wowonder_icon);
+                    element.is_html = 0;
+                }
+                else if (!fs.existsSync(path.resolve('../themes/',ctx.globalconfig["theme"]+'/reaction/like-sm.png'))) {
+                    if (element.id == 1) {
+                        element.wowonder_icon = '<div class="emoji emoji--like"><div class="emoji__hand"><div class="emoji__thumb"></div></div></div>';
+                    }
+                    if (element.id == 2) {
+                        element.wowonder_icon = '<div class="emoji emoji--love"><div class="emoji__heart"></div></div>';
+                    }
+                    if (element.id == 3) {
+                        element.wowonder_icon = '<div class="emoji emoji--haha"><div class="emoji__face"><div class="emoji__eyes"></div><div class="emoji__mouth"><div class="emoji__tongue"></div></div></div></div>';
+                    }
+                    if (element.id == 4) {
+                        element.wowonder_icon = '<div class="emoji emoji--wow"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                    }
+                    if (element.id == 5) {
+                        element.wowonder_icon = '<div class="emoji emoji--sad"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                    }
+                    if (element.id == 6) {
+                        element.wowonder_icon = '<div class="emoji emoji--angry"><div class="emoji__face"><div class="emoji__eyebrows"></div><div class="emoji__eyes"></div><div class="emoji__mouth"></div></div></div>';
+                    }
+                    element.wowonder_small_icon = '';
+                    element.is_html = 1;
+                }
+
+                if (element.sunshine_icon && element.sunshine_icon != '' && element.sunshine_icon !== undefined) {
+                    element.sunshine_icon = element.sunshine_small_icon = Wo_GetMedia(element.sunshine_icon);
+                }
+                else if (fs.existsSync(path.resolve('../themes/',ctx.globalconfig["theme"]+'/reaction/like-sm.png'))) {
+                    if (element.id == 1) {
+                        element.sunshine_icon = ctx.globalconfig['theme_url']+"/reaction/like.gif";
+                        element.sunshine_small_icon = ctx.globalconfig['theme_url']+"/reaction/like-sm.png";
+                    }
+                    if (element.id == 2) {
+                        element.sunshine_icon = ctx.globalconfig['theme_url']+"/reaction/love.gif";
+                        element.sunshine_small_icon = ctx.globalconfig['theme_url']+"/reaction/love-sm.png";
+                    }
+                    if (element.id == 3) {
+                        element.sunshine_icon = ctx.globalconfig['theme_url']+"/reaction/haha.gif";
+                        element.sunshine_small_icon = ctx.globalconfig['theme_url']+"/reaction/haha-sm.png";
+                    }
+                    if (element.id == 4) {
+                        element.sunshine_icon = ctx.globalconfig['theme_url']+"/reaction/wow.gif";
+                        element.sunshine_small_icon = ctx.globalconfig['theme_url']+"/reaction/wow-sm.png";
+                    }
+                    if (element.id == 5) {
+                        element.sunshine_icon = ctx.globalconfig['theme_url']+"/reaction/sad.gif";
+                        element.sunshine_small_icon = ctx.globalconfig['theme_url']+"/reaction/sad-sm.png";
+                    }
+                    if (element.id == 6) {
+                        element.sunshine_icon = ctx.globalconfig['theme_url']+"/reaction/angry.gif";
+                        element.sunshine_small_icon = ctx.globalconfig['theme_url']+"/reaction/angry-sm.png";
+                    }
+                }
+            }
+            res[element.id] = element;
+        });
+        return res;
+    }
+    async Wo_IsReacted(ctx,object_id, col = "post",type = '',user_id) {
+        var name = col+'_id';
+        if (type == 'blog') {
+            var result = await ctx.wo_blog_reaction.count({
+                where: {
+                    [name]: object_id,
+                    user_id: user_id
+                },
+                raw: true
+            });
+        }
+        else{
+            var result = await ctx.wo_reactions.count({
+                where: {
+                    [name]: object_id,
+                    user_id: user_id
+                },
+                raw: true
+            });
+        }
+        return result;
+    }
+    async Wo_GetPostReactions(ctx,object_id, col = "post",type = '') {
+       var reactions_html = '';
+       var reactions     = [];
+       var reactions_count = 0;
+       var name = col+'_id';
+       if (type == 'blog') {
+            var result = await ctx.wo_blog_reaction.findAll({
+                where: {
+                    [name]: object_id
+                },
+                raw: true
+            });
+       }
+       else{
+            var result = await ctx.wo_reactions.findAll({
+                where: {
+                    [name]: object_id
+                },
+                raw: true
+            });
+       }
+       result.forEach(element => {
+            reactions[element.reaction] = element.reaction;
+            reactions_count++;
+
+       });
+
+
+       
+           
+
+       if(reactions && reactions !== undefined){
+
+            reactions.forEach(element => {
+                if (type == 'blog' || col == 'message') {
+                    var first = "<span class=\"how_reacted like-btn-"+element.toLowerCase()+"\" id=\"_"+col+object_id+"\">";
+                }
+                else{
+                    var first = "<span class=\"how_reacted like-btn-"+element.toLowerCase()+"\" id=\"_"+col+object_id+"\" onclick=\"Wo_OpenPostReactedUsers("+object_id+",'"+element.toLowerCase()+"','"+col+"');\">";
+                }
+
+                if (ctx.reactions_types[element].is_html == 1) {
+
+
+                    if (ctx.reactions_types[element].is_html == 1) {
+
+
+                        switch (parseInt(element)) {
+                           case 1:
+                               reactions_html += first+"<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--like'><div class='emoji__hand'><div class='emoji__thumb'></div></div></div></div></span>";
+                               break;
+                           case 2:
+                               reactions_html += first+"<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--love'><div class='emoji__heart'></div></div></div></span>";
+                               break;
+                           case 3:
+                              reactions_html += first+"<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--haha'><div class='emoji__face'><div class='emoji__eyes'></div><div class='emoji__mouth'><div class='emoji__tongue'></div></div></div></div></div></span>";
+                               break;
+                           case 4:
+                               reactions_html += first+"<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--wow'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div></span>";
+                               break;
+                           case 5:
+                               reactions_html += first+"<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--sad'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div></span>";
+                               break;
+                           case 6:
+                               reactions_html += first+"<div class='inline_post_count_emoji no_anim'><div class='emoji emoji--angry'><div class='emoji__face'><div class='emoji__eyebrows'></div><div class='emoji__eyes'></div><div class='emoji__mouth'></div></div></div></div></span>";
+                               break;
+                       }
+                    }
+                    else{
+                        if (ctx.reactions_types[element].wowonder_small_icon && ctx.reactions_types[element].wowonder_small_icon !== undefined && ctx.reactions_types[element].wowonder_small_icon != '') {
+                            reactions_html += first+"<div class='inline_post_count_emoji reaction'><img src='"+ctx.reactions_types[element].wowonder_small_icon+"' alt=\""+ctx.reactions_types[element].name+"\"></div></span>";
+                        }
+                    }
+                }
+                else{
+
+                    if (ctx.reactions_types[element].sunshine_small_icon && ctx.reactions_types[element].sunshine_small_icon !== undefined && ctx.reactions_types[element].sunshine_small_icon != '') {
+                        reactions_html += first+"<div class='inline_post_count_emoji'><img src='"+ctx.reactions_types[element].sunshine_small_icon+"' alt=\""+ctx.reactions_types[element].name+"\"></div></span>";
+                    }
+                }
+
+            });
+
+            if (reactions_count == 0) {
+                reactions_count = '';
+            }
+            if (col != 'message') {
+                return reactions_html += "<span class=\"how_many_reacts\">"+reactions_count+"</span>";
+            }
+            else{
+                return reactions_html;
+            }
+       }else{
+           return "";
+       }
+    }
+    async FormatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
 }
 

@@ -13,7 +13,7 @@ if ($f == 'ads') {
         } else {
             if (strlen($_POST['name']) < 3 || strlen($_POST['name']) > 100) {
                 $error = $error_icon . $wo['lang']['invalid_company_name'];
-            } else if (!filter_var($_POST['website'], FILTER_VALIDATE_URL) || $_POST['website'] > 3000) {
+            } else if (!filter_var($_POST['website'], FILTER_VALIDATE_URL) || strlen($_POST['website'])  > 3000) {
                 $error = $error_icon . $wo['lang']['enter_valid_url'];
             } else if (strlen($_POST['headline']) < 5 || strlen($_POST['headline']) > 200) {
                 $error = $error_icon . $wo['lang']['enter_valid_title'];

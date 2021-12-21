@@ -190,6 +190,7 @@ jQuery(document).ready(function($) {
              $(".text-sender-container .red-list").css('background', data.color);
              $(".text-sender-container .btn-file").css('background', data.color);
              $(".text-sender-container .btn-file").css('border-color', data.color);
+             $(".chat_page_" + page_id).find('.record-chat-audio').find('[fill]').attr('fill', data.color);
           }
         }
       });

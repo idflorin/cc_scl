@@ -145,7 +145,7 @@ if ($f == "update_general_settings") {
                             $send = Wo_SendMessage($send_message_data);
                             if ($send) {
                                 $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
-                                                                                                                     'new_email'      => Wo_Secure($_POST['email'])));
+                                                                                                                     'new_email'      => Wo_Secure($_POST['email'],0)));
                                 $save = false;
                                 $data['type'] = 'email';
                                 $data['status'] = 200;

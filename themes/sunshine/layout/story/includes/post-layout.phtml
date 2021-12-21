@@ -404,7 +404,7 @@
 
 <?php } ?>
 <?php if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['story']['stream_name']) && $wo['story']['is_still_live']) { ?>
-  RunLiveAgora("<?php echo $wo['story']['stream_name']; ?>","post_live_video_<?php echo($wo['story']['id']) ?>");
+  RunLiveAgora("<?php echo $wo['story']['stream_name']; ?>","post_live_video_<?php echo($wo['story']['id']) ?>","<?php echo($wo['story']['agora_token']) ?>");
   
 <?php } ?>
 </script>

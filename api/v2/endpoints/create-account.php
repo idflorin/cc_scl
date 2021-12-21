@@ -81,6 +81,34 @@ if (empty($error_code)) {
         if (!empty($_POST['ios_n_device_id'])) {
             $account_data['ios_n_device_id']  = Wo_Secure($_POST['ios_n_device_id']);
         }
+        if (!empty($_POST['ref'])) {
+            $get_ip = get_ip_address();
+            if (!empty($get_ip)) {
+                $_POST['ref'] = Wo_Secure($_POST['ref']);
+                $ref_user_id = Wo_UserIdFromUsername($_POST['ref']);
+                $user_date = Wo_UserData($ref_user_id);
+                if (!empty($user_date)) {
+                    if (ip_in_range($user_date['ip_address'], '/24') === false && $user_date['ip_address'] != $get_ip) {
+                        $_SESSION['ref'] = $user_date['username'];
+                        if (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 0) {
+                            $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
+                            if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
+                                $account_data['referrer'] = Wo_Secure($ref_user_id);
+                                $account_data['src']      = Wo_Secure('Referrer');
+                                $update_balance      = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
+                                unset($_SESSION['ref']);
+                            }
+                        }
+                        elseif (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 1) {
+                            $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
+                            if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
+                                $account_data['ref_user_id']      = Wo_Secure($ref_user_id);
+                            }
+                        }
+                    }
+                }
+            }
+        }
         $register     = Wo_RegisterUser($account_data);
         if ($register === true) {
             

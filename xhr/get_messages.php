@@ -48,7 +48,7 @@ if ($f == 'get_messages') {
                         $wo['page_message']['message'] = $message[0];
                         $data['html'] .= Wo_LoadPage('header/page_messages');
                     }
-                    else{
+                    elseif(!empty($value['message']['user_id']) && $value['message']['user_id'] > 0){
                         $message = Wo_GetMessagesHeader(array('user_id' => $value['user_id']), 'user');
                         if (!empty($message['messageUser'])) {
                             $wo['message'] = $value;

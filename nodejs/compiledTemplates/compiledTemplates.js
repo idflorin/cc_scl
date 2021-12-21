@@ -1,27 +1,45 @@
 let Handlebars = require("handlebars")
 let fs = require("fs")
-let chatList = fs.readFileSync('./templates/chat-list.html');
-let groupList = fs.readFileSync('./templates/group-list.html');
-let offlineUser = fs.readFileSync('./templates/offline-user.html');
-let onlineUser = fs.readFileSync('./templates/online-user.html');
-let messageList = fs.readFileSync('./templates/message-text-list.html');
-let messageGroupRecipientsList = fs.readFileSync('./templates/messages-group-list.html');
-let messageRecipientsList = fs.readFileSync('./templates/messages-recipients-list.html');
+const path = require('path');
+let chatList ;
+let groupList;
+let offlineUser;
+let onlineUser;
+let messageList;
+let messageGroupRecipientsList;
+let messageRecipientsList;
+
 
 // let notification = fs.readFileSync('./notification.html');
 
-const chatListTemplate = Handlebars.compile(chatList.toString());
-const groupListTemplate = Handlebars.compile(groupList.toString());
-const messageListTemplate = Handlebars.compile(messageList.toString());
-const offlineUserTemplate = Handlebars.compile(offlineUser.toString());
-const onlineUserTemplate = Handlebars.compile(onlineUser.toString());
-const messageGroupRecipientsTemplate = Handlebars.compile(messageGroupRecipientsList.toString());
-const messageRecipientsTemplate = Handlebars.compile(messageRecipientsList.toString());
+let chatListTemplate;
+let groupListTemplate;
+let messageListTemplate;
+let offlineUserTemplate;
+let onlineUserTemplate;
+let messageGroupRecipientsTemplate;
+let messageRecipientsTemplate;
 
 
 const funcs = require('../functions/functions');
 const { group } = require("console");
+module.exports.DefineTemplates = async (ctx) => {
+    chatList = fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/chat-list.phtml'));
+    groupList =  fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/group-list.phtml'));
+    offlineUser =  fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/offline-user.phtml'));
+    onlineUser =  fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/online-user.phtml'));
+    messageList =  fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/message-text-list.phtml'));
+    messageGroupRecipientsList =  fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/messages-group-list.phtml'));
+    messageRecipientsList =  fs.readFileSync(path.resolve(__dirname, '../../themes/'+ctx.globalconfig['theme']+'/layout/nodejs/messages-recipients-list.phtml'));
 
+    chatListTemplate = Handlebars.compile(chatList.toString());
+    groupListTemplate = Handlebars.compile(groupList.toString());
+    messageListTemplate = Handlebars.compile(messageList.toString());
+    offlineUserTemplate = Handlebars.compile(offlineUser.toString());
+    onlineUserTemplate = Handlebars.compile(onlineUser.toString());
+    messageGroupRecipientsTemplate = Handlebars.compile(messageGroupRecipientsList.toString());
+    messageRecipientsTemplate = Handlebars.compile(messageRecipientsList.toString());
+}
 module.exports.messageRecipientsTemplate = async (ctx, recipientUserId, isActive, isOnline, count_messages, messageText) => {
     let user = await funcs.Wo_UserData(ctx, recipientUserId)
     if (user) {
@@ -53,7 +71,6 @@ module.exports.messageGroupRecipientsTemplate = async (ctx, groupId, groupName, 
         groupAvatar: await funcs.Wo_GetMedia(ctx, groupAvatar),
         time: (messageText.time ? funcs.Wo_Time_Elapsed_String(ctx, messageText.time) : ''),
         messageText: messageText.text || "",
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
     })
     return a
 }
@@ -65,7 +82,6 @@ module.exports.onlineUserTemplate = async (ctx, onlineUser, count_messages) => {
         chat_list_avatar: await funcs.Wo_GetMedia(ctx, onlineUser.avatar),
         is_message_count_zero: count_messages == 0,
         message_count_per_user: count_messages,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
     })
 }
 
@@ -76,11 +92,68 @@ module.exports.offlineUserTemplate = async (ctx, offlineUser, count_messages) =>
         chat_list_avatar: await funcs.Wo_GetMedia(ctx, offlineUser.avatar),
         is_message_count_zero: ctx.globalconfig["user_lastseen"] === '1' && offlineUser.showlastseen !== '0',
         message_count_per_user: count_messages,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
     })
 }
 
 module.exports.chatListOwnerFalse = async (ctx, data, fromUser, nextId, hasHTML, sendable_message) => {
+    data.have_story = false;
+    data.story = {thumbnail: '',
+                 id: 0,
+                 title: ''};
+    if (data.story_id && data.story_id > 0) {
+        var story = await ctx.wo_userstory.findOne({
+                            where: {
+                                id: data.story_id
+                            }
+                        })
+        if (story && story.id) {
+            data.have_story = true;
+            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+        }
+        data.story = story;
+    }
+    var chat_to_id = fromUser.user_id;
+    var reply_message = {text: ''};
+    var have_reply = false;
+    var mediaReplyHTML = false;
+    if (data.message_reply_id && data.message_reply_id !== undefined && data.message_reply_id > 0) {
+        r_message = await funcs.Wo_GetMessageByID(ctx,data.message_reply_id);
+        if (r_message && r_message != undefined) {
+            have_reply = true;
+            if (r_message.media && r_message.media != undefined) {
+                mediaReplyHTML = await funcs.Wo_DisplaySharedFile(ctx, r_message.id, 'chat');
+            }
+            reply_message = r_message;
+        }
+    }
+    reactions_html = "";
+    onwer = true;
+    ctx.reactions_types.forEach(element => {
+        if (element.status == 1) {
+            first_text = 'left: 10px;';
+            if (onwer) {
+                first_text = 'right: 10px;';
+            }
+            if (ctx.globalconfig['theme'] === "wowonder") {
+                r_img = '<img src="'+element.wowonder_icon+'">';
+                var matches = element.wowonder_icon.match(/<[^<]+>/);
+                if (matches) {
+                    r_img = element.wowonder_icon;
+                }
+                reactions_html += '<li style="'+first_text+'" class="reaction reaction-'+element.id+'" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.wowonder_small_icon+'\','+element.is_html+');">'+r_img+'</li>';
+
+            }
+            else{
+                reactions_html += '<li style="'+first_text+'"class="reaction reaction-'+element.id+' animated_2" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.sunshine_small_icon+'\');"><img class="" src="'+element.sunshine_icon+'" alt="'+element.name+'"></li>';
+            }
+        }
+    });
+    reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
+    var have_reaction = false;
+    if (reactions_info_html != '') {
+        have_reaction = true;
+    }
+    
     return chatListTemplate({
         onwer: false,
         chatmsgId: "" + nextId,
@@ -92,11 +165,78 @@ module.exports.chatListOwnerFalse = async (ctx, data, fromUser, nextId, hasHTML,
         media: false,
         chatTxt: sendable_message,
         hasHTML: hasHTML,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
+        have_story: data.have_story,
+        story_thumbnail: data.story.thumbnail,
+        story_title: data.story.title,
+        story_id: data.story.id,
+        chat_to_id: chat_to_id,
+        have_reply: have_reply,
+        reply_text: reply_message.text,
+        mediaReplyHTML: mediaReplyHTML,
+        reactions_html: reactions_html,
+        reactions_info_html: reactions_info_html,
+        have_reaction: have_reaction
     })
 }
 
 module.exports.chatListOwnerTrue = async (ctx, data, fromUser, nextId, hasHTML, sendable_message, color) => {
+    data.have_story = false;
+    data.story = {thumbnail: '',
+                 id: 0,
+                 title: ''};
+    if (data.story_id && data.story_id > 0) {
+        var story = await ctx.wo_userstory.findOne({
+                            where: {
+                                id: data.story_id
+                            }
+                        })
+        if (story && story.id) {
+            data.have_story = true;
+            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+        }
+        data.story = story;
+    }
+    var chat_to_id = data.to_id;
+    var reply_message = {text: ''};
+    var have_reply = false;
+    var mediaReplyHTML = false;
+    if (data.message_reply_id && data.message_reply_id !== undefined && data.message_reply_id > 0) {
+        r_message = await funcs.Wo_GetMessageByID(ctx,data.message_reply_id);
+        if (r_message && r_message != undefined) {
+            have_reply = true;
+            if (r_message.media && r_message.media != undefined) {
+                mediaReplyHTML = await funcs.Wo_DisplaySharedFile(ctx, r_message.id, 'chat');
+            }
+            reply_message = r_message;
+        }
+    }
+    reactions_html = "";
+    onwer = true;
+    ctx.reactions_types.forEach(element => {
+        if (element.status == 1) {
+            first_text = 'left: 10px;';
+            if (onwer) {
+                first_text = 'right: 10px;';
+            }
+            if (ctx.globalconfig['theme'] === "wowonder") {
+                r_img = '<img src="'+element.wowonder_icon+'">';
+                var matches = element.wowonder_icon.match(/<[^<]+>/);
+                if (matches) {
+                    r_img = element.wowonder_icon;
+                }
+                reactions_html += '<li style="'+first_text+'" class="reaction reaction-'+element.id+'" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.wowonder_small_icon+'\','+element.is_html+');">'+r_img+'</li>';
+
+            }
+            else{
+                reactions_html += '<li style="'+first_text+'"class="reaction reaction-'+element.id+' animated_2" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.sunshine_small_icon+'\');"><img class="" src="'+element.sunshine_icon+'" alt="'+element.name+'"></li>';
+            }
+        }
+    });
+    reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
+    var have_reaction = false;
+    if (reactions_info_html != '') {
+        have_reaction = true;
+    }
     return chatListTemplate({
         onwer: true,
         chatmsgId: "" + nextId,
@@ -108,12 +248,89 @@ module.exports.chatListOwnerTrue = async (ctx, data, fromUser, nextId, hasHTML, 
         backgroundColor: color,
         color: "rgb(255, 255, 255)",
         chatTxt: sendable_message,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
+        have_story: data.have_story,
+        story_thumbnail: data.story.thumbnail,
+        story_title: data.story.title,
+        story_id: data.story.id,
+        chat_to_id: chat_to_id,
+        have_reply: have_reply,
+        reply_text: reply_message.text,
+        mediaReplyHTML: mediaReplyHTML,
+        reactions_html: reactions_html,
+        reactions_info_html: reactions_info_html,
+        have_reaction: have_reaction
     })
 }
 
 
 module.exports.chatListOwnerTrueWithMedia = async (ctx, data, fromUser, nextId, hasHTML,  color, isSticker) => {
+    data.have_story = false;
+    data.story = {thumbnail: '',
+                 id: 0,
+                 title: ''};
+    if (data.story_id && data.story_id > 0) {
+        var story = await ctx.wo_userstory.findOne({
+                            where: {
+                                id: data.story_id
+                            }
+                        })
+        if (story && story.id) {
+            data.have_story = true;
+            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+        }
+        data.story = story;
+    }
+    var chat_to_id = data.to_id;
+    var reply_message = {text: ''};
+    var have_reply = false;
+    var mediaReplyHTML = false;
+    if (data.message_reply_id && data.message_reply_id !== undefined && data.message_reply_id > 0) {
+        r_message = await funcs.Wo_GetMessageByID(ctx,data.message_reply_id);
+        if (r_message && r_message != undefined) {
+            have_reply = true;
+            if (r_message.media && r_message.media != undefined) {
+                mediaReplyHTML = await funcs.Wo_DisplaySharedFile(ctx, r_message.id, 'chat');
+            }
+            reply_message = r_message;
+        }
+    }
+    reactions_html = "";
+    onwer = true;
+    ctx.reactions_types.forEach(element => {
+        if (element.status == 1) {
+            first_text = 'left: 10px;';
+            if (onwer) {
+                first_text = 'right: 10px;';
+            }
+            if (ctx.globalconfig['theme'] === "wowonder") {
+                r_img = '<img src="'+element.wowonder_icon+'">';
+                var matches = element.wowonder_icon.match(/<[^<]+>/);
+                if (matches) {
+                    r_img = element.wowonder_icon;
+                }
+                reactions_html += '<li style="'+first_text+'" class="reaction reaction-'+element.id+'" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.wowonder_small_icon+'\','+element.is_html+');">'+r_img+'</li>';
+
+            }
+            else{
+                reactions_html += '<li style="'+first_text+'"class="reaction reaction-'+element.id+' animated_2" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.sunshine_small_icon+'\');"><img class="" src="'+element.sunshine_icon+'" alt="'+element.name+'"></li>';
+            }
+        }
+    });
+    reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
+    var file_size = "0MB";
+    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
+        var current_message = await funcs.Wo_GetMessageByID(ctx,data.mediaId);
+        if (current_message && current_message != undefined && current_message.media && current_message.media != undefined) {
+            s = fs.statSync(path.resolve(__dirname, '../../'+current_message.media));
+            if (s && s != undefined && s.size && s.size != undefined) {
+                file_size = await funcs.FormatBytes(s.size);
+            }
+        }
+    }
+    var have_reaction = false;
+    if (reactions_info_html != '') {
+        have_reaction = true;
+    }
     return chatListTemplate({
         onwer: true,
         chatmsgId: "" + nextId,
@@ -125,11 +342,89 @@ module.exports.chatListOwnerTrueWithMedia = async (ctx, data, fromUser, nextId, 
         backgroundColor: color,
         color: "rgb(255, 255, 255)",
         chatTxt: "",
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
+        have_story: data.have_story,
+        story_thumbnail: data.story.thumbnail,
+        story_title: data.story.title,
+        story_id: data.story.id,
+        chat_to_id: chat_to_id,
+        have_reply: have_reply,
+        reply_text: reply_message.text,
+        mediaReplyHTML: mediaReplyHTML,
+        reactions_html: reactions_html,
+        reactions_info_html: reactions_info_html,
+        file_size: file_size,
+        have_reaction: have_reaction
     })
 }
 
 module.exports.chatListOwnerFalseWithMedia = async (ctx, data, fromUser, nextId, hasHTML, isSticker) => {
+    data.have_story = false;
+    data.story = {thumbnail: '',
+                 id: 0,
+                 title: ''};
+    if (data.story_id && data.story_id > 0) {
+        var story = await ctx.wo_userstory.findOne({
+                            where: {
+                                id: data.story_id
+                            }
+                        })
+        if (story && story.id) {
+            data.have_story = true;
+            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+        }
+        data.story = story;
+    }
+    var chat_to_id = fromUser.user_id;
+    var reply_message = {text: ''};
+    var have_reply = false;
+    var mediaReplyHTML = false;
+    if (data.message_reply_id && data.message_reply_id !== undefined && data.message_reply_id > 0) {
+        r_message = await funcs.Wo_GetMessageByID(ctx,data.message_reply_id);
+        if (r_message && r_message != undefined) {
+            have_reply = true;
+            if (r_message.media && r_message.media != undefined) {
+                mediaReplyHTML = await funcs.Wo_DisplaySharedFile(ctx, r_message.id, 'chat');
+            }
+            reply_message = r_message;
+        }
+    }
+    reactions_html = "";
+    onwer = false;
+    ctx.reactions_types.forEach(element => {
+        if (element.status == 1) {
+            first_text = 'left: 10px;';
+            if (onwer) {
+                first_text = 'right: 10px;';
+            }
+            if (ctx.globalconfig['theme'] === "wowonder") {
+                r_img = '<img src="'+element.wowonder_icon+'">';
+                var matches = element.wowonder_icon.match(/<[^<]+>/);
+                if (matches) {
+                    r_img = element.wowonder_icon;
+                }
+                reactions_html += '<li style="'+first_text+'" class="reaction reaction-'+element.id+'" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.wowonder_small_icon+'\','+element.is_html+');">'+r_img+'</li>';
+
+            }
+            else{
+                reactions_html += '<li style="'+first_text+'"class="reaction reaction-'+element.id+' animated_2" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.sunshine_small_icon+'\');"><img class="" src="'+element.sunshine_icon+'" alt="'+element.name+'"></li>';
+            }
+        }
+    });
+    reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
+    var file_size = "0MB";
+    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
+        var current_message = await funcs.Wo_GetMessageByID(ctx,data.mediaId);
+        if (current_message && current_message != undefined && current_message.media && current_message.media != undefined) {
+            s = fs.statSync(path.resolve(__dirname, '../../'+current_message.media));
+            if (s && s != undefined && s.size && s.size != undefined) {
+                file_size = await funcs.FormatBytes(s.size);
+            }
+        }
+    }
+    var have_reaction = false;
+    if (reactions_info_html != '') {
+        have_reaction = true;
+    }
     return chatListTemplate({
         onwer: false,
         chatmsgId: "" + nextId,
@@ -142,11 +437,38 @@ module.exports.chatListOwnerFalseWithMedia = async (ctx, data, fromUser, nextId,
         mediaHTML: await funcs.Wo_DisplaySharedFile(ctx, data.mediaId, 'chat', isSticker),
         chatTxt: data.msg,
         hasHTML: hasHTML,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
+        have_story: data.have_story,
+        story_thumbnail: data.story.thumbnail,
+        story_title: data.story.title,
+        story_id: data.story.id,
+        chat_to_id: chat_to_id,
+        have_reply: have_reply,
+        reply_text: reply_message.text,
+        mediaReplyHTML: mediaReplyHTML,
+        reactions_html: reactions_html,
+        reactions_info_html: reactions_info_html,
+        file_size: file_size,
+        have_reaction: have_reaction
     })
 }
 
 module.exports.messageListOwnerTrue = async (ctx, data, fromUser, message, hasHTML, sendable_message, color) => {
+    data.have_story = false;
+    data.story = {thumbnail: '',
+                 id: 0,
+                 title: ''};
+    if (data.story_id && data.story_id > 0) {
+        var story = await ctx.wo_userstory.findOne({
+                            where: {
+                                id: data.story_id
+                            }
+                        })
+        if (story && story.id) {
+            data.have_story = true;
+            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+        }
+        data.story = story;
+    }
     if (message && message.time && message.id && message.time != '' && message.id != '') {
         nextId = message.id;
         timeText = funcs.Wo_Time_Elapsed_String(ctx, message.time);
@@ -156,6 +478,52 @@ module.exports.messageListOwnerTrue = async (ctx, data, fromUser, message, hasHT
         nextId = message;
         timeText = 'Just now';
         time = Math.floor(Date.now() / 1000);
+    }
+    reactions_html = "";
+    onwer = true;
+    ctx.reactions_types.forEach(element => {
+        if (element.status == 1) {
+            first_text = 'left: 10px;';
+            if (onwer) {
+                first_text = 'right: 10px;';
+            }
+            if (ctx.globalconfig['theme'] === "wowonder") {
+                r_img = '<img src="'+element.wowonder_icon+'">';
+                var matches = element.wowonder_icon.match(/<[^<]+>/);
+                if (matches) {
+                    r_img = element.wowonder_icon;
+                }
+                reactions_html += '<li style="'+first_text+'" class="reaction reaction-'+element.id+'" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.wowonder_small_icon+'\','+element.is_html+');">'+r_img+'</li>';
+
+            }
+            else{
+                reactions_html += '<li style="'+first_text+'"class="reaction reaction-'+element.id+' animated_2" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.sunshine_small_icon+'\');"><img class="" src="'+element.sunshine_icon+'" alt="'+element.name+'"></li>';
+            }
+        }
+    });
+    reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
+    if (!data.story) {
+        data.story = {thumbnail: '',
+                     id: 0,
+                     title: ''};
+    }
+    var chat_to_id = data.to_id;
+    var reply_message = {text: ''};
+    var have_reply = false;
+    var mediaReplyHTML = false;
+    if (data.message_reply_id && data.message_reply_id !== undefined && data.message_reply_id > 0) {
+        r_message = await funcs.Wo_GetMessageByID(ctx,data.message_reply_id);
+        if (r_message && r_message != undefined) {
+            have_reply = true;
+            if (r_message.media && r_message.media != undefined) {
+                mediaReplyHTML = await funcs.Wo_DisplaySharedFile(ctx, r_message.id, 'chat');
+            }
+            reply_message = r_message;
+        }
+    }
+    var have_reaction = false;
+    if (reactions_info_html != '') {
+        have_reaction = true;
     }
     return messageListTemplate({
         onwer: true,
@@ -167,14 +535,40 @@ module.exports.messageListOwnerTrue = async (ctx, data, fromUser, message, hasHT
         color: "rgb(255, 255, 255)",
         msgColor: "rgb(168, 72, 73)",
         chatTxt: sendable_message,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder",
         msgTime: time,
-        ElapsedTime: timeText
+        ElapsedTime: timeText,
+        have_story: data.have_story,
+        story_thumbnail: data.story.thumbnail,
+        story_title: data.story.title,
+        story_id: data.story.id,
+        reactions_html: reactions_html,
+        reactions_info_html: reactions_info_html,
+        chat_to_id: chat_to_id,
+        have_reply: have_reply,
+        reply_text: reply_message.text,
+        mediaReplyHTML: mediaReplyHTML,
+        have_reaction: have_reaction
     })
 }
 
 
 module.exports.messageListOwnerTrueWithMedia = async (ctx, data, fromUser, message, hasHTML, color) => {
+    data.have_story = false;
+    data.story = {thumbnail: '',
+                 id: 0,
+                 title: ''};
+    if (data.story_id && data.story_id > 0) {
+        var story = await ctx.wo_userstory.findOne({
+                            where: {
+                                id: data.story_id
+                            }
+                        })
+        if (story && story.id) {
+            data.have_story = true;
+            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+        }
+        data.story = story;
+    }
     if (message && message.time && message.id && message.time != '' && message.id != '') {
         nextId = message.id;
         timeText = funcs.Wo_Time_Elapsed_String(ctx, message.time);
@@ -185,6 +579,58 @@ module.exports.messageListOwnerTrueWithMedia = async (ctx, data, fromUser, messa
         timeText = 'Just now';
         time = Math.floor(Date.now() / 1000);
     }
+    reactions_html = "";
+    onwer = false;
+    hasHTML = true;
+    ctx.reactions_types.forEach(element => {
+        if (element.status == 1) {
+            first_text = 'left: 10px;';
+            if (onwer) {
+                first_text = 'right: 10px;';
+            }
+            if (ctx.globalconfig['theme'] === "wowonder") {
+                r_img = '<img src="'+element.wowonder_icon+'">';
+                var matches = element.wowonder_icon.match(/<[^<]+>/);
+                if (matches) {
+                    r_img = element.wowonder_icon;
+                }
+                reactions_html += '<li style="'+first_text+'" class="reaction reaction-'+element.id+'" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.wowonder_small_icon+'\','+element.is_html+');">'+r_img+'</li>';
+
+            }
+            else{
+                reactions_html += '<li style="'+first_text+'"class="reaction reaction-'+element.id+' animated_2" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.sunshine_small_icon+'\');"><img class="" src="'+element.sunshine_icon+'" alt="'+element.name+'"></li>';
+            }
+        }
+    });
+    reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
+    var chat_to_id = data.to_id;
+    var reply_message = {text: ''};
+    var have_reply = false;
+    var mediaReplyHTML = false;
+    if (data.message_reply_id && data.message_reply_id !== undefined && data.message_reply_id > 0) {
+        r_message = await funcs.Wo_GetMessageByID(ctx,data.message_reply_id);
+        if (r_message && r_message != undefined) {
+            have_reply = true;
+            if (r_message.media && r_message.media != undefined) {
+                mediaReplyHTML = await funcs.Wo_DisplaySharedFile(ctx, r_message.id, 'chat');
+            }
+            reply_message = r_message;
+        }
+    }
+    var file_size = "0MB";
+    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
+        var current_message = await funcs.Wo_GetMessageByID(ctx,data.mediaId);
+        if (current_message && current_message != undefined && current_message.media && current_message.media != undefined) {
+            s = fs.statSync(path.resolve(__dirname, '../../'+current_message.media));
+            if (s && s != undefined && s.size && s.size != undefined) {
+                file_size = await funcs.FormatBytes(s.size);
+            }
+        }
+    }
+    var have_reaction = false;
+    if (reactions_info_html != '') {
+        have_reaction = true;
+    }
     return messageListTemplate({
         onwer: true,
         chatMsgId: "" + nextId,
@@ -194,14 +640,41 @@ module.exports.messageListOwnerTrueWithMedia = async (ctx, data, fromUser, messa
         hasHTML: hasHTML,
         color: "rgb(255, 255, 255)",
         chatTxt: "",
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder",
         mediaHTML: await funcs.Wo_DisplaySharedFile(ctx, data.mediaId, 'message'),
         msgTime: time,
-        ElapsedTime: timeText
+        ElapsedTime: timeText,
+        reactions_html: reactions_html,
+        reactions_info_html: reactions_info_html,
+        have_story: data.have_story,
+        story_thumbnail: data.story.thumbnail,
+        story_title: data.story.title,
+        story_id: data.story.id,
+        chat_to_id: chat_to_id,
+        have_reply: have_reply,
+        reply_text: reply_message.text,
+        mediaReplyHTML: mediaReplyHTML,
+        file_size: file_size,
+        have_reaction: have_reaction
     })
 }
 
 module.exports.messageListOwnerFalse = async (ctx, data, message, fromUser, hasHTML, sendable_message) => {
+    data.have_story = false;
+    data.story = {thumbnail: '',
+                 id: 0,
+                 title: ''};
+    if (data.story_id && data.story_id > 0) {
+        var story = await ctx.wo_userstory.findOne({
+                            where: {
+                                id: data.story_id
+                            }
+                        })
+        if (story && story.id) {
+            data.have_story = true;
+            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+        }
+        data.story = story;
+    }
     //funcs.Wo_Time_Elapsed_String(ctx, Math.floor(Date.now() / 1000))
     if (message && message.time && message.id && message.time != '' && message.id != '') {
         nextId = message.id;
@@ -213,6 +686,53 @@ module.exports.messageListOwnerFalse = async (ctx, data, message, fromUser, hasH
         timeText = 'Just now';
         time = Math.floor(Date.now() / 1000);
     }
+    reactions_html = "";
+    onwer = false;
+    hasHTML = true;
+    ctx.reactions_types.forEach(element => {
+        if (element.status == 1) {
+            first_text = 'left: 10px;';
+            if (onwer) {
+                first_text = 'right: 10px;';
+            }
+            if (ctx.globalconfig['theme'] === "wowonder") {
+                r_img = '<img src="'+element.wowonder_icon+'">';
+                var matches = element.wowonder_icon.match(/<[^<]+>/);
+                if (matches) {
+                    r_img = element.wowonder_icon;
+                }
+                reactions_html += '<li style="'+first_text+'" class="reaction reaction-'+element.id+'" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.wowonder_small_icon+'\','+element.is_html+');">'+r_img+'</li>';
+
+            }
+            else{
+                reactions_html += '<li style="'+first_text+'"class="reaction reaction-'+element.id+' animated_2" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.sunshine_small_icon+'\');"><img class="" src="'+element.sunshine_icon+'" alt="'+element.name+'"></li>';
+            }
+        }
+    });
+    reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
+    if (!data.story) {
+        data.story = {thumbnail: '',
+                     id: 0,
+                     title: ''};
+    }
+    var chat_to_id = fromUser.user_id;
+    var reply_message = {text: ''};
+    var have_reply = false;
+    var mediaReplyHTML = false;
+    if (data.message_reply_id && data.message_reply_id !== undefined && data.message_reply_id > 0) {
+        r_message = await funcs.Wo_GetMessageByID(ctx,data.message_reply_id);
+        if (r_message && r_message != undefined) {
+            have_reply = true;
+            if (r_message.media && r_message.media != undefined) {
+                mediaReplyHTML = await funcs.Wo_DisplaySharedFile(ctx, r_message.id, 'chat');
+            }
+            reply_message = r_message;
+        }
+    }
+    var have_reaction = false;
+    if (reactions_info_html != '') {
+        have_reaction = true;
+    }
 
     return messageListTemplate({
         onwer: false,
@@ -223,23 +743,103 @@ module.exports.messageListOwnerFalse = async (ctx, data, message, fromUser, hasH
         color: "",
         chatTxt: sendable_message,
         hasHTML: hasHTML,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder",
         msgTime: time,
-        ElapsedTime: timeText
+        ElapsedTime: timeText,
+        have_story: data.have_story,
+        story_thumbnail: data.story.thumbnail,
+        story_title: data.story.title,
+        story_id: data.story.id,
+        reactions_html: reactions_html,
+        reactions_info_html: reactions_info_html,
+        chat_to_id: chat_to_id,
+        have_reply: have_reply,
+        reply_text: reply_message.text,
+        mediaReplyHTML: mediaReplyHTML,
+        have_reaction: have_reaction
     })
 }
 
 
 module.exports.messageListOwnerFalseWithMedia = async (ctx, data, message, fromUser, isSticker) => {
+    data.have_story = false;
+    data.story = {thumbnail: '',
+                 id: 0,
+                 title: ''};
+    if (data.story_id && data.story_id > 0) {
+        var story = await ctx.wo_userstory.findOne({
+                            where: {
+                                id: data.story_id
+                            }
+                        })
+        if (story && story.id) {
+            data.have_story = true;
+            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+        }
+        data.story = story;
+    }
     if (message && message.time && message.id && message.time != '' && message.id != '') {
         nextId = message.id;
         timeText = funcs.Wo_Time_Elapsed_String(ctx, message.time);
         time = message.time;
     }
     else{
-        nextId = message;
+        nextId = data.mediaId;
+        if (message !== false) {
+            nextId = message;
+        }
         timeText = 'Just now';
         time = Math.floor(Date.now() / 1000);
+    }
+    reactions_html = "";
+    onwer = false;
+    ctx.reactions_types.forEach(element => {
+        if (element.status == 1) {
+            first_text = 'left: 10px;';
+            if (onwer) {
+                first_text = 'right: 10px;';
+            }
+            if (ctx.globalconfig['theme'] === "wowonder") {
+                r_img = '<img src="'+element.wowonder_icon+'">';
+                var matches = element.wowonder_icon.match(/<[^<]+>/);
+                if (matches) {
+                    r_img = element.wowonder_icon;
+                }
+                reactions_html += '<li style="'+first_text+'" class="reaction reaction-'+element.id+'" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.wowonder_small_icon+'\','+element.is_html+');">'+r_img+'</li>';
+
+            }
+            else{
+                reactions_html += '<li style="'+first_text+'"class="reaction reaction-'+element.id+' animated_2" data-reaction="'+element.name+'" data-reaction-id="'+element.id+'" data-reaction-lang="'+element.name+'" data-post-id="'+nextId+'" onclick="Wo_RegisterMessageReaction(this,\''+element.sunshine_small_icon+'\');"><img class="" src="'+element.sunshine_icon+'" alt="'+element.name+'"></li>';
+            }
+        }
+    });
+    reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
+    var chat_to_id = fromUser.user_id;
+    var reply_message = {text: ''};
+    var have_reply = false;
+    var mediaReplyHTML = false;
+    if (data.message_reply_id && data.message_reply_id !== undefined && data.message_reply_id > 0) {
+        r_message = await funcs.Wo_GetMessageByID(ctx,data.message_reply_id);
+        if (r_message && r_message != undefined) {
+            have_reply = true;
+            if (r_message.media && r_message.media != undefined) {
+                mediaReplyHTML = await funcs.Wo_DisplaySharedFile(ctx, r_message.id, 'chat');
+            }
+            reply_message = r_message;
+        }
+    }
+    var file_size = "0MB";
+    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
+        var current_message = await funcs.Wo_GetMessageByID(ctx,data.mediaId);
+        if (current_message && current_message != undefined && current_message.media && current_message.media != undefined) {
+            s = fs.statSync(path.resolve(__dirname, '../../'+current_message.media));
+            if (s && s != undefined && s.size && s.size != undefined) {
+                file_size = await funcs.FormatBytes(s.size);
+            }
+        }
+    }
+    var have_reaction = false;
+    if (reactions_info_html != '') {
+        have_reaction = true;
     }
     return messageListTemplate({
         onwer: false,
@@ -249,10 +849,21 @@ module.exports.messageListOwnerFalseWithMedia = async (ctx, data, message, fromU
         backgroundColor: "",
         color: "",
         chatTxt: "",
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder",
         mediaHTML: await funcs.Wo_DisplaySharedFile(ctx, data.mediaId, 'message', isSticker),
         msgTime: time,
-        ElapsedTime: timeText
+        ElapsedTime: timeText,
+        reactions_html: reactions_html,
+        reactions_info_html: reactions_info_html,
+        have_story: data.have_story,
+        story_thumbnail: data.story.thumbnail,
+        story_title: data.story.title,
+        story_id: data.story.id,
+        chat_to_id: chat_to_id,
+        have_reply: have_reply,
+        reply_text: reply_message.text,
+        mediaReplyHTML: mediaReplyHTML,
+        file_size: file_size,
+        have_reaction: have_reaction
     })
 }
 
@@ -266,7 +877,6 @@ module.exports.groupListOwnerTrue = async (ctx, messageOwner, nextId, data, hasH
         chatMsgTxt: sendable_message,
         hasHTML: hasHTML,
         username: messageOwner.username,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
     })
 }
 
@@ -278,7 +888,6 @@ module.exports.groupListOwnerTrueWithMedia = async (ctx, messageOwner, nextId, d
         chatMsgTxt: "",
         username: messageOwner.username,
         mediaHTML: await funcs.Wo_DisplaySharedFile(ctx, data.mediaId, 'chat', isSticker),
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
     })
 }
 
@@ -289,7 +898,6 @@ module.exports.groupListOwnerFalse = async (ctx, messageOwner, nextId, data, has
         chatMsgTxt: sendable_message,
         hasHTML: hasHTML,
         username: messageOwner.username,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
     })
 }
 
@@ -301,6 +909,5 @@ module.exports.groupListOwnerFalseWithMedia = async (ctx, messageOwner, nextId, 
         chatMsgTxt: "",
         mediaHTML: await funcs.Wo_DisplaySharedFile(ctx, data.mediaId, 'chat', isSticker),
         username: messageOwner.username,
-        wowonderTheme: ctx.globalconfig['theme'] === "wowonder"
     })
 }

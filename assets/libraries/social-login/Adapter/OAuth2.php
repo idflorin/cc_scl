@@ -206,7 +206,7 @@ abstract class OAuth2 extends AbstractAdapter implements AdapterInterface
      *
      * @var array|null
      */
-    protected $tokenRefreshParameters = null;
+    protected $tokenRefreshParameters = [];
 
     /**
      * Refresh Token Request HTTP headers.

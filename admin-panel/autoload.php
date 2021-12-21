@@ -104,6 +104,8 @@ $pages = array(
     'send_email',
     'live',
     'node',
+    'manage_emails',
+    'ffmpeg',
 );
 $mod_pages = array('dashboard', 'post-settings', 'manage-stickers', 'manage-gifts', 'manage-users', 'online-users', 'manage-stories', 'manage-pages', 'manage-groups', 'manage-posts', 'manage-articles', 'manage-events', 'manage-forum-threads', 'manage-forum-messages', 'manage-movies', 'manage-games', 'add-new-game', 'manage-user-ads', 'manage-reports', 'manage-third-psites', 'edit-movie','bank-receipts','job-categories','manage-jobs');
 
@@ -301,6 +303,9 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                     }
                     json_data = JSON.parse($(data).filter('#json-data').val());
                     $('.content').html(data);
+                    setTimeout(function () {
+                      $(".content").getNiceScroll().resize()
+                    }, 300);
                 });
             }
         });
@@ -594,7 +599,7 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                     </li>
                     <?php if ($is_admin == true) { ?>
-                    <li <?php echo ($page == 'general-settings' || $page == 'post-settings' || $page == 'site-settings' || $page == 'email-settings' || $page == 'social-login' || $page == 'site-features' || $page == 'amazon-settings' ||  $page == 'video-settings' || $page == 'payment-settings' || $page == 'manage-currencies' || $page == 'manage-colored-posts' || $page == 'live' || $page == 'node' || $page == 'manage-reactions') ? 'class="open"' : ''; ?>>
+                    <li <?php echo ($page == 'general-settings' || $page == 'post-settings' || $page == 'site-settings' || $page == 'email-settings' || $page == 'social-login' || $page == 'site-features' || $page == 'amazon-settings' ||  $page == 'video-settings' || $page == 'payment-settings' || $page == 'manage-currencies' || $page == 'manage-colored-posts' || $page == 'live' || $page == 'node' || $page == 'manage-reactions' || $page == 'ffmpeg') ? 'class="open"' : ''; ?>>
                         <a href="#">
                             <span class="nav-link-icon">
                                 <i class="material-icons">settings</i>
@@ -633,8 +638,12 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                                 <a <?php echo ($page == 'live') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('live'); ?>" data-ajax="?path=live">Live Stream Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'node') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('node'); ?>" data-ajax="?path=node">NodeJs</a>
+                                <a <?php echo ($page == 'ffmpeg') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('ffmpeg'); ?>" data-ajax="?path=ffmpeg">FFMPEG Settings</a>
                             </li>
+                            <li>
+                                <a <?php echo ($page == 'node') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('node'); ?>" data-ajax="?path=node">NodeJS Settings</a>
+                            </li>
+                           
                             <li>
                                 <a <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts' || $page == 'manage-reactions') ? 'class="open"' : ''; ?> href="javascript:void(0);">Posts</a>
                                 <ul class="ml-menu">
@@ -1028,6 +1037,9 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
+                                <a <?php echo ($page == 'manage_emails') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage_emails'); ?>">Manage Emails</a>
+                            </li>
+                            <li>
                                 <a <?php echo ($page == 'manage-invitation') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation'); ?>" data-ajax="?path=manage-invitation">Users Invitation</a>
                             </li>
                             <li>
@@ -1163,6 +1175,11 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                     </li>
                     <?php } ?>
+                    <a class="pow_link" href="https://bit.ly/2R2jrcz" target="_blank">
+                        <p>Powered by</p>
+                        <img src="https://demo.wowonder.com/themes/default/img/logo.png">
+                        <b class="badge">v<?php echo $wo['config']['version'];?></b>
+                    </a>
                 </ul>
             </div>
         </div>

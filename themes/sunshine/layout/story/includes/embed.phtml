@@ -31,7 +31,8 @@ FB.init({
 </script>
 <!-- <script crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script> -->
 <div id="fb-root"></div>
-<div class="fb-video" data-href="https://www.facebook.com/<?php echo $wo['story']['postFacebook'];?>" data-show-text="false" data-width=""></div>
+<!-- <div class="fb-video" data-href="https://www.facebook.com/<?php echo $wo['story']['postFacebook'];?>" data-show-text="false" data-width=""></div> -->
+<div class="fb-post" data-href="<?php echo $wo['story']['postFacebook'];?>" data-width="500"></div>
 <div class="clear"></div>
 <!-- <div class="post-youtube wo_video_post">
    <iframe src="https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/<?php echo $wo['story']['postFacebook'];?>&show_text=0" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>

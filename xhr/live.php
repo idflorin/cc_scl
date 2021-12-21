@@ -16,15 +16,20 @@ if ($f == 'live') {
             if (!empty($_COOKIE['post_privacy']) && in_array($_COOKIE['post_privacy'], $privacy_array)) {
                 $postPrivacy = Wo_Secure($_COOKIE['post_privacy']);
             }
+            $token = null;
+            if (!empty($_POST['token']) && !is_null($_POST['token'])) {
+                $token = Wo_Secure($_POST['token']);
+            }
     		$post_id = $db->insert(T_POSTS,array('user_id' => $wo['user']['id'],
 		    	                                 'postText' => '',
                                                  'postType' => 'live',
                                                  'postPrivacy' => $postPrivacy,
+                                                 'agora_token' => $token,
                                                  'stream_name' => Wo_Secure($_POST['stream_name']),
                                                  'time' => time()));
     		$db->where('id',$post_id)->update(T_POSTS,array('post_id' => $post_id));
-            Wo_RunInBackground(array('status' => 200,
-                                     'post_id' => $post_id));
+            // Wo_RunInBackground(array('status' => 200,
+            //                          'post_id' => $post_id));
 
             if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['config']['agora_customer_id']) && !empty($wo['config']['agora_customer_certificate']) && $wo['config']['live_video_save'] == 1) {
 
@@ -34,7 +39,7 @@ if ($f == 'live') {
 
                     if (in_array(strtolower($wo['config']['region_2']),array_keys($region_array) )) {
 
-                        StartCloudRecording(1,$region_array[strtolower($wo['config']['region_2'])],$wo['config']['bucket_name_2'],$wo['config']['amazone_s3_key_2'],$wo['config']['amazone_s3_s_key_2'],$_POST['stream_name'],explode('_', $_POST['stream_name'])[2],$post_id);
+                        StartCloudRecording(1,$region_array[strtolower($wo['config']['region_2'])],$wo['config']['bucket_name_2'],$wo['config']['amazone_s3_key_2'],$wo['config']['amazone_s3_s_key_2'],$_POST['stream_name'],12,$post_id,$token);
                     }
                     
                 }
@@ -206,7 +211,8 @@ if ($f == 'live') {
                                                  'sid' => $post->agora_sid,
                                                  'cname' => $post->stream_name,
                                                  'post_id' => $post->post_id,
-                                                 'uid' => explode('_', $post->stream_name)[2]));
+                                                 'token' => $post->agora_token,
+                                                 'uid' => 12));
                     }
                 }
                 if ($wo['config']['agora_live_video'] == 1 && $wo['config']['amazone_s3_2'] != 1) {

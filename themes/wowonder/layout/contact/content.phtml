@@ -33,10 +33,17 @@
 							<div class="g-recaptcha" data-sitekey="<?php echo $wo['config']['reCaptchaKey']?>"></div>
 						</div>
 					<?php } ?>
+					<div class="terms">
+					<input type="checkbox" name="accept_terms" id="accept_terms" onchange="activateButton(this)">
+						<label for="accept_terms"> 
+							<?php echo str_replace('{privacy}', '<a href="'.Wo_SeoLink('index.php?link1=terms&type=privacy-policy').'">'.$wo['lang']['privacy_policy'].'</a>', $wo['lang']['terms_contact'])  ?>
+						</label>
+						<div class="clear"></div>
+					</div>
 
 					<div class="contact-us-alert setting-update-alert"></div>
 					<div class="text-center">
-						<button class="btn btn-main btn-mat btn-mat-raised add_wow_loader" type="submit" name="send" id="send"><?php echo $wo['lang']['send']; ?></button>
+						<button class="btn btn-main btn-mat btn-mat-raised add_wow_loader" type="submit" name="send" id="send" disabled><?php echo $wo['lang']['send']; ?></button>
 					</div>
 				</form>
 			</div>
@@ -48,6 +55,14 @@
 </div>
 <!-- .page-margin -->
 <script>
+function activateButton(element) {
+	if(element.checked) {
+		document.getElementById("send").disabled = false;
+	}
+	else  {
+		document.getElementById("send").disabled = true;
+	}
+};
 $('.wow_main_blogs_bg').css('height', ($('.wow_main_float_head').height()) + 'px');
    $(function() {
      $('form.contact-us-form').ajaxForm({

@@ -1,5 +1,5 @@
 <?php
-if (!empty($_POST['postText']) && Wo_IsUrl($_POST['postText'])) {
+if (!empty($_POST['postText'])) {
 
 
     if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $_POST["postText"], $match)) {
@@ -42,62 +42,65 @@ if (!empty($_POST['postText']) && Wo_IsUrl($_POST['postText'])) {
             $_POST['url_link'] = $_POST["postText"];
         }
     } else if (isset($_POST["postText"])) {
-        $page_title = '';
-        $image_urls = array();
-        $page_body  = '';
-        $get_url    = $_POST["postText"];
-        include_once("assets/libraries/simple_html_dom.inc.php");
-        $get_image = getimagesize($get_url);
-        if (!empty($get_image)) {
-            $image_urls[] = $get_url;
-            $page_title   = 'Image';
-        } else {
-            $get_content = file_get_html($get_url);
-            foreach ($get_content->find('title') as $element) {
-                @$page_title = $element->plaintext;
-            }
-            if (empty($page_title)) {
-                $page_title = '';
-            }
-            @$page_body = $get_content->find("meta[name='description']", 0)->content;
-            $page_body = mb_substr($page_body, 0, 250, "utf-8");
-            if ($page_body === false) {
-                $page_body = '';
-            }
-            if (empty($page_body)) {
-                @$page_body = $get_content->find("meta[property='og:description']", 0)->content;
-                $page_body = mb_substr($page_body, 0, 250, "utf-8");
-                if ($page_body === false) {
-                    $page_body = '';
-                }
-            }
+        $link_regex = '/(http\:\/\/|https\:\/\/|www\.)([^\ ]+)/i';
+        $i          = 0;
+        preg_match_all($link_regex, $_POST['postText'], $matches);
+        if (!empty($matches) && !empty($matches[0]) && !empty($matches[0][0])) {
+            //include_once("assets/libraries/simple_html_dom.inc.php");
+            $page_title = '';
             $image_urls = array();
-            @$page_image = $get_content->find("meta[property='og:image']", 0)->content;
-            if (!empty($page_image)) {
-                if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $page_image)) {
-                    $image_urls[] = $page_image;
+            $page_body  = '';
+            $get_url    = strip_tags($matches[0][0]);
+            $save = IsSaveUrl($get_url);
+            if ($save['status'] == 200) {
+                if ($save['type'] == 'image') {
+                    $get_image = getimagesize($get_url);
+                    $image_urls[] = $get_url;
+                    $page_title   = 'Image';
                 }
-            } else {
-                foreach ($get_content->find('img') as $element) {
-                    if (!preg_match('/blank.(.*)/i', $element->src)) {
-                        if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $element->src)) {
-                            $image_urls[] = $element->src;
+                else {
+                    include_once("assets/libraries/simple_html_dom.inc.php");
+                    $get_content = file_get_html($get_url);
+                    foreach ($get_content->find('title') as $element) {
+                        @$page_title = $element->plaintext;
+                    }
+                    if (empty($page_title)) {
+                        $page_title = '';
+                    }
+                    @$page_body = $get_content->find("meta[name='description']", 0)->content;
+                    $page_body = mb_substr($page_body, 0, 250, "utf-8");
+                    if ($page_body === false) {
+                        $page_body = '';
+                    }
+                    if (empty($page_body)) {
+                        @$page_body = $get_content->find("meta[property='og:description']", 0)->content;
+                        $page_body = mb_substr($page_body, 0, 250, "utf-8");
+                        if ($page_body === false) {
+                            $page_body = '';
+                        }
+                    }
+                    $image_urls = array();
+                    @$page_image = $get_content->find("meta[property='og:image']", 0)->content;
+                    if (!empty($page_image)) {
+                        if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $page_image)) {
+                            $image_urls[] = $page_image;
+                        }
+                    } else {
+                        foreach ($get_content->find('img') as $element) {
+                            if (!preg_match('/blank.(.*)/i', $element->src)) {
+                                if (preg_match('/[\w\-]+\.(jpg|png|gif|jpeg)/', $element->src)) {
+                                    $image_urls[] = $element->src;
+                                }
+                            }
                         }
                     }
                 }
+                $_POST['url_title'] = $page_title;
+                $_POST['url_content'] = $page_body;
+                $_POST['url_image'] = $image_urls[0];
+                $_POST['url_link'] = $_POST["postText"];
             }
         }
-        // $output = array(
-        //     'title' => $page_title,
-        //     'images' => $image_urls,
-        //     'content' => $page_body,
-        //     'url' => $_POST["postText"]
-        // );
-
-        $_POST['url_title'] = $page_title;
-        $_POST['url_content'] = $page_body;
-        $_POST['url_image'] = $image_urls[0];
-        $_POST['url_link'] = $_POST["postText"];
     }
 
 }
@@ -188,16 +191,16 @@ $multi = 0;
 if (isset($_FILES['postPhotos']['name']) && empty($mediaFilename) && empty($_POST['album_name'])) {
     
     if (count($_FILES['postPhotos']['name']) == 1) {
-        if ($_FILES['postPhotos']['size'] > $wo['config']['maxUpload']) {
+        if ($_FILES['postPhotos']['size'][0] > $wo['config']['maxUpload']) {
             $invalid_file = 1;
-        } else if (Wo_IsFileAllowed($_FILES['postPhotos']['name']) == false) {
+        } else if (Wo_IsFileAllowed($_FILES['postPhotos']['name'][0]) == false) {
             $invalid_file = 2;
         } else {
             $fileInfo = array(
-                'file' => $_FILES["postPhotos"]["tmp_name"],
-                'name' => $_FILES['postPhotos']['name'],
-                'size' => $_FILES["postPhotos"]["size"],
-                'type' => $_FILES["postPhotos"]["type"]
+                'file' => $_FILES["postPhotos"]["tmp_name"][0],
+                'name' => $_FILES['postPhotos']['name'][0],
+                'size' => $_FILES["postPhotos"]["size"][0],
+                'type' => $_FILES["postPhotos"]["type"][0]
             );
             $media    = Wo_ShareFile($fileInfo);
             if (!empty($media)) {
@@ -308,7 +311,7 @@ if (isset($_FILES['postPhotos']['name'])) {
         if (count($_FILES['postPhotos']['name']) > 1) {
             $new_string = pathinfo($_FILES['postPhotos']['name'][$i]);
         } else {
-            $new_string = pathinfo($_FILES['postPhotos']['name']);
+            $new_string = pathinfo($_FILES['postPhotos']['name'][0]);
         }
         if (!in_array(strtolower($new_string['extension']), $allowed)) {
         	$error_code    = 11;
@@ -335,7 +338,7 @@ if (empty($error_message)) {
         $is_option = true;
     }
     $post_data = array(
-        'user_id' => Wo_Secure($user_id),
+        'user_id' => $wo['user']['user_id'],
         'page_id' => Wo_Secure($page_id),
         'event_id' => Wo_Secure($event_id),
         'group_id' => Wo_Secure($group_id),

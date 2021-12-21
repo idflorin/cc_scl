@@ -345,55 +345,55 @@ function socketSide(){
       }
     })
     // console.log("Seen registered")
-    socket.on("lastseen", (data) => {
+    // socket.on("lastseen", (data) => {
          
-    var inputs = $("input.chat-user-id");
-    if (inputs.length > 0) {
-        for(var i = 0; i < inputs.length; i++){
-          let id = $(inputs[i]).val()
-          if (current_width < 700) {
-            return false;
-          }
-          if ($('.search-users-chat').val().length > 0) {
-            return false;
-          }
-          if ($('body').attr('sending-' + id) == 'true') {
-              return false;
-          }
-          var chat_container = $('.chat-tab').find('.chat_main_' + id);
-          var offline_users_container = $('.offline-users');
-          var user_id = chat_container.find('.chat-user-id').val();
-          var message_id = chat_container.find('.chat-messages-wrapper').find('.messages-wrapper:last').attr('data-message-id');
-          var chat_user_tab = chat_container.find('.chat-wrapper').find('.chat-status');
-          var online_users_container = $('.online-users');
-          var last_id = chat_container.find('.messages-text:last').attr('data-message-id');
-          var is_empty_seen = 1;
-          var chat_groups = $(".chat_groups");
-          var last_group = ($(".groups-list").length > 0) ? $(".groups-list").last().attr('data-chat-group') : 0;
+    // var inputs = $("input.chat-user-id");
+    // if (inputs.length > 0) {
+    //     for(var i = 0; i < inputs.length; i++){
+    //       let id = $(inputs[i]).val()
+    //       if (current_width < 700) {
+    //         return false;
+    //       }
+    //       if ($('.search-users-chat').val().length > 0) {
+    //         return false;
+    //       }
+    //       if ($('body').attr('sending-' + id) == 'true') {
+    //           return false;
+    //       }
+    //       var chat_container = $('.chat-tab').find('.chat_main_' + id);
+    //       var offline_users_container = $('.offline-users');
+    //       var user_id = chat_container.find('.chat-user-id').val();
+    //       var message_id = chat_container.find('.chat-messages-wrapper').find('.messages-wrapper:last').attr('data-message-id');
+    //       var chat_user_tab = chat_container.find('.chat-wrapper').find('.chat-status');
+    //       var online_users_container = $('.online-users');
+    //       var last_id = chat_container.find('.messages-text:last').attr('data-message-id');
+    //       var is_empty_seen = 1;
+    //       var chat_groups = $(".chat_groups");
+    //       var last_group = ($(".groups-list").length > 0) ? $(".groups-list").last().attr('data-chat-group') : 0;
 
-          if (!$('#messageId_'+message_id).find('.message-seen').is(':empty')) {
-              is_empty_seen = 0;
-          }
-          if (typeof user_id === 'undefined') {
-            user_id = 0;
-          }
-          if (typeof message_id === 'undefined') {
-            message_id = 0;
-          }
-          if (typeof last_id === 'undefined') {
-            last_id = 0;
-          }
-          var count_span = $('.count-online-users');
+    //       if (!$('#messageId_'+message_id).find('.message-seen').is(':empty')) {
+    //           is_empty_seen = 0;
+    //       }
+    //       if (typeof user_id === 'undefined') {
+    //         user_id = 0;
+    //       }
+    //       if (typeof message_id === 'undefined') {
+    //         message_id = 0;
+    //       }
+    //       if (typeof last_id === 'undefined') {
+    //         last_id = 0;
+    //       }
+    //       var count_span = $('.count-online-users');
 
-          if (is_empty_seen == 1 && data.can_seen == 1) {
-              chat_container.find('#messageId_'+message_id).find('.message-seen').hide().html('<i class="fa fa-check"></i> <?php echo $wo["lang"]["seen"];?> (<span class="ajax-time" title="' + data.time + '">' + data.seen + '</span>)').fadeIn(300);
-              setTimeout(function(){
-               chat_container.find('.chat-messages-wrapper').scrollTop(chat_container.find('.chat-messages-wrapper')[0].scrollHeight);
-            }, 100);
-          }
-        }
-      }
-    })
+    //       if (is_empty_seen == 1 && data.can_seen == 1) {
+    //           chat_container.find('#messageId_'+message_id).find('.message-seen').hide().html('<i class="fa fa-check"></i> <?php echo $wo["lang"]["seen"];?> (<span class="ajax-time" title="' + data.time + '">' + data.seen + '</span>)').fadeIn(300);
+    //           setTimeout(function(){
+    //            chat_container.find('.chat-messages-wrapper').scrollTop(chat_container.find('.chat-messages-wrapper')[0].scrollHeight);
+    //         }, 100);
+    //       }
+    //     }
+    //   }
+    // })
   <?php } ?>
 }
 $(()=>{
@@ -435,6 +435,12 @@ function Wo_ChatSide(id) {
     }
     var count_span = $('.count-online-users');
     $.get(Wo_Ajax_Requests_File(), {f:'chat', s:'chat_side', user_id:user_id, message_id:message_id, last_id:last_id,last_group:last_group}, function(data) {
+    	if (data.reactions) {
+	      	for (var i = data.reactions.length - 1; i >= 0; i--) {
+	      		$('.post-reactions-icons-m-'+data.reactions[i].id).html(data.reactions[i].reactions);
+	      		
+	      	}
+	      }
         if (data.status == 200  && data.chat_groups.length > 0) {
           chat_groups.html(data.chat_groups);
         }
@@ -473,6 +479,9 @@ function Wo_ChatSide(id) {
             chat_user_tab.removeClass('active');
         }
         if (data.messages == 200) {
+        	if (data.chat_color) {
+        	 $('.chat_' + user_id).find('.online-toggle').attr('style', 'background: '+data.chat_color+' !important;');
+        	}
             chat_container.find('.chat-messages-wrapper').find("div[class*='message-seen']").empty();
             chat_container.find('.chat-messages-wrapper').find("div[class*='message-typing']").empty();
             chat_container.find('.chat-messages-wrapper').append(data.messages_html);
@@ -503,10 +512,18 @@ function Wo_ChatSide(id) {
             chat_container.find('.messages-text:last').find('.message-typing').empty();
         } 
         if (data.chat_color) {
-            $(".chat_" + user_id).find('.online-toggle, .outgoing').css('background', data.chat_color);
+	        //$(".chat_" + user_id).find('.online-toggle, .outgoing').css('background', data.chat_color);
             $(".chat_" + user_id).find('.outgoing p').css('color', '#fff');
             $(".chat_" + user_id).find('#color').val(data.chat_color);
             $(".chat_" + user_id).find('.select-color').css('color', data.chat_color);
+            $(".chat_" + user_id).find('.outgoing .message-text, .outgoing .message-media, .outgoing.message').css('background', data.chat_color);
+             $(".chat_" + user_id).find('.outgoing .message-text').css('color', '#fff');
+             $(".chat_" + user_id).find('.select-color path').css('fill', data.chat_color);
+             $(".chat_" + user_id).find('#color').val(data.chat_color);
+             $(".text-sender-container .red-list").css('background', data.chat_color);
+             $(".text-sender-container .btn-file").css('background', data.chat_color);
+             $(".text-sender-container .btn-file").css('border-color', data.chat_color);
+             $(".chat_" + user_id).find('.record-chat-audio').find('[fill]').attr('fill', data.chat_color);
         }
     });
   <?php } ?>

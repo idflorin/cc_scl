@@ -649,6 +649,14 @@ background-color: #6f6449;}
     background: #494949;
 }
 
+.chat-messages-wrapper .incoming .message-text .wo_reply_msg_bg, .text-sender-container .incoming .message-model .message .wo_reply_msg_bg {
+    background: #565656;
+}
+.message_reply_text, .message_reply_story_text, .chat_reply_text {
+    background: #363636;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%);
+}
+
 
 
 

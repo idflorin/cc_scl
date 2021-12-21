@@ -1,5 +1,5 @@
 <script type="text/javascript">
-	var rand = <?php echo rand(1111111,9999999); ?>;
+	var rand = 0;
 
 	function ready() {
 
@@ -111,7 +111,7 @@ function changeStreamSource (deviceIndex, deviceType) {
 
 
 var agoraAppId = '<?php echo($wo['config']['agora_app_id']) ?>'; // set app id
-var channelName = "stream_<?php echo($wo['user']['id']) ?>_"+rand; // set channel name
+var channelName = "<?php echo($wo['AgorachannelName']) ?>"; // set channel name
 
 // create client instance
 var client = AgoraRTC.createClient({mode: 'live', codec: 'vp8'}); // h264 better detail at a higher motion
@@ -259,7 +259,7 @@ function joinChannel() {
       $('#publishBtn').addClass('hidden');
       $('.end_vdo_call').removeClass('hidden');
 
-      $.post(Wo_Ajax_Requests_File() + "?f=live&s=create", {stream_name: channelName}, function(data, textStatus, xhr) {
+      $.post(Wo_Ajax_Requests_File() + "?f=live&s=create", {stream_name: channelName,token:token}, function(data, textStatus, xhr) {
 	                if (data.status == 200) {
 	                  $('#live_post_id').val(data.post_id);
                     $('.live_mic_cam_switch').slideDown();
@@ -345,6 +345,7 @@ function createCameraStream(uid, deviceIds) {
 
 // use tokens for added security
 function generateToken() {
-  return null; // TODO: add a token generation
+  return "<?php echo($wo['AgoraToken']); ?>";
+  //return null; // TODO: add a token generation
 }
 </script>

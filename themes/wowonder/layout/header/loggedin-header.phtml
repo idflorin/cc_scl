@@ -282,7 +282,7 @@ if ($followers_alert == 0) {
 			<?php } ?>
 			<li><hr></li>
 			<li>
-				<a href="<?php echo Wo_SeoLink('index.php?link1=logout'); ?>"><?php echo $wo['lang']['log_out']; ?></a>
+				<a href="<?php echo Wo_SeoLink('index.php?link1=logout')."/?cache=".time(); ?>"><?php echo $wo['lang']['log_out']; ?></a>
 			</li>
 			<li><hr></li>
 			<li>

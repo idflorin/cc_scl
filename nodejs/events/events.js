@@ -163,6 +163,12 @@ module.exports.unseen = async (ctx, socket) => {
 }
 
 module.exports.privateMessageToPersonOwnerFalse = async (ctx, io, data, fromUser, nextId, hasHTML, sendable_message, color) => {
+    var lng = 0;
+    var lat = 0;
+    if (data.lng && data.lat && data.lng !== undefined && data.lat !== undefined) {
+        lng = data.lng;
+        lat = data.lat;
+    }
     io.to(data.to_id).emit('private_message', {
         messages_html: await compiledTemplates.chatListOwnerFalse(ctx, data, fromUser, nextId, hasHTML, sendable_message),
         id: ctx.userHashUserId[data.from_id],
@@ -174,6 +180,10 @@ module.exports.privateMessageToPersonOwnerFalse = async (ctx, io, data, fromUser
         time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
         isMedia: false,
         isRecord: false,
+        lng: lng,
+        lat: lat,
+        message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+        time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
     });
 }
 
@@ -211,6 +221,12 @@ module.exports.privateMessagePageToPersonOwnerTrueWithMedia = async (ctx, io, da
 
 
 module.exports.privateMessagePageToPersonOwnerFalseWithMedia = async (ctx, io, data, fromUser, nextId, hasHTML, isSticker) => {
+    var lng = 0;
+    var lat = 0;
+    if (data.lng && data.lat && data.lng !== undefined && data.lat !== undefined) {
+        lng = data.lng;
+        lat = data.lat;
+    }
     await io.to(data.to_id).emit('private_message_page', {
         html: await compiledTemplates.messageListOwnerFalseWithMedia(ctx, data, nextId, fromUser, isSticker),
         status: 200,
@@ -219,13 +235,23 @@ module.exports.privateMessagePageToPersonOwnerFalseWithMedia = async (ctx, io, d
         sender: ctx.userHashUserId[data.from_id],
         isMedia: true,
         time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
-        mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+        mediaLink: funcs.Wo_GetMedia(ctx, data.mediaId),
         isMedia: true,
         isRecord: true,
+        lng: lng,
+        lat: lat,
+        message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+        time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
     });
 }
 
 module.exports.privateMessageToPersonOwnerFalseWithMedia = async (ctx, io, data, fromUser, nextId, hasHTML, isSticker) => {
+    var lng = 0;
+    var lat = 0;
+    if (data.lng && data.lat && data.lng !== undefined && data.lat !== undefined) {
+        lng = data.lng;
+        lat = data.lat;
+    }
     await io.to(data.to_id).emit('private_message', {
         messages_html: await compiledTemplates.chatListOwnerFalseWithMedia(ctx, data, fromUser, nextId, hasHTML, isSticker),
         id: ctx.userHashUserId[data.from_id],
@@ -233,13 +259,23 @@ module.exports.privateMessageToPersonOwnerFalseWithMedia = async (ctx, io, data,
         sender: ctx.userHashUserId[data.from_id],
         isMedia: true,
         time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
-        mediaLink: funcs.Wo_GetLink(ctx, data.mediaId),
+        mediaLink: funcs.Wo_GetMedia(ctx, data.mediaId),
         isMedia: true,
         isRecord: true,
+        lng: lng,
+        lat: lat,
+        message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+        time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
     });
 }
 
 module.exports.privateMessagePageToPersonOwnerFalse = async (ctx, io, data, fromUser, nextId, hasHTML, sendable_message, color) => {
+    var lng = 0;
+    var lat = 0;
+    if (data.lng && data.lat && data.lng !== undefined && data.lat !== undefined) {
+        lng = data.lng;
+        lat = data.lat;
+    }
     io.to(data.to_id).emit('private_message_page', {
         html: await compiledTemplates.messageListOwnerFalse(ctx, data, nextId, fromUser, hasHTML, sendable_message),
         status: 200,
@@ -252,6 +288,10 @@ module.exports.privateMessagePageToPersonOwnerFalse = async (ctx, io, data, from
         time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
         isMedia: false,
         isRecord: false,
+        lng: lng,
+        lat: lat,
+        message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+        time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
     });
 }
 
@@ -264,7 +304,10 @@ module.exports.groupMessage = async (ctx, io, socket, data, messageOwner, nextId
             await io.to(client).emit('group_message', {
                 status: 200,
                 html: await compiledTemplates.groupListOwnerTrue(ctx, messageOwner, nextId, data, hasHTML, sendable_message),
-                id: data.group_id
+                id: data.group_id,
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
+
             });
             await ctx.wo_groupchatusers.update({
                 last_seen: Math.floor(Date.now() / 1000),
@@ -279,7 +322,9 @@ module.exports.groupMessage = async (ctx, io, socket, data, messageOwner, nextId
             await io.to(client).emit('group_message', {
                 status: 200,
                 html: await compiledTemplates.groupListOwnerFalse(ctx, messageOwner, nextId, data, hasHTML, sendable_message),
-                id: data.group_id
+                id: data.group_id,
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
             await ctx.wo_groupchatusers.update({
                 last_seen: Math.floor(Date.now() / 1000),
@@ -309,7 +354,9 @@ module.exports.groupMessageWithMedia = async (ctx, io, socket, data, messageOwne
             await io.to(client).emit('group_message', {
                 status: 200,
                 html: await compiledTemplates.groupListOwnerTrueWithMedia(ctx, messageOwner, nextId, data, isSticker),
-                id: data.group_id
+                id: data.group_id,
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
             await ctx.wo_groupchatusers.update({
                 last_seen: Math.floor(Date.now() / 1000),
@@ -324,7 +371,9 @@ module.exports.groupMessageWithMedia = async (ctx, io, socket, data, messageOwne
             await io.to(client).emit('group_message', {
                 status: 200,
                 html: await compiledTemplates.groupListOwnerFalseWithMedia(ctx, messageOwner, nextId, data, isSticker),
-                id: data.group_id
+                id: data.group_id,
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
             await ctx.wo_groupchatusers.update({
                 last_seen: Math.floor(Date.now() / 1000),
@@ -353,7 +402,9 @@ module.exports.groupMessagePage = async (ctx, io, socket, data, messageOwner, ne
                 id: data.group_id,
                 receiver: ctx.userHashUserId[data.from_id],
                 sender: ctx.userHashUserId[data.from_id],
-                self: true
+                self: true,
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
             await ctx.wo_groupchatusers.update({
                 last_seen: Math.floor(Date.now() / 1000),
@@ -372,7 +423,9 @@ module.exports.groupMessagePage = async (ctx, io, socket, data, messageOwner, ne
                 html: await compiledTemplates.messageListOwnerFalse(ctx, data, nextId, messageOwner, hasHTML, sendable_message),
                 id: data.group_id,
                 receiver: data.group_id,
-                sender: ctx.userHashUserId[data.from_id]
+                sender: ctx.userHashUserId[data.from_id],
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
             await ctx.wo_groupchatusers.update({
                 last_seen: Math.floor(Date.now() / 1000),
@@ -404,7 +457,9 @@ module.exports.groupMessagePageWithMedia = async (ctx, io, socket, data, message
                 id: data.group_id,
                 receiver: ctx.userHashUserId[data.from_id],
                 sender: ctx.userHashUserId[data.from_id],
-                self: true
+                self: true,
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
             await ctx.wo_groupchatusers.update({
                 last_seen: Math.floor(Date.now() / 1000),
@@ -421,7 +476,9 @@ module.exports.groupMessagePageWithMedia = async (ctx, io, socket, data, message
                 html: await compiledTemplates.messageListOwnerFalseWithMedia(ctx, data, nextId, messageOwner, hasHTML, isSticker),
                 id: data.group_id,
                 receiver: data.group_id,
-                sender: ctx.userHashUserId[data.from_id]
+                sender: ctx.userHashUserId[data.from_id],
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
             await ctx.wo_groupchatusers.update({
                 last_seen: Math.floor(Date.now() / 1000),

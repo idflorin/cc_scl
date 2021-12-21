@@ -53,7 +53,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             if (strlen($_POST['name']) < 3 || strlen($_POST['name']) > 100) {
                 $error_code    = 6;
                 $error_message = 'Please enter a valid company name!';
-            } else if (!filter_var($_POST['website'], FILTER_VALIDATE_URL) || $_POST['website'] > 3000) {
+            } else if (!filter_var($_POST['website'], FILTER_VALIDATE_URL) || strlen($_POST['website']) > 3000) {
                 $error_code    = 7;
                 $error_message = 'Please enter a valid link!';
             } else if (strlen($_POST['headline']) < 5 || strlen($_POST['headline']) > 200) {
@@ -107,6 +107,25 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             }
         }
         if (empty($error_message)) {
+            $page_id = 0;
+            if (!empty($_POST['page'])) {
+                $page_id = Wo_PageIdFromPagename($_POST['page']);
+                if (empty($page_id)) {
+                    $page_id = 0;
+                }
+            }
+            $start = '';
+            if (!empty($_POST['start'])) {
+                $start = Wo_Secure($_POST['start']);
+            }
+            $end = '';
+            if (!empty($_POST['end'])) {
+                $end = Wo_Secure($_POST['end']);
+            }
+            $budget = 0;
+            if (!empty($_POST['budget']) && is_numeric($_POST['budget']) && $_POST['budget'] > 0) {
+                $budget = Wo_Secure($_POST['budget']);
+            }
             $registration_data             = array(
                 'name' => Wo_Secure($_POST['name']),
                 'url' => Wo_Secure($_POST['website']),
@@ -118,7 +137,11 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 'bidding' => Wo_Secure($_POST['bidding']),
                 'posted' => time(),
                 'appears' => Wo_Secure($_POST['appears']),
-                'user_id' => Wo_Secure($wo['user']['user_id'])
+                'user_id' => Wo_Secure($wo['user']['user_id']),
+                'page_id' => $page_id,
+                'start'   => $start,
+                'end'   => $end,
+                'budget'   => $budget
             );
             $fileInfo                      = array(
                 'file' => $_FILES["media"]["tmp_name"],

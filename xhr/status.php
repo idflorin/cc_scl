@@ -23,6 +23,11 @@ if ($f == 'status') {
             }
         }
         if (!$error) {
+            $amazone_s3 = $wo['config']['amazone_s3'];
+            $ftp_upload = $wo['config']['ftp_upload'];
+            $spaces = $wo['config']['spaces'];
+            $cloud_upload = $wo['config']['cloud_upload'];
+
             $registration_data            = array();
             $registration_data['user_id'] = $wo['user']['id'];
             $registration_data['posted']  = time();
@@ -39,7 +44,20 @@ if ($f == 'status') {
                     $files   = Wo_MultipleArrayFiles($_FILES["statusMedia"]);
                     $sources = array();
                     $thumb   = '';
+                    
                     foreach ($files as $fileInfo) {
+                        if (!in_array(strtolower(pathinfo($fileInfo['name'], PATHINFO_EXTENSION)), array(
+                                    "m4v",
+                                    "avi",
+                                    "mpg",
+                                    'mp4'
+                                ))) {
+                            $wo['config']['amazone_s3'] = 0;
+                            $wo['config']['ftp_upload'] = 0;
+                            $wo['config']['spaces'] = 0;
+                            $wo['config']['cloud_upload'] = 0;
+                        }
+                        
                         if ($fileInfo['size'] > 0) {
                             $fileInfo['file'] = $fileInfo['tmp_name'];
                             $media            = Wo_ShareFile($fileInfo);
@@ -74,7 +92,12 @@ if ($f == 'status') {
                                         $importImage = @file_put_contents($thumb, $fileget);
                                     }
                                     $crop_image = Wo_Resize_Crop_Image(400, 400, $thumb, $last_file, 60);
+                                    $wo['config']['amazone_s3'] = $amazone_s3;
+                                    $wo['config']['ftp_upload'] = $ftp_upload;
+                                    $wo['config']['spaces'] = $spaces;
+                                    $wo['config']['cloud_upload'] = $cloud_upload;
                                     $upload_s3  = Wo_UploadToS3($last_file);
+                                    $upload_s3  = Wo_UploadToS3($media['filename']);
                                     $thumb      = $last_file;
                                 }
                             }
@@ -92,6 +115,10 @@ if ($f == 'status') {
                                     "mpg",
                                     'mp4'
                                 )) && !empty($_FILES["cover"]) && in_array($_FILES["cover"]["type"], $img_types)) {
+                        $wo['config']['amazone_s3'] = 0;
+                        $wo['config']['ftp_upload'] = 0;
+                        $wo['config']['spaces'] = 0;
+                        $wo['config']['cloud_upload'] = 0;
                         $fileInfo = array(
                             'file' => $_FILES["cover"]["tmp_name"],
                             'name' => $_FILES['cover']['name'],
@@ -122,6 +149,10 @@ if ($f == 'status') {
                                     $importImage = @file_put_contents($thumb, $fileget);
                                 }
                                 $crop_image = Wo_Resize_Crop_Image(400, 400, $thumb, $last_file, 60);
+                                $wo['config']['amazone_s3'] = $amazone_s3;
+                                $wo['config']['ftp_upload'] = $ftp_upload;
+                                $wo['config']['spaces'] = $spaces;
+                                $wo['config']['cloud_upload'] = $cloud_upload;
                                 $upload_s3  = Wo_UploadToS3($last_file);
                                 $thumb      = $last_file;
                             }
@@ -133,7 +164,7 @@ if ($f == 'status') {
                             Wo_InsertUserStoryMedia($registration_data);
                         }
                         if (!empty($thumb)) {
-                            $thumb        = Wo_Secure($thumb);
+                            $thumb        = Wo_Secure($thumb,0);
                             $mysqli_query = mysqli_query($sqlConnect, "UPDATE " . T_USER_STORY . " SET thumbnail = '$thumb' WHERE id = $last_id");
                         }
                         $data = array(
@@ -222,5 +253,45 @@ if ($f == 'status') {
             echo json_encode($data);
             exit();
         }
+    }
+    if ($s == 'register_reaction') {
+        $data = array('status' => 400);
+        $reactions_types = array_keys($wo['reactions_types']);
+        if (!empty($_GET['story_id']) && is_numeric($_GET['story_id']) && $_GET['story_id'] > 0 && !empty($_GET['reaction']) && in_array($_GET['reaction'], $reactions_types)) {
+            $story_id = Wo_Secure($_GET['story_id']);
+            $story = $db->where('id',$story_id)->getOne(T_USER_STORY);
+            if (!empty($story)) {
+                $is_reacted = $db->where('user_id',$wo['user']['user_id'])->where('story_id',$story_id)->getValue(T_REACTIONS,'COUNT(*)');
+                if ($is_reacted > 0) {
+                    $db->where('user_id',$wo['user']['user_id'])->where('story_id',$story_id)->delete(T_REACTIONS);
+                }
+                $db->insert(T_REACTIONS,array('user_id' => $wo['user']['id'],
+                                                   'story_id' => $story_id,
+                                                   'reaction' => Wo_Secure($_GET['reaction'])));
+                $text           = 'story';
+                $type2          = Wo_Secure($_GET['reaction']);
+                $notification_data_array = array(
+                    'recipient_id' => $story->user_id,
+                    'story_id' => $story->id,
+                    'type' => 'reaction',
+                    'text' => $text,
+                    'type2' => $type2,
+                    'url' => 'index.php?link1=timeline&u=' . $wo['user']['username'] . '&story=true&story_id=' . $story->id
+                );
+                Wo_RegisterNotification($notification_data_array);
+                $data = array(
+                    'status' => 200,
+                    'reactions' => Wo_GetPostReactions($story_id,'story'),
+                    'like_lang' => $wo['lang']['liked']
+                );
+                if (Wo_CanSenEmails()) {
+                    $data['can_send'] = 1;
+                }
+                $data['dislike'] = 0;
+            }
+        }
+        header("Content-type: application/json");
+        echo json_encode($data);
+        exit();
     }
 }

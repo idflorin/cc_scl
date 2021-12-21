@@ -110,7 +110,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_code    = 4;
             $error_message = 'user_id (POST) is missing';
         }
-        $albums = Wo_GetUserAlbums($wo['user_id']);
+        //$albums = Wo_GetUserAlbums($wo['user_id']);
     }
     if ($_POST['type'] == 'add') {
         if (!empty($_POST['id']) && !empty($_FILES['postPhotos']['name'])) {

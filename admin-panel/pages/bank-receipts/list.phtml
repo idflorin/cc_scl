@@ -10,7 +10,7 @@
 		</td>
 		<td>
 			<?php if((int)$wo['mediafilelist']->approved == 0){?>
-				<a href="#" class="btn bg-success admn_table_btn" onclick="Wo_ApproveReceipt(<?php echo $wo['mediafilelist']->id?>,'<?php echo $wo['mediafilelist']->receipt_file?>','hide');">Approve</a>
+				<a href="javascript:void(0)" class="btn bg-success admn_table_btn" onclick="Wo_ApproveReceipt(<?php echo $wo['mediafilelist']->id?>,'<?php echo $wo['mediafilelist']->receipt_file?>','hide');">Approve</a>
 				<a href="javascript:void(0)" class="btn bg-danger admn_table_btn" onclick="Wo_DeleteReceipt(<?php echo $wo['mediafilelist']->id?>,<?php echo $wo['mediafilelist']->user_id?>,'<?php echo $wo['mediafilelist']->receipt_file?>','hide');">Delete</a>
 			<?php } else{ ?>
 				<b style="color:darkgreen;">Approved <?php echo Wo_Time_Elapsed_String($wo['mediafilelist']->approved_at); ?></b>

@@ -339,6 +339,8 @@ $(function () {
 jQuery(document).click(function(event){
     if (!(jQuery(event.target).closest(".remove_combo_on_click").length)) {
         jQuery('.remove_combo_on_click').removeClass('comment-toggle');
+		$('#gif-form-<?php echo $wo['story']['id']; ?>').slideUp(200);
+		$('#sticker-form-<?php echo $wo['story']['id']; ?>').slideUp(200);
     }
 });
 <?php if ($wo['config']['live_video'] == 1 && !empty($wo['story']['stream_name']) && $wo['story']['is_still_live'] && $wo['story']['comments_status'] == 1 && $wo['story']['live_ended'] == 0) { ?>
@@ -395,7 +397,7 @@ jQuery(document).click(function(event){
 
 <?php } ?>
 <?php if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['story']['stream_name']) && $wo['story']['is_still_live']) { ?>
-  RunLiveAgora("<?php echo $wo['story']['stream_name']; ?>","post_live_video_<?php echo($wo['story']['id']) ?>");
+  RunLiveAgora("<?php echo $wo['story']['stream_name']; ?>","post_live_video_<?php echo($wo['story']['id']) ?>","<?php echo($wo['story']['agora_token']) ?>");
   
 <?php } ?>
 

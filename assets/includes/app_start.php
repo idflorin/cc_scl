@@ -64,7 +64,7 @@ if( ISSET( $_GET['theme'] ) && in_array($_GET['theme'], ['default', 'sunshine', 
     $_SESSION['theme'] = $_GET['theme'];
 }
 
-if( ISSET( $_SESSION['theme'] ) ){
+if( ISSET( $_SESSION['theme'] )   && !empty($_SESSION['theme'])){
     $config['theme'] = $_SESSION['theme'];
     if( $_SERVER["REQUEST_URI"] == "/v2/wonderful" || $_SERVER["REQUEST_URI"] == "/v2/wowonder" ){
         header("Location: " . $_SERVER['HTTP_REFERER']);
@@ -212,6 +212,10 @@ $wo['googleLoginUrl']     = $config['site_url'] . '/login-with.php?provider=Goog
 $wo['linkedInLoginUrl']   = $config['site_url'] . '/login-with.php?provider=LinkedIn';
 $wo['VkontakteLoginUrl']  = $config['site_url'] . '/login-with.php?provider=Vkontakte';
 $wo['instagramLoginUrl']  = $config['site_url'] . '/login-with.php?provider=Instagram';
+$wo['QQLoginUrl']  = $config['site_url'] . '/login-with.php?provider=QQ';
+$wo['WeChatLoginUrl']  = $config['site_url'] . '/login-with.php?provider=WeChat';
+$wo['DiscordLoginUrl']  = $config['site_url'] . '/login-with.php?provider=Discord';
+$wo['MailruLoginUrl']  = $config['site_url'] . '/login-with.php?provider=Mailru';
 // Defualt User Pictures 
 $wo['userDefaultAvatar']  = 'upload/photos/d-avatar.jpg';
 $wo['userDefaultFAvatar']  = 'upload/photos/f-avatar.jpg';

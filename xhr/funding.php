@@ -126,6 +126,30 @@ if ($f == 'funding' && $wo['config']['funding_system'] == 1) {
 				$insert_array = array('title' => Wo_Secure($_POST['title']),
 			                          'description'   => Wo_Secure($_POST['description']),
 			                          'amount'   => Wo_Secure($_POST['amount']));
+				if (!empty($_FILES["image"])) {
+					$fileInfo      = array(
+		                'file' => $_FILES["image"]["tmp_name"],
+		                'name' => $_FILES['image']['name'],
+		                'size' => $_FILES["image"]["size"],
+		                'type' => $_FILES["image"]["type"],
+		                'types' => 'jpeg,jpg,png,bmp'
+		            );
+		            $media         = Wo_ShareFile($fileInfo);
+		            if (!empty($media) && !empty($media['filename'])) {
+						$insert_array['image'] = $media['filename'];
+					}
+
+					@Wo_DeleteFromToS3($fund->image);
+
+					if (file_exists($fund->image)) {
+						try {
+							unlink($fund->image);	
+						}
+						catch (Exception $e) {
+						}
+					}
+				}
+					
 				$db->where('id',$id)->update(T_FUNDING,$insert_array);
 				$data['status'] = 200;
 				$data['message'] = $wo['lang']['funding_edited'];

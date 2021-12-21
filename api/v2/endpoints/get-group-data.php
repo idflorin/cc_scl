@@ -29,7 +29,7 @@ if (empty($error_code)) {
             unset($group_data[$value]);
         }
         $group_data['post_count'] = Wo_CountGroupPosts($group_data['group_id']);
-        $group_data['is_joined'] = Wo_IsGroupJoined($group_data['group_id']);
+        //$group_data['is_joined'] = Wo_IsGroupJoined($group_data['group_id']);
         $group_data['is_owner'] = Wo_IsGroupOnwer($group_data['group_id']);
 
         $response_data['group_data'] = $group_data;

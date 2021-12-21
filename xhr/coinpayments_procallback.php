@@ -22,9 +22,20 @@ if ($f == 'coinpayments_procallback') {
                     $amount1        = floatval($_POST['amount1']); //   The total amount of the payment in your original currency/coin.
                     $amount2        = floatval($_POST['amount2']); //  The total amount of the payment in the buyer's selected coin.
                     $status         = intval($_POST['status']);
-                    $impload        = "`is_pro` = '1', `pro_time` = '" . time() . "', `verified` = '1', `pro_type` = '" . $user_type . "'";
-                    $query_one      = " UPDATE " . T_USERS . " SET {$impload} WHERE `user_id` = {$user_id} ";
-                    $mysqli         = mysqli_query($sqlConnect, $query_one);
+                    // $impload        = "`is_pro` = '1', `pro_time` = '" . time() . "', `verified` = '1', `pro_type` = '" . $user_type . "'";
+                    // $query_one      = " UPDATE " . T_USERS . " SET {$impload} WHERE `user_id` = {$user_id} ";
+                    // $mysqli         = mysqli_query($sqlConnect, $query_one);
+                    $update_array = array(
+                        'is_pro' => 1,
+                        'pro_time' => time(),
+                        'pro_' => 1,
+                        'pro_type' => $user_type
+                    );
+                    if (in_array($user_type, array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$user_type]]['verified_badge'] == 1) {
+                        $update_array['verified'] = 1;
+                    }
+                    $mysqli       = Wo_UpdateUserData($wo['user']['user_id'], $update_array);
+                    
                     $date           = date('n') . '/' . date("Y");
                     $time = time();
                     $create_payment = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENTS . " (`user_id`, `amount`, `date`, `type`,`time`) VALUES ({$user_id}, {$amount1}, '{$date}', '{$user_type}', '{$time}')");

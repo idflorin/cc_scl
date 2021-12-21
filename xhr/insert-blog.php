@@ -30,6 +30,8 @@ if ($f == "insert-blog") {
             if ($wo['config']['blog_approval'] == 1 && !Wo_IsAdmin()) {
                 $active = 0;
             }
+            $_POST['blog_tags'] = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_POST['blog_tags']);
+            $_POST['blog_tags'] = strip_tags($_POST['blog_tags']);
 
             $registration_data = array(
                 'user' => $wo['user']['id'],

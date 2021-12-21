@@ -66,9 +66,16 @@ if (empty($error_code)) {
                 $file_size = $_FILES["event_cover"]["size"];
                 Wo_UploadImage($temp_name, $file_name, 'cover', $file_type, $last_id, 'event');
             }
+            $data = Wo_EventData($last_id);
+            foreach ($non_allowed as $key => $value) {
+               unset($data['user_data'][$value]);
+            }
+            $data['start_date'] = date($wo['config']['date_style'], strtotime($data['start_date']));
+            $data['end_date'] = date($wo['config']['date_style'], strtotime($data['end_date']));
             $response_data = array(
                 'api_status' => 200,
-                'event_id' => $last_id
+                'event_id' => $last_id,
+                'data' => $data
             );
         }
     }

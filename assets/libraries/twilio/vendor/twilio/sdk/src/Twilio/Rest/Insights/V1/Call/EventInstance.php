@@ -24,8 +24,6 @@ use Twilio\Version;
  * @property string $group
  * @property string $level
  * @property string $name
- * @property array $client
- * @property array $gateway
  * @property array $carrierEdge
  * @property array $sipEdge
  * @property array $sdkEdge
@@ -35,16 +33,15 @@ class EventInstance extends InstanceResource {
     /**
      * Initialize the EventInstance
      *
-     * @param \Twilio\Version $version Version that contains the resource
+     * @param Version $version Version that contains the resource
      * @param mixed[] $payload The response payload
      * @param string $callSid The call_sid
-     * @return \Twilio\Rest\Insights\V1\Call\EventInstance
      */
-    public function __construct(Version $version, array $payload, $callSid) {
+    public function __construct(Version $version, array $payload, string $callSid) {
         parent::__construct($version);
 
         // Marshaled Properties
-        $this->properties = array(
+        $this->properties = [
             'timestamp' => Values::array_get($payload, 'timestamp'),
             'callSid' => Values::array_get($payload, 'call_sid'),
             'accountSid' => Values::array_get($payload, 'account_sid'),
@@ -52,15 +49,13 @@ class EventInstance extends InstanceResource {
             'group' => Values::array_get($payload, 'group'),
             'level' => Values::array_get($payload, 'level'),
             'name' => Values::array_get($payload, 'name'),
-            'client' => Values::array_get($payload, 'client'),
-            'gateway' => Values::array_get($payload, 'gateway'),
             'carrierEdge' => Values::array_get($payload, 'carrier_edge'),
             'sipEdge' => Values::array_get($payload, 'sip_edge'),
             'sdkEdge' => Values::array_get($payload, 'sdk_edge'),
             'clientEdge' => Values::array_get($payload, 'client_edge'),
-        );
+        ];
 
-        $this->solution = array('callSid' => $callSid, );
+        $this->solution = ['callSid' => $callSid, ];
     }
 
     /**
@@ -70,13 +65,13 @@ class EventInstance extends InstanceResource {
      * @return mixed The requested property
      * @throws TwilioException For unknown properties
      */
-    public function __get($name) {
-        if (array_key_exists($name, $this->properties)) {
+    public function __get(string $name) {
+        if (\array_key_exists($name, $this->properties)) {
             return $this->properties[$name];
         }
 
-        if (property_exists($this, '_' . $name)) {
-            $method = 'get' . ucfirst($name);
+        if (\property_exists($this, '_' . $name)) {
+            $method = 'get' . \ucfirst($name);
             return $this->$method();
         }
 
@@ -88,7 +83,7 @@ class EventInstance extends InstanceResource {
      *
      * @return string Machine friendly representation
      */
-    public function __toString() {
+    public function __toString(): string {
         return '[Twilio.Insights.V1.EventInstance]';
     }
 }

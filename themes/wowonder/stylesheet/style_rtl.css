@@ -1064,6 +1064,15 @@ body .text-sender-container .outgoing .message-model {
     margin-left: 0;
 }
 
+body .vid_procss_alrt > span {
+    right: auto;
+    left: 10px;
+}
+.chat-messages-wrapper .outgoing .wo_chat_story {
+	margin-left: 0;margin-right: auto;
+}
+#poll-form .publisher-hidden-option.answers > span svg {right: auto;left: 5px;}
+
 
 
 

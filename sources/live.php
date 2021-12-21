@@ -16,6 +16,7 @@ if ($if_live > 0) {
 	header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
     exit();
 }
+include_once 'assets/libraries/AgoraDynamicKey/sample/RtcTokenBuilderSample.php';
 $db->where('time',time()-60,'<')->delete(T_LIVE_SUB);
 $wo['description'] = $wo['config']['siteDesc'];
 $wo['keywords']    = $wo['config']['siteKeywords'];

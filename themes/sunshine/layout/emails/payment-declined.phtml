@@ -1,8 +1,6 @@
-Hello {name},
-<br><br>
-Unfortunately your payment of ${amount} was declined.
-<br><br>
-For more info, please reply to this email.
-<br><br>
-Kind regards,<br>
-{site_name} Team
+<?php 
+$data = $db->where('name','payment_declined')->getOne(T_HTML_EMAILS);
+$html = $data->value;
+$html = Wo_ReplaceText($html);
+echo $html;
+ ?>

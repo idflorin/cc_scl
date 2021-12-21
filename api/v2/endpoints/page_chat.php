@@ -77,6 +77,10 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 
                 $last_id = Wo_RegisterPageMessage($message_data);
                 if ($last_id && $last_id > 0) {
+                    if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
+                        $reply_id = Wo_Secure($_POST['reply_id']);
+                        $db->where('id',$last_id)->update(T_MESSAGES,array('reply_id' => $reply_id));
+                    }
                     $message_info = Wo_GetPageMessages(array(
                         'id' => $last_id,
                         'page_id' => Wo_Secure($_POST['page_id'])
@@ -124,6 +128,50 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                             }
                         }
                         $message['message_hash_id'] = $_POST['message_hash_id'];
+
+                        if (!empty($message['reply'])) {
+                            foreach ($non_allowed as $key => $value) {
+                               unset($message['reply']['messageUser'][$value]);
+                            }
+
+                            $message['reply']['time_text'] = Wo_Time_Elapsed_String($message['reply']['time']);
+                            $message_po           = 'left';
+                            if ($message['reply']['from_id'] == $wo['user']['user_id']) {
+                                $message_po = 'right';
+                            }
+                            $message['reply']['position'] = $message_po;
+                            $message['reply']['type']     = Wo_GetFilePosition($message['reply']['media']);
+                            if ($message['reply']['type_two'] == 'contact') {
+                                $message['reply']['type']   = 'contact';
+                            }
+                            if (!empty($message['reply']['lng']) && !empty($message['reply']['lat'])) {
+                                $message['reply']['type']   = 'map';
+                            }
+                            $message['reply']['type']     = $message_po . '_' . $message['reply']['type'];
+                            $message['reply']['file_size'] = 0;
+                            if (!empty($message['reply']['media'])) {
+                                $message['reply']['file_size'] = '0MB';
+                                if (file_exists($message['reply']['file_size'])) {
+                                    $message['reply']['file_size'] = Wo_SizeFormat(filesize($message['reply']['media']));
+                                }
+                                $message['reply']['media']     = Wo_GetMedia($message['reply']['media']);
+                            }
+                            if (!empty($message['reply']['time'])) {
+                                $time_today = time() - 86400;
+                                if ($message['reply']['time'] < $time_today) {
+                                    $message['reply']['time_text'] = date('m.d.y', $message['reply']['time']);
+                                } else {
+                                    $time = new DateTime('now', $timezone);
+                                    $time->setTimestamp($message['reply']['time']);
+                                    $message['reply']['time_text'] = $time->format('H:i');
+                                }
+                            }
+                            $message['reply']['message_hash_id'] = '';
+                            if (!empty($_POST['message_hash_id'])) {
+                                $message['reply']['message_hash_id'] = $_POST['message_hash_id'];
+                            }
+                        }
+
                         array_push($messages, $message);
                     }
 
@@ -225,6 +273,55 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                             $message['time_text'] = $time->format('H:i');
                         }
                     }
+                    if (!empty($message['reply'])) {
+                        foreach ($non_allowed as $key => $value) {
+                           unset($message['reply']['messageUser'][$value]);
+                        }
+                        if (empty($message['reply']['stickers'])) {
+                            $message['reply']['stickers'] = '';
+                        }
+                        $message['reply']['time_text'] = Wo_Time_Elapsed_String($message['reply']['time']);
+                        $message_po  = 'left';
+                        if ($message['reply']['from_id'] == $user_id) {
+                            $message_po  = 'right';
+                        }
+                        
+                        $message['reply']['position']  = $message_po;
+                        $message['reply']['type']      = Wo_GetFilePosition($message['reply']['media']);
+                        if (!empty($message['reply']['stickers']) && strpos($message['reply']['stickers'], '.gif') !== false) {
+                            $message['reply']['type'] = 'gif';
+                        }
+                        if ($message['reply']['type_two'] == 'contact') {
+                            $message['reply']['type']   = 'contact';
+                        }
+                        $message['reply']['type']     = $message_po . '_' . $message['reply']['type'];
+                        $message['reply']['product']     = null;
+                        if (!empty($message['reply']['product_id'])) {
+                            $message['reply']['type']     = $message_po . '_product';
+                            $message['reply']['product'] = Wo_GetProduct($message['reply']['product_id']);
+                        }
+                        $message['reply']['file_size'] = 0;
+                        if (!empty($message['reply']['media'])) {
+                            $message['reply']['file_size'] = '0MB';
+                            if (file_exists($message['reply']['file_size'])) {
+                                $message['reply']['file_size'] = Wo_SizeFormat(filesize($message['reply']['media']));
+                            }
+                            $message['reply']['media']     = Wo_GetMedia($message['reply']['media']);
+                        }
+                        if (!empty($message['reply']['time'])) {
+                            $time_today  = time() - 86400;
+                            if ($message['reply']['time'] < $time_today) {
+                                $message['reply']['time_text'] = date('m.d.y', $message['reply']['time']);
+                            } else {
+                                $time = new DateTime('now', $timezone);
+                                $time->setTimestamp($message['reply']['time']);
+                                $message['reply']['time_text'] = $time->format('H:i');
+                            }
+                        }
+                    }
+
+
+
                     array_push($messages, $message);
                 }
 
@@ -266,6 +363,18 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
         if (!empty($get)) {
             foreach ($get as $key => $value) {
                 $page = Wo_PageData($value['message']['page_id']);
+                $page['chat_id'] = $value['chat_id'];
+                $page['mute'] = array('notify' => 'yes',
+                                       'call_chat' => 'yes',
+                                       'archive' => 'no',
+                                       'pin' => 'no');
+                $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$value['chat_id'])->where('type','page')->getOne(T_MUTE);
+                if (!empty($mute)) {
+                    $page['mute']['notify'] = $mute->notify;
+                    $page['mute']['call_chat'] = $mute->call_chat;
+                    $page['mute']['archive'] = $mute->archive;
+                    $page['mute']['pin'] = $mute->pin;
+                }
                 if (!empty($page) && !empty($value['message']) && !empty($value['message']['page_id']) && !empty($value['message']['user_id']) && !empty($value['message']['conversation_user_id'])) {
                     $message = Wo_GetPageMessages(array(
                                                 'page_id' => $value['message']['page_id'],

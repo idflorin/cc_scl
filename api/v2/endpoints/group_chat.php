@@ -23,7 +23,8 @@ $required_fields =  array(
                         'fetch_messages',
                         'get_list',
                         'accept',
-                        'reject'
+                        'reject',
+                        'get_by_id'
                     );
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
     if ($_POST['type'] == 'create') {
@@ -40,9 +41,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             }
         }
 
-        if (empty($error_code) && (strlen($_POST['group_name']) < 4 || strlen($_POST['group_name']) > 15)) {
+        if (empty($error_code) && (strlen($_POST['group_name']) < 4 || strlen($_POST['group_name']) > 25)) {
             $error_code    = 5;
-            $error_message = 'group_name must be between 4 and 15 character';
+            $error_message = 'group_name must be between 4 and 25 character';
         }
 
         if (empty($error_code) && isset($_FILES["avatar"])) {
@@ -135,9 +136,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_code      = 9;
             $error_message   = 'group_name and image can not be empty';
         }
-        if (!empty($_POST['group_name']) && (strlen($_POST['group_name']) < 4 || strlen($_POST['group_name']) > 15) ) {
+        if (!empty($_POST['group_name']) && (strlen($_POST['group_name']) < 4 || strlen($_POST['group_name']) > 25) ) {
             $error_code      = 5;
-            $error_message   = 'group_name must be between 4 and 15 character';
+            $error_message   = 'group_name must be between 4 and 25 character';
         }
         if (!empty($_FILES["avatar"]) && isset($_FILES["avatar"])) {
             if (file_exists($_FILES["avatar"]["tmp_name"])) {
@@ -376,6 +377,10 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $last_id      = Wo_RegisterMessageGroup($message_data);
 
             if (!empty($last_id)) {
+                if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
+                    $reply_id = Wo_Secure($_POST['reply_id']);
+                    $db->where('id',$last_id)->update(T_MESSAGES,array('reply_id' => $reply_id));
+                }
                 $message_info = array(
                     'group_id' => $group_id,
                     'id' => $last_id
@@ -426,6 +431,49 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     $message['message_hash_id'] = '';
                     if (!empty($_POST['message_hash_id'])) {
                         $message['message_hash_id'] = $_POST['message_hash_id'];
+                    }
+
+                    if (!empty($message['reply'])) {
+                        foreach ($non_allowed as $key => $value) {
+                           unset($message['reply']['messageUser'][$value]);
+                        }
+
+                        $message['reply']['time_text'] = Wo_Time_Elapsed_String($message['reply']['time']);
+                        $message_po           = 'left';
+                        if ($message['reply']['from_id'] == $wo['user']['user_id']) {
+                            $message_po = 'right';
+                        }
+                        $message['reply']['position'] = $message_po;
+                        $message['reply']['type']     = Wo_GetFilePosition($message['reply']['media']);
+                        if ($message['reply']['type_two'] == 'contact') {
+                            $message['reply']['type']   = 'contact';
+                        }
+                        if (!empty($message['reply']['lng']) && !empty($message['reply']['lat'])) {
+                            $message['reply']['type']   = 'map';
+                        }
+                        $message['reply']['type']     = $message_po . '_' . $message['reply']['type'];
+                        $message['reply']['file_size'] = 0;
+                        if (!empty($message['reply']['media'])) {
+                            $message['reply']['file_size'] = '0MB';
+                            if (file_exists($message['reply']['file_size'])) {
+                                $message['reply']['file_size'] = Wo_SizeFormat(filesize($message['reply']['media']));
+                            }
+                            $message['reply']['media']     = Wo_GetMedia($message['reply']['media']);
+                        }
+                        if (!empty($message['reply']['time'])) {
+                            $time_today = time() - 86400;
+                            if ($message['reply']['time'] < $time_today) {
+                                $message['reply']['time_text'] = date('m.d.y', $message['reply']['time']);
+                            } else {
+                                $time = new DateTime('now', $timezone);
+                                $time->setTimestamp($message['reply']['time']);
+                                $message['reply']['time_text'] = $time->format('H:i');
+                            }
+                        }
+                        $message['reply']['message_hash_id'] = '';
+                        if (!empty($_POST['message_hash_id'])) {
+                            $message['reply']['message_hash_id'] = $_POST['message_hash_id'];
+                        }
                     }
                     array_push($messages, $message);
                 }
@@ -534,6 +582,46 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     }
                 }
 
+
+                if (!empty($message['reply'])) {
+                    foreach ($non_allowed as $key => $value) {
+                       unset($message['reply']['messageUser'][$value]);
+                    }
+
+                    $message['reply']['time_text'] = Wo_Time_Elapsed_String($message['reply']['time']);
+                    $message_po  = 'left';
+                    if ($message['reply']['from_id'] == $wo['user']['id']) {
+                        $message_po  = 'right';
+                    }
+                    
+                    $message['reply']['position']  = $message_po;
+                    $message['reply']['type']      = Wo_GetFilePosition($message['reply']['media']);
+                    if ($message['reply']['type_two'] == 'contact') {
+                        $message['reply']['type']   = 'contact';
+                    }
+                    if (!empty($message['reply']['lng']) && !empty($message['reply']['lat'])) {
+                        $message['reply']['type']   = 'map';
+                    }
+                    $message['reply']['type']     = $message_po . '_' . $message['reply']['type'];
+                    $message['reply']['file_size'] = 0;
+                    if (!empty($message['reply']['media'])) {
+                        $message['reply']['file_size'] = '0MB';
+                        if (file_exists($message['reply']['file_size'])) {
+                            $message['reply']['file_size'] = Wo_SizeFormat(filesize($message['reply']['media']));
+                        }
+                        $message['reply']['media']     = Wo_GetMedia($message['reply']['media']);
+                    }
+                    if (!empty($message['reply']['time'])) {
+                        $time_today  = time() - 86400;
+                        if ($message['reply']['time'] < $time_today) {
+                            $message['reply']['time_text'] = date('m.d.y', $message['reply']['time']);
+                        } else {
+                            $time = new DateTime('now', $timezone);
+                            $time->setTimestamp($message['reply']['time']);
+                            $message['reply']['time_text'] = $time->format('H:i');
+                        }
+                    }
+                }
                 array_push($group_messages, $message);
             }
             $send_messages_to_phones = Wo_MessagesPushNotifier();
@@ -581,6 +669,17 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                       unset($groups[$key]['last_message']['user_data'][$value5]);
                     }
                 }
+            }
+            $groups[$key]['mute'] = array('notify' => 'yes',
+                               'call_chat' => 'yes',
+                               'archive' => 'no',
+                               'pin' => 'no');
+            $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$groups[$key]['chat_id'])->where('type','group')->getOne(T_MUTE);
+            if (!empty($mute)) {
+                $groups[$key]['mute']['notify'] = $mute->notify;
+                $groups[$key]['mute']['call_chat'] = $mute->call_chat;
+                $groups[$key]['mute']['archive'] = $mute->archive;
+                $groups[$key]['mute']['pin'] = $mute->pin;
             }
         }
 
@@ -645,6 +744,30 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $error_message = 'group_id can not be empty';
         }
 
+    }
+    if ($_POST['type'] == 'get_by_id') {
+        if (!empty($_POST['id']) && is_numeric($_POST['id']) && $_POST['id'] > 0) {
+            $id = Wo_Secure($_POST['id']);
+            $group_data = Wo_GetChatGroupData($id);
+            foreach ($group_data as $key_g => $group) {
+                foreach ($non_allowed as $key => $value) {
+                    unset($group_data[$key_g]['user_data'][$value]);
+                }
+                foreach ($group_data[$key_g]['parts'] as $key1 => $part) {
+                    foreach ($non_allowed as $key => $value) {
+                        unset($group_data[$key_g]['parts'][$key1][$value]);
+                    }
+                }
+            }
+            $response_data = array(
+                'api_status' => 200,
+                'data' => $group_data
+            );
+        }
+        else{
+            $error_code    = 4;
+            $error_message = 'id can not be empty';
+        }
     }
 
 

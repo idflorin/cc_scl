@@ -861,7 +861,7 @@ function Wo_CheckOutCard(type, description, amount, payment_type) {
 	} else if (type == 4) {
 		img = 'vip';
 	}
-	if (payment_type != 'bank_payment' && payment_type != 'checkout') {
+	if (payment_type != 'bank_payment' && payment_type != 'checkout' && payment_type != 'bitcoin') {
 		var stripe = Stripe('<?php echo $wo['config']['stripe_id'];?>');
 		$.post(Wo_Ajax_Requests_File() + '?f=stripe&s=session', {amount: amount,type:'pro',pro_type:type,payment_type:payment_type}, function(data, textStatus, xhr) {
 			if (data.status == 200) {

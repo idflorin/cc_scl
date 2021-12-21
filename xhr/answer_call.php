@@ -7,12 +7,21 @@ if ($f == 'answer_call') {
         } else {
             $query = mysqli_query($sqlConnect, "UPDATE " . T_VIDEOS_CALLES . " SET `active` = 1 WHERE `id` = '$id'");
         }
+        if ($wo['config']['agora_chat_video'] == 1) {
+            $query = mysqli_query($sqlConnect, "UPDATE " . T_AGORA . " SET `active` = 1 WHERE `id` = '$id'");
+        }
         if ($query) {
             $data = array(
                 'status' => 200
             );
             if ($_GET['type'] == 'audio') {
-                $query = mysqli_query($sqlConnect, "SELECT * FROM " . T_AUDIO_CALLES . " WHERE `id` = '{$id}'");
+                if ($wo['config']['agora_chat_video'] == 1) {
+                    $query = mysqli_query($sqlConnect, "SELECT * FROM " . T_AGORA . " WHERE `id` = '{$id}'");
+                }
+                else{
+                    $query = mysqli_query($sqlConnect, "SELECT * FROM " . T_AUDIO_CALLES . " WHERE `id` = '{$id}'");
+                }
+                
                 $sql   = mysqli_fetch_assoc($query);
                 if (!empty($sql) && is_array($sql)) {
                     $wo['incall']                 = $sql;

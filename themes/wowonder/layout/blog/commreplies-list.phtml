@@ -34,7 +34,7 @@
 		              <?php echo Wo_GetPostReactions($wo['comm-reply']['id'],"reply",'blog');?>
 		              </span>
 		            </div>
-					<div class="wo-reaction wo-reaction-replay stat-item" data-id="<?php echo $wo['comm-reply']['id']; ?>" id="comment_reactions" data-id="<?php echo $wo['comment']['id']; ?>">
+					<div class="wo-reaction wo-reaction-replay stat-item" data-id="<?php echo $wo['comm-reply']['id']; ?>" id="comment_reactions">
 		                <span class="like-btn like-btn-replay" data-id="<?php echo $wo['comm-reply']['id']; ?>">
 		                    <?php
 		                    if (Wo_IsReacted($wo['comm-reply']['id'], $wo['comm-reply']['user_id'],"reply",'blog') === true) {    

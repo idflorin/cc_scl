@@ -34,6 +34,22 @@ $LoginWithConfig = array(
 			"enabled" => true,
 			"keys" => array("id" => $config['instagramAppId'], "secret" => $config['instagramAppkey'])
 		),
+		"QQ" => array(
+			"enabled" => true,
+			"keys" => array("id" => $config['qqAppId'], "secret" => $config['qqAppkey'])
+		),
+		"WeChat" => array(
+			"enabled" => true,
+			"keys" => array("id" => $config['WeChatAppId'], "secret" => $config['WeChatAppkey'])
+		),
+		"Discord" => array(
+			"enabled" => true,
+			"keys" => array("id" => $config['DiscordAppId'], "secret" => $config['DiscordAppkey'])
+		),
+		"Mailru" => array(
+			"enabled" => true,
+			"keys" => array("id" => $config['MailruAppId'], "secret" => $config['MailruAppkey'])
+		),
     ),
 );
 ?>

@@ -110,6 +110,7 @@ function Wo_GetMessagesUsersAPP($fetch_array = array()) {
             $new_data = Wo_UserData($sql_fetch_one['conversation_user_id']);
             if (!empty($new_data) && !empty($new_data['username'])) {
                 $new_data['chat_time'] = $sql_fetch_one['time'];
+                $new_data['chat_id'] = $sql_fetch_one['id'];
                 $data[] = $new_data;
             }
             

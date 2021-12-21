@@ -2,6 +2,7 @@ const moment = require("moment");
 var fs = require('fs');
 var express = require('express');
 var app = express();
+const path = require('path');
 
 let ctx = {};
 
@@ -35,8 +36,8 @@ async function loadConfig(ctx) {
   if (ctx.globalconfig["nodejs_ssl"] == 1) {
     var https = require('https');
     var options = {
-      key: fs.readFileSync(ctx.globalconfig["nodejs_key_path"]),
-      cert: fs.readFileSync(ctx.globalconfig["nodejs_cert_path"])
+      key: fs.readFileSync(path.resolve(__dirname, ctx.globalconfig["nodejs_key_path"])),
+      cert: fs.readFileSync(path.resolve(__dirname, ctx.globalconfig["nodejs_cert_path"]))
     };
     serverPort = ctx.globalconfig["nodejs_ssl_port"];
     server = https.createServer(options, app);
@@ -82,6 +83,10 @@ async function init() {
   ctx.wo_pages = require("./models/wo_pages")(sequelize, DataTypes)
   ctx.wo_groups = require("./models/wo_groups")(sequelize, DataTypes)
   ctx.wo_events = require("./models/wo_events")(sequelize, DataTypes)
+  ctx.wo_userstory = require("./models/wo_userstory")(sequelize, DataTypes)
+  ctx.wo_reactions_types = require("./models/wo_reactions_types")(sequelize, DataTypes)
+  ctx.wo_reactions = require("./models/wo_reactions")(sequelize, DataTypes)
+  ctx.wo_blog_reaction = require("./models/wo_blog_reaction")(sequelize, DataTypes)
 
   ctx.globalconfig = {}
   ctx.globallangs = {}

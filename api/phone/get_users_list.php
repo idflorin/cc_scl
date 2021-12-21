@@ -132,6 +132,20 @@ if ($type == 'get_users_list') {
                     'chat_time'    => $user_list['chat_time'],
                     'about' => $user_list['about']
                 );
+                if (!empty($user_list['chat_id'])) {
+                    $json_data['mute'] = array('notify' => 'yes',
+                                           'call_chat' => 'yes',
+                                           'archive' => 'no',
+                                           'pin' => 'no');
+                    $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$user_list['chat_id'])->where('type','user')->getOne(T_MUTE);
+                    if (!empty($mute)) {
+                        $json_data['mute']['notify'] = $mute->notify;
+                        $json_data['mute']['call_chat'] = $mute->call_chat;
+                        $json_data['mute']['archive'] = $mute->archive;
+                        $json_data['mute']['pin'] = $mute->pin;
+                    }
+                }
+                    
                 $json_data['is_following'] = (Wo_IsFollowing($user_list['user_id'],$wo['user']['user_id'] )) ? 1 : 0;
                 $json_data['last_message'] = Wo_GetMessagesHeader(array(
                     'user_id' => $user_list['user_id'],

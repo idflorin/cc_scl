@@ -16,7 +16,7 @@ use Twilio\Values;
 use Twilio\Version;
 
 /**
- * PLEASE NOTE that this class contains preview products that are subject to change. Use them with caution. If you currently do not have developer preview access, please contact help@twilio.com.
+ * PLEASE NOTE that this class contains beta products that are subject to change. Use them with caution.
  *
  * @property string $sid
  * @property string $accountSid
@@ -31,20 +31,20 @@ class AssetVersionInstance extends InstanceResource {
     /**
      * Initialize the AssetVersionInstance
      *
-     * @param \Twilio\Version $version Version that contains the resource
+     * @param Version $version Version that contains the resource
      * @param mixed[] $payload The response payload
-     * @param string $serviceSid The SID of the Service that the AssetVersion
+     * @param string $serviceSid The SID of the Service that the Asset Version
      *                           resource is associated with
      * @param string $assetSid The SID of the Asset resource that is the parent of
-     *                         the asset version
-     * @param string $sid The SID that identifies the AssetVersion resource to fetch
-     * @return \Twilio\Rest\Serverless\V1\Service\Asset\AssetVersionInstance
+     *                         the Asset Version
+     * @param string $sid The SID that identifies the Asset Version resource to
+     *                    fetch
      */
-    public function __construct(Version $version, array $payload, $serviceSid, $assetSid, $sid = null) {
+    public function __construct(Version $version, array $payload, string $serviceSid, string $assetSid, string $sid = null) {
         parent::__construct($version);
 
         // Marshaled Properties
-        $this->properties = array(
+        $this->properties = [
             'sid' => Values::array_get($payload, 'sid'),
             'accountSid' => Values::array_get($payload, 'account_sid'),
             'serviceSid' => Values::array_get($payload, 'service_sid'),
@@ -53,25 +53,22 @@ class AssetVersionInstance extends InstanceResource {
             'visibility' => Values::array_get($payload, 'visibility'),
             'dateCreated' => Deserialize::dateTime(Values::array_get($payload, 'date_created')),
             'url' => Values::array_get($payload, 'url'),
-        );
+        ];
 
-        $this->solution = array(
+        $this->solution = [
             'serviceSid' => $serviceSid,
             'assetSid' => $assetSid,
             'sid' => $sid ?: $this->properties['sid'],
-        );
+        ];
     }
 
     /**
      * Generate an instance context for the instance, the context is capable of
      * performing various actions.  All instance actions are proxied to the context
      *
-     * @return \Twilio\Rest\Serverless\V1\Service\Asset\AssetVersionContext Context
-     *                                                                      for
-     *                                                                      this
-     *                                                                      AssetVersionInstance
+     * @return AssetVersionContext Context for this AssetVersionInstance
      */
-    protected function proxy() {
+    protected function proxy(): AssetVersionContext {
         if (!$this->context) {
             $this->context = new AssetVersionContext(
                 $this->version,
@@ -85,12 +82,12 @@ class AssetVersionInstance extends InstanceResource {
     }
 
     /**
-     * Fetch a AssetVersionInstance
+     * Fetch the AssetVersionInstance
      *
      * @return AssetVersionInstance Fetched AssetVersionInstance
      * @throws TwilioException When an HTTP error occurs.
      */
-    public function fetch() {
+    public function fetch(): AssetVersionInstance {
         return $this->proxy()->fetch();
     }
 
@@ -101,13 +98,13 @@ class AssetVersionInstance extends InstanceResource {
      * @return mixed The requested property
      * @throws TwilioException For unknown properties
      */
-    public function __get($name) {
-        if (array_key_exists($name, $this->properties)) {
+    public function __get(string $name) {
+        if (\array_key_exists($name, $this->properties)) {
             return $this->properties[$name];
         }
 
-        if (property_exists($this, '_' . $name)) {
-            $method = 'get' . ucfirst($name);
+        if (\property_exists($this, '_' . $name)) {
+            $method = 'get' . \ucfirst($name);
             return $this->$method();
         }
 
@@ -119,11 +116,11 @@ class AssetVersionInstance extends InstanceResource {
      *
      * @return string Machine friendly representation
      */
-    public function __toString() {
-        $context = array();
+    public function __toString(): string {
+        $context = [];
         foreach ($this->solution as $key => $value) {
             $context[] = "$key=$value";
         }
-        return '[Twilio.Serverless.V1.AssetVersionInstance ' . implode(' ', $context) . ']';
+        return '[Twilio.Serverless.V1.AssetVersionInstance ' . \implode(' ', $context) . ']';
     }
 }
