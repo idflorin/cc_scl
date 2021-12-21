@@ -73,7 +73,7 @@
 
             <span class="comment-options">
 				<?php if ($wo['config']['second_post_button'] == 'reaction') { ?>
-					<div class="wo-reaction wo-reaction-replay stat-item" data-id="<?php echo $wo['reply']['id']; ?>" id="comment_reactions" data-id="<?php echo $wo['comment']['id']; ?>">
+					<div class="wo-reaction wo-reaction-replay stat-item" data-id="<?php echo $wo['reply']['id']; ?>" id="comment_reactions">
                 <span class="like-btn like-btn-replay" data-id="<?php echo $wo['reply']['id']; ?>">
                     <?php
                     if (Wo_IsReacted($wo['reply']['id'], $wo['reply']['user_id'],"replay") === true) {    
@@ -90,7 +90,7 @@
                         if ($value['status'] == 1) {
                           
                        ?>
-                    <li class="reaction reaction-<?php echo $value['id'];?>" data-reaction="<?php echo $value['name'];?>" data-reaction-id="<?php echo $value['id'];?>" data-reaction-lang="<?php echo $value['name'];?>" data-post-id="<?php echo $wo['story']['id']; ?>" onclick="Wo_RegisterReplyReaction(<?php echo $wo['reply']['user_id']; ?>,<?php echo $wo['reply']['id']; ?>,<?php echo $value['id'];?>);">
+                    <li class="reaction reaction-<?php echo $value['id'];?>" data-reaction="<?php echo $value['name'];?>" data-reaction-id="<?php echo $value['id'];?>" data-reaction-lang="<?php echo $value['name'];?>" data-post-id="<?php //echo $wo['story']['id']; ?>" onclick="Wo_RegisterReplyReaction(<?php echo $wo['reply']['user_id']; ?>,<?php echo $wo['reply']['id']; ?>,<?php echo $value['id'];?>);">
                       <?php if (preg_match("/<[^<]+>/",$value['wowonder_icon'],$m)) {
                             echo($value['wowonder_icon']);
                          }

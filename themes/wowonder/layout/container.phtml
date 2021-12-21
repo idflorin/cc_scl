@@ -487,7 +487,7 @@
               // }, 2000);
               setInterval(() => {
                 socket.emit("ping_for_lastseen", {user_id: _getCookie("user_id")})
-              }, 1000);
+              }, 2000);
           });
          }, 3000);
 
@@ -513,11 +513,28 @@
                 // }, 2000);
                 setInterval(() => {
                   socket.emit("ping_for_lastseen", {user_id: _getCookie("user_id")})
-                }, 1000);
+                }, 2000);
             });
           }, 3000);
         })
-
+          socket.on("on_user_loggedin", (data) => {
+            $('#chat_' + data.user_id).find('.chat-tab-status').addClass('active');
+            $("#online_" + data.user_id).find('svg path').attr('fill', '#60d465');
+            $("#messages-recipient-" + data.user_id).find('.dot').css({"background-color": "#63c666"});
+          });
+          socket.on("on_user_loggedoff", (data) => {
+            $('#chat_' + data.user_id).find('.chat-tab-status').removeClass('active');
+            $("#online_" + data.user_id).find('svg path').attr('fill', '#dddddd');
+            $("#messages-recipient-" + data.user_id).find('.dot').css({"background-color": "lightgray"});
+          });
+          socket.on("on_avatar_changed", (data) => {
+            $("#online_" + data.user_id).find('img').attr('src', data.name);
+            $("#messages-recipient-" + data.user_id).find('img').attr('src', data.name);
+          });
+          socket.on("on_name_changed", (data) => {
+            $("#online_" + data.user_id).find('#chat-tab-id').html(data.name);
+            $("#messages-recipient-" + data.user_id).find('.messages-user-name').html(data.name);
+          });
         socket.on("color-change", (data)=>{
           if (data.sender == <?php echo $wo['user']['user_id'];?>) {
             $(".chat_" + data.id).find('.outgoing .message-text, .outgoing .message-media').css('background', data.color);
@@ -555,6 +572,9 @@
                $(".text-sender-container .btn-file").css('background', data.color);
                $(".text-sender-container .btn-file").css('border-color', data.color);
              }
+          } else {
+            current_number = $('#online_' + data.id).find('.new-message-alert').text();
+            $('#online_' + data.id).find('.new-message-alert').html(Number(current_number) + 1).show();
           }
           if(data.sender != <?php echo $wo['user']['user_id'];?>){
              document.getElementById('message-sound').play();
@@ -967,6 +987,5 @@
     <?php } } ?>
     <div class="modal fade sun_modal" id="apply-job-modal" role="dialog">
     </div>
-    
    </body>
 </html>

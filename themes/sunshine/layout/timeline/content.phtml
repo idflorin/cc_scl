@@ -1336,6 +1336,9 @@ $(function () {
         $('[id^=updateImage-<?php echo $wo['user_profile']['id']; ?>]').attr('onclick', 'Wo_OpenProfilePicture("' + data.img_or + '");');
         $('[id^=updateImage-<?php echo $wo['user_profile']['id']; ?>]').attr("src", data.img);
         $('#cropImage').modal('show');
+        <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+            socket.emit("on_avatar_changed", {from_id: _getCookie("user_id"), name: data.img});
+          <?php } ?>
         $('#image-to-crop img').attr('src', data.avatar_full);
         $('#image-to-crop img').attr('data-image', data.avatar_full_or);
         $('#image-to-crop img').on("load", function() {

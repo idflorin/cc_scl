@@ -277,7 +277,8 @@ if ($f == "update_general_settings") {
                                 $data = array(
                                     'status' => 200,
                                     'message' => $success_icon . $wo['lang']['setting_updated'],
-                                    'username' => Wo_SeoLink('index.php?link1=timeline&u=' . Wo_Secure($_POST['username']))
+                                    'username' => Wo_SeoLink('index.php?link1=timeline&u=' . Wo_Secure($_POST['username'])),
+                                    'username_or' => Wo_Secure($_POST['username']),
                                 );
                             }
                         }

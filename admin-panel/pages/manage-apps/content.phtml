@@ -125,13 +125,13 @@ $apps = $db->objectbuilder()->paginate(T_APPS, $page);
                         <nav>
                           <ul class="pagination">
                             <li>
-                              <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=1').$link; ?>" class="waves-effect" title='First Page'>
+                              <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=1').$link; ?>" data-ajax="?path=manage-apps&page-id=1<?php echo($link); ?>" class="waves-effect" title='First Page'>
                                   <i class="material-icons">first_page</i>
                               </a>
                             </li>
                             <?php if ($page > 1) {  ?>
                               <li>
-                                  <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=' . ($page - 1)).$link; ?>" class="waves-effect" title='Previous Page'>
+                                  <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=' . ($page - 1)).$link; ?>" data-ajax="?path=manage-apps&page-id=<?php echo($page - 1) ?><?php echo($link); ?>" class="waves-effect" title='Previous Page'>
                                       <i class="material-icons">chevron_left</i>
                                   </a>
                               </li>
@@ -145,7 +145,7 @@ $apps = $db->objectbuilder()->paginate(T_APPS, $page);
                                 if ($nums < 20) {
                             ?>
                               <li class="<?php echo ($page == $i) ? 'active' : ''; ?>">
-                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=' . ($i)).$link; ?>" class="waves-effect">
+                                <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=' . ($i)).$link; ?>" data-ajax="?path=manage-apps&page-id=<?php echo($i) ?><?php echo($link); ?>" class="waves-effect">
                                   <?php echo $i ?>   
                                 </a>
                               </li>
@@ -154,13 +154,13 @@ $apps = $db->objectbuilder()->paginate(T_APPS, $page);
 
                             <?php if ($db->totalPages > $page) { ?>
                               <li>
-                                  <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=' . ($page + 1)).$link; ?>" class="waves-effect" title="Next Page">
+                                  <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=' . ($page + 1)).$link; ?>" data-ajax="?path=manage-apps&page-id=<?php echo($page + 1) ?><?php echo($link); ?>" class="waves-effect" title="Next Page">
                                       <i class="material-icons">chevron_right</i>
                                   </a>
                               </li>
                             <?php } ?>
                             <li>
-                              <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=' . ($db->totalPages)).$link; ?>" class="waves-effect" title='Last Page'>
+                              <a href="<?php echo Wo_LoadAdminLinkSettings('manage-apps?page-id=' . ($db->totalPages)).$link; ?>" data-ajax="?path=manage-apps&page-id=<?php echo($db->totalPages) ?><?php echo($link); ?>" class="waves-effect" title='Last Page'>
                                   <i class="material-icons">last_page</i>
                               </a>
                             </li>

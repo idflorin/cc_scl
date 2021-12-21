@@ -369,6 +369,9 @@ if ($f == 'posts') {
                 $multi = 1;
             }
         }
+        if (!empty($_FILES['postPhotos']) && !empty($_FILES['postMusic'])) {
+            $multi = 1;
+        }
         if (empty($_POST['postPrivacy'])) {
             $_POST['postPrivacy'] = 0;
         }

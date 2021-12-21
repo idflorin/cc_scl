@@ -10,7 +10,7 @@ if ($f == 'job' && $wo['config']['job_system'] == 1) {
 
     		$page_data = $db->where('page_id',Wo_Secure($_POST['page_id']))->getOne(T_PAGES);
 
-    		if (!empty($page_data) && $page_data->user_id == $wo['user']['id']) {
+    		if (!empty($page_data) && Wo_IsPageOnwer($page_data->page_id)) {
 
 	    		$insert_array = array();
 

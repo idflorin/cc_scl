@@ -10,7 +10,7 @@ class SpacesConnect {
     function __construct($access_key, $secret_key, $spaceName = "", $region = "nyc3", $host = "digitaloceanspaces.com") {
 
         //Only pulled if an AWS class doesn't already exist.
-        $non_composer_aws_lib = dirname(__FILE__)."/../s3/aws-autoloader.php";
+        $non_composer_aws_lib = dirname(__FILE__)."/../s3/vendor/autoload.php";
 
         if(!empty($spaceName)) {
           $endpoint = "https://".$spaceName.".".$region.".".$host;

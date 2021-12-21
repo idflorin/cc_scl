@@ -3,6 +3,8 @@ const compiledTemplates = require('../compiledTemplates/compiledTemplates')
 const socketEvents = require('../events/events')
 const { Sequelize, Op, DataTypes } = require("sequelize");
 const striptags = require('striptags');
+const moment = require("moment")
+
 
 
 module.exports.registerListeners = async (socket, io, ctx) => {
@@ -15,20 +17,29 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         }
         let user_id = await ctx.wo_appssessions.findOne({
             attributes: [
-                "user_id"
+                "user_id",
             ],
             where: {
                 session_id: data.user_id
             }
         })
-        // update last seen to now
-        user_id = user_id.user_id
+        user_id = user_id.user_id;
+
+        let user_status = await ctx.wo_users.findOne({
+            attributes: [
+                "status"
+            ],
+            where: {
+                user_id: user_id
+            }
+        })
+        user_status = user_status.status;
+
         ctx.socketIdUserHash[socket.id] = data.user_id;
         ctx.userIdSocket[user_id] ? ctx.userIdSocket[user_id].push(socket) : ctx.userIdSocket[user_id] = [socket]
         ctx.userHashUserId[data.user_id] = user_id;
         ctx.userIdCount[user_id] = ctx.userIdCount[user_id] ? ctx.userIdCount[user_id] + 1 : 1
-        await funcs.Wo_LastSeen(ctx, user_id)
-        
+        //await funcs.Wo_LastSeen(ctx, user_id)
 
         if (data.recipient_ids && data.recipient_ids.length) {
             for (let recipient_id of data.recipient_ids) {
@@ -43,6 +54,22 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         }
 
         await socketEvents.emitUserStatus(ctx, socket, data)
+        if (user_status == 0) {
+            let followers = await ctx.wo_followers.findAll({
+                attributes: ["following_id"],
+                where: {
+                    follower_id: user_id,
+                    following_id: {
+                        [Op.not]: user_id
+                    }
+                },
+                raw: true
+            })
+
+            for (let follow of followers) {
+                await io.to(follow.following_id).emit("on_user_loggedin", { user_id: user_id })
+            }
+        }
 
         socket.join(user_id);
         //subscribe to all groups
@@ -52,11 +79,21 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         }
         callback()
     })
-    // socket.on("ping_for_lastseen", async (data) => {
-    //     if (ctx.userHashUserId[data.user_id]) {
-    //         await funcs.Wo_LastSeen(ctx, ctx.userHashUserId[data.user_id])
-    //     }
-    // })
+    socket.on("ping_for_lastseen", async (data) => {
+        if (ctx.userHashUserId[data.user_id]) {
+            let userlastseen_status = await ctx.wo_users.findOne({
+                attributes: [
+                    "status"
+                ],
+                where: {
+                    user_id: ctx.userHashUserId[data.user_id]
+                }
+            })
+            if (userlastseen_status.status == 0) {
+                await funcs.Wo_LastSeen(ctx, ctx.userHashUserId[data.user_id])
+            }
+        }
+    })
 
     // socket.on("get_user_status", async (data) => {
     //     if (ctx.userHashUserId[data.user_id]) {
@@ -129,8 +166,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         else {
             await socketEvents.unseen(ctx, socket)
         }
-        await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.user_id])
-        await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.user_id])
+       // await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.user_id])
+        //await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.user_id])
     })
     socket.on("group_message", async (data, callback) => {
         if ((!data.msg || data.msg.trim() === "") && !data.mediaId) {
@@ -648,22 +685,22 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     }
                 })
         }
-        await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
-        await socketEvents.emitUserStatus(ctx, io, data.to_id)
+        //await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
+       // await socketEvents.emitUserStatus(ctx, io, data.to_id)
         // await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.from_id], data.to_id)
-        await socketEvents.updateMessageUsersList(ctx, io, data.to_id, data.to_id)
+       // await socketEvents.updateMessageUsersList(ctx, io, data.to_id, data.to_id)
 
 
-        if (ctx.userHashUserId[data.user_id]) {
-            await funcs.Wo_LastSeen(ctx, ctx.userHashUserId[data.user_id])
-        }
+        // if (ctx.userHashUserId[data.user_id]) {
+        //     await funcs.Wo_LastSeen(ctx, ctx.userHashUserId[data.user_id])
+        // }
     })
     socket.on("active-message-user-change", async (data) => {
         if (data.group) {
             if (ctx.userIdExtra[ctx.userHashUserId[data.from_id]]) {
                 ctx.userIdExtra[ctx.userHashUserId[data.from_id]].active_message_group_id = data.group_id;
-                await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
-                await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.from_id])
+                // await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
+                // await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.from_id])
                 await socketEvents.updateMessageGroupsList(ctx, io, ctx.userHashUserId[data.from_id])
                 return
             }
@@ -672,16 +709,16 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         else {
             if (ctx.userIdExtra[ctx.userHashUserId[data.from_id]]) {
                 ctx.userIdExtra[ctx.userHashUserId[data.from_id]].active_message_user_id = data.user_id;
-                await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
-                await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.from_id])
+                // await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
+                // await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.from_id])
                 await socketEvents.updateMessageGroupsList(ctx, io, ctx.userHashUserId[data.from_id])
                 return
             }
             ctx.userIdExtra[ctx.userHashUserId[data.from_id]] = { active_message_user_id: data.user_id };
         }
-        await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
+        // await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
         // await socket.emitUserStatus(ctx, io, data.user_id)
-        await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.from_id])
+        // await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.from_id])
         await socketEvents.updateMessageGroupsList(ctx, io, ctx.userHashUserId[data.from_id])
     })
     socket.on('typing', async (data) => {
@@ -799,7 +836,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 media: data.mediaFilename,
                 mediaFileName: data.mediaName,
                 seen: Math.floor(Date.now() / 1000),
-                time: Math.floor(Date.now() / 1000)
+                time: Math.floor(Date.now() / 1000),
+                isRecord: true
             })
             data.mediaId = ret.id;
             await socket.emit('private_message', {
@@ -808,7 +846,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 receiver: ctx.userHashUserId[data.from_id],
                 sender: ctx.userHashUserId[data.from_id],
                 status: 200,
-                color: data.color
+                color: data.color,
+                isMedia: true
             });
         }
         ({ msg, hasHTML } = funcs.Wo_Emo(data.msg))
@@ -867,7 +906,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 status: 200,
                 html: await compiledTemplates.chatListOwnerTrue(ctx, data, fromUser, nextId, hasHTML, sendable_message, data.color),
                 receiver: data.to_id,
-                sender: ctx.userHashUserId[data.from_id]
+                sender: ctx.userHashUserId[data.from_id],
+                message: sendable_message,
+                time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
             })
             // send same message to all tabs
             for (userSocket of remainingSameUserSockets) {
@@ -878,7 +919,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     color: data.color,
-                    self: true
+                    self: true,
+                    message: sendable_message,
+                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>' 
                 });
                 await userSocket.emit('private_message_page', {
                     html: await compiledTemplates.messageListOwnerTrue(ctx, data, fromUser, nextId, hasHTML, sendable_message, data.color),
@@ -887,7 +930,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     color: data.color,
-                    self: true
+                    self: true,
+                    message: sendable_message,
+                    time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
                 });
             }
             await socketEvents.privateMessageToPersonOwnerFalse(ctx, io, data, fromUser, nextId, hasHTML, sendable_message, data.color);
@@ -963,14 +1008,14 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     }
                 })
         }
-        await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
-        await socketEvents.emitUserStatus(ctx, io, data.to_id)
+        //await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
+        //await socketEvents.emitUserStatus(ctx, io, data.to_id)
         // await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.from_id], data.to_id)
-        await socketEvents.updateMessageUsersList(ctx, io, data.to_id, data.to_id)
+        //await socketEvents.updateMessageUsersList(ctx, io, data.to_id, data.to_id)
 
-        if (ctx.userHashUserId[data.user_id]) {
-            await funcs.Wo_LastSeen(ctx, ctx.userHashUserId[data.user_id])
-        }
+        // if (ctx.userHashUserId[data.user_id]) {
+        //     await funcs.Wo_LastSeen(ctx, ctx.userHashUserId[data.user_id])
+        // }
     })
     socket.on("loadmore", async (data, callback) => {
         let fromUser = await ctx.wo_users.findOne({
@@ -1031,7 +1076,7 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             order: [['id', 'DESC']]
         })
         let html = ""
-        for (let message_index = messages.length-1; message_index >= 0; message_index--) {
+        for (let message_index = messages.length - 1; message_index >= 0; message_index--) {
             let message = messages[message_index]
             if (message.media && message.media != "") {
                 let d = { ...data }
@@ -1044,7 +1089,7 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 }
             } else {
                 let msg = message.text || "";
-                if(!message.text){
+                if (!message.text) {
                     message.text = ""
                 }
                 let hasHTML = message.text.split(" ").includes("<i")
@@ -1169,7 +1214,7 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             order: [['id', 'DESC']]
         })
         let html = ""
-        for (let message_index = messages.length-1; message_index >= 0; message_index--) {
+        for (let message_index = messages.length - 1; message_index >= 0; message_index--) {
             let message = messages[message_index]
             if (message.media && message.media != "") {
                 let d = { ...data }
@@ -1180,9 +1225,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 else {
                     html += await compiledTemplates.messageListOwnerFalseWithMedia(ctx, d, message, fromUser, data.isSticker)
                 }
-            } else  {
+            } else {
                 let msg = message.text || "";
-                if(!message.text){
+                if (!message.text) {
                     message.text = ""
                 }
                 let hasHTML = msg.split(" ").includes("<i")
@@ -1473,7 +1518,85 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         })
     })
 
-    socket.on('disconnect', (reason) => {
+
+    socket.on("on_name_changed", async (data) => {
+        let user_id = ctx.userHashUserId[data.from_id]
+        let followers = await ctx.wo_followers.findAll({
+            attributes: ["following_id"],
+            where: {
+                follower_id: user_id,
+                following_id: {
+                    [Op.not]: user_id
+                }
+            },
+            raw: true
+        })
+        for (let follow of followers) {
+            await io.to(follow.following_id).emit("on_name_changed", {
+                user_id: user_id,
+                name: data.name
+            })
+        }
+    })
+
+
+    socket.on("on_avatar_changed", async (data) => {
+        let user_id = ctx.userHashUserId[data.from_id]
+        let followers = await ctx.wo_followers.findAll({
+            attributes: ["following_id"],
+            where: {
+                follower_id: user_id,
+                following_id: {
+                    [Op.not]: user_id
+                }
+            },
+            raw: true
+        })
+        for (let follow of followers) {
+            await io.to(follow.following_id).emit("on_avatar_changed", {
+                user_id: user_id,
+                name: data.name
+            })
+        }
+    })
+
+    socket.on("on_user_loggedin", async (data) => {
+        let user_id = ctx.userHashUserId[data.from_id]
+        let followers = await ctx.wo_followers.findAll({
+            attributes: ["following_id"],
+            where: {
+                follower_id: user_id,
+                following_id: {
+                    [Op.not]: user_id
+                }
+            },
+            raw: true
+        })
+        for (let follow of followers) {
+            await io.to(follow.following_id).emit("on_user_loggedin", { user_id: user_id })
+        }
+    })
+
+    socket.on("on_user_loggedoff", async (data) => {
+        let user_id = ctx.userHashUserId[data.from_id]
+        let followers = await ctx.wo_followers.findAll({
+            attributes: ["following_id"],
+            where: {
+                follower_id: user_id,
+                following_id: {
+                    [Op.not]: user_id
+                }
+            },
+            raw: true
+        })
+        for (let follow of followers) {
+            await io.to(follow.following_id).emit("on_user_loggedoff", { user_id: user_id })
+        }
+    })
+
+    
+
+    socket.on('disconnect', async (reason) => {
         console.log('a user disconnected ' + socket.id + " " + reason);
         let hash = ctx.socketIdUserHash[socket.id]
         let user_id = ctx.userHashUserId[hash]
@@ -1481,6 +1604,22 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         if (ctx.userIdCount[user_id] === 0) {
             delete ctx.userIdCount[user_id]
             delete ctx.userHashUserId[hash]
+
+            // emit user logged off
+            let followers = await ctx.wo_followers.findAll({
+                attributes: ["following_id"],
+                where: {
+                    follower_id: user_id,
+                    following_id: {
+                        [Op.not]: user_id
+                    }
+                },
+                raw: true
+            })
+
+            for (let follow of followers) {
+                await io.to(follow.following_id).emit("on_user_loggedoff", { user_id: user_id })
+            }
         }
         if (ctx.userIdSocket[user_id]) {
             ctx.userIdSocket[user_id] = ctx.userIdSocket[user_id].filter(d => d.id != socket.id)

@@ -82,6 +82,9 @@ $(function() {
         scrollToTop();
         $(".cover-read, .avatar-read").slideUp(200);
         if (data.avatar) {
+          <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+            socket.emit("on_avatar_changed", {from_id: _getCookie("user_id"), name: data.avatar});
+          <?php } ?>
           var user_id = $('form.setting-profile-form').find('#user-id').val();
           $('[id^=updateImage-' + user_id + ']').fadeOut(300, function () { $('[id^=updateImage-' + user_id + ']').attr("src", data.avatar)}).fadeIn(300);
         }

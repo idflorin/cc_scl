@@ -1914,7 +1914,7 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
     placement = 3;
   }
   var loading_icon = '<svg width="50px" height="50px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><circle cx="50" cy="50" r="40" stroke="#676d76" fill="none" stroke-width="11" stroke-linecap="round"><animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="502"></animate><animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="150.6 100.4;1 250;150.6 100.4"></animate></circle></svg>';
-  $('#online_' + recipient_id).find('.new-message-alert').hide();
+  $('#online_' + recipient_id).find('.new-message-alert').html('0').hide();
   if (group_id) {
     var loading_div = $('.chat-container').find('#group_tab_' + group_id).find('.chat-loading-icon');
   }else{
@@ -1938,7 +1938,7 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
     page_user_id:page_user_id
   }, function (data) {
     if(data.status == 200) {
-
+      // $("#online_" + recipient_id).find('svg path').attr('fill', '#fff');
       if ($('.chat-wrapper').length == 3) {
          if ($('.chat_main_' + recipient_id).length == 0) {
             $('.chat_main:first-child').remove();
@@ -3250,7 +3250,25 @@ function escapeHtml(html)
     return div.innerHTML;
 }
 
+function decodeHTMLEntities(text) {
+    var entities = [
+        ['amp', '&'],
+        ['apos', '\''],
+        ['#x27', '\''],
+        ['#x2F', '/'],
+        ['#39', '\''],
+        ['#47', '/'],
+        ['lt', '<'],
+        ['gt', '>'],
+        ['nbsp', ' '],
+        ['quot', '"']
+    ];
 
+    for (var i = 0, max = entities.length; i < max; ++i) 
+        text = text.replace(new RegExp('&'+entities[i][0]+';', 'g'), entities[i][1]);
+
+    return text;
+}
 
 function Wo_RegisterCommentReaction(comment_id,reaction){
   if (!comment_id && !reaction)

@@ -555,7 +555,7 @@ class FunctionsUtils {
         if (!user_id) {
             return []
         }
-        let time = Math.floor(Date.now() / 1000) - 60;
+        let time = Math.floor(Date.now() / 1000) - 3;
         let blocked = await ctx.wo_blocks.findAll({
             attributes: [
                 "blocked"

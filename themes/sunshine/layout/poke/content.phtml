@@ -55,6 +55,7 @@
         })
         .done(function(data) {
             if (data.status == 200) {
+                $(self).parent('div').parent('.poke_info').parent('.wo_poke_users').parent('.wo_pokes_cont').remove();
                 Wo_Delay(function(){
                     $('#pokeuser_' + received_user_id).remove();
                 },2000);

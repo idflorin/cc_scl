@@ -3054,3 +3054,10 @@ to{opacity:1;margin-top:0}
 }
 .upload-product-image{width: 90px;height: 90px;border-radius: 5px;border: 2px dashed #cecece;cursor: pointer;display: table;margin: 0 6px 0 15px;}
 .upload-product-image svg.feather{width:24px;height:24px;color:#848484dd}
+.header-message{
+  text-overflow: ellipsis;
+  overflow: hidden; 
+  width: 260px; 
+  height: 20px; 
+  white-space: nowrap;
+}

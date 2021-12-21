@@ -9,7 +9,7 @@ $pro_types_array = array(
 if ($f == 'stripe') {
 	if ($s == 'session') {
 		$link = '';
-		if (!empty($_POST['type']) && in_array($_POST['type'], array('wallet','fund','pro'))) {
+		if (!empty($_POST['type']) && in_array($_POST['type'], array('wallet','fund','pro')) && !empty($_POST['payment_type']) && in_array($_POST['payment_type'], array('alipay','credit_card'))) {
 			
 			$amount = 0;
 			if ($_POST['type'] == 'wallet' && !empty($_POST['amount']) && is_numeric($_POST['amount']) && $_POST['amount'] > 0) {
@@ -52,8 +52,8 @@ if ($f == 'stripe') {
 	            );
 			}
 			$payment_method_types = array('card');
-			if ($wo['config']['alipay'] == 'yes') {
-				$payment_method_types = array('card','alipay');
+			if ($wo['config']['alipay'] == 'yes' && $_POST['payment_type'] == 'alipay') {
+				$payment_method_types = array('alipay');
 			}
 			$domain_url = $wo['config']['site_url'].'/requests.php';
 			try {

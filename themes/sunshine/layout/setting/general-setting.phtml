@@ -320,6 +320,9 @@ $(function() {
       	}
       	else{
 	        <?php if($wo['user']['user_id'] == $wo['setting']['user_id']) { ?>
+	        <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+	        		socket.emit("on_name_changed", {from_id: _getCookie("user_id"), name: data.username_or});
+            <?php } ?>
 	        $('[id^=update-username]').attr('href', data.username);
 	        <?php } ?>
 	        $('.setting-general-alert').html('<div class="alert alert-success">' + data.message + '</div>');

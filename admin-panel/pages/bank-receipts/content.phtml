@@ -1,6 +1,6 @@
 <?php
-$page           = (!empty($_GET['page-id']) && is_numeric($_GET['page-id'])) ? SH_Secure($_GET['page-id']) : 1;
-$filter_keyword = (!empty($_GET['query'])) ? SH_Secure($_GET['query']) : '';
+$page           = (!empty($_GET['page-id']) && is_numeric($_GET['page-id'])) ? Wo_Secure($_GET['page-id']) : 1;
+$filter_keyword = (!empty($_GET['query'])) ? Wo_Secure($_GET['query']) : '';
 $db->pageLimit  = 20;
 
 if(isset($_GET['approved']) && $_GET['approved'] == 1){
@@ -116,13 +116,13 @@ $db->where('recipient_id',0)->where('admin',1)->where('seen',0)->where('type','b
                         <nav>
                             <ul class="pagination">
                                 <li>
-                                    <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=1'); ?>" class="waves-effect" title='First Page'>
+                                    <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=1'); ?>" data-ajax="?path=bank-receipts&page-id=1" class="waves-effect" title='First Page'>
                                         <i class="material-icons">first_page</i>
                                     </a>
                                 </li>
                                 <?php if ($page > 1) {  ?>
                                     <li>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=' . ($page - 1)); ?>" class="waves-effect" title='Previous Page'>
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=' . ($page - 1)); ?>" data-ajax="?path=bank-receipts&page-id=<?php echo($page - 1) ?>" class="waves-effect" title='Previous Page'>
                                             <i class="material-icons">chevron_left</i>
                                         </a>
                                     </li>
@@ -136,7 +136,7 @@ $db->where('recipient_id',0)->where('admin',1)->where('seen',0)->where('type','b
                                     if ($nums < 20) {
                                         ?>
                                         <li class="<?php echo ($page == $i) ? 'active' : ''; ?>">
-                                            <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=' . ($i)); ?>" class="waves-effect">
+                                            <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=' . ($i)); ?>" data-ajax="?path=bank-receipts&page-id=<?php echo($i) ?>" class="waves-effect">
                                                 <?php echo $i ?>
                                             </a>
                                         </li>
@@ -145,13 +145,13 @@ $db->where('recipient_id',0)->where('admin',1)->where('seen',0)->where('type','b
 
                                 <?php if ($db->totalPages > $page) { ?>
                                     <li>
-                                        <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=' . ($page + 1)); ?>" class="waves-effect" title="Next Page">
+                                        <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=' . ($page + 1)); ?>" data-ajax="?path=bank-receipts&page-id=<?php echo($page + 1) ?>" class="waves-effect" title="Next Page">
                                             <i class="material-icons">chevron_right</i>
                                         </a>
                                     </li>
                                 <?php } ?>
                                 <li>
-                                    <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=' . ($db->totalPages)); ?>" class="waves-effect" title='Last Page'>
+                                    <a href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts?page-id=' . ($db->totalPages)); ?>" data-ajax="?path=bank-receipts&page-id=<?php echo($db->totalPages) ?>" class="waves-effect" title='Last Page'>
                                         <i class="material-icons">last_page</i>
                                     </a>
                                 </li>

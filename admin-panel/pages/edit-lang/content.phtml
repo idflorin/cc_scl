@@ -106,13 +106,13 @@ if ($db->totalPages != 0) {
                         <nav>
                             <ul class="pagination">
                                 <li>
-                                    <a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=1").$link; ?>" class="waves-effect" title='First Page'>
+                                    <a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=1").$link; ?>" data-ajax="?path=edit-lang&id=<?php echo($lang_name); ?>&page-id=1<?php echo($link); ?>" class="waves-effect" title='First Page'>
                                         <i class="material-icons">first_page</i>
                                     </a>
                                 </li>
                                 <?php if ($page > 1) {  ?>
                                 <li>
-                                    <a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=" . ($page - 1)).$link; ?>" class="waves-effect" title='Previous Page'>
+                                    <a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=" . ($page - 1)).$link; ?>" data-ajax="?path=edit-lang&id=<?php echo($lang_name); ?>&page-id=<?php echo($page - 1) ?><?php echo($link); ?>" class="waves-effect" title='Previous Page'>
                                         <i class="material-icons">chevron_left</i>
                                     </a>
                                 </li>
@@ -123,7 +123,7 @@ if ($db->totalPages != 0) {
                                 for ($i=$nums_pages; $i <= $db->totalPages; $i++) { 
                                     if ($nums < 20) {
                                     ?>
-                                    <li class="<?php echo ($page == $i) ? 'active' : ''; ?>"><a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=" . ($i)).$link; ?>" class="waves-effect"><?php echo $i ?></a></li>
+                                    <li class="<?php echo ($page == $i) ? 'active' : ''; ?>"><a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=" . ($i)).$link; ?>" data-ajax="?path=edit-lang&id=<?php echo($lang_name); ?>&page-id=<?php echo($i) ?><?php echo($link); ?>" class="waves-effect"><?php echo $i ?></a></li>
                                     <?php
                                     }
                                     $nums++;
@@ -131,13 +131,13 @@ if ($db->totalPages != 0) {
                                 ?>
                                 <?php if ($db->totalPages > $page) { ?>
                                 <li>
-                                    <a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=" . ($page + 1)).$link; ?>" class="waves-effect" title="Next Page">
+                                    <a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=" . ($page + 1)).$link; ?>" data-ajax="?path=edit-lang&id=<?php echo($lang_name); ?>&page-id=<?php echo($page + 1) ?><?php echo($link); ?>" class="waves-effect" title="Next Page">
                                         <i class="material-icons">chevron_right</i>
                                     </a>
                                 </li>
                                 <?php } ?>
                                 <li>
-                                    <a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=" . ($db->totalPages)).$link; ?>" class="waves-effect" title='Last Page'>
+                                    <a href="<?php echo Wo_LoadAdminLinkSettings("edit-lang?id=".$lang_name."&page-id=" . ($db->totalPages)).$link; ?>" data-ajax="?path=edit-lang&id=<?php echo($lang_name); ?>&page-id=<?php echo($db->totalPages) ?><?php echo($link); ?>" class="waves-effect" title='Last Page'>
                                         <i class="material-icons">last_page</i>
                                     </a>
                                 </li>

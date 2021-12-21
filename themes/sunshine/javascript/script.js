@@ -1765,7 +1765,7 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
     placement = 3;
   }
   var loading_icon = '<div class="ball-pulse" style="display: block;"><div></div><div></div><div></div></div>';
-  $('#online_' + recipient_id).find('.new-message-alert').hide();
+  $('#online_' + recipient_id).find('.new-message-alert').html('0').hide();
   if (group_id) {
     var loading_div = $('.chat-container').find('#group_tab_' + group_id).find('.chat-loading-icon');
   }else{
@@ -3004,7 +3004,25 @@ function escapeHtml(html)
     return div.innerHTML;
 }
 
+function decodeHTMLEntities(text) {
+    var entities = [
+        ['amp', '&'],
+        ['apos', '\''],
+        ['#x27', '\''],
+        ['#x2F', '/'],
+        ['#39', '\''],
+        ['#47', '/'],
+        ['lt', '<'],
+        ['gt', '>'],
+        ['nbsp', ' '],
+        ['quot', '"']
+    ];
 
+    for (var i = 0, max = entities.length; i < max; ++i) 
+        text = text.replace(new RegExp('&'+entities[i][0]+';', 'g'), entities[i][1]);
+
+    return text;
+}
 
 function Wo_RegisterCommentReaction(comment_id,reaction){
   if (!comment_id && !reaction)

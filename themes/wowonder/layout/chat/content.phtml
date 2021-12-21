@@ -636,6 +636,12 @@ function Wo_ChatSearchUsers(search_query) {
 
 function Wo_UpdateStatus(status,event) {
     event.preventDefault();
+    if (status == 'offline') {
+    	socket.emit('on_user_loggedoff', {from_id: _getCookie("user_id")});
+    }
+    if (status == 'online') {
+    	socket.emit('on_user_loggedin', {from_id: _getCookie("user_id")});
+    }
     var status_container = $('.online-content-toggler');
     var offline_status = status_container.find('.chat-opacity');
     $.post(Wo_Ajax_Requests_File() + '?f=chat&s=update_chat_status', {

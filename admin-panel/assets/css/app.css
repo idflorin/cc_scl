@@ -10266,3 +10266,35 @@ body:not(.horizontal-navigation) .navigation {bottom: 0;}
 .admin-apps-card .btn:hover {
   color: white !important;
 }
+.barloading {
+  height: 4px;
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  height: 2px;
+  width:100%;
+  display: none;
+  position:fixed;
+  z-index:5000;
+  overflow: hidden;
+  background-color: #fff;
+}
+.barloading:before {
+  display: block;
+  position: absolute;
+  content: "";
+  left: -200px;
+  width: 200px;
+  height: 3px;
+  animation: barloading 1.5s linear infinite;
+}
+
+@keyframes barloading {
+    from {left: -200px; width: 30%;}
+    50% {width: 30%;}
+    70% {width: 70%;}
+    80% { left: 50%;}
+    95% {left: 120%;}
+    to {left: 100%;}
+}

@@ -1,7 +1,19 @@
 <?php
 $wo['activity']['type_text'] = '';
 $wo['activity']['icon']      = '';
-$post_publisher              = '<a class="second-user-color" data-ajax="?link1=timeline&u=' . $wo['activity']['postData']['publisher']['username'] . '" href="' . $wo['activity']['postData']['publisher']['url'] . '">' . $wo['activity']['postData']['publisher']['name'] . '</a>';
+$post_publisher              = '<a class="second-user-color" data-ajax="?link1=timeline&u=" href=""></a>';
+    $replaced_txt                = array(
+    $post_publisher,
+    ''
+);
+if (!empty($wo['activity']['postData'])) {
+    $post_publisher              = '<a class="second-user-color" data-ajax="?link1=timeline&u=' . $wo['activity']['postData']['publisher']['username'] . '" href="' . $wo['activity']['postData']['publisher']['url'] . '">' . $wo['activity']['postData']['publisher']['name'] . '</a>';
+    $replaced_txt                = array(
+    $post_publisher,
+    $wo['activity']['postData']['url']
+);
+}
+    
 $orginal_txt                 = array(
     "{user}",
     "{post}"
@@ -10,10 +22,7 @@ if ($wo['activity']['activity_type'] == 'following' || $wo['activity']['activity
    $wo['activity']['following']  = Wo_UserData($wo['activity']['follow_id']);
    $post_publisher              = '<a class="second-user-color" data-ajax="?link1=timeline&u=' . $wo['activity']['following']['username'] . '" href="' . $wo['activity']['following']['url'] . '">' . $wo['activity']['following']['name'] . '</a>';
 }
-$replaced_txt                = array(
-    $post_publisher,
-    $wo['activity']['postData']['url']
-);
+
 $wo['activity']['color'] = '';
 if (!empty($wo['activity']['activity_type'])) {
 

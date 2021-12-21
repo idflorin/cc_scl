@@ -10,7 +10,7 @@ if ($f == 'offer' && $wo['config']['offer_system'] == 1) {
 
     		$page_data = $db->where('page_id',Wo_Secure($_POST['page_id']))->getOne(T_PAGES);
 
-    		if (!empty($page_data) && $page_data->user_id == $wo['user']['id']) {
+    		if (!empty($page_data) && Wo_IsPageOnwer($page_data->page_id)) {
 
 	    		$discount_type = 'free_shipping';
 	    		$discount_percent = 0;
@@ -180,13 +180,13 @@ if ($f == 'offer' && $wo['config']['offer_system'] == 1) {
     if ($s == 'edit_offer' && !empty($_POST['offer_id']) && is_numeric($_POST['offer_id']) && $_POST['offer_id'] > 0) {
     	$offer_id = Wo_Secure($_POST['offer_id']);
         $offer = $db->where('id',$offer_id)->getOne(T_OFFER);
-        if (!empty($offer) && ($offer->user_id == $wo['user']['id'] || Wo_IsModerator() || Wo_IsAdmin())) {
+        if (!empty($offer) && (Wo_IsPageOnwer($offer->page_id) || $offer->user_id == $wo['user']['id'] || Wo_IsModerator() || Wo_IsAdmin())) {
 
         	if (!empty($_POST['discount_type']) && in_array($_POST['discount_type'], $discount_type) && !empty($_POST['page_id'])) {
 
 	    		$page_data = $db->where('page_id',Wo_Secure($_POST['page_id']))->getOne(T_PAGES);
 
-	    		if (!empty($page_data) && $page_data->user_id == $wo['user']['id']) {
+	    		if (!empty($page_data) && Wo_IsPageOnwer($page_data->page_id)) {
 
 		    		$discount_type = 'free_shipping';
 		    		$discount_percent = 0;

@@ -202,6 +202,9 @@ $(function() {
       if (data.status == 200) {
         <?php if($wo['user']['user_id'] == $wo['setting']['user_id']) { ?>
         if (data.first_name != '' || data.last_name != '') {
+        	<?php if ($wo['config']['node_socket_flow'] == "1") { ?>
+            socket.emit("on_name_changed", {from_id: _getCookie("user_id"), name: data.first_name + ' ' + data.last_name});
+            <?php } ?>
           $('[id^=user-full-name]').text(data.first_name + ' ' + data.last_name);
         }
         <?php } ?>

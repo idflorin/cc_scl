@@ -227,7 +227,6 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
 
 <!-- App scripts -->
 
-<script type="text/javascript" src="<?php echo $pt->config->theme_url; ?>/js/jquery.form.min.js"></script>
 <link href="<?php echo Wo_LoadAdminLink('vendors/sweetalert/sweetalert.css'); ?>" rel="stylesheet" />
 <script src="<?php echo Wo_LoadAdminLink('assets/js/admin.js'); ?>"></script>
 <link rel="stylesheet" href="<?php echo(Wo_LoadAdminLink('vendors/select2/css/select2.min.css')) ?>" type="text/css">
@@ -263,6 +262,9 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
         function Wo_Ajax_Requests_File(){
             return "<?php echo $wo['config']['site_url'].'/requests.php';?>"
         }
+        function Wo_Ajax_Requests_File_load(){
+            return "<?php echo $wo['config']['site_url'].'/admin_load.php';?>"
+        }
     </script>
     <style>
         body {background-color: <?php echo $wo['config']['btn_background_color'];?>;}
@@ -275,7 +277,41 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
         .select2-container--default.select2-container--focus .select2-selection--multiple {border: 2px solid <?php echo $wo['config']['btn_background_color'];?> !important;}
     </style>
 </head>
+<script type="text/javascript">
+    $(function() {
+        $(document).on('click', 'a[data-ajax]', function(e) {
+            $(document).off('click', '.ranges ul li');
+            $(document).off('click', '.applyBtn');
+            e.preventDefault();
+            if (($(this)[0].hasAttribute("data-sent") && $(this).attr('data-sent') == '0') || !$(this)[0].hasAttribute("data-sent")) {
+                if (!$(this)[0].hasAttribute("data-sent") && !$(this).hasClass('waves-effect')) {
+                    $('.navigation-menu-body').find('a').removeClass('active');
+                    $(this).addClass('active');
+                }
+                window.history.pushState({state:'new'},'', $(this).attr('href'));
+                $(".barloading").css("display","block");
+                if ($(this)[0].hasAttribute("data-sent")) {
+                    $(this).attr('data-sent', "1");
+                }
+                var url = $(this).attr('data-ajax');
+                $.post(Wo_Ajax_Requests_File_load() + url, {url:url}, function (data) {
+                    $(".barloading").css("display","none");
+                    if ($('#redirect_link')[0].hasAttribute("data-sent")) {
+                        $('#redirect_link').attr('data-sent', "0");
+                    }
+                    json_data = JSON.parse($(data).filter('#json-data').val());
+                    $('.content').html(data);
+                });
+            }
+        });
+        $(window).on("popstate", function (e) {
+            location.reload();
+        });
+    });
+</script>
 <body <?php echo ($mode == 'night' ? 'class="dark"' : ''); ?>>
+    <div class="barloading"></div>
+    <a id="redirect_link" href="" data-ajax="" data-sent="0"></a>
     <input type="hidden" class="main_session" value="<?php echo Wo_CreateMainSession();?>">
     <div class="colors"> <!-- To use theme colors with Javascript -->
         <div class="bg-primary"></div>
@@ -550,7 +586,7 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
             <div class="navigation-menu-body">
                 <ul>
                     <li>
-                        <a <?php echo ($page == 'dashboard') ? 'class="active"' : ''; ?>  href="<?php echo Wo_LoadAdminLinkSettings(''); ?>">
+                        <a <?php echo ($page == 'dashboard') ? 'class="active"' : ''; ?>  href="<?php echo Wo_LoadAdminLinkSettings(''); ?>" data-ajax="?path=dashboard">
                             <span class="nav-link-icon">
                                 <i class="material-icons">dashboard</i>
                             </span>
@@ -567,53 +603,53 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a <?php echo ($page == 'general-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('general-settings'); ?>">General Settings</a>
+                                <a <?php echo ($page == 'general-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('general-settings'); ?>" data-ajax="?path=general-settings">General Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'site-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('site-settings'); ?>">Site Settings</a>
+                                <a <?php echo ($page == 'site-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('site-settings'); ?>" data-ajax="?path=site-settings">Site Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'site-features') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('site-features'); ?>">Manage Site Features</a>
+                                <a <?php echo ($page == 'site-features') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('site-features'); ?>" data-ajax="?path=site-features">Manage Site Features</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'email-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('email-settings'); ?>">E-mail & SMS Settings</a>
+                                <a <?php echo ($page == 'email-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('email-settings'); ?>" data-ajax="?path=email-settings">E-mail & SMS Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'video-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('video-settings'); ?>">Video & Audio Chat Settings</a>
+                                <a <?php echo ($page == 'video-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('video-settings'); ?>" data-ajax="?path=video-settings">Video & Audio Chat Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'social-login') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('social-login'); ?>">Social Login Settings</a>
+                                <a <?php echo ($page == 'social-login') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('social-login'); ?>" data-ajax="?path=social-login">Social Login Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'payment-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('payment-settings'); ?>">Payment System Settings</a>
+                                <a <?php echo ($page == 'payment-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('payment-settings'); ?>" data-ajax="?path=payment-settings">Payment System Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-currencies') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-currencies'); ?>">Manage Currencies</a>
+                                <a <?php echo ($page == 'manage-currencies') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-currencies'); ?>" data-ajax="?path=manage-currencies">Manage Currencies</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'amazon-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('amazon-settings'); ?>">Storage Settings</a>
+                                <a <?php echo ($page == 'amazon-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('amazon-settings'); ?>" data-ajax="?path=amazon-settings">Storage Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'live') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('live'); ?>">Live Stream Settings</a>
+                                <a <?php echo ($page == 'live') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('live'); ?>" data-ajax="?path=live">Live Stream Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'node') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('node'); ?>">NodeJs</a>
+                                <a <?php echo ($page == 'node') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('node'); ?>" data-ajax="?path=node">NodeJs</a>
                             </li>
                             <li>
                                 <a <?php echo ($page == 'post-settings' || $page == 'manage-colored-posts' || $page == 'manage-reactions') ? 'class="open"' : ''; ?> href="javascript:void(0);">Posts</a>
                                 <ul class="ml-menu">
                                     <li>
-                                        <a <?php echo ($page == 'post-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('post-settings'); ?>">
+                                        <a <?php echo ($page == 'post-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('post-settings'); ?>" data-ajax="?path=post-settings">
                                             <span>Post Settings</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'manage-colored-posts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>">
+                                        <a <?php echo ($page == 'manage-colored-posts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-colored-posts'); ?>" data-ajax="?path=manage-colored-posts">
                                             <span>Manage Colored Posts</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'manage-reactions') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-reactions'); ?>">
+                                        <a <?php echo ($page == 'manage-reactions') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-reactions'); ?>" data-ajax="?path=manage-reactions">
                                             <span>Post Reactions</span>
                                         </a>
                                     </li>
@@ -630,10 +666,10 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul <?php echo ($page == 'manage-languages' || $page == 'add-language' || $page == 'edit-lang') ? 'style="display: block;"' : ''; ?>>
                             <li>
-                                <a <?php echo ($page == 'add-language') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-language'); ?>">Add New Language & Keys</a>
+                                <a <?php echo ($page == 'add-language') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-language'); ?>" data-ajax="?path=add-language">Add New Language & Keys</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-languages' || $page == 'edit-lang') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-languages'); ?>">Manage Languages</a>
+                                <a <?php echo ($page == 'manage-languages' || $page == 'edit-lang') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-languages'); ?>" data-ajax="?path=manage-languages">Manage Languages</a>
                             </li>
                         </ul>
                     </li>
@@ -647,22 +683,22 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a <?php echo ($page == 'manage-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-users'); ?>">Manage Users</a>
+                                <a <?php echo ($page == 'manage-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-users'); ?>" data-ajax="?path=manage-users">Manage Users</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'online-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('online-users'); ?>">Online Users</a>
+                                <a <?php echo ($page == 'online-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('online-users'); ?>" data-ajax="?path=online-users">Online Users</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-stories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-stories'); ?>">Manage User Stories / Status</a>
+                                <a <?php echo ($page == 'manage-stories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-stories'); ?>" data-ajax="?path=manage-stories">Manage User Stories / Status</a>
                             </li>
                             <?php if ($is_admin == true) { ?>
                             <li>
-                                <a <?php echo ($page == 'manage-profile-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-profile-fields'); ?>">Manage Custom Profile Fields</a>
+                                <a <?php echo ($page == 'manage-profile-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-profile-fields'); ?>" data-ajax="?path=manage-profile-fields">Manage Custom Profile Fields</a>
                             </li>
                             <?php } ?>
                             <?php if ($is_admin == true) { ?>
                             <li>
-                                <a <?php echo ($page == 'manage-verification-reqeusts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-verification-reqeusts'); ?>">Manage Verification Requests</a>
+                                <a <?php echo ($page == 'manage-verification-reqeusts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-verification-reqeusts'); ?>" data-ajax="?path=manage-verification-reqeusts">Manage Verification Requests</a>
                             </li>
                             <?php } ?>
                             <?php if ($is_admin == true) { ?>
@@ -670,12 +706,12 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                                 <a <?php echo ($page == 'affiliates-settings' || $page == 'payment-reqeuests' || $page == 'referrals-list') ? 'class="active"' : ''; ?> href="javascript:void(0);">Affiliates System</a>
                                 <ul class="ml-menu">
                                     <li>
-                                        <a <?php echo ($page == 'affiliates-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('affiliates-settings'); ?>">
+                                        <a <?php echo ($page == 'affiliates-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('affiliates-settings'); ?>" data-ajax="?path=affiliates-settings">
                                             <span>Affiliates Settings</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'payment-reqeuests') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('payment-reqeuests'); ?>">
+                                        <a <?php echo ($page == 'payment-reqeuests') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('payment-reqeuests'); ?>" data-ajax="?path=payment-reqeuests">
                                             <span>Payment Requests</span>
                                         </a>
                                     </li>
@@ -684,7 +720,7 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                             <?php } ?>
                             <?php if ($is_admin == true) { ?>
                             <li>
-                                <a <?php echo ($page == 'manage-genders') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-genders'); ?>">Manage genders</a>
+                                <a <?php echo ($page == 'manage-genders') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-genders'); ?>" data-ajax="?path=manage-genders">Manage genders</a>
                             </li>
                             <?php } ?>
                         </ul>
@@ -699,19 +735,19 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                             </a>
                             <ul class="ml-menu">
                                 <li>
-                                    <a <?php echo ($page == 'pro-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-settings'); ?>">Pro System Settings</a>
+                                    <a <?php echo ($page == 'pro-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-settings'); ?>" data-ajax="?path=pro-settings">Pro System Settings</a>
                                 </li>
                                 <li>
-                                    <a <?php echo ($page == 'pro-features') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-features'); ?>">Pro Features</a>
+                                    <a <?php echo ($page == 'pro-features') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-features'); ?>" data-ajax="?path=pro-features">Pro Features</a>
                                 </li>
                                 <li>
-                                    <a <?php echo ($page == 'pro-payments') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>">Manage Payments</a>
+                                    <a <?php echo ($page == 'pro-payments') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>" data-ajax="?path=pro-payments">Manage Payments</a>
                                 </li>
                                 <li>
-                                    <a <?php echo ($page == 'pro-memebers') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-memebers'); ?>">Manage Pro Members</a>
+                                    <a <?php echo ($page == 'pro-memebers') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-memebers'); ?>" data-ajax="?path=pro-memebers">Manage Pro Members</a>
                                 </li>
                                 <li>
-                                    <a <?php echo ($page == 'pro-refund') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-refund'); ?>">Manage Pro Refund</a>
+                                    <a <?php echo ($page == 'pro-refund') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pro-refund'); ?>" data-ajax="?path=pro-refund">Manage Pro Refund</a>
                                 </li>
                             </ul>
                         </li>
@@ -725,69 +761,69 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a <?php echo ($page == 'manage-apps') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-apps'); ?>">Apps</a>
+                                <a <?php echo ($page == 'manage-apps') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-apps'); ?>" data-ajax="?path=manage-apps">Apps</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-pages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-pages'); ?>">Pages</a>
+                                <a <?php echo ($page == 'manage-pages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-pages'); ?>" data-ajax="?path=manage-pages">Pages</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-groups') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-groups'); ?>">Groups</a>
+                                <a <?php echo ($page == 'manage-groups') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-groups'); ?>" data-ajax="?path=manage-groups">Groups</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-posts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-posts'); ?>">Posts</a>
+                                <a <?php echo ($page == 'manage-posts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-posts'); ?>" data-ajax="?path=manage-posts">Posts</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-fund') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-fund'); ?>">Fundings</a>
+                                <a <?php echo ($page == 'manage-fund') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-fund'); ?>" data-ajax="?path=manage-fund">Fundings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-jobs') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-jobs'); ?>">Jobs</a>
+                                <a <?php echo ($page == 'manage-jobs') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-jobs'); ?>" data-ajax="?path=manage-jobs">Jobs</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-offers') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-offers'); ?>">Offers</a>
+                                <a <?php echo ($page == 'manage-offers') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-offers'); ?>" data-ajax="?path=manage-offers">Offers</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-articles') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-articles'); ?>">Articles (Blog)</a>
+                                <a <?php echo ($page == 'manage-articles') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-articles'); ?>" data-ajax="?path=manage-articles">Articles (Blog)</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-events') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-events'); ?>">Events</a>
+                                <a <?php echo ($page == 'manage-events') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-events'); ?>" data-ajax="?path=manage-events">Events</a>
                             </li>
                             <li <?php echo ($page == 'manage-forum-sections' || $page == 'manage-forum-forums' || $page == 'manage-forum-threads' || $page == 'manage-forum-messages' || $page == 'create-new-forum' || $page == 'create-new-section') ? 'class="open"' : ''; ?>>
                                 <a href="javascript:void(0);">Forums</a>
                                 <ul class="ml-menu">
                                     <?php if ($is_admin == true) { ?>
                                     <li>
-                                        <a <?php echo ($page == 'manage-forum-sections') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-sections'); ?>">
+                                        <a <?php echo ($page == 'manage-forum-sections') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-sections'); ?>" data-ajax="?path=manage-forum-sections">
                                             <span>Manage Forums Sections</span>
                                         </a>
                                     </li>
                                     <?php } ?>
                                     <?php if ($is_admin == true) { ?>
                                     <li>
-                                        <a <?php echo ($page == 'manage-forum-forums') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-forums'); ?>">
+                                        <a <?php echo ($page == 'manage-forum-forums') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-forums'); ?>" data-ajax="?path=manage-forum-forums">
                                             <span>Manage Forums</span>
                                         </a>
                                     </li>
                                     <?php } ?>
                                     <li>
-                                        <a <?php echo ($page == 'manage-forum-threads') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-threads'); ?>">
+                                        <a <?php echo ($page == 'manage-forum-threads') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-threads'); ?>" data-ajax="?path=manage-forum-threads">
                                             <span>Manage Threads</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'manage-forum-messages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-messages'); ?>">
+                                        <a <?php echo ($page == 'manage-forum-messages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-forum-messages'); ?>" data-ajax="?path=manage-forum-messages">
                                             <span>Manage Replies</span>
                                         </a>
                                     </li>
                                     <?php if ($is_admin == true) { ?>
                                     <li>
-                                        <a <?php echo ($page == 'create-new-section') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('create-new-section'); ?>">
+                                        <a <?php echo ($page == 'create-new-section') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('create-new-section'); ?>" data-ajax="?path=create-new-section">
                                             <span>Create New Section</span>
                                         </a>
                                     </li>
                                     <?php } ?>
                                     <?php if ($is_admin == true) { ?>
                                     <li>
-                                        <a <?php echo ($page == 'create-new-forum') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('create-new-forum'); ?>">
+                                        <a <?php echo ($page == 'create-new-forum') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('create-new-forum'); ?>" data-ajax="?path=create-new-forum">
                                             <span>Create New Forum</span>
                                         </a>
                                     </li>
@@ -798,13 +834,13 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                                 <a href="javascript:void(0);">Movies</a>
                                 <ul class="ml-menu">
                                     <li>
-                                        <a <?php echo ($page == 'manage-movies') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-movies'); ?>">
+                                        <a <?php echo ($page == 'manage-movies') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-movies'); ?>" data-ajax="?path=manage-movies">
                                             <span>Manage Movies</span>
                                         </a>
                                     </li>
                                     <?php if ($is_admin == true) { ?>
                                     <li>
-                                        <a <?php echo ($page == 'add-new-movies') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-movies'); ?>">
+                                        <a <?php echo ($page == 'add-new-movies') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-movies'); ?>" data-ajax="?path=add-new-movies">
                                             <span>Add New Movie</span>
                                         </a>
                                     </li>
@@ -816,12 +852,12 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                                 <a href="javascript:void(0);">Games</a>
                                 <ul class="ml-menu">
                                     <li>
-                                        <a <?php echo ($page == 'manage-games') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-games'); ?>">
+                                        <a <?php echo ($page == 'manage-games') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-games'); ?>" data-ajax="?path=manage-games">
                                             <span>Manage Games</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'add-new-game') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-game'); ?>">
+                                        <a <?php echo ($page == 'add-new-game') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-game'); ?>" data-ajax="?path=add-new-game">
                                             <span>Add New Game</span>
                                         </a>
                                     </li>
@@ -831,42 +867,42 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                                 <a href="javascript:void(0);">Categories</a>
                                 <ul class="ml-menu">
                                     <li>
-                                        <a <?php echo ($page == 'pages-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pages-categories'); ?>">
+                                        <a <?php echo ($page == 'pages-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pages-categories'); ?>" data-ajax="?path=pages-categories">
                                             <span>Pages Categories</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'pages-sub-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pages-sub-categories'); ?>">
+                                        <a <?php echo ($page == 'pages-sub-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pages-sub-categories'); ?>" data-ajax="?path=pages-sub-categories">
                                             <span>Pages Sub Categories</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'groups-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('groups-categories'); ?>">
+                                        <a <?php echo ($page == 'groups-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('groups-categories'); ?>" data-ajax="?path=groups-categories">
                                             <span>Groups Categories</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'groups-sub-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('groups-sub-categories'); ?>">
+                                        <a <?php echo ($page == 'groups-sub-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('groups-sub-categories'); ?>" data-ajax="?path=groups-sub-categories">
                                             <span>Groups Sub Categories</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'blogs-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('blogs-categories'); ?>">
+                                        <a <?php echo ($page == 'blogs-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('blogs-categories'); ?>" data-ajax="?path=blogs-categories">
                                             <span>Blogs Categories</span>
                                         </a>
                                     </li> 
                                     <li>
-                                        <a <?php echo ($page == 'products-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('products-categories'); ?>">
+                                        <a <?php echo ($page == 'products-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('products-categories'); ?>" data-ajax="?path=products-categories">
                                             <span>Products Categories</span>
                                         </a>
                                     </li> 
                                     <li>
-                                        <a <?php echo ($page == 'products-sub-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('products-sub-categories'); ?>">
+                                        <a <?php echo ($page == 'products-sub-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('products-sub-categories'); ?>" data-ajax="?path=products-sub-categories">
                                             <span>Products Sub Categories</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'job-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('job-categories'); ?>">
+                                        <a <?php echo ($page == 'job-categories') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('job-categories'); ?>" data-ajax="?path=job-categories">
                                             <span>Job Categories</span>
                                         </a>
                                     </li>
@@ -876,17 +912,17 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                                 <a href="javascript:void(0);">Custom Fields</a>
                                 <ul class="ml-menu">
                                     <li>
-                                        <a <?php echo ($page == 'pages-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pages-fields'); ?>">
+                                        <a <?php echo ($page == 'pages-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('pages-fields'); ?>" data-ajax="?path=pages-fields">
                                             <span>Pages Fields</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'groups-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('groups-fields'); ?>">
+                                        <a <?php echo ($page == 'groups-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('groups-fields'); ?>" data-ajax="?path=groups-fields">
                                             <span>Groups Fields</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'products-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('products-fields'); ?>">
+                                        <a <?php echo ($page == 'products-fields') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('products-fields'); ?>" data-ajax="?path=products-fields">
                                             <span>Products Fields</span>
                                         </a>
                                     </li>
@@ -898,12 +934,12 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                                 <a href="javascript:void(0);">Gifts</a>
                                 <ul class="ml-menu">
                                     <li>
-                                        <a <?php echo ($page == 'manage-gifts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-gifts'); ?>">
+                                        <a <?php echo ($page == 'manage-gifts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-gifts'); ?>" data-ajax="?path=manage-gifts">
                                             <span>Manage Gifts</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'add-new-gift') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-gift'); ?>">
+                                        <a <?php echo ($page == 'add-new-gift') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-gift'); ?>" data-ajax="?path=add-new-gift">
                                             <span>Add New Gift</span>
                                         </a>
                                     </li>
@@ -916,12 +952,12 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                                 <a href="javascript:void(0);">Chat Stickers</a>
                                 <ul class="ml-menu">
                                     <li>
-                                        <a <?php echo ($page == 'manage-stickers') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-stickers'); ?>">
+                                        <a <?php echo ($page == 'manage-stickers') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-stickers'); ?>" data-ajax="?path=manage-stickers">
                                             <span>Manage Stickers</span>
                                         </a>
                                     </li>
                                     <li>
-                                        <a <?php echo ($page == 'add-new-sticker') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-sticker'); ?>">
+                                        <a <?php echo ($page == 'add-new-sticker') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('add-new-sticker'); ?>" data-ajax="?path=add-new-sticker">
                                             <span>Add New sticker</span>
                                         </a>
                                     </li>
@@ -931,7 +967,7 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </ul>
                     </li>
                     <li>
-                        <a <?php echo ($page == 'bank-receipts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts'); ?>">
+                        <a <?php echo ($page == 'bank-receipts') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('bank-receipts'); ?>" data-ajax="?path=bank-receipts">
                             <span class="nav-link-icon">
                                 <i class="material-icons">credit_card</i>
                             </span>
@@ -948,16 +984,16 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         <ul class="ml-menu">
                             <?php if ($is_admin == true) { ?>
                             <li>
-                                <a <?php echo ($page == 'ads-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('ads-settings'); ?>">Advertisement System Settings</a>
+                                <a <?php echo ($page == 'ads-settings') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('ads-settings'); ?>" data-ajax="?path=ads-settings">Advertisement System Settings</a>
                             </li>
                             <?php } ?>
                             <?php if ($is_admin == true) { ?>
                             <li>
-                                <a <?php echo ($page == 'manage-site-ads') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-site-ads'); ?>">Manage Site Advertisements</a>
+                                <a <?php echo ($page == 'manage-site-ads') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-site-ads'); ?>" data-ajax="?path=manage-site-ads">Manage Site Advertisements</a>
                             </li>
                             <?php } ?>
                             <li>
-                                <a <?php echo ($page == 'manage-user-ads') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-user-ads'); ?>">Manage User Advertisements</a>
+                                <a <?php echo ($page == 'manage-user-ads') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-user-ads'); ?>" data-ajax="?path=manage-user-ads">Manage User Advertisements</a>
                             </li>
                         </ul>
                     </li>
@@ -971,13 +1007,13 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a <?php echo ($page == 'manage-themes') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-themes'); ?>">Themes</a>
+                                <a <?php echo ($page == 'manage-themes') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-themes'); ?>" data-ajax="?path=manage-themes">Themes</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-site-design') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-site-design'); ?>">Change Site Design</a>
+                                <a <?php echo ($page == 'manage-site-design') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-site-design'); ?>" data-ajax="?path=manage-site-design">Change Site Design</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'custom-code') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('custom-code'); ?>">Custom JS / CSS</a>
+                                <a <?php echo ($page == 'custom-code') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('custom-code'); ?>" data-ajax="?path=custom-code">Custom JS / CSS</a>
                             </li>
                         </ul>
                     </li>
@@ -992,47 +1028,47 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a <?php echo ($page == 'manage-invitation') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation'); ?>">Users Invitation</a>
+                                <a <?php echo ($page == 'manage-invitation') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation'); ?>" data-ajax="?path=manage-invitation">Users Invitation</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'send_email') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('send_email'); ?>">Send E-mail</a>
+                                <a <?php echo ($page == 'send_email') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('send_email'); ?>" data-ajax="?path=send_email">Send E-mail</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-announcements') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-announcements'); ?>">Announcements</a>
+                                <a <?php echo ($page == 'manage-announcements') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-announcements'); ?>" data-ajax="?path=manage-announcements">Announcements</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'auto-delete') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-delete'); ?>">Auto Delete Data</a>
+                                <a <?php echo ($page == 'auto-delete') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-delete'); ?>" data-ajax="?path=auto-delete">Auto Delete Data</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'auto-friend') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-friend'); ?>">Auto Friend</a>
+                                <a <?php echo ($page == 'auto-friend') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-friend'); ?>" data-ajax="?path=auto-friend">Auto Friend</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'auto-like') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-like'); ?>">Auto Page Like</a>
+                                <a <?php echo ($page == 'auto-like') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-like'); ?>" data-ajax="?path=auto-like">Auto Page Like</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'auto-join') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-join'); ?>">Auto Group Join</a>
+                                <a <?php echo ($page == 'auto-join') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('auto-join'); ?>" data-ajax="?path=auto-join">Auto Group Join</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'fake-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('fake-users'); ?>">Fake User Generator</a>
+                                <a <?php echo ($page == 'fake-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('fake-users'); ?>" data-ajax="?path=fake-users">Fake User Generator</a>
                             </li>
                             
                             <li>
-                                <a <?php echo ($page == 'mailing-list') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('mailing-list'); ?>">Maling List</a>
+                                <a <?php echo ($page == 'mailing-list') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('mailing-list'); ?>" data-ajax="?path=mailing-list">Maling List</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'mass-notifications') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('mass-notifications'); ?>">Mass Notifications</a>
+                                <a <?php echo ($page == 'mass-notifications') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('mass-notifications'); ?>" data-ajax="?path=mass-notifications">Mass Notifications</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'ban-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('ban-users'); ?>">BlackList</a>
+                                <a <?php echo ($page == 'ban-users') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('ban-users'); ?>" data-ajax="?path=ban-users">BlackList</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'generate-sitemap') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('generate-sitemap'); ?>">Generate SiteMap</a>
+                                <a <?php echo ($page == 'generate-sitemap') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('generate-sitemap'); ?>" data-ajax="?path=generate-sitemap">Generate SiteMap</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-invitation-keys') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation-keys'); ?>">Invitation Codes</a>
+                                <a <?php echo ($page == 'manage-invitation-keys') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-invitation-keys'); ?>" data-ajax="?path=manage-invitation-keys">Invitation Codes</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'backups') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('backups'); ?>">Backup SQL & Files</a>
+                                <a <?php echo ($page == 'backups') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('backups'); ?>" data-ajax="?path=backups">Backup SQL & Files</a>
                             </li>
                         </ul>
                     </li>
@@ -1047,10 +1083,10 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a <?php echo ($page == 'manage-custom-pages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-custom-pages'); ?>">Manage Custom Pages</a>
+                                <a <?php echo ($page == 'manage-custom-pages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-custom-pages'); ?>" data-ajax="?path=manage-custom-pages">Manage Custom Pages</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'edit-terms-pages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('edit-terms-pages'); ?>">Edit Terms Pages</a>
+                                <a <?php echo ($page == 'edit-terms-pages') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('edit-terms-pages'); ?>" data-ajax="?path=edit-terms-pages">Edit Terms Pages</a>
                             </li>
                         </ul>
                     </li>
@@ -1064,7 +1100,7 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a <?php echo ($page == 'manage-reports') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-reports'); ?>">Manage Reports</a>
+                                <a <?php echo ($page == 'manage-reports') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-reports'); ?>" data-ajax="?path=manage-reports">Manage Reports</a>
                             </li>
                         </ul>
                     </li>
@@ -1078,16 +1114,16 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a <?php echo ($page == 'manage-api-access-keys') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-api-access-keys'); ?>">Manage API Server Key</a>
+                                <a <?php echo ($page == 'manage-api-access-keys') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-api-access-keys'); ?>" data-ajax="?path=manage-api-access-keys">Manage API Server Key</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'push-notifications-system') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('push-notifications-system'); ?>">Push Notifications Settings</a>
+                                <a <?php echo ($page == 'push-notifications-system') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('push-notifications-system'); ?>" data-ajax="?path=push-notifications-system">Push Notifications Settings</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'verfiy-applications') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('verfiy-applications'); ?>">Verify Applications</a>
+                                <a <?php echo ($page == 'verfiy-applications') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('verfiy-applications'); ?>" data-ajax="?path=verfiy-applications">Verify Applications</a>
                             </li>
                             <li>
-                                <a <?php echo ($page == 'manage-third-psites') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-third-psites'); ?>">3rd Party Scripts</a>
+                                <a <?php echo ($page == 'manage-third-psites') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-third-psites'); ?>" data-ajax="?path=manage-third-psites">3rd Party Scripts</a>
                             </li>
                         </ul>
                     </li>
@@ -1102,14 +1138,14 @@ if (!empty($_COOKIE['mode']) && $_COOKIE['mode'] == 'night') {
                         </a>
                         <ul class="ml-menu">
                             <li>
-                                <a <?php echo ($page == 'manage-updates') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-updates'); ?>">Updates & Bug Fixes</a>
+                                <a <?php echo ($page == 'manage-updates') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('manage-updates'); ?>" data-ajax="?path=manage-updates">Updates & Bug Fixes</a>
                             </li>
                         </ul>
                     </li>
                     <?php } ?>
                     <?php if ($is_admin == true) { ?>
                     <li>
-                        <a <?php echo ($page == 'changelog') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('changelog'); ?>">
+                        <a <?php echo ($page == 'changelog') ? 'class="active"' : ''; ?> href="<?php echo Wo_LoadAdminLinkSettings('changelog'); ?>" data-ajax="?path=changelog">
                             <span class="nav-link-icon">
                                 <i class="material-icons">update</i>
                             </span>

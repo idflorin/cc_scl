@@ -524,7 +524,7 @@ $(function () {
     	first_chat_id = $(first_chat).attr('id');
     	sending_text = $('.mobileleftpane .text-sender-container textarea').val();
     	if (sending_text.length  > 100) {
-    		sending_text = jQuery.trim(sending_text).substring(0, 97)+'...';
+    		//sending_text = jQuery.trim(sending_text).substring(0, 97)+'...';
     	}
 
       $('#messages-recipient-'+chat_number).insertBefore( $( "#"+first_chat_id ) );
@@ -1056,6 +1056,7 @@ function Wo_GetUserMessages(user_id, user_name, userlink) {
     user_id: user_id
   }, function (data) {
     if(data.status == 200) {
+    	window.history.pushState({state:'new'},'', "<?php echo($wo['config']['site_url']) ?>/messages/"+user_id);
     	$('.send-button').css('background-color', data.color);
         $('.send-button').css('border-color', data.color);
     	$('#user_attachments').html(data.attachments_html);
@@ -1308,6 +1309,14 @@ function Wo_getNewMessages() {
        to_id = $('#messages-to-id').val();
         if (data.color) {
             $(".text-sender-container .red-list").css('background', data.color);
+        }
+        
+        $("#messages-recipient-" + data.sender).parent().prepend($("#messages-recipient-" + data.sender));
+
+        if ($('#user-id').val() != data.sender) {
+		    $("#messages-recipient-" + data.sender).find('.new-message-alert').removeClass("hidden").fadeIn(200);
+		    $("#messages-recipient-" + data.sender).find('.messages-last-sent').addClass('new_msg_lst_lsent');
+		    $("#messages-recipient-" + data.sender).find('p').addClass('new_msg_active_list');
         }
         if(data.status == 200) {
           if(!$(".messages-container").find(".no-messages").length){

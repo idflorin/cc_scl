@@ -1,6 +1,6 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(0);
 header('Cache-Control: max-age=846000');
 
@@ -906,16 +906,19 @@ if ($wo['loggedin'] == true && $wo['user']['is_pro']) {
         $year = date('Y');
         $query_one = " SELECT COUNT(*) AS count FROM " . T_NOTIFICATION . " WHERE `recipient_id` = " . $wo['user']['id'] . " AND DAY(FROM_UNIXTIME(time)) = '{$day}' AND MONTH(FROM_UNIXTIME(time)) = '{$month}' AND YEAR(FROM_UNIXTIME(time)) = '{$year}' AND `type` = 'remaining'";
         $query          = mysqli_query($sqlConnect, $query_one);
-        $fetched_data = mysqli_fetch_assoc($query);
+        if ($query) {
+            $fetched_data = mysqli_fetch_assoc($query);
 
-        if ($fetched_data['count'] < 1) {
-            $db->insert(T_NOTIFICATION,array('recipient_id' => $wo['user']['id'],
-                                             'type' => 'remaining',
-                                             'text' => str_replace('{{time}}', $left_time, $wo['lang']['remaining_text']),
-                                             'url'  => 'index.php?link1=home',
-                                             'time' => time()));
+            if ($fetched_data['count'] < 1) {
+                $db->insert(T_NOTIFICATION,array('recipient_id' => $wo['user']['id'],
+                                                 'type' => 'remaining',
+                                                 'text' => str_replace('{{time}}', $left_time, $wo['lang']['remaining_text']),
+                                                 'url'  => 'index.php?link1=home',
+                                                 'time' => time()));
 
+            }
         }
+            
     }
     if ($remove == true) {
         $update      = Wo_UpdateUserData($wo['user']['id'], array(

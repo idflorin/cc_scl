@@ -67,7 +67,10 @@ if ($f == 'verificate-user') {
                     'types' => 'jpg,png,bmp,gif'
                 );
                 $media             = Wo_ShareFile($fileInfo);
-                $update_data[$key] = $media['filename'];
+                if (!empty($media)) {
+                    $update_data[$key] = $media['filename'];
+                }
+                
             }
             if (Wo_UpdateVerificationRequest($last_id, $update_data)) {
                 $data['status']  = 200;

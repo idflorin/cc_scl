@@ -9,6 +9,10 @@ if ($f == 'resned_ac_email') {
             $errors[] = $error_icon . $wo['lang']['failed_to_send_code_fill'];
         }
         if (!empty($_POST['email'])) {
+            $user2 = $db->where('email',Wo_Secure($_POST['email']))->getOne(T_USERS);
+            if (empty($user2)  || (!empty($user2) && $user2->user_id != $user['user_id'])) {
+                $errors[] = $error_icon . $wo['lang']['failed_to_send_code_fill'];
+            }
             if (Wo_EmailExists($_POST['email']) === true && $user['email'] != $_POST['email']) {
                 $errors[] = $error_icon . $wo['lang']['email_exists'];
             }
@@ -20,6 +24,10 @@ if ($f == 'resned_ac_email') {
                 $phone = 0;
             }
         } else if (!empty($_POST['phone_number'])) {
+            $user2 = $db->where('phone_number',Wo_Secure($_POST['phone_number']))->getOne(T_USERS);
+            if (empty($user2)  || (!empty($user2) && $user2->user_id != $user['user_id'])) {
+                $errors[] = $error_icon . $wo['lang']['failed_to_send_code_fill'];
+            }
             if (!preg_match('/^\+?\d+$/', $_POST['phone_number'])) {
                 $errors[] = $error_icon . $wo['lang']['worng_phone_number'];
             }
@@ -50,7 +58,8 @@ if ($f == 'resned_ac_email') {
                     'message_body' => $body,
                     'is_html' => true
                 );
-                $query                  = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `email` = '" . Wo_Secure($_POST['email']) . "', `email_code` = '$code' WHERE `user_id` = {$user_id}");
+                //$query                  = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `email` = '" . Wo_Secure($_POST['email']) . "', `email_code` = '$code' WHERE `user_id` = {$user_id}");
+                $query                  = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `email_code` = '$code' WHERE `user_id` = {$user_id}");
                 $send                   = Wo_SendMessage($send_message_data);
                 if ($send) {
                     $data = array(
@@ -63,7 +72,7 @@ if ($f == 'resned_ac_email') {
                 $message           = "Your confirmation code is: {$random_activation}";
                 $user_id           = $_SESSION['code_id'];
                 $phone_num         = Wo_Secure($_POST['phone_number']);
-                $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `phone_number` = '{$phone_num}' WHERE `user_id` = {$user_id}");
+                //$query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `phone_number` = '{$phone_num}' WHERE `user_id` = {$user_id}");
                 $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
                 if ($query) {
                     if (Wo_SendSMSMessage($_POST['phone_number'], $message) === true) {

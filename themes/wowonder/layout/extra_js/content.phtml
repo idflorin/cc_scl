@@ -740,19 +740,19 @@ function Wo_GetPayPalDonateLink(fund_id,amount) {
   });
 }
 
-function Wo_StripeDonate(fund_id,amount,type = 'stripe') {
+function Wo_StripeDonate(fund_id,amount,type = 'credit_card') {
   if (!amount || !fund_id) {
     return false;
   }
 
-  if (type == 'stripe') {
+  if (type == 'credit_card') {
     $('.btn-cart').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
   }
   else{
     $('.btn-alipay').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
   }
   var stripe = Stripe('<?php echo $wo['config']['stripe_id'];?>');
-  $.post(Wo_Ajax_Requests_File() + '?f=stripe&s=session', {amount: amount,type:'fund',fund_id:fund_id}, function(data, textStatus, xhr) {
+  $.post(Wo_Ajax_Requests_File() + '?f=stripe&s=session', {amount: amount,type:'fund',fund_id:fund_id,payment_type:type}, function(data, textStatus, xhr) {
     if (data.status == 200) {
       return stripe.redirectToCheckout({ sessionId: data.sessionId });
     }

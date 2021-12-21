@@ -394,7 +394,7 @@ $(function () {
     	first_chat_id = $(first_chat).attr('id');
     	sending_text = $('.mobileleftpane .text-sender-container textarea').val();
     	if (sending_text.length  > 100) {
-    		sending_text = jQuery.trim(sending_text).substring(0, 97)+'...';
+    		//sending_text = jQuery.trim(sending_text).substring(0, 97)+'...';
     	}
 
       $('#messages-recipient-'+chat_number).insertBefore( $( "#"+first_chat_id ) );
@@ -720,12 +720,24 @@ function Wo_GetMessagesUsers(query) {
 function messageTyping(){
   // console.log("Typing registered")
   socket.on("typing",(data)=>{
-   
-    var user_id = $("#user-id").val()
     
+    var user_id = $("#user-id").val()
+    if (typeof $("#messages-recipient-" + data.sender_id).attr("data-content") === 'undefined') {
+    	$("#messages-recipient-" + data.sender_id).attr("data-content", $("#messages-recipient-" + data.sender_id).find('p').text());
+    }
+    
+    var last_message = $("#messages-recipient-" + data.sender_id).find('p').html();
     if ( data.sender_id === +user_id && data.is_typing == 200) {
       $('.message-contnaier:last').find('.message-typing').html('<div class="incoming pull-left" id="typing"><div class="message-typing message-details"><div class="message-user-image pull-left"><img src="' + data.img + '" alt="Profile Picture"></div><svg width="30" height="40" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" fill="currentColor"> <circle cx="15" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="60" cy="15" r="9" fill-opacity="0.3"> <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s" values=".5;1;.5" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="105" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> </svg></div></div>').fadeIn(300);
+      if ($("#messages-recipient-" + data.sender_id).find('svg').length == 0 ) {
+      	 $("#messages-recipient-" + data.sender_id).find('p').html('<svg width="25" height="20" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" fill="currentColor"> <circle cx="15" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="60" cy="15" r="9" fill-opacity="0.3"> <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s" values=".5;1;.5" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="105" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> </svg>'); 
+      }
+    } else if (data.is_typing == 300) {
+    	$("#messages-recipient-" + data.sender_id).find('p').html($("#messages-recipient-" + data.sender_id).attr("data-content"));
     } else {
+    	if ($("#messages-recipient-" + data.sender_id).find('svg').length == 0 ) {
+    	  $("#messages-recipient-" + data.sender_id).find('p').html('<svg width="25" height="20" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" fill="currentColor"> <circle cx="15" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="60" cy="15" r="9" fill-opacity="0.3"> <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s" values=".5;1;.5" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="105" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> </svg>'); 
+    	}
        for (let a of $('.message-contnaier')) {
          $(a).find('.message-typing').empty()
        }
@@ -829,6 +841,7 @@ function Wo_GetUserMessages(user_id, user_name, userlink) {
     user_id: user_id
   }, function (data) {
     if(data.status == 200) {
+      window.history.pushState({state:'new'},'', "<?php echo($wo['config']['site_url']) ?>/messages/"+user_id);
       $('.wo_msg_user_dtl').css('display', 'none');
 
       $('.wo_msg_dtl_most_bottom').css('display', 'block');
@@ -1077,6 +1090,21 @@ function Wo_getNewMessages() {
         if (data.color) {
             $(".text-sender-container .red-list").css('background', data.color);
         }
+        if (data.hasOwnProperty('isMedia')) {
+        	$("#messages-recipient-" + data.sender).find('p').html("<?php echo $wo['lang']['media'];?>");
+        } else {
+        	
+        	$("#messages-recipient-" + data.sender).find('p').html(data.message);
+        }
+        $("#messages-recipient-" + data.sender).parent().prepend($("#messages-recipient-" + data.sender));
+        $("#messages-recipient-" + data.sender).find(".messages-last-sent").replaceWith(data.time);
+
+        if ($('#user-id').val() != data.sender) {
+		    $("#messages-recipient-" + data.sender).find('.new-message-alert').removeClass("hidden").fadeIn(200);
+		    $("#messages-recipient-" + data.sender).find('.messages-last-sent').addClass('new_msg_lst_lsent');
+		    $("#messages-recipient-" + data.sender).find('p').addClass('new_msg_active_list');
+        }
+        $("#messages-recipient-" + data.sender).attr("data-content", data.message);
         if(data.status == 200) {
           if(!$(".messages-container").find(".no-messages").length){
             if(+user_id === +data.sender || (data.self && (+data.id === +user_id))){

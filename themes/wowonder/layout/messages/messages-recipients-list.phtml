@@ -9,12 +9,13 @@ if (!empty($message['from_id'])) {
     $unread_class = ' unread';
    }
    if (strlen($message['text']) > 100) {
-   	$message['text'] = mb_substr( $message['text'], 0, 97, "utf-8") . '...';
+   	//$message['text'] = mb_substr( $message['text'], 0, 97, "utf-8") . '...';
    }
+   $message['text'] = Wo_Emo($message['text']);
    
 }
 ?>
-<div class="messages-recipients-list mobileopenlist <?php echo ($wo['session_active_background'] == $wo['recipient']['user_id']) ? 'active' : ''; ?>" id="messages-recipient-<?php echo $wo['recipient']['user_id']; ?>" onclick="Wo_GetUserMessages(<?php echo $wo['recipient']['user_id']; ?>,'<?php echo $wo['recipient']['name']; ?>');">
+<div class="messages-recipients-list mobileopenlist <?php echo (!empty($wo['session_active_background']) && $wo['session_active_background'] == $wo['recipient']['user_id']) ? 'active' : ''; ?>" id="messages-recipient-<?php echo $wo['recipient']['user_id']; ?>" onclick="Wo_GetUserMessages(<?php echo $wo['recipient']['user_id']; ?>,'<?php echo $wo['recipient']['name']; ?>');">
 	<div class="avatar <?php echo Wo_RightToLeft('pull-left');?>">
 		<img alt="<?php echo $wo['recipient']['name']; ?> Profile Picture" src="<?php echo $wo['recipient']['avatar'];?>">
 		<?php if ($wo['recipient']['lastseen'] > (time() - 60)) { ?>

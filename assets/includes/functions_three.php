@@ -190,8 +190,13 @@ function Wo_GetProduct($id = 0) {
     }
     $query_one    = " SELECT * FROM " . T_PRODUCTS . " WHERE `id` = '{$id}' ORDER BY `id` DESC";
     $sql          = mysqli_query($sqlConnect, $query_one);
-    $fetched_data = mysqli_fetch_assoc($sql);
-    if (empty($fetched_data)) {
+    if (mysqli_num_rows($sql)) {
+        $fetched_data = mysqli_fetch_assoc($sql);
+        if (empty($fetched_data)) {
+            return array();
+        }
+    }
+    else{
         return array();
     }
     $fetched_data['images']           = Wo_GetProductImages($fetched_data['id']);
@@ -248,13 +253,15 @@ function Wo_GetProductImages($id = 0) {
     $id        = Wo_Secure($id);
     $query_one = "SELECT `id`,`image`,`product_id` FROM " . T_PRODUCTS_MEDIA . " WHERE `product_id` = {$id} ORDER BY `id` DESC";
     $sql       = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql)) {
-        $explode2                  = @end(explode('.', $fetched_data['image']));
-        $explode3                  = @explode('.', $fetched_data['image']);
-        $fetched_data['image_org'] = $explode3[0] . '_small.' . $explode2;
-        $fetched_data['image_org'] = Wo_GetMedia($fetched_data['image_org']);
-        $fetched_data['image']     = Wo_GetMedia($fetched_data['image']);
-        $data[]                    = $fetched_data;
+    if (mysqli_num_rows($sql)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql)) {
+            $explode2                  = @end(explode('.', $fetched_data['image']));
+            $explode3                  = @explode('.', $fetched_data['image']);
+            $fetched_data['image_org'] = $explode3[0] . '_small.' . $explode2;
+            $fetched_data['image_org'] = Wo_GetMedia($fetched_data['image_org']);
+            $fetched_data['image']     = Wo_GetMedia($fetched_data['image']);
+            $data[]                    = $fetched_data;
+        }
     }
     return $data;
 }
@@ -291,29 +298,34 @@ function Wo_ProductImageData($data = array()) {
     }
     $query_one    = "SELECT * FROM " . T_PRODUCTS_MEDIA . " WHERE $subquery ORDER by `id` {$order_by}";
     $sql          = mysqli_query($sqlConnect, $query_one);
-    $fetched_data = mysqli_fetch_assoc($sql);
-    if (!empty($fetched_data)) {
-        $fetched_data['image_org'] = Wo_GetMedia($fetched_data['image']);
+    if (mysqli_num_rows($sql)) {
+        $fetched_data = mysqli_fetch_assoc($sql);
+        if (!empty($fetched_data)) {
+            $fetched_data['image_org'] = Wo_GetMedia($fetched_data['image']);
+        }
+        return $fetched_data;
     }
-    return $fetched_data;
+    return false;
 }
 function Wo_GetWelcomeFileds() {
     global $wo, $sqlConnect;
     $data      = array();
     $query_one = " SELECT * FROM " . T_FIELDS . " WHERE `registration_page` = '1' ORDER BY `id` ASC";
     $sql       = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql)) {
-        $fetched_data['fid'] = 'fid_' . $fetched_data['id'];
-        $fetched_data['name'] = preg_replace_callback("/{{LANG (.*?)}}/", function($m) use ($wo) {
-            return (isset($wo['lang'][$m[1]])) ? $wo['lang'][$m[1]] : '';
-        }, $fetched_data['name']);
-        $fetched_data['description'] = preg_replace_callback("/{{LANG (.*?)}}/", function($m) use ($wo) {
-            return (isset($wo['lang'][$m[1]])) ? $wo['lang'][$m[1]] : '';
-        }, $fetched_data['description']);
-        $fetched_data['type'] = preg_replace_callback("/{{LANG (.*?)}}/", function($m) use ($wo) {
-            return (isset($wo['lang'][$m[1]])) ? $wo['lang'][$m[1]] : '';
-        }, $fetched_data['type']);
-        $data[]               = $fetched_data;
+    if (mysqli_num_rows($sql)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql)) {
+            $fetched_data['fid'] = 'fid_' . $fetched_data['id'];
+            $fetched_data['name'] = preg_replace_callback("/{{LANG (.*?)}}/", function($m) use ($wo) {
+                return (isset($wo['lang'][$m[1]])) ? $wo['lang'][$m[1]] : '';
+            }, $fetched_data['name']);
+            $fetched_data['description'] = preg_replace_callback("/{{LANG (.*?)}}/", function($m) use ($wo) {
+                return (isset($wo['lang'][$m[1]])) ? $wo['lang'][$m[1]] : '';
+            }, $fetched_data['description']);
+            $fetched_data['type'] = preg_replace_callback("/{{LANG (.*?)}}/", function($m) use ($wo) {
+                return (isset($wo['lang'][$m[1]])) ? $wo['lang'][$m[1]] : '';
+            }, $fetched_data['type']);
+            $data[]               = $fetched_data;
+        }
     }
     return $data;
 }
@@ -358,8 +370,11 @@ function Wo_IsProductSold($id) {
     }
     $id            = Wo_Secure($id);
     $query_one     = mysqli_query($sqlConnect, "SELECT COUNT(`id`) as `count` FROM " . T_PRODUCTS . " WHERE `id` = {$id} AND `status` = '1'");
-    $sql_query_one = mysqli_fetch_assoc($query_one);
-    return ($sql_query_one['count'] == 1) ? true : false;
+    if (mysqli_num_rows($query_one)) {
+        $sql_query_one = mysqli_fetch_assoc($query_one);
+        return ($sql_query_one['count'] == 1) ? true : false;
+    }
+    return false;
 }
 function Wo_GetPostIDFromProdcutID($id) {
     global $sqlConnect;
@@ -369,8 +384,11 @@ function Wo_GetPostIDFromProdcutID($id) {
     $id            = Wo_Secure($id);
     $query_one     = "SELECT `id` FROM " . T_POSTS . " WHERE `product_id` = '{$id}'";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    $sql_fetch_one = mysqli_fetch_assoc($sql_query_one);
-    return $sql_fetch_one['id'];
+    if (mysqli_num_rows($sql_query_one)) {
+        $sql_fetch_one = mysqli_fetch_assoc($sql_query_one);
+        return $sql_fetch_one['id'];
+    }
+    return false;
 }
 function Wo_UpdateProductData($product_id, $update_data) {
     global $wo, $sqlConnect;
@@ -496,10 +514,12 @@ function Wo_GetProducts($filter_data = array()) {
         }
     }
     $sql = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql)) {
-        $products           = Wo_GetProduct($fetched_data['id']);
-        $products['seller'] = Wo_UserData($fetched_data['user_id']);
-        $data[]             = $products;
+    if (mysqli_num_rows($sql)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql)) {
+            $products           = Wo_GetProduct($fetched_data['id']);
+            $products['seller'] = Wo_UserData($fetched_data['user_id']);
+            $data[]             = $products;
+        }
     }
     return $data;
 }
@@ -533,8 +553,10 @@ function Wo_GetPostOptions($post_id = 0) {
     $post_id       = Wo_Secure($post_id);
     $query_one     = "SELECT * FROM " . T_POLLS . " WHERE `post_id` = '{$post_id}'";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
-        $data[] = $fetched_data;
+    if (mysqli_num_rows($sql_query_one)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
+            $data[] = $fetched_data;
+        }
     }
     return $data;
 }
@@ -546,8 +568,11 @@ function Wo_GetPostIDFromOptionID($id) {
     $id            = Wo_Secure($id);
     $query_one     = "SELECT `post_id` FROM " . T_POLLS . " WHERE `id` = '{$id}'";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    $sql_fetch_one = mysqli_fetch_assoc($sql_query_one);
-    return $sql_fetch_one['post_id'];
+    if (mysqli_num_rows($sql_query_one)) {
+        $sql_fetch_one = mysqli_fetch_assoc($sql_query_one);
+        return $sql_fetch_one['post_id'];
+    }
+    return false;
 }
 function Wo_VoteUp($option_id = 0, $user_id = 0) {
     global $sqlConnect;
@@ -588,9 +613,11 @@ function Wo_IsOptionVoted($option_id, $user_id) {
     $option_id = Wo_Secure($option_id);
     $query_one = "SELECT COUNT(id) as count FROM " . T_VOTES . " WHERE `option_id` = '{$option_id}' AND `user_id` = '{$user_id}'";
     $sql       = mysqli_query($sqlConnect, $query_one);
-    $sql_fetch = mysqli_fetch_assoc($sql);
-    if ($sql_fetch['count'] > 0) {
-        return true;
+    if (mysqli_num_rows($sql)) {
+        $sql_fetch = mysqli_fetch_assoc($sql);
+        if ($sql_fetch['count'] > 0) {
+            return true;
+        }
     }
     return false;
 }
@@ -606,9 +633,11 @@ function Wo_IsPostVoted($post_id, $user_id) {
     $post_id   = Wo_Secure($post_id);
     $query_one = "SELECT COUNT(id) as count FROM " . T_VOTES . " WHERE `post_id` = '{$post_id}' AND `user_id` = '{$user_id}'";
     $sql       = mysqli_query($sqlConnect, $query_one);
-    $sql_fetch = mysqli_fetch_assoc($sql);
-    if ($sql_fetch['count'] > 0) {
-        return true;
+    if (mysqli_num_rows($sql)) {
+        $sql_fetch = mysqli_fetch_assoc($sql);
+        if ($sql_fetch['count'] > 0) {
+            return true;
+        }
     }
     return false;
 }
@@ -625,9 +654,11 @@ function Ju_GetPercentageOfOptionPost($post_id) {
     $query_one     = "SELECT * FROM " . T_POLLS . " WHERE `post_id` = '{$post_id}'";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
     $all           = 0;
-    while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
-        $fetched_data['option_votes'] = Wo_GetVotes($fetched_data['id']);
-        $data[]                       = $fetched_data;
+    if (mysqli_num_rows($sql_query_one)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
+            $fetched_data['option_votes'] = Wo_GetVotes($fetched_data['id']);
+            $data[]                       = $fetched_data;
+        }
     }
     foreach ($data as $key => $value) {
         $all += $value['option_votes'];
@@ -655,19 +686,24 @@ function Wo_GetVotes($option_id) {
     $option_id    = Wo_Secure($option_id);
     $query_one    = "SELECT COUNT(id) as count FROM " . T_VOTES . " WHERE `option_id` = {$option_id}";
     $sql          = mysqli_query($sqlConnect, $query_one);
-    $fetched_data = mysqli_fetch_assoc($sql);
-    if (empty($fetched_data)) {
-        return array();
+    if (mysqli_num_rows($sql)) {
+        $fetched_data = mysqli_fetch_assoc($sql);
+        if (empty($fetched_data)) {
+            return array();
+        }
+        return $fetched_data['count'];
     }
-    return $fetched_data['count'];
+    return false;
 }
 function Wo_GetCustomPages() {
     global $sqlConnect;
     $data          = array();
     $query_one     = "SELECT * FROM " . T_CUSTOM_PAGES . " ORDER BY `id` DESC";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
-        $data[] = Wo_GetCustomPage($fetched_data['page_name']);
+    if (mysqli_num_rows($sql_query_one)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
+            $data[] = Wo_GetCustomPage($fetched_data['page_name']);
+        }
     }
     return $data;
 }
@@ -680,8 +716,11 @@ function Wo_GetCustomPage($page_name) {
     $page_name     = Wo_Secure($page_name);
     $query_one     = "SELECT * FROM " . T_CUSTOM_PAGES . " WHERE `page_name` = '{$page_name}'";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    $fetched_data  = mysqli_fetch_assoc($sql_query_one);
-    return $fetched_data;
+    if (mysqli_num_rows($sql_query_one)) {
+        $fetched_data  = mysqli_fetch_assoc($sql_query_one);
+        return $fetched_data;
+    }
+    return false;
 }
 function Wo_RegisterNewPage($registration_data) {
     global $wo, $sqlConnect;
@@ -752,8 +791,10 @@ function Wo_GetReferrers($user_id = 0) {
     $data          = array();
     $query_one     = "SELECT * FROM " . T_USERS . " WHERE `referrer` = '{$user_id}' ORDER BY `user_id` DESC";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
-        $data[] = Wo_UserData($fetched_data['user_id']);
+    if (mysqli_num_rows($sql_query_one)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
+            $data[] = Wo_UserData($fetched_data['user_id']);
+        }
     }
     return $data;
 }
@@ -837,8 +878,10 @@ function Wo_GetPaymentsHistory($user_id = 0) {
     $data          = array();
     $query_one     = "SELECT `id` FROM " . T_A_REQUESTS . " WHERE `user_id` = '{$user_id}' ORDER BY `id` DESC";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
-        $data[] = Wo_GetPaymentHistory($fetched_data['id']);
+    if (mysqli_num_rows($sql_query_one)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
+            $data[] = Wo_GetPaymentHistory($fetched_data['id']);
+        }
     }
     return $data;
 }
@@ -852,8 +895,10 @@ function Wo_GetAllPaymentsHistory($type = 0) {
     }
     $query_one     = "SELECT * FROM " . T_A_REQUESTS . " {$where} ORDER BY `id` DESC";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
-        $data[] = Wo_GetPaymentHistory($fetched_data['id']);
+    if (mysqli_num_rows($sql_query_one)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
+            $data[] = Wo_GetPaymentHistory($fetched_data['id']);
+        }
     }
     return $data;
 }
@@ -863,8 +908,11 @@ function Wo_CountPaymentHistory($id) {
     $id            = Wo_Secure($id);
     $query_one     = "SELECT COUNT(`id`) as count FROM " . T_A_REQUESTS . " WHERE `status` = '{$id}'";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    $fetched_data  = mysqli_fetch_assoc($sql_query_one);
-    return $fetched_data['count'];
+    if (mysqli_num_rows($sql_query_one)) {
+        $fetched_data  = mysqli_fetch_assoc($sql_query_one);
+        return $fetched_data['count'];
+    }
+    return false;
 }
 function Wo_GetPaymentHistory($id) {
     global $sqlConnect, $wo;
@@ -875,12 +923,15 @@ function Wo_GetPaymentHistory($id) {
     $id                           = Wo_Secure($id);
     $query_one                    = "SELECT * FROM " . T_A_REQUESTS . " WHERE `id` = '{$id}'";
     $sql_query_one                = mysqli_query($sqlConnect, $query_one);
-    $fetched_data                 = mysqli_fetch_assoc($sql_query_one);
-    $fetched_data['user']         = Wo_UserData($fetched_data['user_id']);
-    $fetched_data['total_refs']   = Wo_CountRefs($fetched_data['user_id']);
-    $fetched_data['time_text']    = Wo_Time_Elapsed_String($fetched_data['time']);
-    $fetched_data['callback_url'] = $wo['config']['site_url'] . '/' . 'requests.php?f=admincp&paid_user_id=' . $fetched_data['user_id'] . '&paid_ref_id=' . $fetched_data['id'];
-    return $fetched_data;
+    if (mysqli_num_rows($sql_query_one)) {
+        $fetched_data                 = mysqli_fetch_assoc($sql_query_one);
+        $fetched_data['user']         = Wo_UserData($fetched_data['user_id']);
+        $fetched_data['total_refs']   = Wo_CountRefs($fetched_data['user_id']);
+        $fetched_data['time_text']    = Wo_Time_Elapsed_String($fetched_data['time']);
+        $fetched_data['callback_url'] = $wo['config']['site_url'] . '/' . 'requests.php?f=admincp&paid_user_id=' . $fetched_data['user_id'] . '&paid_ref_id=' . $fetched_data['id'];
+        return $fetched_data;
+    }
+    return false;
 }
 function Wo_CountRefs($user_id = 0) {
     global $sqlConnect;
@@ -888,8 +939,11 @@ function Wo_CountRefs($user_id = 0) {
     $user_id       = Wo_Secure($user_id);
     $query_one     = "SELECT COUNT(`user_id`) as count FROM " . T_USERS . " WHERE `referrer` = '{$user_id}'";
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
-    $fetched_data  = mysqli_fetch_assoc($sql_query_one);
-    return $fetched_data['count'];
+    if (mysqli_num_rows($sql_query_one)) {
+        $fetched_data  = mysqli_fetch_assoc($sql_query_one);
+        return $fetched_data['count'];
+    }
+    return false;
 }
 function Wo_InsertBlog($registration_data = array()) {
     global $sqlConnect, $wo;
@@ -941,12 +995,17 @@ function Wo_GetBlogCommentsCount($id) {
     $count        = 0;
     $sql          = "SELECT COUNT(`id`) as blogComments FROM " . T_BLOG_COMM . " WHERE `blog_id` = '$id'";
     $query        = mysqli_query($sqlConnect, $sql);
-    $fetched_data = mysqli_fetch_assoc($query);
-    $count += $fetched_data['blogComments'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        $count += $fetched_data['blogComments'];
+    }
     $sql          = "SELECT COUNT(`id`) as blogComments FROM " . T_BLOG_COMM_REPLIES . " WHERE `blog_id` = '$id'";
     $query        = mysqli_query($sqlConnect, $sql);
-    $fetched_data = mysqli_fetch_assoc($query);
-    return $count + $fetched_data['blogComments'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        return $count + $fetched_data['blogComments'];
+    }
+    return $count;
 }
 function Wo_GetBlogComments($args = array()) {
     global $sqlConnect, $wo;
@@ -975,10 +1034,12 @@ function Wo_GetBlogComments($args = array()) {
         $limit   = Wo_Secure($args['limit']);
     }
     $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_BLOG_COMM . " WHERE `id` > 0 {$query_one} ORDER BY `id` DESC LIMIT $limit ");
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $comment = Wo_GetBlogCommentData($fetched_data['id']);
-        if ($comment && !empty($comment)) {
-            $data[] = $comment;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $comment = Wo_GetBlogCommentData($fetched_data['id']);
+            if ($comment && !empty($comment)) {
+                $data[] = $comment;
+            }
         }
     }
     return $data;
@@ -989,9 +1050,11 @@ function Wo_GetBlogCommLikes($id) {
     $likes = 0;
     $sql   = "SELECT COUNT(`id`) as blogCommentLikes FROM " . T_BM_LIKES . " WHERE `blog_comm_id` = '$id'";
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query && !empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        $likes        = $fetched_data['blogCommentLikes'];
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            $likes        = $fetched_data['blogCommentLikes'];
+        }
     }
     return $likes;
 }
@@ -1001,9 +1064,11 @@ function Wo_GetBlogCommReplyLikes($id) {
     $likes = 0;
     $sql   = "SELECT COUNT(`id`) as blogCommentReplyLikes FROM " . T_BM_LIKES . " WHERE `blog_commreply_id` = '$id'";
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query && !empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        $likes        = $fetched_data['blogCommentReplyLikes'];
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            $likes        = $fetched_data['blogCommentReplyLikes'];
+        }
     }
     return $likes;
 }
@@ -1013,9 +1078,11 @@ function Wo_GetBlogCommReplyDisLikes($id) {
     $likes = 0;
     $sql   = "SELECT COUNT(`id`) as blogCommentReplyDisLikes FROM " . T_BM_DISLIKES . " WHERE `blog_commreply_id` = '$id'";
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query && !empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        $likes        = $fetched_data['blogCommentReplyDisLikes'];
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            $likes        = $fetched_data['blogCommentReplyDisLikes'];
+        }
     }
     return $likes;
 }
@@ -1025,9 +1092,11 @@ function Wo_GetBlogCommDisLikes($id) {
     $likes = 0;
     $sql   = "SELECT COUNT(`id`) as blogCommentDisLikes FROM " . T_BM_DISLIKES . " WHERE `blog_comm_id` = '$id'";
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query && !empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        $likes        = $fetched_data['blogCommentDisLikes'];
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            $likes        = $fetched_data['blogCommentDisLikes'];
+        }
     }
     return $likes;
 }
@@ -1058,10 +1127,12 @@ function Wo_GetBlogCommentReplies($args = array()) {
         $query_one .= " AND `id` > $offset ";
     }
     $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_BLOG_COMM_REPLIES . " WHERE `id` > 0 {$query_one} ORDER BY `id` ASC $limit");
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $comment = Wo_GetBlogCommReplyData($fetched_data['id']);
-        if ($comment && !empty($comment)) {
-            $data[] = $comment;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $comment = Wo_GetBlogCommReplyData($fetched_data['id']);
+            if ($comment && !empty($comment)) {
+                $data[] = $comment;
+            }
         }
     }
     return $data;
@@ -1073,10 +1144,12 @@ function Wo_IsBlogCommentOwner($id) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_BLOG_COMM . " WHERE `id` = '$id'");
-    $fetched_data = mysqli_fetch_assoc($query);
-    if (!empty($fetched_data) && is_array($fetched_data)) {
-        if ($fetched_data['user_id'] == $wo['user']['id'] || $wo['user']['admin'] == 1) {
-            $is_owner = true;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        if (!empty($fetched_data) && is_array($fetched_data)) {
+            if ($fetched_data['user_id'] == $wo['user']['id'] || $wo['user']['admin'] == 1) {
+                $is_owner = true;
+            }
         }
     }
     return $is_owner;
@@ -1089,9 +1162,11 @@ function Wo_IsBlogCommReplyOwner($id) {
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_BLOG_COMM_REPLIES . " WHERE `id` = '$id'");
     $fetched_data = mysqli_fetch_assoc($query);
-    if (!empty($fetched_data) && is_array($fetched_data)) {
-        if ($fetched_data['user_id'] == $wo['user']['id'] || $wo['user']['admin'] == 1) {
-            $is_owner = true;
+    if (mysqli_num_rows($query)) {
+        if (!empty($fetched_data) && is_array($fetched_data)) {
+            if ($fetched_data['user_id'] == $wo['user']['id'] || $wo['user']['admin'] == 1) {
+                $is_owner = true;
+            }
         }
     }
     return $is_owner;
@@ -1102,19 +1177,22 @@ function Wo_GetBlogCommentData($id) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_BLOG_COMM . " WHERE `id` = '$id'");
-    $fetched_data = mysqli_fetch_assoc($query);
-    $data         = false;
-    if (!empty($fetched_data)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['is_owner']  = Wo_IsBlogCommentOwner($fetched_data['id']);
-        $fetched_data['likes']     = Wo_GetBlogCommLikes($fetched_data['id']);
-        $fetched_data['dislikes']  = Wo_GetBlogCommDisLikes($fetched_data['id']);
-        $fetched_data['replies']   = Wo_GetBlogCommentReplies(array(
-            'comm_id' => $fetched_data['id']
-        ));
-        $data                      = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        $data         = false;
+        if (!empty($fetched_data)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['is_owner']  = Wo_IsBlogCommentOwner($fetched_data['id']);
+            $fetched_data['likes']     = Wo_GetBlogCommLikes($fetched_data['id']);
+            $fetched_data['dislikes']  = Wo_GetBlogCommDisLikes($fetched_data['id']);
+            $fetched_data['replies']   = Wo_GetBlogCommentReplies(array(
+                'comm_id' => $fetched_data['id']
+            ));
+            $data                      = $fetched_data;
+        }
+        return $data;
     }
-    return $data;
+    return false;
 }
 function Wo_GetBlogCommReplyData($id) {
     global $sqlConnect, $wo;
@@ -1122,16 +1200,19 @@ function Wo_GetBlogCommReplyData($id) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_BLOG_COMM_REPLIES . " WHERE `id` = '$id'");
-    $fetched_data = mysqli_fetch_assoc($query);
-    $data         = false;
-    if (!empty($fetched_data)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['is_owner']  = Wo_IsBlogCommReplyOwner($fetched_data['id']);
-        $fetched_data['likes']     = Wo_GetBlogCommReplyLikes($fetched_data['id']);
-        $fetched_data['dislikes']  = Wo_GetBlogCommReplyDisLikes($fetched_data['id']);
-        $data                      = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        $data         = false;
+        if (!empty($fetched_data)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['is_owner']  = Wo_IsBlogCommReplyOwner($fetched_data['id']);
+            $fetched_data['likes']     = Wo_GetBlogCommReplyLikes($fetched_data['id']);
+            $fetched_data['dislikes']  = Wo_GetBlogCommReplyDisLikes($fetched_data['id']);
+            $data                      = $fetched_data;
+        }
+        return $data;
     }
-    return $data;
+    return false;
 }
 function Wo_IsBlogCommentLikeExists($id) {
     global $sqlConnect, $wo;
@@ -1328,8 +1409,11 @@ function Wo_IsBlogOwner($blog_id = 0, $user_id = 0) {
     $user_id = Wo_Secure($user_id);
     $blog_id = Wo_Secure($blog_id);
     $query   = mysqli_query($sqlConnect, "SELECT COUNT(`id`) as count FROM " . T_BLOG . " WHERE `user` = {$user_id} AND `id` = $blog_id");
-    $query_  = mysqli_fetch_assoc($query);
-    return ($query_['count'] > 0) ? true : false;
+    if (mysqli_num_rows($query)) {
+        $query_  = mysqli_fetch_assoc($query);
+        return ($query_['count'] > 0) ? true : false;
+    }
+    return false;
 }
 function Wo_UpdateBlog($id = 0, $update_data = array()) {
     global $sqlConnect, $wo;
@@ -1373,8 +1457,10 @@ function Wo_GetMyBlogs($user = 0, $offset = 0) {
     $offset = Wo_Secure($offset);
     $t_blog = T_BLOG;
     $query  = mysqli_query($sqlConnect, "SELECT * FROM  `$t_blog` WHERE `user` = '$user' {$active} {$after_blogs} ORDER BY `id` DESC LIMIT 10");
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = Wo_GetArticle($fetched_data['id']);
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = Wo_GetArticle($fetched_data['id']);
+        }
     }
 
     return $data;
@@ -1430,8 +1516,10 @@ function Wo_GetBlogs($args = array()) {
     $query_two = "SELECT * FROM  " . T_BLOG . " {$query_one} ORDER BY $order_by_text LIMIT {$limit} ";
     $query     = mysqli_query($sqlConnect, $query_two);
     $data      = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = Wo_GetArticle($fetched_data['id']);
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = Wo_GetArticle($fetched_data['id']);
+        }
     }
     return $data;
 }
@@ -1484,29 +1572,32 @@ function Wo_GetArticle($id = 0) {
     }
     $id            = Wo_Secure($id);
     $sql_query_one = mysqli_query($sqlConnect, "SELECT * FROM " . T_BLOG . " WHERE `id` = '$id' {$active}");
-    $fetched_data  = mysqli_fetch_assoc($sql_query_one);
-    if (!empty($fetched_data)) {
-        $fetched_data['author']        = Wo_UserData($fetched_data['user']);
-        $fetched_data['thumbnail']     = Wo_GetMedia($fetched_data['thumbnail']);
-        $fetched_data['tags_array']    = @explode(',', $fetched_data['tags']);
-        if ($wo['config']['useSeoFrindly'] == 1) {
-            $fetched_data['url']           = Wo_SeoLink('index.php?link1=read-blog&id=' . $fetched_data['id'] . '_' . Wo_SlugPost($fetched_data['title']));
+    if (mysqli_num_rows($sql_query_one)) {
+        $fetched_data  = mysqli_fetch_assoc($sql_query_one);
+        if (!empty($fetched_data)) {
+            $fetched_data['author']        = Wo_UserData($fetched_data['user']);
+            $fetched_data['thumbnail']     = Wo_GetMedia($fetched_data['thumbnail']);
+            $fetched_data['tags_array']    = @explode(',', $fetched_data['tags']);
+            if ($wo['config']['useSeoFrindly'] == 1) {
+                $fetched_data['url']           = Wo_SeoLink('index.php?link1=read-blog&id=' . $fetched_data['id'] . '_' . Wo_SlugPost($fetched_data['title']));
+            }
+            else{
+                $fetched_data['url']           = Wo_SeoLink('index.php?link1=read-blog&id=' . $fetched_data['id']);
+            }
+            $fetched_data['author']        = Wo_UserData($fetched_data['user']);
+            $fetched_data['category_link'] = Wo_SeoLink('index.php?link1=blog-category&id=' . $fetched_data['category']);
+            $fetched_data['category_name'] = '';
+            $fetched_data['is_post_admin'] = false;
+            if ($wo['loggedin'] == true) {
+                $fetched_data['is_post_admin'] = ($fetched_data['user'] == $wo['user']['id']) ? true : false;
+            }
+            if (!empty($wo['blog_categories'][$fetched_data['category']])) {
+                $fetched_data['category_name'] = $wo['blog_categories'][$fetched_data['category']];
+            }
         }
-        else{
-            $fetched_data['url']           = Wo_SeoLink('index.php?link1=read-blog&id=' . $fetched_data['id']);
-        }
-        $fetched_data['author']        = Wo_UserData($fetched_data['user']);
-        $fetched_data['category_link'] = Wo_SeoLink('index.php?link1=blog-category&id=' . $fetched_data['category']);
-        $fetched_data['category_name'] = '';
-        $fetched_data['is_post_admin'] = false;
-        if ($wo['loggedin'] == true) {
-            $fetched_data['is_post_admin'] = ($fetched_data['user'] == $wo['user']['id']) ? true : false;
-        }
-        if (!empty($wo['blog_categories'][$fetched_data['category']])) {
-            $fetched_data['category_name'] = $wo['blog_categories'][$fetched_data['category']];
-        }
+        return $fetched_data;
     }
-    return $fetched_data;
+    return false;
 }
 function Wo_SearchBlogs($args = array()) {
     global $sqlConnect, $wo;
@@ -1526,8 +1617,10 @@ function Wo_SearchBlogs($args = array()) {
     $query_two = "SELECT * FROM " . T_BLOG . " WHERE  `category` = '$category' AND  `title` LIKE '%$keyword%' OR `description` LIKE '%$keyword%' ";
     $query     = mysqli_query($sqlConnect, $query_two);
     $data      = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = Wo_GetArticle($fetched_data['id']);
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = Wo_GetArticle($fetched_data['id']);
+        }
     }
     return $data;
 }
@@ -1566,18 +1659,20 @@ function Wo_GetForumSec($args = array()) {
     }
     $sql_query_one = mysqli_query($sqlConnect, "SELECT * FROM " . T_FORUM_SEC . " WHERE `id` > 0 {$query_one}");
     $data          = array();
-    while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
-        if ($forums) {
-            $fetched_data['forums'] = Wo_GetForums(array(
-                "section" => $fetched_data['id'],
-                "search" => $search,
-                "keyword" => $keyword
-            ));
-            if (count($fetched_data['forums']) > 0) {
+    if (mysqli_num_rows($sql_query_one)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
+            if ($forums) {
+                $fetched_data['forums'] = Wo_GetForums(array(
+                    "section" => $fetched_data['id'],
+                    "search" => $search,
+                    "keyword" => $keyword
+                ));
+                if (count($fetched_data['forums']) > 0) {
+                    $data[] = $fetched_data;
+                }
+            } else {
                 $data[] = $fetched_data;
             }
-        } else {
-            $data[] = $fetched_data;
         }
     }
     return $data;
@@ -1638,13 +1733,15 @@ function Wo_GetForumInfo($fid) {
     }
     $sql_query_one = mysqli_query($sqlConnect, "SELECT * FROM " . T_FORUMS . " WHERE `id` = '$fid'");
     $data          = array();
-    while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
-        $data['threads'] = Wo_GetForumThreads(array(
-            "forum" => $fetched_data['id'],
-            "limit" => 10
-        ));
-        $data['forum']   = $fetched_data;
-        $data['forums']  = Wo_GetForums();
+    if (mysqli_num_rows($sql_query_one)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql_query_one)) {
+            $data['threads'] = Wo_GetForumThreads(array(
+                "forum" => $fetched_data['id'],
+                "limit" => 10
+            ));
+            $data['forum']   = $fetched_data;
+            $data['forums']  = Wo_GetForums();
+        }
     }
     return $data;
 }
@@ -1654,11 +1751,14 @@ function Wo_GetForum($fid) {
         return array();
     }
     $sql_query_one = mysqli_query($sqlConnect, "SELECT * FROM " . T_FORUMS . " WHERE `id` = '$fid'");
-    $fetched_data  = mysqli_fetch_assoc($sql_query_one);
-    if (!empty($fetched_data)) {
-        $fetched_data['name'] = Wo_GetShortTitle($fetched_data['name'], true);
+    if (mysqli_num_rows($sql_query_one)) {
+        $fetched_data  = mysqli_fetch_assoc($sql_query_one);
+        if (!empty($fetched_data)) {
+            $fetched_data['name'] = Wo_GetShortTitle($fetched_data['name'], true);
+        }
+        return $fetched_data;
     }
-    return $fetched_data;
+    return false;
 }
 function Wo_GetForumThreads($args = array()) {
     global $sqlConnect;
@@ -1914,12 +2014,14 @@ function Wo_GetForumUsers($args = array()) {
         $query_one .= " AND `username` LIKE '%$name%'";
     }
     $sql = mysqli_query($sqlConnect, " SELECT `user_id` FROM " . T_USERS . " WHERE `type` = 'user' {$query_one} ORDER BY `user_id` DESC LIMIT 10 ");
-    while ($fetched_data = mysqli_fetch_assoc($sql)) {
-        $data_user                = Wo_UserData($fetched_data['user_id']);
-        $data_user['forum_posts'] = Wo_GetTotalThreads(array(
-            'user' => $fetched_data['user_id']
-        ));
-        $data[]                   = $data_user;
+    if (mysqli_num_rows($sql)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql)) {
+            $data_user                = Wo_UserData($fetched_data['user_id']);
+            $data_user['forum_posts'] = Wo_GetTotalThreads(array(
+                'user' => $fetched_data['user_id']
+            ));
+            $data[]                   = $data_user;
+        }
     }
     return $data;
 }
@@ -2600,19 +2702,22 @@ function Is_EventOwner($id, $user = false, $admin = true) {
     }
     $user         = ($user && is_numeric($user)) ? $user : $wo['user']['id'];
     $query        = mysqli_query($sqlConnect, "SELECT * FROM " . T_EVENTS . "  WHERE `id` = '$id'");
-    $fetched_data = mysqli_fetch_assoc($query);
-    $result       = false;
-    if (!empty($fetched_data)) {
-        if ($fetched_data['poster_id'] == $user) {
-            if ($admin == true) {
-                if (Wo_IsAdmin($user)) {
-                    $result = true;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        $result       = false;
+        if (!empty($fetched_data)) {
+            if ($fetched_data['poster_id'] == $user) {
+                if ($admin == true) {
+                    if (Wo_IsAdmin($user)) {
+                        $result = true;
+                    }
                 }
+                $result = true;
             }
-            $result = true;
         }
+        return $result;
     }
-    return $result;
+    return false;
 }
 function Wo_InsertEvent($registration_data = array()) {
     global $sqlConnect, $wo;
@@ -2668,8 +2773,10 @@ function Wo_EventGoingExists($event_id) {
     $data     = array();
     $sql      = "SELECT `id` FROM " . T_EVENTS_GOING . "  WHERE `event_id` = '$event_id' AND `user_id` = '$user_id ' ";
     $query    = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = $fetched_data;
+        }
     }
     if (count($data) > 0) {
         return true;
@@ -2689,8 +2796,10 @@ function Wo_EventInterestedExists($event_id) {
     $data     = array();
     $sql      = "SELECT `id` FROM " . T_EVENTS_INT . "  WHERE `event_id` = '$event_id' AND `user_id` = '$user_id' ";
     $query    = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = $fetched_data;
+        }
     }
     if (count($data) > 0) {
         return true;
@@ -2713,8 +2822,10 @@ function Wo_EventInvitedExists($event_id, $user_id) {
     $data     = array();
     $sql      = "SELECT `id` FROM " . T_EVENTS_INV . "  WHERE `event_id` = '$event_id' AND `invited_id` = '$user_id' ";
     $query    = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = $fetched_data;
+        }
     }
     if (count($data) > 0) {
         return true;
@@ -2734,8 +2845,11 @@ function Wo_TotalInvitedUsers($event_id) {
     $data         = array();
     $sql          = "SELECT COUNT(`id`) AS count FROM " . T_EVENTS_INV . " WHERE `event_id` = '$event_id'";
     $query        = mysqli_query($sqlConnect, $sql);
-    $fetched_data = mysqli_fetch_assoc($query);
-    return $fetched_data['count'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        return $fetched_data['count'];
+    }
+    return false;
 }
 function Wo_TotalGoingUsers($event_id) {
     global $sqlConnect, $wo;
@@ -2750,8 +2864,11 @@ function Wo_TotalGoingUsers($event_id) {
     $data         = array();
     $sql          = "SELECT COUNT(`id`) AS count FROM " . T_EVENTS_GOING . " WHERE `event_id` = '$event_id'";
     $query        = mysqli_query($sqlConnect, $sql);
-    $fetched_data = mysqli_fetch_assoc($query);
-    return $fetched_data['count'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        return $fetched_data['count'];
+    }
+    return false;
 }
 function Wo_TotalInterestedUsers($event_id) {
     global $sqlConnect, $wo;
@@ -2766,8 +2883,11 @@ function Wo_TotalInterestedUsers($event_id) {
     $data         = array();
     $sql          = "SELECT COUNT(`id`) AS count FROM " . T_EVENTS_INT . " WHERE `event_id` = '$event_id'";
     $query        = mysqli_query($sqlConnect, $sql);
-    $fetched_data = mysqli_fetch_assoc($query);
-    return $fetched_data['count'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        return $fetched_data['count'];
+    }
+    return false;
 }
 function Wo_AddEventGoingUsers($event_id) {
     global $sqlConnect, $wo;
@@ -2915,13 +3035,15 @@ function Wo_GetEvents($args = array()) {
     }
     $query = mysqli_query($sqlConnect, $sql);
     $data  = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data']  = Wo_UserData($fetched_data['poster_id']);
-        //$fetched_data['start_date'] = date('F j Y, g:i a', strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
-        $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
-        $fetched_data['cover']      = Wo_GetMedia($fetched_data['cover']);
-        $fetched_data['url']        = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
-        $data[]                     = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data']  = Wo_UserData($fetched_data['poster_id']);
+            //$fetched_data['start_date'] = date('F j Y, g:i a', strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
+            $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
+            $fetched_data['cover']      = Wo_GetMedia($fetched_data['cover']);
+            $fetched_data['url']        = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
+            $data[]                     = $fetched_data;
+        }
     }
     return $data;
 }
@@ -2944,11 +3066,13 @@ function Wo_GetSuggestedEvents($args = array()) {
     }
     $query = mysqli_query($sqlConnect, $sql);
     $data  = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data']  = Wo_UserData($fetched_data['poster_id']);
-        $fetched_data['start_date'] = date('F j Y, g:i a', strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
-        $fetched_data['url']        = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
-        $data[]                     = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data']  = Wo_UserData($fetched_data['poster_id']);
+            $fetched_data['start_date'] = date('F j Y, g:i a', strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
+            $fetched_data['url']        = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
+            $data[]                     = $fetched_data;
+        }
     }
     return $data;
 }
@@ -2966,9 +3090,11 @@ function Wo_GetGoingEvents($offset = 0,$limit = 10) {
     $sql     = "SELECT `event_id` FROM " . T_EVENTS_GOING . "  WHERE `user_id` = '$user_id' {$sub_q}  ORDER BY `event_id` DESC LIMIT {$limit}";
     $query   = mysqli_query($sqlConnect, $sql);
     $data    = array();
-    if ($query && !empty($query)) {
-        while ($fetched_data = mysqli_fetch_assoc($query)) {
-            $data[] = Wo_EventData($fetched_data['event_id']);
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            while ($fetched_data = mysqli_fetch_assoc($query)) {
+                $data[] = Wo_EventData($fetched_data['event_id']);
+            }
         }
     }
     return $data;
@@ -2987,9 +3113,11 @@ function Wo_GetInvitedEvents($offset = 0,$limit = 10) {
     $sql     = "SELECT `event_id` FROM " . T_EVENTS_INV . "  WHERE `invited_id` = '$user_id' {$sub_q}  ORDER BY `event_id` DESC LIMIT {$limit}";
     $query   = mysqli_query($sqlConnect, $sql);
     $data    = array();
-    if ($query && !empty($query)) {
-        while ($fetched_data = mysqli_fetch_assoc($query)) {
-            $data[] = Wo_EventData($fetched_data['event_id']);
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            while ($fetched_data = mysqli_fetch_assoc($query)) {
+                $data[] = Wo_EventData($fetched_data['event_id']);
+            }
         }
     }
     return $data;
@@ -3008,10 +3136,12 @@ function Wo_GetInterestedEvents($offset = 0,$limit = 10) {
     $sql     = "SELECT `event_id` FROM " . T_EVENTS_INT . " WHERE `user_id` = '$user_id' {$sub_q} ORDER BY `event_id` DESC LIMIT {$limit}";
     $query   = mysqli_query($sqlConnect, $sql);
     $data    = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $event = Wo_EventData($fetched_data['event_id']);
-        if ($event && !empty($event)) {
-            $data[] = $event;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $event = Wo_EventData($fetched_data['event_id']);
+            if ($event && !empty($event)) {
+                $data[] = $event;
+            }
         }
     }
     return $data;
@@ -3037,11 +3167,13 @@ function Wo_GetInterestedEventsUsers($event_id,$offset = 0,$limit = 0) {
     $sql     = "SELECT `user_id`,`id` FROM " . T_EVENTS_INT . " WHERE `event_id` = '$event_id' {$sub_q} ORDER BY `id` DESC $limit_query";
     $query   = mysqli_query($sqlConnect, $sql);
     $data    = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $event = Wo_UserData($fetched_data['user_id']);
-        $event['id_in'] = $fetched_data['id'];
-        if ($event && !empty($event)) {
-            $data[] = $event;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $event = Wo_UserData($fetched_data['user_id']);
+            $event['id_in'] = $fetched_data['id'];
+            if ($event && !empty($event)) {
+                $data[] = $event;
+            }
         }
     }
     return $data;
@@ -3067,11 +3199,13 @@ function Wo_GetGoingEventsUsers($event_id,$offset = 0,$limit = 0) {
     $sql     = "SELECT `user_id`,`id` FROM " . T_EVENTS_GOING . " WHERE `event_id` = '$event_id' {$sub_q} ORDER BY `id` DESC $limit_query";
     $query   = mysqli_query($sqlConnect, $sql);
     $data    = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $event = Wo_UserData($fetched_data['user_id']);
-        $event['id_go'] = $fetched_data['id'];
-        if ($event && !empty($event)) {
-            $data[] = $event;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $event = Wo_UserData($fetched_data['user_id']);
+            $event['id_go'] = $fetched_data['id'];
+            if ($event && !empty($event)) {
+                $data[] = $event;
+            }
         }
     }
     return $data;
@@ -3089,13 +3223,15 @@ function Wo_GetPastEvents($offset = 0,$limit = 10) {
     $sql   = "SELECT * FROM " . T_EVENTS . "  WHERE `end_date` < CURDATE() {$sub_q} ORDER BY `id` DESC LIMIT {$limit}";
     $query = mysqli_query($sqlConnect, $sql);
     $data  = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['poster_id']);
-        $fetched_data['cover']     = Wo_GetMedia($fetched_data['cover']);
-        $fetched_data['is_owner']  = Is_EventOwner($fetched_data['id']);
-        $fetched_data['url']       = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
-        $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
-        $data[]                    = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['poster_id']);
+            $fetched_data['cover']     = Wo_GetMedia($fetched_data['cover']);
+            $fetched_data['is_owner']  = Is_EventOwner($fetched_data['id']);
+            $fetched_data['url']       = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
+            $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
+            $data[]                    = $fetched_data;
+        }
     }
     return $data;
 }
@@ -3113,13 +3249,15 @@ function Wo_GetMyEvents($offset = 0,$limit = 10) {
     $sql     = "SELECT * FROM " . T_EVENTS . "  WHERE `poster_id` = '$user_id' {$sub_q} ORDER BY `id` DESC LIMIT {$limit}";
     $query   = mysqli_query($sqlConnect, $sql);
     $data    = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['poster_id']);
-        $fetched_data['cover']     = Wo_GetMedia($fetched_data['cover']);
-        $fetched_data['is_owner']  = Is_EventOwner($fetched_data['id']);
-        $fetched_data['url']       = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
-        $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
-        $data[]                    = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['poster_id']);
+            $fetched_data['cover']     = Wo_GetMedia($fetched_data['cover']);
+            $fetched_data['is_owner']  = Is_EventOwner($fetched_data['id']);
+            $fetched_data['url']       = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
+            $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
+            $data[]                    = $fetched_data;
+        }
     }
     return $data;
 }
@@ -3179,19 +3317,21 @@ function Wo_EventData($id = false) {
     //     return false;
     // }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM " . T_EVENTS . "  WHERE `id` = '$id'");
-    $fetched_data = mysqli_fetch_assoc($query);
-    if (!empty($fetched_data)) {
-        $fetched_data['user_data']  = Wo_UserData($fetched_data['poster_id']);
-        $fetched_data['cover']      = Wo_GetMedia($fetched_data['cover']);
-        $fetched_data['is_owner']   = Is_EventOwner($fetched_data['id']);
-        //$fetched_data['start_date'] = date($fetched_data['start_date']);
-        $fetched_data['start_edit_date'] = date($fetched_data['start_date']);
-        $fetched_data['start_date_js'] = date('m/d/y' , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
-        $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
-        $fetched_data['end_edit_date'] = date($fetched_data['end_date']);
-        $fetched_data['end_date']   = date($wo['config']['date_style'], strtotime($fetched_data['end_date']));
-        $fetched_data['url']        = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
-        return $fetched_data;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        if (!empty($fetched_data)) {
+            $fetched_data['user_data']  = Wo_UserData($fetched_data['poster_id']);
+            $fetched_data['cover']      = Wo_GetMedia($fetched_data['cover']);
+            $fetched_data['is_owner']   = Is_EventOwner($fetched_data['id']);
+            //$fetched_data['start_date'] = date($fetched_data['start_date']);
+            $fetched_data['start_edit_date'] = date($fetched_data['start_date']);
+            $fetched_data['start_date_js'] = date('m/d/y' , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
+            $fetched_data['start_date'] = date($wo['config']['date_style'] , strtotime($fetched_data['start_date'] . $fetched_data['start_time']));
+            $fetched_data['end_edit_date'] = date($fetched_data['end_date']);
+            $fetched_data['end_date']   = date($wo['config']['date_style'], strtotime($fetched_data['end_date']));
+            $fetched_data['url']        = Wo_SeoLink("index.php?link1=show-event&eid=" . $fetched_data['id']);
+            return $fetched_data;
+        }
     }
     return array();
 }
@@ -3364,11 +3504,13 @@ function Wo_GetMovies($args = array()) {
     }
     $query = mysqli_query($sqlConnect, "SELECT * FROM " . T_MOVIES . " WHERE `id` > 0 {$sub_sql} ORDER BY `id` DESC {$total}");
     $data  = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['cover']  = Wo_GetMedia($fetched_data['cover']);
-        $fetched_data['source'] = Wo_GetMedia($fetched_data['source']);
-        $fetched_data['url']    = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
-        $data[]                 = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['cover']  = Wo_GetMedia($fetched_data['cover']);
+            $fetched_data['source'] = Wo_GetMedia($fetched_data['source']);
+            $fetched_data['url']    = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
+            $data[]                 = $fetched_data;
+        }
     }
     return $data;
 }
@@ -3381,11 +3523,13 @@ function Wo_GetRecommendedFilms() {
     $year  = date('Y');
     $sql   = "SELECT * FROM " . T_MOVIES . " WHERE `release` = '$year' OR `quality` IN ('hd','dvd','hd-tv') ORDER BY `id` DESC LIMIT 26";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['cover']  = Wo_GetMedia($fetched_data['cover']);
-        $fetched_data['source'] = Wo_GetMedia($fetched_data['source']);
-        $fetched_data['url']    = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
-        $data[]                 = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['cover']  = Wo_GetMedia($fetched_data['cover']);
+            $fetched_data['source'] = Wo_GetMedia($fetched_data['source']);
+            $fetched_data['url']    = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
+            $data[]                 = $fetched_data;
+        }
     }
     return $data;
 }
@@ -3398,11 +3542,13 @@ function Wo_GetNewFilms() {
     $year  = date('Y');
     $sql   = "SELECT * FROM " . T_MOVIES . " WHERE `release` = '$year' ORDER BY `id` DESC LIMIT 26";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['cover']  = Wo_GetMedia($fetched_data['cover']);
-        $fetched_data['source'] = Wo_GetMedia($fetched_data['source']);
-        $fetched_data['url']    = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
-        $data[]                 = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['cover']  = Wo_GetMedia($fetched_data['cover']);
+            $fetched_data['source'] = Wo_GetMedia($fetched_data['source']);
+            $fetched_data['url']    = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
+            $data[]                 = $fetched_data;
+        }
     }
     return $data;
 }
@@ -3416,11 +3562,13 @@ function Wo_GetMtwFilms($limit = 26) {
     $limit  = Wo_Secure($limit);
     $sql   = "SELECT * FROM " . T_MOVIES . "  ORDER BY `views` DESC LIMIT {$limit}";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['cover']  = Wo_GetMedia($fetched_data['cover']);
-        $fetched_data['source'] = Wo_GetMedia($fetched_data['source']);
-        $fetched_data['url']    = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
-        $data[]                 = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['cover']  = Wo_GetMedia($fetched_data['cover']);
+            $fetched_data['source'] = Wo_GetMedia($fetched_data['source']);
+            $fetched_data['url']    = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
+            $data[]                 = $fetched_data;
+        }
     }
     return $data;
 }
@@ -3440,11 +3588,13 @@ function Wo_SearchFilms($key) {
                  OR `stars` LIKE '%$key%'
                   LIMIT 10";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['url']   = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
-        $fetched_data['name']  = Wo_GetShortTitle($fetched_data['name']);
-        $fetched_data['cover'] = Wo_GetMedia($fetched_data['cover']);
-        $data[]                = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['url']   = Wo_SeoLink("index.php?link1=watch-film&film-id=" . $fetched_data['id']);
+            $fetched_data['name']  = Wo_GetShortTitle($fetched_data['name']);
+            $fetched_data['cover'] = Wo_GetMedia($fetched_data['cover']);
+            $data[]                = $fetched_data;
+        }
     }
     return $data;
 }
@@ -3492,12 +3642,17 @@ function Wo_GetMovieCommentsCount($id) {
     $count        = 0;
     $sql          = "SELECT COUNT(`id`) as blogComments FROM " . T_MOVIE_COMMS . " WHERE `movie_id` = '$id'";
     $query        = mysqli_query($sqlConnect, $sql);
-    $fetched_data = mysqli_fetch_assoc($query);
-    $count += $fetched_data['blogComments'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        $count += $fetched_data['blogComments'];
+    }
     $sql          = "SELECT COUNT(`id`) as blogComments FROM " . T_MOVIE_COMM_REPLIES . " WHERE `movie_id` = '$id'";
     $query        = mysqli_query($sqlConnect, $sql);
-    $fetched_data = mysqli_fetch_assoc($query);
-    return $count + $fetched_data['blogComments'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        return $count + $fetched_data['blogComments'];
+    }
+    return $count;
 }
 function Wo_GetMovieComments($args = array()) {
     global $sqlConnect, $wo;
@@ -3527,10 +3682,12 @@ function Wo_GetMovieComments($args = array()) {
         $limit = " LIMIT $limit ";
     }
     $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_MOVIE_COMMS . " WHERE `id` > 0 {$query_one} ORDER BY `id` DESC $limit");
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $comment = Wo_GetMovieCommentData($fetched_data['id']);
-        if ($comment && !empty($comment)) {
-            $data[] = $comment;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $comment = Wo_GetMovieCommentData($fetched_data['id']);
+            if ($comment && !empty($comment)) {
+                $data[] = $comment;
+            }
         }
     }
     return $data;
@@ -3567,10 +3724,12 @@ function Wo_GetMovieCommentReplies($args = array()) {
         $query_one .= " AND `id` > $offset ";
     }
     $query = mysqli_query($sqlConnect, "SELECT `id` FROM  " . T_MOVIE_COMM_REPLIES . " WHERE `id` > 0 {$query_one} ORDER BY `id` ASC $limit");
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $comment = Wo_GetMovieCommReplyData($fetched_data['id']);
-        if ($comment && !empty($comment)) {
-            $data[] = $comment;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $comment = Wo_GetMovieCommReplyData($fetched_data['id']);
+            if ($comment && !empty($comment)) {
+                $data[] = $comment;
+            }
         }
     }
     return $data;
@@ -3582,10 +3741,12 @@ function Wo_IsMovieCommentOwner($id) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_MOVIE_COMMS . " WHERE `id` = '$id'");
+    if (mysqli_num_rows($query)) {
     $fetched_data = mysqli_fetch_assoc($query);
-    if (!empty($fetched_data) && is_array($fetched_data)) {
-        if ($fetched_data['user_id'] == $wo['user']['id'] || $wo['user']['admin'] == 1) {
-            $is_owner = true;
+        if (!empty($fetched_data) && is_array($fetched_data)) {
+            if ($fetched_data['user_id'] == $wo['user']['id'] || $wo['user']['admin'] == 1) {
+                $is_owner = true;
+            }
         }
     }
     return $is_owner;
@@ -3597,10 +3758,12 @@ function Wo_IsMovieCommReplyOwner($id) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_MOVIE_COMM_REPLIES . " WHERE `id` = '$id'");
-    $fetched_data = mysqli_fetch_assoc($query);
-    if (!empty($fetched_data) && is_array($fetched_data)) {
-        if ($fetched_data['user_id'] == $wo['user']['id'] || $wo['user']['admin'] == 1) {
-            $is_owner = true;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        if (!empty($fetched_data) && is_array($fetched_data)) {
+            if ($fetched_data['user_id'] == $wo['user']['id'] || $wo['user']['admin'] == 1) {
+                $is_owner = true;
+            }
         }
     }
     return $is_owner;
@@ -3611,19 +3774,22 @@ function Wo_GetMovieCommentData($id) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_MOVIE_COMMS . " WHERE `id` = '$id'");
-    $fetched_data = mysqli_fetch_assoc($query);
-    $data         = false;
-    if (!empty($fetched_data)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['is_owner']  = Wo_IsMovieCommentOwner($fetched_data['id']);
-        $fetched_data['likes']     = Wo_GetMovieCommLikes($fetched_data['id']);
-        $fetched_data['dislikes']  = Wo_GetMovieCommDisLikes($fetched_data['id']);
-        $fetched_data['replies']   = Wo_GetMovieCommentReplies(array(
-            'comm_id' => $fetched_data['id']
-        ));
-        $data                      = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        $data         = false;
+        if (!empty($fetched_data)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['is_owner']  = Wo_IsMovieCommentOwner($fetched_data['id']);
+            $fetched_data['likes']     = Wo_GetMovieCommLikes($fetched_data['id']);
+            $fetched_data['dislikes']  = Wo_GetMovieCommDisLikes($fetched_data['id']);
+            $fetched_data['replies']   = Wo_GetMovieCommentReplies(array(
+                'comm_id' => $fetched_data['id']
+            ));
+            $data                      = $fetched_data;
+        }
+        return $data;
     }
-    return $data;
+    return false;
 }
 function Wo_GetMovieCommReplyData($id) {
     global $sqlConnect, $wo;
@@ -3631,16 +3797,19 @@ function Wo_GetMovieCommReplyData($id) {
         return false;
     }
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  " . T_MOVIE_COMM_REPLIES . " WHERE `id` = '$id'");
-    $fetched_data = mysqli_fetch_assoc($query);
-    $data         = false;
-    if (!empty($fetched_data)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['is_owner']  = Wo_IsMovieCommReplyOwner($fetched_data['id']);
-        $fetched_data['likes']     = Wo_GetMovieCommReplyLikes($fetched_data['id']);
-        $fetched_data['dislikes']  = Wo_GetMovieCommReplyDisLikes($fetched_data['id']);
-        $data                      = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        $data         = false;
+        if (!empty($fetched_data)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['is_owner']  = Wo_IsMovieCommReplyOwner($fetched_data['id']);
+            $fetched_data['likes']     = Wo_GetMovieCommReplyLikes($fetched_data['id']);
+            $fetched_data['dislikes']  = Wo_GetMovieCommReplyDisLikes($fetched_data['id']);
+            $data                      = $fetched_data;
+        }
+        return $data;
     }
-    return $data;
+    return false;
 }
 function Wo_GetMovieCommLikes($id) {
     global $sqlConnect, $wo;
@@ -3648,9 +3817,11 @@ function Wo_GetMovieCommLikes($id) {
     $likes = 0;
     $sql   = "SELECT COUNT(`id`) as movieCommentLikes FROM " . T_BM_LIKES . " WHERE `movie_comm_id` = '$id'";
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query && !empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        $likes        = $fetched_data['movieCommentLikes'];
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            $likes        = $fetched_data['movieCommentLikes'];
+        }
     }
     return $likes;
 }
@@ -3660,9 +3831,11 @@ function Wo_GetMovieCommDisLikes($id) {
     $likes = 0;
     $sql   = "SELECT COUNT(`id`) as movieCommentDisLikes FROM " . T_BM_DISLIKES . " WHERE `movie_comm_id` = '$id'";
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query && !empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        $likes        = $fetched_data['movieCommentDisLikes'];
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            $likes        = $fetched_data['movieCommentDisLikes'];
+        }
     }
     return $likes;
 }
@@ -3672,9 +3845,11 @@ function Wo_GetMovieCommReplyDisLikes($id) {
     $likes = 0;
     $sql   = "SELECT COUNT(`id`) as movieCommentReplyDisLikes FROM " . T_BM_DISLIKES . " WHERE `movie_commreply_id` = '$id'";
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query && !empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        $likes        = $fetched_data['movieCommentReplyDisLikes'];
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            $likes        = $fetched_data['movieCommentReplyDisLikes'];
+        }
     }
     return $likes;
 }
@@ -3684,9 +3859,11 @@ function Wo_GetMovieCommReplyLikes($id) {
     $likes = 0;
     $sql   = "SELECT COUNT(`id`) as movieCommentReplyLikes FROM " . T_BM_LIKES . " WHERE `movie_commreply_id` = '$id'";
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query && !empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        $likes        = $fetched_data['movieCommentReplyLikes'];
+    if (mysqli_num_rows($query)) {
+        if ($query && !empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            $likes        = $fetched_data['movieCommentReplyLikes'];
+        }
     }
     return $likes;
 }
@@ -3920,14 +4097,16 @@ function Wo_GetSideBarAds() {
         ORDER BY RAND() LIMIT 2";
     $query = mysqli_query($sqlConnect, $sql);
     $data  = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['ad_media']    = Wo_GetMedia($fetched_data['ad_media']);
-        $fetched_data['headline']    = Wo_GetShortTitle($fetched_data['headline'], false, 30);
-        $fetched_data['description'] = Wo_GetShortTitle($fetched_data['description'], false, 60);
-        if ($fetched_data['bidding'] == 'views') {
-            @Wo_RegisterAdConversionView($fetched_data['id']);
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['ad_media']    = Wo_GetMedia($fetched_data['ad_media']);
+            $fetched_data['headline']    = Wo_GetShortTitle($fetched_data['headline'], false, 30);
+            $fetched_data['description'] = Wo_GetShortTitle($fetched_data['description'], false, 60);
+            if ($fetched_data['bidding'] == 'views') {
+                @Wo_RegisterAdConversionView($fetched_data['id']);
+            }
+            $data[] = $fetched_data;
         }
-        $data[] = $fetched_data;
     }
     return $data;
 }
@@ -3976,10 +4155,12 @@ function Wo_IsAdsOwnerNotAdmin($ads_id = 0, $user_id = 0) {
     $result  = false;
     $query   = mysqli_query($sqlConnect, "SELECT * FROM
             " . T_USER_ADS . " WHERE `id` = '$ads_id'");
-    if (!empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        if ($fetched_data['user_id'] == $wo['user']['user_id']) {
-            $result = true;
+    if (mysqli_num_rows($query)) {
+        if (!empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            if ($fetched_data['user_id'] == $wo['user']['user_id']) {
+                $result = true;
+            }
         }
     }
     return $result;
@@ -3994,10 +4175,12 @@ function Wo_IsAdsOwner($ads_id = 0, $user_id = 0) {
     $result  = false;
     $query   = mysqli_query($sqlConnect, "SELECT * FROM
             " . T_USER_ADS . " WHERE `id` = '$ads_id'");
-    if (!empty($query)) {
-        $fetched_data = mysqli_fetch_assoc($query);
-        if ($fetched_data['user_id'] == $wo['user']['user_id'] || $wo['user']['admin'] == 1 || Wo_IsModerator() == true) {
-            $result = true;
+    if (mysqli_num_rows($query)) {
+        if (!empty($query)) {
+            $fetched_data = mysqli_fetch_assoc($query);
+            if ($fetched_data['user_id'] == $wo['user']['user_id'] || $wo['user']['admin'] == 1 || Wo_IsModerator() == true) {
+                $result = true;
+            }
         }
     }
     return $result;
@@ -4045,13 +4228,15 @@ function Wo_GetMyAds($args = array()) {
                         {$query_one} ORDER BY `id` 
                             DESC LIMIT ".$limit;
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $ad = Wo_GetUserAdData($fetched_data['id']);
-        if ($ad && !empty($ad)) {
-            $ad['name']     = Wo_GetShortTitle($ad['name']);
-            $ad['edit-url'] = Wo_SeoLink('index.php?link1=edit-ads&id=' . $ad['id']);
-            $ad['chart-url'] = Wo_SeoLink('index.php?link1=chart-ads&id=' . $ad['id']);
-            $data[]         = $ad;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $ad = Wo_GetUserAdData($fetched_data['id']);
+            if ($ad && !empty($ad)) {
+                $ad['name']     = Wo_GetShortTitle($ad['name']);
+                $ad['edit-url'] = Wo_SeoLink('index.php?link1=edit-ads&id=' . $ad['id']);
+                $ad['chart-url'] = Wo_SeoLink('index.php?link1=chart-ads&id=' . $ad['id']);
+                $data[]         = $ad;
+            }
         }
     }
     return $data;
@@ -4080,8 +4265,10 @@ function Wo_GetMytransactions($args = array()) {
     }
     $sql   = "SELECT * FROM " . T_PAYMENT_TRANSACTIONS . " WHERE `userid` = '$user_id' ORDER BY `id` DESC LIMIT 30";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = $fetched_data;
+        }
     }
     return $data;
 }
@@ -4094,18 +4281,21 @@ function Wo_GetUserAdData($id) {
 
     $table        = T_USER_ADS;
     $query        = mysqli_query($sqlConnect, "SELECT * FROM  `$table` WHERE `id` = '$id' ");
-    $fetched_data = mysqli_fetch_assoc($query);
-    $data         = false;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        $data         = false;
 
-    if (!empty($fetched_data)) {
-        $fetched_data['user_data']   = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['is_owner']    = Wo_IsAdsOwner($fetched_data['id']);
-        $fetched_data['country_ids'] = array_values(explode(',', $fetched_data['audience']));
-        $fetched_data['ad_media']    = Wo_GetMedia($fetched_data['ad_media']);
-        $data                        = $fetched_data;
+        if (!empty($fetched_data)) {
+            $fetched_data['user_data']   = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['is_owner']    = Wo_IsAdsOwner($fetched_data['id']);
+            $fetched_data['country_ids'] = array_values(explode(',', $fetched_data['audience']));
+            $fetched_data['ad_media']    = Wo_GetMedia($fetched_data['ad_media']);
+            $data                        = $fetched_data;
+        }
+
+        return $data;
     }
-
-    return $data;
+    return false;
 }
 
 function Wo_GetPostAds($last_id = 0) {
@@ -4136,21 +4326,24 @@ function Wo_GetPostAds($last_id = 0) {
         {$query_one} AND ((start = '') OR (start <= '{$start}' && end >= '{$start}'))  AND ((budget = 0) OR (spent < budget))
         ORDER BY `id` DESC LIMIT 100";
     $query        = mysqli_query($sqlConnect, $sql);
-    $fetched_data = mysqli_fetch_assoc($query);
-    $data         = array();
-    if (is_array($fetched_data) && !empty($fetched_data)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['is_owner']  = Wo_IsAdsOwner($fetched_data['id']);
-        $fetched_data['ad_media']  = Wo_GetMedia($fetched_data['ad_media']);
-        $fetched_data['postType']  = 'ad';
-        if (!empty($fetched_data['page_id'])) {
-            $page = Wo_PageData($fetched_data['page_id']);
-            $fetched_data['user_data']['avatar'] = $page['avatar'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        $data         = array();
+        if (is_array($fetched_data) && !empty($fetched_data)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['is_owner']  = Wo_IsAdsOwner($fetched_data['id']);
+            $fetched_data['ad_media']  = Wo_GetMedia($fetched_data['ad_media']);
+            $fetched_data['postType']  = 'ad';
+            if (!empty($fetched_data['page_id'])) {
+                $page = Wo_PageData($fetched_data['page_id']);
+                $fetched_data['user_data']['avatar'] = $page['avatar'];
+            }
+            $data                      = $fetched_data;
+            
         }
-        $data                      = $fetched_data;
-        
+        return $data;
     }
-    return $data;
+    return array();
 }
 function Wo_GetAds($last_id = 0) {
     global $sqlConnect, $wo;
@@ -4164,12 +4357,14 @@ function Wo_GetAds($last_id = 0) {
     $sql   = "SELECT * FROM  " . T_USER_ADS . " WHERE `id` > 0 {$query_one} ORDER BY `id` DESC";
     $query = mysqli_query($sqlConnect, $sql);
     $data  = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['is_owner']  = Wo_IsAdsOwner($fetched_data['id']);
-        $fetched_data['ad_media']  = Wo_GetMedia($fetched_data['ad_media']);
-        $fetched_data['edit-url']  = Wo_SeoLink('index.php?link1=manage-ads&id=' . $fetched_data['id']);
-        $data[]                    = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['is_owner']  = Wo_IsAdsOwner($fetched_data['id']);
+            $fetched_data['ad_media']  = Wo_GetMedia($fetched_data['ad_media']);
+            $fetched_data['edit-url']  = Wo_SeoLink('index.php?link1=manage-ads&id=' . $fetched_data['id']);
+            $data[]                    = $fetched_data;
+        }
     }
     return $data;
 }
@@ -4185,11 +4380,13 @@ function Wo_GetAllStories($last_id = 0) {
     $sql   = "SELECT * FROM  " . T_USER_STORY . " WHERE `id` > 0 {$query_one} ORDER BY `id` DESC LIMIT 1000000";
     $query = mysqli_query($sqlConnect, $sql);
     $data  = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $story_expire              = $fetched_data['expire'];
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['expires']   = date("Y/m/d", $fetched_data['expire']);
-        $data[]                    = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $story_expire              = $fetched_data['expire'];
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['expires']   = date("Y/m/d", $fetched_data['expire']);
+            $data[]                    = $fetched_data;
+        }
     }
     return $data;
 }
@@ -4302,7 +4499,7 @@ function Wo_IsStoryOwner($id) {
     $result = false;
     $user   = $wo['user']['id'];
     $query  = mysqli_query($sqlConnect, $sql);
-    if ($query) {
+    if (mysqli_num_rows($query)) {
         $fetched_data = mysqli_fetch_assoc($query);
         if ($fetched_data['user_id'] == $user || Wo_IsAdmin() || Wo_IsModerator()) {
             $result = true;
@@ -4362,16 +4559,18 @@ function Wo_GetStroies($args = array()) {
     }
     $sql   = "SELECT * FROM " . T_USER_STORY . " WHERE `id` > 0 {$query_one} ORDER BY `id` DESC";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $story_images = Wo_GetStoryMedia($fetched_data['id'], 'image');
-        if (count($story_images) > 0) {
-            $fetched_data['thumb']  = array_shift($story_images);
-            $fetched_data['images'] = $story_images;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $story_images = Wo_GetStoryMedia($fetched_data['id'], 'image');
+            if (count($story_images) > 0) {
+                $fetched_data['thumb']  = array_shift($story_images);
+                $fetched_data['images'] = $story_images;
+            }
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['videos']    = Wo_GetStoryMedia($fetched_data['id'], 'video');
+            $fetched_data['is_owner']  = ($fetched_data['user_id'] == $wo['user']['id'] || Wo_IsAdmin() || Wo_IsModerator()) ? true : false;
+            $data[]                    = $fetched_data;
         }
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['videos']    = Wo_GetStoryMedia($fetched_data['id'], 'video');
-        $fetched_data['is_owner']  = ($fetched_data['user_id'] == $wo['user']['id'] || Wo_IsAdmin() || Wo_IsModerator()) ? true : false;
-        $data[]                    = $fetched_data;
     }
     return $data;
 }
@@ -4383,9 +4582,11 @@ function Wo_GetStoryMedia($id = false, $type = 'image') {
     $sql   = "SELECT * FROM " . T_USER_STORY_MEDIA . " WHERE `story_id` = '$id' AND `type` = '$type'";
     $query = mysqli_query($sqlConnect, $sql);
     $data  = array();
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['filename'] = Wo_GetMedia($fetched_data['filename']);
-        $data[]                   = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['filename'] = Wo_GetMedia($fetched_data['filename']);
+            $data[]                   = $fetched_data;
+        }
     }
     return $data;
 }
@@ -4402,7 +4603,7 @@ function Wo_CountUserStatus($id = false) {
     $sql   = "SELECT COUNT(`id`) AS count FROM " . T_USER_STORY . " WHERE `user_id` = {$user} ";
     $count = 0;
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query) {
+    if (mysqli_num_rows($query)) {
         $fetched_data = mysqli_fetch_assoc($query);
         $count        = $fetched_data['count'];
     }
@@ -4511,8 +4712,10 @@ function Wo_GetUsersByName($name = '', $friends = false, $limit = 25) {
     }
     $sql   = "SELECT `user_id` FROM " . T_USERS . " WHERE `user_id` <> {$user} AND `username`  LIKE '%$name%' {$sub_sql} $limit_text";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = Wo_UserData($fetched_data['user_id']);
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = Wo_UserData($fetched_data['user_id']);
+        }
     }
     return $data;
 }
@@ -4524,8 +4727,10 @@ function Wo_GetUserIds() {
     $data  = array();
     $admin = $wo['user']['id'];
     $query = mysqli_query($sqlConnect, "SELECT `user_id` FROM " . T_USERS . " WHERE active = '1' AND `user_id` <> {$admin}");
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = $fetched_data['user_id'];
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = $fetched_data['user_id'];
+        }
     }
     return $data;
 }
@@ -4769,9 +4974,11 @@ function Wo_GetAdminInvitation() {
     $query = mysqli_query($sqlConnect, "SELECT * FROM " . T_INVITATIONS . " ORDER BY `id` DESC ");
     $data  = array();
     $site  = $wo['config']['site_url'] . '/register?invite=';
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['url'] = $site . $fetched_data['code'];
-        $data[]              = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['url'] = $site . $fetched_data['code'];
+            $data[]              = $fetched_data;
+        }
     }
     return $data;
 }
@@ -4977,15 +5184,17 @@ function Wo_GetPageAdmins($page_id = false, $return = 'all') {
     $sql     = " SELECT `user_id` FROM " . T_PAGE_ADMINS . " WHERE `page_id` = {$page_id}";
     $data    = array();
     $query   = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        if ($return == 'all') {
-            $user                  = Wo_UserData($fetched_data['user_id']);
-        } else {
-             $user['user_id']       = $fetched_data['user_id'];
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            if ($return == 'all') {
+                $user                  = Wo_UserData($fetched_data['user_id']);
+            } else {
+                 $user['user_id']       = $fetched_data['user_id'];
+            }
+            $user['page_id']       = $page_id;
+            $user['is_page_onwer'] = true;
+            $data[]                = $user;
         }
-        $user['page_id']       = $page_id;
-        $user['is_page_onwer'] = true;
-        $data[]                = $user;
     }
     return $data;
 }
@@ -5000,7 +5209,10 @@ function Wo_GetPageAdminInfo($user_id,$page_id)
     $sql     = " SELECT * FROM " . T_PAGE_ADMINS . " WHERE `page_id` = {$page_id} AND `user_id` = {$user_id}";
     $data    = array();
     $query   = mysqli_query($sqlConnect, $sql);
-    return mysqli_fetch_assoc($query);
+    if (mysqli_num_rows($query)) {
+        return mysqli_fetch_assoc($query);
+    }
+    return false;
 }
 function Wo_CreateGChat($name = false, $parts = array()) {
     global $sqlConnect, $wo;
@@ -5120,14 +5332,16 @@ function Wo_GetChatGroups($after_id = false) {
                 WHERE (`user_id` = {$user} OR `group_id` IN 
                    (SELECT `group_id` FROM Wo_GroupChatUsers  WHERE `user_id` = {$user} AND active = 1)) {$sub_sql} ORDER BY `time` DESC";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data']    = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['owner']        = ($fetched_data['user_id'] == $user) ? true : false;
-        $fetched_data['last_message'] = Wo_GetChatGroupLastMessage($fetched_data['group_id']);
-        $fetched_data['parts']        = Wo_GetGChatMemebers($fetched_data['group_id']);
-        $fetched_data['avatar']       = Wo_GetMedia($fetched_data['avatar']);
-        $fetched_data['last_seen']    = Wo_CheckLastGroupAction();
-        $data[]                       = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data']    = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['owner']        = ($fetched_data['user_id'] == $user) ? true : false;
+            $fetched_data['last_message'] = Wo_GetChatGroupLastMessage($fetched_data['group_id']);
+            $fetched_data['parts']        = Wo_GetGChatMemebers($fetched_data['group_id']);
+            $fetched_data['avatar']       = Wo_GetMedia($fetched_data['avatar']);
+            $fetched_data['last_seen']    = Wo_CheckLastGroupAction();
+            $data[]                       = $fetched_data;
+        }
     }
     return $data;
 }
@@ -5144,14 +5358,16 @@ function Wo_GetChatGroupData($id = false) {
                 WHERE (`user_id` = {$user} OR `group_id` IN 
                    (SELECT `group_id` FROM Wo_GroupChatUsers  WHERE `user_id` = {$user})) AND `group_id` = {$id}";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data']    = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['owner']        = ($fetched_data['user_id'] == $user) ? true : false;
-        $fetched_data['last_message'] = Wo_GetChatGroupLastMessage($fetched_data['group_id']);
-        $fetched_data['parts']        = Wo_GetGChatMemebers($fetched_data['group_id']);
-        $fetched_data['avatar']       = Wo_GetMedia($fetched_data['avatar']);
-        $fetched_data['last_seen']    = Wo_CheckLastGroupAction();
-        $data[]                       = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data']    = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['owner']        = ($fetched_data['user_id'] == $user) ? true : false;
+            $fetched_data['last_message'] = Wo_GetChatGroupLastMessage($fetched_data['group_id']);
+            $fetched_data['parts']        = Wo_GetGChatMemebers($fetched_data['group_id']);
+            $fetched_data['avatar']       = Wo_GetMedia($fetched_data['avatar']);
+            $fetched_data['last_seen']    = Wo_CheckLastGroupAction();
+            $data[]                       = $fetched_data;
+        }
     }
     return $data;
 }
@@ -5166,11 +5382,13 @@ function Wo_CheckLastGroupAction() {
     $time   = time();
     $sql    = "SELECT `last_seen`,`group_id` FROM " . T_GROUP_CHAT_USERS . " WHERE `user_id` = {$user}";
     $query  = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $last_message = Wo_GetChatGroupLastMessage($fetched_data['group_id']);
-        if (!empty($last_message) && isset($last_message['time']) && isset($last_message['from_id'])) {
-            if ($last_message['time'] > $fetched_data['last_seen'] && $last_message['from_id'] != $user) {
-                $groups[] = $fetched_data['group_id'];
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $last_message = Wo_GetChatGroupLastMessage($fetched_data['group_id']);
+            if (!empty($last_message) && isset($last_message['time']) && isset($last_message['from_id'])) {
+                if ($last_message['time'] > $fetched_data['last_seen'] && $last_message['from_id'] != $user) {
+                    $groups[] = $fetched_data['group_id'];
+                }
             }
         }
     }
@@ -5186,11 +5404,13 @@ function Wo_CheckLastGroupUnread() {
     $time   = time();
     $sql    = "SELECT `last_seen`,`group_id` FROM " . T_GROUP_CHAT_USERS . " WHERE `user_id` = {$user} AND `active` = '1' ";
     $query  = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $last_message = Wo_GetChatGroupLastMessage($fetched_data['group_id']);
-        if (!empty($last_message) && isset($last_message['time']) && isset($last_message['from_id']) && $last_message['from_id'] != $wo['user']['id']) {
-            if ($last_message['time'] >= $fetched_data['last_seen']) {
-                $groups[] = $fetched_data['group_id'];
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $last_message = Wo_GetChatGroupLastMessage($fetched_data['group_id']);
+            if (!empty($last_message) && isset($last_message['time']) && isset($last_message['from_id']) && $last_message['from_id'] != $wo['user']['id']) {
+                if ($last_message['time'] >= $fetched_data['last_seen']) {
+                    $groups[] = $fetched_data['group_id'];
+                }
             }
         }
     }
@@ -5205,8 +5425,10 @@ function Wo_GetGChatMemebers($id = false) {
     $data  = array();
     $sql   = " SELECT `user_id` FROM " . T_GROUP_CHAT_USERS . " WHERE `group_id` = {$id} AND `active` = '1'";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $data[] = Wo_UserData($fetched_data['user_id']);
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $data[] = Wo_UserData($fetched_data['user_id']);
+        }
     }
     return $data;
 }
@@ -5458,17 +5680,19 @@ function Wo_PageRating($page_id = false, $user_id = 0) {
     $three = 0;
     $four  = 0;
     $five  = 0;
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        if ($fetched_data['valuation'] == 1) {
-            $one += $fetched_data['valuation'];
-        } else if ($fetched_data['valuation'] == 2) {
-            $two += $fetched_data['valuation'];
-        } else if ($fetched_data['valuation'] == 3) {
-            $three += $fetched_data['valuation'];
-        } else if ($fetched_data['valuation'] == 4) {
-            $four += $fetched_data['valuation'];
-        } else {
-            $five += $fetched_data['valuation'];
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            if ($fetched_data['valuation'] == 1) {
+                $one += $fetched_data['valuation'];
+            } else if ($fetched_data['valuation'] == 2) {
+                $two += $fetched_data['valuation'];
+            } else if ($fetched_data['valuation'] == 3) {
+                $three += $fetched_data['valuation'];
+            } else if ($fetched_data['valuation'] == 4) {
+                $four += $fetched_data['valuation'];
+            } else {
+                $five += $fetched_data['valuation'];
+            }
         }
     }
     if (($five + $four + $three + $two + $one) > 0) {
@@ -5491,9 +5715,11 @@ function Wo_GetPageReviews($page_id = false, $after_id = false,$limit = 1) {
     $limit = Wo_Secure($limit);
     $sql   = " SELECT * FROM " . T_PAGE_RATING . " WHERE `page_id` = {$page_id} {$sub_sql} ORDER BY `id` DESC LIMIT {$limit}";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
-        $data[]                    = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['user_id']);
+            $data[]                    = $fetched_data;
+        }
     }
     return $data;
 }
@@ -5628,18 +5854,22 @@ function Wo_GetFamaly($user_id = false, $after_id = false, $active = 1, $request
         $sql = "SELECT * FROM " . T_FAMILY . " WHERE `member_id` = '$user' {$subquery} AND `active` = '$active' AND `requesting` <> '$user' ORDER BY `id` DESC";
     }
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $user_data                 = ($requests == true) ? $fetched_data['user_id'] : $fetched_data['member_id'];
-        $fetched_data['user_data'] = Wo_UserData(($user_data));
-        $fetched_data['type']      = 'family';
-        $data[]                    = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $user_data                 = ($requests == true) ? $fetched_data['user_id'] : $fetched_data['member_id'];
+            $fetched_data['user_data'] = Wo_UserData(($user_data));
+            $fetched_data['type']      = 'family';
+            $data[]                    = $fetched_data;
+        }
     }
     $sql   = " SELECT * FROM " . T_REL_SHIP . " WHERE `to_id` = '$user' AND `active` = '0' ORDER BY `id` DESC ";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data'] = Wo_UserData($fetched_data['from_id']);
-        $fetched_data['type']      = 'rel_ship';
-        $data[]                    = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data'] = Wo_UserData($fetched_data['from_id']);
+            $fetched_data['type']      = 'rel_ship';
+            $data[]                    = $fetched_data;
+        }
     }
     return $data;
 }
@@ -5800,14 +6030,16 @@ function Wo_GetNearbyUsers($args = array()) {
     AND `lat` <> 0 AND `lng` <> 0
     HAVING distance < '$distance' ORDER BY `user_id` DESC LIMIT 0, $limit ";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['user_data']        = Wo_UserData($fetched_data['user_id']);
-        $fetched_data['user_data']['age'] = Wo_GetUserCountryName($fetched_data['user_data']);
-        $fetched_data['user_geoinfo']     = $fetched_data['user_data']['lat'] . ',' . $fetched_data['user_data']['lng'];
-        if ($fetched_data['user_data']['share_my_location'] == 1) {
-            $data[] = $fetched_data;
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['user_data']        = Wo_UserData($fetched_data['user_id']);
+            $fetched_data['user_data']['age'] = Wo_GetUserCountryName($fetched_data['user_data']);
+            $fetched_data['user_geoinfo']     = $fetched_data['user_data']['lat'] . ',' . $fetched_data['user_data']['lng'];
+            if ($fetched_data['user_data']['share_my_location'] == 1) {
+                $data[] = $fetched_data;
+            }
+            
         }
-        
     }
     return $data;
 }
@@ -5978,7 +6210,7 @@ function Wo_GetFriendsStatusAPI($data_array = array('limit' => 8, 'user_id' => 0
     return $data;
 }
 
-function Wo_HashPassword($password = '', $hashed_password) {
+function Wo_HashPassword($password = '', $hashed_password = '') {
     global $wo, $sqlConnect;
     if (empty($password)) {
         return '';
@@ -6106,51 +6338,65 @@ function Wo_DeleteAllData($type = 0) {
     $me = $wo['user']['user_id'];
     if ($type == 1) {
         $query = mysqli_query($sqlConnect, "SELECT user_id FROM " . T_USERS . " WHERE active = '0' OR active = '2'");
-        while ($row = mysqli_fetch_assoc($query)) {
-            $delete_user = Wo_DeleteUser($row['user_id']);
+        if (mysqli_num_rows($query)) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $delete_user = Wo_DeleteUser($row['user_id']);
+            }
         }
     }
     if ($type == 2) {
         $time = strtotime("-1 week");
         $query = mysqli_query($sqlConnect, "SELECT user_id FROM " . T_USERS . " WHERE lastseen < $time AND status = '0' AND user_id <> $me");
-        while ($row = mysqli_fetch_assoc($query)) {
-            $delete_user = Wo_DeleteUser($row['user_id']);
+        if (mysqli_num_rows($query)) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $delete_user = Wo_DeleteUser($row['user_id']);
+            }
         }
     }
     if ($type == 3) {
         $time = strtotime("-1 month");
         $query = mysqli_query($sqlConnect, "SELECT user_id FROM " . T_USERS . " WHERE lastseen < $time AND status = '0' AND user_id <> $me");
-        while ($row = mysqli_fetch_assoc($query)) {
-            $delete_user = Wo_DeleteUser($row['user_id']);
+        if (mysqli_num_rows($query)) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $delete_user = Wo_DeleteUser($row['user_id']);
+            }
         }
     }
     if ($type == 4) {
         $time = strtotime("-1 year");
         $query = mysqli_query($sqlConnect, "SELECT user_id FROM " . T_USERS . " WHERE lastseen < $time AND status = '0' AND user_id <> $me");
-        while ($row = mysqli_fetch_assoc($query)) {
-            $delete_user = Wo_DeleteUser($row['user_id']);
+        if (mysqli_num_rows($query)) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $delete_user = Wo_DeleteUser($row['user_id']);
+            }
         }
     }
 
     if ($type == 5) {
         $time = strtotime("-1 week");
         $query = mysqli_query($sqlConnect, "SELECT id FROM " . T_POSTS . " WHERE time < $time AND user_id <> $me");
-        while ($row = mysqli_fetch_assoc($query)) {
-            $delete_post = Wo_DeletePost($row['id']);
+        if (mysqli_num_rows($query)) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $delete_post = Wo_DeletePost($row['id']);
+            }
         }
     }
     if ($type == 6) {
         $time = strtotime("-1 month");
         $query = mysqli_query($sqlConnect, "SELECT id FROM " . T_POSTS . " WHERE time < $time AND user_id <> $me");
-        while ($row = mysqli_fetch_assoc($query)) {
-            $delete_post = Wo_DeletePost($row['id']);
+        if (mysqli_num_rows($query)) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $delete_post = Wo_DeletePost($row['id']);
+            }
         }
     }
     if ($type == 7) {
         $time = strtotime("-1 year");
         $query = mysqli_query($sqlConnect, "SELECT id FROM " . T_POSTS . " WHERE time < $time AND user_id <> $me");
-        while ($row = mysqli_fetch_assoc($query)) {
-            $delete_post = Wo_DeletePost($row['id']);
+        if (mysqli_num_rows($query)) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $delete_post = Wo_DeletePost($row['id']);
+            }
         }
     }
     return true;
@@ -6361,7 +6607,7 @@ function Wo_GetAllStatus()
     $user_id = $wo['user']['user_id'];
     return $db->rawQuery("SELECT DISTINCT user_id,title,description,posted,expire,thumbnail,(SELECT MAX(us.id) FROM " . T_USER_STORY . " us WHERE us.user_id = " . T_USER_STORY . ".user_id) AS id  FROM " . T_USER_STORY . " WHERE (user_id IN (SELECT following_id FROM " . T_FOLLOWERS . " WHERE follower_id = '$user_id') OR user_id = $user_id) AND user_id IN (SELECT user_id FROM " . T_USERS . " WHERE active = '1') GROUP BY user_id ORDER BY id DESC");
 }
-function Wo_SharePostOn($id = false,$type_id,$type) {
+function Wo_SharePostOn($id = false,$type_id = 0,$type = '') {
     global $sqlConnect, $wo;
     if ($wo['loggedin'] == false || !$id || $id < 1 || !$type_id) {
         return false;
@@ -6411,7 +6657,7 @@ function Wo_SharePostOn($id = false,$type_id,$type) {
         $last                     = mysqli_insert_id($sqlConnect);
         if (!empty($post_data['album_name'])) {
             $query = mysqli_query($sqlConnect,"SELECT `id`,`image`,`post_id` FROM " . T_ALBUMS_MEDIA . " WHERE `post_id` = {$id} ORDER BY `id` DESC");
-            if ($query) {
+            if (mysqli_num_rows($query)) {
                 while ($fetched_data = mysqli_fetch_assoc($query)) {
                     $media = $fetched_data['image'];
                     mysqli_query($sqlConnect, "INSERT INTO " . T_ALBUMS_MEDIA . " (`post_id`,`image`) VALUES ({$last}, '{$media}')");
@@ -6547,40 +6793,43 @@ function Wo_GetJobById($job_id)
     $job_id = Wo_Secure($job_id);
     $query_one = " SELECT * FROM " . T_JOB . " WHERE id = '{$job_id}'";
     $sql = mysqli_query($sqlConnect, $query_one);
-    $jobs = mysqli_fetch_assoc($sql);
-    if (!empty($jobs)) {
-        $page = Wo_PageData($jobs['page_id']);
-        if (!empty($jobs['question_one_answers'])) {
-            $jobs['question_one_answers'] = json_decode($jobs['question_one_answers'],true);
-        }
-        if (!empty($jobs['question_two_answers'])) {
-            $jobs['question_two_answers'] = json_decode($jobs['question_two_answers'],true);
-        }
-        if (!empty($jobs['question_three_answers'])) {
-            $jobs['question_three_answers'] = json_decode($jobs['question_three_answers'],true);
-        }
-        $jobs['page'] = $page;
-        $jobs['apply'] = false;
-        if ($wo['loggedin']) {
-            $user_id = $wo['user']['id'];
-            $query        = "SELECT COUNT(*) as count FROM " . T_JOB_APPLY . " WHERE `job_id` = '{$job_id}' AND `user_id` = '{$user_id}'";
+    if (mysqli_num_rows($sql)) {
+        $jobs = mysqli_fetch_assoc($sql);
+        if (!empty($jobs)) {
+            $page = Wo_PageData($jobs['page_id']);
+            if (!empty($jobs['question_one_answers'])) {
+                $jobs['question_one_answers'] = json_decode($jobs['question_one_answers'],true);
+            }
+            if (!empty($jobs['question_two_answers'])) {
+                $jobs['question_two_answers'] = json_decode($jobs['question_two_answers'],true);
+            }
+            if (!empty($jobs['question_three_answers'])) {
+                $jobs['question_three_answers'] = json_decode($jobs['question_three_answers'],true);
+            }
+            $jobs['page'] = $page;
+            $jobs['apply'] = false;
+            if ($wo['loggedin']) {
+                $user_id = $wo['user']['id'];
+                $query        = "SELECT COUNT(*) as count FROM " . T_JOB_APPLY . " WHERE `job_id` = '{$job_id}' AND `user_id` = '{$user_id}'";
+                $query_run    = mysqli_query($sqlConnect, $query);
+                $fetched_data = mysqli_fetch_assoc($query_run);
+                $jobs['apply'] = ($fetched_data['count'] > 0) ? true : false;
+            }
+            $query        = "SELECT COUNT(*) as count FROM " . T_JOB_APPLY . " WHERE `job_id` = '{$job_id}'";
             $query_run    = mysqli_query($sqlConnect, $query);
             $fetched_data = mysqli_fetch_assoc($query_run);
-            $jobs['apply'] = ($fetched_data['count'] > 0) ? true : false;
-        }
-        $query        = "SELECT COUNT(*) as count FROM " . T_JOB_APPLY . " WHERE `job_id` = '{$job_id}'";
-        $query_run    = mysqli_query($sqlConnect, $query);
-        $fetched_data = mysqli_fetch_assoc($query_run);
-        $job_apply = $fetched_data['count'];
+            $job_apply = $fetched_data['count'];
 
-        $query_one = " SELECT `id` FROM " . T_POSTS . " WHERE job_id = '{$job_id}'";
-        $sql = mysqli_query($sqlConnect, $query_one);
-        $fetched_data = mysqli_fetch_assoc($sql);
-        
-        $jobs['url'] = Wo_SeoLink('index.php?link1=post&id=' . $fetched_data['id']);
-        $jobs['apply_count'] = $job_apply;
+            $query_one = " SELECT `id` FROM " . T_POSTS . " WHERE job_id = '{$job_id}'";
+            $sql = mysqli_query($sqlConnect, $query_one);
+            $fetched_data = mysqli_fetch_assoc($sql);
+            
+            $jobs['url'] = Wo_SeoLink('index.php?link1=post&id=' . $fetched_data['id']);
+            $jobs['apply_count'] = $job_apply;
+        }
+        return $jobs;
     }
-    return $jobs;
+    return false;
 }
 
 
@@ -6674,10 +6923,12 @@ function Wo_GetAllJobs($filter_data = array()) {
     }
     
     $sql = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql)) {
-        $job           = Wo_GetJobById($fetched_data['id']);
-        //$products['seller'] = Wo_UserData($fetched_data['user_id']);
-        $data[]             = $job;
+    if (mysqli_num_rows($sql)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql)) {
+            $job           = Wo_GetJobById($fetched_data['id']);
+            //$products['seller'] = Wo_UserData($fetched_data['user_id']);
+            $data[]             = $job;
+        }
     }
     return $data;
 }
@@ -6823,7 +7074,7 @@ function Wo_GetCommonUsers($args = array()) {
     {$order_by} LIMIT $limit ";
     //print_r($sql);
     $query = mysqli_query($sqlConnect, $sql);
-    if ($query) {
+    if (mysqli_num_rows($query)) {
         
         while ($fetched_data = mysqli_fetch_assoc($query)) {
             $fetched_data['user_data']        = Wo_UserData($fetched_data['user_id']);
@@ -7084,9 +7335,11 @@ function Wo_GetAllOffers($filter_data = array()) {
     }
     
     $sql = mysqli_query($sqlConnect, $query_one);
-    while ($fetched_data = mysqli_fetch_assoc($sql)) {
-        $offer           = Wo_GetOfferById($fetched_data['id']);
-        $data[]             = $offer;
+    if (mysqli_num_rows($sql)) {
+        while ($fetched_data = mysqli_fetch_assoc($sql)) {
+            $offer           = Wo_GetOfferById($fetched_data['id']);
+            $data[]             = $offer;
+        }
     }
     return $data;
 }
@@ -7138,11 +7391,13 @@ function Wo_GetNearbyShops($args = array()) {
     cos(radians(lat)) * cos(radians(lng) - radians('$user_lng')) + 
     sin(radians('$user_lat')) * sin(radians(lat ))) ) < '$distance' {$sub_sql2}) GROUP BY `page_id` ORDER BY `page_id` DESC LIMIT 0, $limit ";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['page_data']        = Wo_PageData($fetched_data['page_id']);
-        $fetched_data['product']          =  Wo_GetProduct($fetched_data['product_id']);
-        $data[] = $fetched_data;
-        
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['page_data']        = Wo_PageData($fetched_data['page_id']);
+            $fetched_data['product']          =  Wo_GetProduct($fetched_data['product_id']);
+            $data[] = $fetched_data;
+            
+        }
     }
     return $data;
 }
@@ -7226,11 +7481,13 @@ function Wo_GetNearbyBusiness($args = array()) {
     cos(radians(lat)) * cos(radians(lng) - radians('$user_lng')) + 
     sin(radians('$user_lat')) * sin(radians(lat ))) ) < '$distance' {$sub_sql2}) GROUP BY `page_id` ORDER BY `page_id` DESC LIMIT 0, $limit ";
     $query = mysqli_query($sqlConnect, $sql);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $fetched_data['page_data']        = Wo_PageData($fetched_data['page_id']);
-        $fetched_data['job']          =  Wo_GetJobById($fetched_data['job_id']);
-        $data[] = $fetched_data;
-        
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $fetched_data['page_data']        = Wo_PageData($fetched_data['page_id']);
+            $fetched_data['job']          =  Wo_GetJobById($fetched_data['job_id']);
+            $data[] = $fetched_data;
+            
+        }
     }
     return $data;
 }
@@ -7297,13 +7554,15 @@ function Wo_IfCanGenerateLink($user_id)
 
     $query_one = " SELECT count(*) AS count FROM " . T_INVITAION_LINKS." WHERE `user_id` = '{$user_id}' AND `time` > '{$time}' ";
     $query = mysqli_query($sqlConnect, $query_one);
-    $fetched_data = mysqli_fetch_assoc($query);
-    if ($wo['config']['user_links_limit'] > 0) {
-        if ($wo['config']['user_links_limit'] > $fetched_data['count']) {
-            return true;
-        }
-        else{
-            return false;
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        if ($wo['config']['user_links_limit'] > 0) {
+            if ($wo['config']['user_links_limit'] > $fetched_data['count']) {
+                return true;
+            }
+            else{
+                return false;
+            }
         }
     }
     return true;
@@ -7335,13 +7594,16 @@ function Wo_GetAvailableLinks($user_id)
 
     $query_one = " SELECT count(*) AS count FROM " . T_INVITAION_LINKS." WHERE `user_id` = '{$user_id}' AND `time` > '{$time}' ";
     $query = mysqli_query($sqlConnect, $query_one);
-    $fetched_data = mysqli_fetch_assoc($query);
-    if ($wo['config']['user_links_limit'] > 0) {
-        return $wo['config']['user_links_limit'] - $fetched_data['count'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        if ($wo['config']['user_links_limit'] > 0) {
+            return $wo['config']['user_links_limit'] - $fetched_data['count'];
+        }
+        else{
+            return $wo['lang']['unlimited'] ;
+        }
     }
-    else{
-        return $wo['lang']['unlimited'] ;
-    }
+    return false;
 }
 
 function Wo_GetGeneratedLinks($user_id)
@@ -7370,8 +7632,12 @@ function Wo_GetGeneratedLinks($user_id)
 
     $query_one = " SELECT count(*) AS count FROM " . T_INVITAION_LINKS." WHERE `user_id` = '{$user_id}' AND `time` > '{$time}' ";
     $query = mysqli_query($sqlConnect, $query_one);
-    $fetched_data = mysqli_fetch_assoc($query);
-    return $fetched_data['count'];
+    if (mysqli_num_rows($query)) {
+
+        $fetched_data = mysqli_fetch_assoc($query);
+        return $fetched_data['count'];
+    }
+    return false;
 }
 
 function Wo_GetUsedLinks($user_id)
@@ -7400,8 +7666,11 @@ function Wo_GetUsedLinks($user_id)
 
     $query_one = " SELECT count(*) AS count FROM " . T_INVITAION_LINKS." WHERE `user_id` = '{$user_id}' AND `invited_id` != 0 AND `time` > '{$time}' ";
     $query = mysqli_query($sqlConnect, $query_one);
-    $fetched_data = mysqli_fetch_assoc($query);
-    return $fetched_data['count'];
+    if (mysqli_num_rows($query)) {
+        $fetched_data = mysqli_fetch_assoc($query);
+        return $fetched_data['count'];
+    }
+    return false;
 }
 
 function Wo_GetMyInvitaionCodes($user_id)
@@ -7431,7 +7700,7 @@ function Wo_GetMyInvitaionCodes($user_id)
 
     $query_one = " SELECT * FROM " . T_INVITAION_LINKS." WHERE `user_id` = '{$user_id}' AND `time` > '{$time}' ";
     $query = mysqli_query($sqlConnect, $query_one);
-    if ($query) {
+    if (mysqli_num_rows($query)) {
         while ($fetched_data = mysqli_fetch_assoc($query)) {
             $fetched_data['user_name'] = '';
             $fetched_data['user_url'] = '';
@@ -7475,7 +7744,7 @@ function Wo_GetAllInvitaionCodes()
 
     $query_one = " SELECT * FROM " . T_INVITAION_LINKS;
     $query = mysqli_query($sqlConnect, $query_one);
-    if ($query) {
+    if (mysqli_num_rows($query)) {
         while ($fetched_data = mysqli_fetch_assoc($query)) {
             $fetched_data['user_name'] = '';
             $fetched_data['user_url'] = '';
@@ -7511,14 +7780,16 @@ function Wo_notifyUsersLive($post_id) {
     $query_text = "SELECT `user_id` FROM " . T_USERS . " WHERE `user_id` IN (SELECT `follower_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` <> {$user_id} AND `following_id` = {$user_id} AND `user_id` NOT IN (SELECT `blocked` FROM " . T_BLOCKS . " WHERE `blocker` = '{$user_id}') AND `user_id` NOT IN (SELECT `blocker` FROM " . T_BLOCKS . " WHERE `blocked` = '{$user_id}') AND `active` = '1') AND `lastseen` > {$time}";
     $query_text .= " AND `active` = '1' ORDER BY `lastseen` DESC";
     $query = mysqli_query($sqlConnect, $query_text);
-    while ($fetched_data = mysqli_fetch_assoc($query)) {
-        $notification_data = array(
-            'recipient_id' => $fetched_data['user_id'],
-            'notifier_id' => $wo['user']['id'],
-            'type' => 'live_video',
-            'url' => 'index.php?link1=post&id=' . $post_id
-        );
-        Wo_RegisterNotification($notification_data);
+    if (mysqli_num_rows($query)) {
+        while ($fetched_data = mysqli_fetch_assoc($query)) {
+            $notification_data = array(
+                'recipient_id' => $fetched_data['user_id'],
+                'notifier_id' => $wo['user']['id'],
+                'type' => 'live_video',
+                'url' => 'index.php?link1=post&id=' . $post_id
+            );
+            Wo_RegisterNotification($notification_data);
+        }
     }
     return $data;
 }
@@ -7560,11 +7831,13 @@ function Wo_CheckAnonymous($id,$type)
     }
     $query_one    = "SELECT COUNT(id) as count FROM " . T_POSTS . " P WHERE P.`postPrivacy` = '4'".$sub;
     $sql          = mysqli_query($sqlConnect, $query_one);
-    $fetched_data = mysqli_fetch_assoc($sql);
-    if (empty($fetched_data)) {
-        return false;
+    if (mysqli_num_rows($sql)) {
+        $fetched_data = mysqli_fetch_assoc($sql);
+        if (empty($fetched_data)) {
+            return false;
+        }
+        return $fetched_data['count'];
     }
-    return $fetched_data['count'];
 }
 function StartCloudRecording($vendor,$region,$bucket,$accessKey,$secretKey,$cname,$uid,$post_id)
 {
@@ -7711,4 +7984,27 @@ function GetVideoTime($first,$second)
     }
     return array('time' => $time.$seconds_time,
                  'current_time' => $current_time);
+}
+function getPageFromPath($path = '') {
+    if (empty($path)) {
+        return false;
+    }
+    $path = explode("&", $path);
+    $data = array();
+    $data['options'] = array();
+    if (!empty($path[0])) {
+        $data['page'] = $path[0];
+    }
+    if (!empty($path[1])) {
+        unset($path[0]);
+        $data['options'] = $path;
+        foreach ($path as $key => $value) {
+            preg_match_all('/(.*)=(.*)/m', $value, $matches);
+            if (!empty($matches) && !empty($matches[1]) && !empty($matches[1][0]) && !empty($matches[2]) && !empty($matches[2][0])) {
+                $_GET[$matches[1][0]] = $matches[2][0];
+            }
+            
+        }
+    }
+    return $data;
 }

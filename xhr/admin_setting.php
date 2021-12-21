@@ -2073,7 +2073,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             );
             if (!empty($_POST['options'])) {
                 $options              = @explode("\n", $_POST['options']);
-                $type                 = Wo_Secure(implode($options, ','));
+                $type                 = Wo_Secure(implode(',', $options));
                 $data_['select_type'] = 'yes';
             }
             $data_['type'] = $type;
@@ -2136,7 +2136,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             );
             if (!empty($_POST['options'])) {
                 $options              = @explode("\n", $_POST['options']);
-                $data_['type']        = implode($options, ',');
+                $data_['type']        = implode(',', $options);
                 $data_['select_type'] = 'yes';
             }
             $add = Wo_UpdateField($_POST['id'], $data_);
@@ -2491,7 +2491,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         exit();
     }
     if ($s == 'test_s3') {
-        include_once('assets/libraries/s3/aws-autoloader.php');
+        include_once('assets/libraries/s3/vendor/autoload.php');
         try {
             $s3Client = S3Client::factory(array(
                 'version' => 'latest',
@@ -2560,7 +2560,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         exit();
     }
     if ($s == 'test_s3_2') {
-        include_once('assets/libraries/s3/aws-autoloader.php');
+        include_once('assets/libraries/s3/vendor/autoload.php');
         try {
             $s3Client = S3Client::factory(array(
                 'version' => 'latest',
@@ -3818,7 +3818,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             );
             if (!empty($_POST['options'])) {
                 $options              = @explode("\n", $_POST['options']);
-                $data_['options']     = Wo_Secure(implode($options, ','));
+                $data_['options']     = Wo_Secure(implode(',', $options));
             }
 
             $add           = Wo_RegisterNewCustomField($data_);
@@ -3902,7 +3902,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 );
                 if (!empty($_POST['options'])) {
                     $options              = @explode("\n", $_POST['options']);
-                    $data_['options']     = Wo_Secure(implode($options, ','));
+                    $data_['options']     = Wo_Secure(implode(',', $options));
                 }
 
                 $add           = Wo_UpdateCustomField(Wo_Secure($_POST['id']),$data_);

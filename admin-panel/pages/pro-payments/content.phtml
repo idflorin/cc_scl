@@ -451,12 +451,20 @@ jQuery(document).ready(function($) {
         $(document).on('click', '.ranges ul li', function(event) {
             event.preventDefault();
             if ($(this).attr('data-range-key') != 'Custom Range') {
-                location.href = "<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>?range="+$(this).attr('data-range-key');
+                $(document).off('click', '.ranges ul li');
+                $('#redirect_link').attr('href', "<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>&range="+$(this).attr('data-range-key'));
+                $('#redirect_link').attr('data-ajax', "?path=pro-payments&range="+$(this).attr('data-range-key'));
+                $('#redirect_link').click();
+                //location.href = "<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>?range="+$(this).attr('data-range-key');
             }
         });
         $(document).on('click', '.applyBtn', function(event) {
             event.preventDefault();
-            location.href = "<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>?range="+$('.drp-selected').html();
+            $(document).off('click', '.applyBtn');
+            $('#redirect_link').attr('href', "<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>&range="+$(this).parent('.drp-buttons').find('.drp-selected').html());
+            $('#redirect_link').attr('data-ajax', "?path=pro-payments&range="+$(this).parent('.drp-buttons').find('.drp-selected').html());
+            $('#redirect_link').click();
+            //location.href = "<?php echo Wo_LoadAdminLinkSettings('pro-payments'); ?>?range="+$('.drp-selected').html();
         });
     var rgbToHex = function (rgb) {
         var hex = Number(rgb).toString(16);

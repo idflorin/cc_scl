@@ -2,11 +2,11 @@
 	<div class="user-request-list ">
 		<div class="user-info">
 			<div class="avatar">
-				<a href="<?php echo $wo['group_chat']['url'];?>" data-ajax="?link1=timeline&u=<?php echo $wo['group_chat']['group_name'];?>">
+				<a href="javascript:void(0)">
 					<img src="<?php echo $wo['group_chat']['avatar'];?>" alt="<?php echo $wo['group_chat']['group_name']; ?> Profile Picture" />
 				</a>
 			</div>
-			<a href="<?php echo $wo['group_chat']['url'];?>" data-ajax="?link1=timeline&u=<?php echo $wo['group_chat']['group_name'];?>"><?php echo $wo['group_chat']['group_name']; ?> (<?php echo $wo['lang']['group']; ?>)</a>
+			<a href="javascript:void(0)"><?php echo $wo['group_chat']['group_name']; ?> (<?php echo $wo['lang']['group']; ?>)</a>
 			<?php $user = Wo_UserData($wo['group_chat']['user_id']); ?>
 			<div class="user-lastseen"><?php echo $user['name']." " . $wo['lang']['invited_to_group']; ?></div>
 		</div>

@@ -1422,7 +1422,7 @@ function Wo_UploadToS3($filename, $config = array()) {
         if (empty($wo['config']['amazone_s3_key']) || empty($wo['config']['amazone_s3_s_key']) || empty($wo['config']['region']) || empty($wo['config']['bucket_name'])) {
             return false;
         }
-        include_once('assets/libraries/s3/aws-autoloader.php');
+        include_once('assets/libraries/s3/vendor/autoload.php');
         $s3 = new S3Client([
             'version'     => 'latest',
             'region'      => $wo['config']['region'],
@@ -1537,7 +1537,7 @@ function Wo_DeleteFromToS3($filename, $config = array()) {
             }
         }
     } else if ($wo['config']['amazone_s3'] == 1) {
-        include_once('assets/libraries/s3/aws-autoloader.php');
+        include_once('assets/libraries/s3/vendor/autoload.php');
         if (empty($wo['config']['amazone_s3_key']) || empty($wo['config']['amazone_s3_s_key']) || empty($wo['config']['region']) || empty($wo['config']['bucket_name'])) {
             return false;
         }
@@ -1590,7 +1590,7 @@ function Wo_DeleteFromToS3($filename, $config = array()) {
     }
 
     if ($wo['config']['amazone_s3_2'] == 1) {
-        include_once('assets/libraries/s3/aws-autoloader.php');
+        include_once('assets/libraries/s3/vendor/autoload.php');
         if (empty($wo['config']['amazone_s3_key_2']) || empty($wo['config']['amazone_s3_s_key_2']) || empty($wo['config']['region_2']) || empty($wo['config']['bucket_name_2'])) {
             return false;
         }

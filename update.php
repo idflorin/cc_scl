@@ -142,11 +142,16 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
                <div class="wo_install_wiz">
                  <?php if ($updated == false) { ?>
                   <div>
-                     <h2 class="light">Update to v3.1.1</span></h2>
+                     <h2 class="light">Update to v3.1.2</span></h2>
                      <div class="setting-well">
                         <h4>Changelog</h4>
                         <ul class="wo_update_changelog">
-                                <li> [Fixed] 10+ reported bugs.</li>
+                                <li> [Added] support for PHP 8.0+ and MySQL 8.0</li>
+                                <li> [Added] new ajax load system for admin panel, now admin panel pages are loaded thru ajax.</li>
+                                <li> [Updated] nodejs chat system, now users can see typing action on messages user list, real time avatar update, name, and status.</li>
+                                <li> [Updated] S3 / Spaces libraries. </li>
+                                <li> [Improved] speed on PHP 8.0</li>
+                                <li> [Fixed] 20+ reported bugs.</li>
                                 <li> [Fixed] bugs in API.</li>
                         </ul>
                         <p class="hide_print">Note: The update process might take few minutes.</p>
@@ -188,7 +193,7 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
 </html>
 <script>  
 var queries = [
-    "UPDATE `Wo_Config` SET `value` = '3.1.1' WHERE `name` = 'version';",
+    "UPDATE `Wo_Config` SET `value` = '3.1.2' WHERE `name` = 'version';",
 
 ];
 $('#input_code').bind("paste keyup input propertychange", function(e) {

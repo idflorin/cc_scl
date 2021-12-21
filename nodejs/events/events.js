@@ -1,5 +1,7 @@
 const funcs = require('../functions/functions')
 const compiledTemplates = require('../compiledTemplates/compiledTemplates')
+const moment = require("moment")
+
 
 module.exports.emitUserStatus = async (ctx, io, user_id) => {
     let online_users = await funcs.Wo_GetChatUsers(ctx, user_id, "online");
@@ -44,21 +46,16 @@ module.exports.updateMessageUsersList = async (ctx, io, user_id, to_whom) => {
     for (let user of messageUsers) {
         let count_messages = await funcs.Wo_CountMessages(ctx, user_id, user.conversation_user_id);
         let messageText = await funcs.getLatestMessage(ctx, user_id, user.conversation_user_id);
-        // if (!messageText || !messageText.text) {
-        //     if (!messageText || messageText.media) {
-        //         messageText = messageText ? messageText.text = "" : { text: "" }
-        //     } else{
-        //         messageText = { text: "" }
-        //     }
-        //     // else {
-        //     //     console.log("Continuing as no message text found")
-        //     //     continue
-        //     // }
-        // }
-        // console.log(messageText.time);
-        //console.log(messageText);
-        if (!messageText) {
-            messageText = { text: ""}
+        if (!messageText || !messageText.text) {
+            if (!messageText || messageText.media) {
+                messageText = messageText ? messageText.text = "" : { text: "" }
+            } else{
+                messageText = { text: "" }
+            }
+            // else {
+            //     console.log("Continuing as no message text found")
+            //     continue
+            // }
         }
         //let hasHTML = messate.text.split(" ").includes("<i");
         // let text = messageText.text;
@@ -85,25 +82,12 @@ module.exports.updateMessageGroupsList = async (ctx, io, user_id) => {
         // let count_messages = await funcs.Wo_CountMessages(ctx, user_id, user.conversation_user_id);
         let group = await funcs.Wo_GetGroupChat(ctx, g.group_id)
         let messageText = await funcs.getLatestGroupMessage(ctx, user_id, group.group_id);
-        let isActive = ctx.userIdExtra[user_id] ? (ctx.userIdExtra[user_id].active_message_group_id === group.group_id) || (ctx.userIdExtra[user_id].active_message_user_id === +group.group_id) : false  //(+to_whom === user.conversation_user_id) || (user_id === user.conversation_user_id);
+        let isActive = ctx.userIdExtra[user_id] ? (ctx.userIdExtra[user_id].active_message_user_id === group.group_id) || (ctx.userIdExtra[user_id].active_message_user_id === +group.group_id) : false  //(+to_whom === user.conversation_user_id) || (user_id === user.conversation_user_id);
         if (!messageText) {
-            messageText = { text: ""}
+            messageText = { text: "" }
         }
-        let online = false;
-        let group_users = await funcs.getGroupUsers(ctx, g.group_id);
-        for (let group_user of group_users) {
-            if (group_user['last_seen'] >= Math.floor(Date.now() / 1000) - 60 && group_user['user_id'] != user_id) {
-                let group_user_data = await funcs.Wo_UserData(ctx, group_user['user_id']);
-                if(group_user_data['lastseen'] >= Math.floor(Date.now() / 1000) - 60){
-                    online = true;
-                }
-            }
-        }
-        
 
-
-        html += await compiledTemplates.messageGroupRecipientsTemplate(ctx, group.group_id, group.group_name, group.avatar, isActive, messageText,online)
-        
+        html += await compiledTemplates.messageGroupRecipientsTemplate(ctx, group.group_id, group.group_name, group.avatar, isActive, messageText)
     }
     await io.to(user_id).emit("update-group-side", {
         status: 200,
@@ -134,18 +118,8 @@ async function updateMessageGroupsListInternal(ctx, io, user_id, to_id, sendable
         if (!messageText) {
             messageText = { text: "" }
         }
-        let online = false;
-        let group_users = await funcs.getGroupUsers(ctx, g.group_id);
-        for (let group_user of group_users) {
-            if (group_user['last_seen'] >= Math.floor(Date.now() / 1000) - 60 && group_user['user_id'] != user_id) {
-                let group_user_data = await funcs.Wo_UserData(ctx, group_user['user_id']);
-                if(group_user_data['lastseen'] >= Math.floor(Date.now() / 1000) - 60){
-                    online = true;
-                }
-            }
-        }
 
-        html += await compiledTemplates.messageGroupRecipientsTemplate(ctx, group.group_id, group.group_name, group.avatar, isActive, messageText,online)
+        html += await compiledTemplates.messageGroupRecipientsTemplate(ctx, group.group_id, group.group_name, group.avatar, isActive, messageText)
     }
     await io.to(to_id).emit("update-group-side", {
         status: 200,
@@ -195,6 +169,8 @@ module.exports.privateMessageToPersonOwnerFalse = async (ctx, io, data, fromUser
         receiver: data.to_id,
         sender: ctx.userHashUserId[data.from_id],
         color: color,
+        message: sendable_message,
+        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
     });
 }
 
@@ -237,7 +213,9 @@ module.exports.privateMessagePageToPersonOwnerFalseWithMedia = async (ctx, io, d
         status: 200,
         id: ctx.userHashUserId[data.from_id],
         receiver: data.to_id,
-        sender: ctx.userHashUserId[data.from_id]
+        sender: ctx.userHashUserId[data.from_id],
+        isMedia: true,
+        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
     });
 }
 
@@ -246,7 +224,9 @@ module.exports.privateMessageToPersonOwnerFalseWithMedia = async (ctx, io, data,
         messages_html: await compiledTemplates.chatListOwnerFalseWithMedia(ctx, data, fromUser, nextId, hasHTML, isSticker),
         id: ctx.userHashUserId[data.from_id],
         receiver: data.to_id,
-        sender: ctx.userHashUserId[data.from_id]
+        sender: ctx.userHashUserId[data.from_id],
+        isMedia: true,
+        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
     });
 }
 
@@ -257,19 +237,13 @@ module.exports.privateMessagePageToPersonOwnerFalse = async (ctx, io, data, from
         id: ctx.userHashUserId[data.from_id],
         receiver: data.to_id,
         sender: ctx.userHashUserId[data.from_id],
-        color: color
+        color: color,
+        message: sendable_message,
+        time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>'
     });
 }
 
 module.exports.groupMessage = async (ctx, io, socket, data, messageOwner, nextId, hasHTML, sendable_message) => {
-    if (!io.sockets.adapter.rooms["group" + data.group_id]) {
-        let groupIds = await funcs.getAllGroupsForUser(ctx, messageOwner.user_id);
-        for (let groupId of groupIds) {
-            if (!io.sockets.adapter.rooms["group" + groupId.group_id]) {
-                socket.join("group" + groupId.group_id);
-            }
-        }
-    }
     for (let client of Object.keys(io.sockets.adapter.rooms["group" + data.group_id].sockets)) {
         if (client === socket.id) {
             continue;
@@ -315,14 +289,6 @@ module.exports.groupMessage = async (ctx, io, socket, data, messageOwner, nextId
 
 
 module.exports.groupMessageWithMedia = async (ctx, io, socket, data, messageOwner, nextId, isSticker) => {
-    if (!io.sockets.adapter.rooms["group" + data.group_id]) {
-        let groupIds = await funcs.getAllGroupsForUser(ctx, messageOwner.user_id);
-        for (let groupId of groupIds) {
-            if (!io.sockets.adapter.rooms["group" + groupId.group_id]) {
-                socket.join("group" + groupId.group_id);
-            }
-        }
-    }
     for (let client of Object.keys(io.sockets.adapter.rooms["group" + data.group_id].sockets)) {
         if (client === socket.id) {
             continue;
@@ -364,14 +330,6 @@ module.exports.groupMessageWithMedia = async (ctx, io, socket, data, messageOwne
 
 
 module.exports.groupMessagePage = async (ctx, io, socket, data, messageOwner, nextId, hasHTML, sendable_message) => {
-    if (!io.sockets.adapter.rooms["group" + data.group_id]) {
-        let groupIds = await funcs.getAllGroupsForUser(ctx, messageOwner.user_id);
-        for (let groupId of groupIds) {
-            if (!io.sockets.adapter.rooms["group" + groupId.group_id]) {
-                socket.join("group" + groupId.group_id);
-            }
-        }
-    }
     for (let client of Object.keys(io.sockets.adapter.rooms["group" + data.group_id].sockets)) {
         if (client === socket.id) {
             continue;
@@ -423,14 +381,6 @@ module.exports.groupMessagePage = async (ctx, io, socket, data, messageOwner, ne
 
 
 module.exports.groupMessagePageWithMedia = async (ctx, io, socket, data, messageOwner, nextId, hasHTML, sendable_message, isSticker) => {
-    if (!io.sockets.adapter.rooms["group" + data.group_id]) {
-        let groupIds = await funcs.getAllGroupsForUser(ctx, messageOwner.user_id);
-        for (let groupId of groupIds) {
-            if (!io.sockets.adapter.rooms["group" + groupId.group_id]) {
-                socket.join("group" + groupId.group_id);
-            }
-        }
-    }
     for (let client of Object.keys(io.sockets.adapter.rooms["group" + data.group_id].sockets)) {
         if (client === socket.id) {
             continue;

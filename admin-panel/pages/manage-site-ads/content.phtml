@@ -83,11 +83,17 @@ $(function() {
                 if (arr[i].name == 'footer') {
                     arr[i].value = btoa(unescape(encodeURIComponent($('#footer').val())));
                 }
-                if (arr[i].name == 'watch_side_bar') {
-                    arr[i].value = btoa(unescape(encodeURIComponent($('#watch_side_bar').val())));
+                if (arr[i].name == 'sidebar') {
+                    arr[i].value = btoa(unescape(encodeURIComponent($('#sidebar').val())));
                 }
-                if (arr[i].name == 'watch_comments') {
-                    arr[i].value = btoa(unescape(encodeURIComponent($('#watch_comments').val())));
+                if (arr[i].name == 'post_first') {
+                    arr[i].value = btoa(unescape(encodeURIComponent($('#post_first').val())));
+                }
+                if (arr[i].name == 'post_second') {
+                    arr[i].value = btoa(unescape(encodeURIComponent($('#post_second').val())));
+                }
+                if (arr[i].name == 'post_third') {
+                    arr[i].value = btoa(unescape(encodeURIComponent($('#post_third').val())));
                 }
             }
           // delete arr[0];

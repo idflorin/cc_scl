@@ -173,11 +173,8 @@ $users_array = $array;
 $posts_array = $array;
 $pages_array = $array;
 $groups_array = $array;
-$users = $db->where('joined',$this_start,'>=')->where('joined',$this_end,'<=')->get(T_USERS);
-$posts = $db->where('time',$this_start,'>=')->where('time',$this_end,'<=')->get(T_POSTS);
-$pages = $db->where('time',$this_start,'>=')->where('time',$this_end,'<=')->get(T_PAGES);
-$groups = $db->where('time',$this_start,'>=')->where('time',$this_end,'<=')->get(T_GROUPS);
 
+$users = $db->where('joined',$this_start,'>=')->where('joined',$this_end,'<=')->get(T_USERS,null,array('joined'));
 foreach ($users as $key => $value) {
     $day = date($code,$value->joined);
     if ($main_range == 'Custom' && !empty($first_code) && !empty($second_code)) {
@@ -190,7 +187,12 @@ foreach ($users as $key => $value) {
         $users_array[$day] += 1; 
     }
 }
+$u_array = implode(', ', $users_array);
+$users = array();
+$users_array = array();
 
+
+$posts = $db->where('time',$this_start,'>=')->where('time',$this_end,'<=')->get(T_POSTS,null,array('time'));
 foreach ($posts as $key => $value) {
     $day = date($code,$value->time);
     if ($main_range == 'Custom' && !empty($first_code) && !empty($second_code)) {
@@ -203,7 +205,11 @@ foreach ($posts as $key => $value) {
         $posts_array[$day] += 1; 
     }
 }
+$p_array = implode(', ', $posts_array);
+$posts = array();
+$posts_array = array();
 
+$pages = $db->where('time',$this_start,'>=')->where('time',$this_end,'<=')->get(T_PAGES,null,array('time'));
 foreach ($pages as $key => $value) {
     $day = date($code,$value->time);
     if ($main_range == 'Custom' && !empty($first_code) && !empty($second_code)) {
@@ -216,7 +222,11 @@ foreach ($pages as $key => $value) {
         $pages_array[$day] += 1; 
     }
 }
+$pa_array = implode(', ', $pages_array);
+$pages = array();
+$pages_array = array();
 
+$groups = $db->where('time',$this_start,'>=')->where('time',$this_end,'<=')->get(T_GROUPS,null,array('time'));
 foreach ($groups as $key => $value) {
     $day = date($code,$value->time);
     if ($main_range == 'Custom' && !empty($first_code) && !empty($second_code)) {
@@ -229,10 +239,13 @@ foreach ($groups as $key => $value) {
         $groups_array[$day] += 1; 
     }
 }
-$u_array = implode(', ', $users_array);
-$p_array = implode(', ', $posts_array);
-$pa_array = implode(', ', $pages_array);
 $g_array = implode(', ', $groups_array);
+$groups = array();
+$groups_array = array();
+
+
+
+
 ?>
 <div class="container-fluid">
     <div>
@@ -478,13 +491,22 @@ jQuery(document).ready(function($) {
         
         $(document).on('click', '.ranges ul li', function(event) {
             event.preventDefault();
+            
             if ($(this).attr('data-range-key') != 'Custom Range') {
-                location.href = "<?php echo Wo_LoadAdminLinkSettings('dashboard'); ?>?range="+$(this).attr('data-range-key');
+                $(document).off('click', '.ranges ul li');
+                //location.href = "<?php echo Wo_LoadAdminLinkSettings('dashboard'); ?>?range="+$(this).attr('data-range-key');
+                $('#redirect_link').attr('href', "<?php echo Wo_LoadAdminLinkSettings('dashboard'); ?>?range="+$(this).attr('data-range-key'));
+                $('#redirect_link').attr('data-ajax', "?path=dashboard//range="+$(this).attr('data-range-key'));
+                $('#redirect_link').click();
             }
         });
         $(document).on('click', '.applyBtn', function(event) {
             event.preventDefault();
-            location.href = "<?php echo Wo_LoadAdminLinkSettings('dashboard'); ?>?range="+$('.drp-selected').html();
+            $(document).off('click', '.applyBtn');
+            $('#redirect_link').attr('href', "<?php echo Wo_LoadAdminLinkSettings('dashboard'); ?>?range="+$(this).parent('.drp-buttons').find('.drp-selected').html());
+            $('#redirect_link').attr('data-ajax', "?path=dashboard//range="+$(this).parent('.drp-buttons').find('.drp-selected').html());
+            $('#redirect_link').click();
+            //location.href = "<?php echo Wo_LoadAdminLinkSettings('dashboard'); ?>?range="+$('.drp-selected').html();
         });
     var rgbToHex = function (rgb) {
         var hex = Number(rgb).toString(16);
