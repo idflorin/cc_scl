@@ -621,6 +621,7 @@ $wo['footer_pages']                  = array(
     'game',
     'funding',
     'jobs',
+    'nearby_business'
 );
 
 $wo['update_cache']                  = '';

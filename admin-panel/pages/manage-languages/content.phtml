@@ -20,8 +20,9 @@
                 <div class="card-body">
                     <h6 class="card-title">Manage & Edit Languages</h6>
                     <div class="langs-settings-alert"></div>
+                    <div class="alert alert-info">You can manage, edit and delete languages.</div>
                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-hover">
+                        <table class="table table-bordered table-striped table-hover" style="table-layout: inherit; border-top: 1px solid;">
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="check-all" class="filled-in check-all" ><label for="check-all"></label></th>
@@ -46,7 +47,7 @@
                     <div class="row">
                         <div class="col-lg-3 col-md-3">
                             <span>&nbsp;</span>
-                            <button type="button" class="btn btn-info waves-effect delete-selected d-block" disabled>Delete Selected<span></span></button>
+                            <button type="button" class="btn btn-info waves-effect delete-selected d-block" disabled>Delete Selected <span></span></button>
                         </div>
                     </div>
                 </div>
@@ -68,7 +69,7 @@
                     Are you sure you want to delete this language?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal">Delete</button>
                 </div>
             </div>
@@ -147,13 +148,13 @@ function update_lang_status(self,name) {
     $.post(Wo_Ajax_Requests_File()+"?f=admin_setting&s=update_lang_status", {name:name,value:value}, function(data, textStatus, xhr) {
         if ($(self).attr('data-type') == 'disable') {
             $(self).attr('data-type','enable');
-            $(self).html('<i class="fa fa-check"></i> Enable');
+            $(self).html('Enable');
         }
         else{
             $(self).attr('data-type','disable');
-            $(self).html('<i class="fa fa-times"></i> Disable');
+            $(self).html('Disable');
         }
-        $('.langs-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
+        $('.langs-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Language status updated.</div>');
         setTimeout(function () {
             $('.langs-settings-alert').empty();
         }, 2000);

@@ -430,9 +430,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'delete_user_posts') {
         $data['status'] = 400;
         if (!empty($_GET['user_id'])) {
-            Wo_RunInBackground(array(
-                    'status' => 200
-                ));
+            ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
             $user_id = Wo_Secure($_GET['user_id']);
             Wo_DeleteAllUserPosts($user_id);
         }
@@ -443,9 +457,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'delete_user_articles') {
         $data['status'] = 400;
         if (!empty($_GET['user_id'])) {
-            Wo_RunInBackground(array(
-                    'status' => 200
-                ));
+            ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
             $user_id = Wo_Secure($_GET['user_id']);
             $blogs = $db->where('user',$user_id)->get(T_BLOG);
             if (!empty($blogs)) {
@@ -461,9 +489,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'delete_user_stories') {
         $data['status'] = 400;
         if (!empty($_GET['user_id'])) {
-            Wo_RunInBackground(array(
-                    'status' => 200
-                ));
+            ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
             $user_id = Wo_Secure($_GET['user_id']);
             $info = $db->where('user_id',$user_id)->get(T_USER_STORY);
             if (!empty($info)) {
@@ -479,9 +521,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'delete_user_messages') {
         $data['status'] = 400;
         if (!empty($_GET['user_id'])) {
-            Wo_RunInBackground(array(
-                    'status' => 200
-                ));
+            ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
             $my_id = Wo_Secure($_GET['user_id']);
             $query_one     = "SELECT id FROM " . T_MESSAGES . " WHERE (`to_id` = '{$my_id}') OR (`from_id` = {$my_id})";
             $sql_query_one = mysqli_query($sqlConnect, $query_one);
@@ -498,9 +554,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'delete_user_notifications') {
         $data['status'] = 400;
         if (!empty($_GET['user_id'])) {
-            Wo_RunInBackground(array(
-                    'status' => 200
-                ));
+            ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
             $my_id = Wo_Secure($_GET['user_id']);
             mysqli_query($sqlConnect, "DELETE FROM " . T_NOTIFICATION . " WHERE `recipient_id` = {$my_id} OR `notifier_id` = {$my_id}");
         }
@@ -511,9 +581,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'ban_user') {
         $data['status'] = 400;
         if (!empty($_GET['user_id'])) {
-            Wo_RunInBackground(array(
-                    'status' => 200
-                ));
+            ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
             $user_id = Wo_Secure($_GET['user_id']);
             $info = $db->where('user_id',$user_id)->getOne(T_USERS);
             Wo_BanNewIp($info->ip_address);
@@ -1522,7 +1606,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                     $data['message'] = 'Connection was successfully established!';
                 }
                 else{
-                    $data['message'] = 'Something Wrong';
+                    $data['message'] = 'Something went wrong, please try again later.';
                 }
             }
             catch (Exception $e) {
@@ -1530,7 +1614,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             }
         }
         else{
-            $data['message'] = 'vision api key can not be empty';
+            $data['message'] = 'Vision api key can not be empty.';
         }
         header("Content-type: application/json");
         echo json_encode($data);
@@ -1588,9 +1672,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 $users_id[] = $i->user_id;
             }
             if (empty($data['error']) && $data['status'] != 500 && !empty($users_id)) {
-                Wo_RunInBackground(array(
-                    'status' => 200
-                ));
+                ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
                 $followed  = Wo_RegisterFollow($_POST['user_id'], $users_id);
                 $user_data = Wo_UpdateUserDetails($_POST['user_id'], false, false, true);
                 $update_user = $db->where('user_id', $_POST['user_id'])->update(T_USERS, array("last_follow_id" => Wo_Secure(end($users_id))));
@@ -2548,7 +2646,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         $count_users = $_POST['count_users'];
         $password = $_POST['password'];
         $avatar = $_POST['avatar'];
-        Wo_RunInBackground(array('status' => 200));
+        ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
         for ($i=0; $i < $count_users; $i++) { 
             $genders = array_keys($wo['genders']);
             $random_keys = array_rand($genders, 1);
@@ -2582,7 +2696,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
         exit();
     }
     if ($s == 'delete_fake_users' && Wo_CheckMainSession($hash_id) === true) {
-        Wo_RunInBackground(array('status' => 200));
+        ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
         $query = mysqli_query($sqlConnect, "SELECT user_id FROM " . T_USERS . " WHERE src = 'Fake'");
         while ($row = mysqli_fetch_assoc($query)) {
             Wo_DeleteUser($row['user_id']);
@@ -2593,7 +2723,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     }
     if ($s == 'auto_delete' && Wo_CheckMainSession($hash_id) === true) {
         if (!empty($_GET['delete'])) {
-            Wo_RunInBackground(array('status' => 200));
+            ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 200
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
             $delete_data = Wo_DeleteAllData($_GET['delete']);
         }
         header("Content-type: application/json");
@@ -2797,7 +2943,7 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
     if ($s == 'update_html_emails') {
         $saveSetting = false;
         foreach ($_POST as $key => $value) {
-            if ($key != 'hash_id' && in_array($key, array('activate','invite','login_with','notification','payment_declined','payment_approved','recover','unusual_login'))) {
+            if ($key != 'hash_id' && in_array($key, array('activate','invite','login_with','notification','payment_declined','payment_approved','recover','unusual_login','account_deleted'))) {
                 $saveSetting = Wo_SaveHTMLEmails($key, base64_decode($value));
             }
         }
@@ -3281,7 +3427,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 } else if ($_POST['send_to'] == 'inactive') {
                     $users = Wo_GetAllUsersByType('inactive');
                 }
-                Wo_RunInBackground(array('status' => 300));
+                ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 300
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
                 foreach ($users as $user) {
                     $send_message_data = array(
                         'from_email' => $wo['config']['siteEmail'],
@@ -3348,7 +3510,23 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                 } else {
                     $users = Wo_GetUsersByTime($_POST['send_to']);
                 }
-                Wo_RunInBackground(array('status' => 300));
+                ob_end_clean();
+            header("Content-Encoding: none");
+            header("Connection: close");
+            ignore_user_abort();
+            ob_start();
+            header('Content-Type: application/json');
+            echo json_encode(array(
+                'status' => 300
+            ));
+            $size = ob_get_length();
+            header("Content-Length: $size");
+            ob_end_flush();
+            flush();
+            session_write_close();
+            if (is_callable('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
                 foreach ($users as $user) {
                     $send_message_data = array(
                         'from_email' => $wo['config']['siteEmail'],

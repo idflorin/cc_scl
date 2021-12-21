@@ -5262,7 +5262,7 @@ function Wo_CheckBirthdays($user_id = 0) {
 
     $data  = array();
     $date  = '-'.date('m') . '-' . date('d');
-    $query = mysqli_query($sqlConnect, "SELECT `user_id` FROM " . T_USERS . " WHERE `birthday` LIKE '%{$date}%' AND `user_id` <> {$user_id} AND `user_id` IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = {$user_id} AND `active` = '1') ORDER BY RAND() LIMIT 5");
+    $query = mysqli_query($sqlConnect, "SELECT `user_id` FROM " . T_USERS . " WHERE `birthday` LIKE '%{$date}%' AND `user_id` <> '{$user_id}' AND `user_id` IN (SELECT `following_id` FROM " . T_FOLLOWERS . " WHERE `follower_id` = '{$user_id}' AND `active` = '1') ORDER BY RAND() LIMIT 5");
     if (mysqli_num_rows($query)) {
         while ($fetched_data = mysqli_fetch_assoc($query)) {
             $user_data = Wo_UserData($fetched_data['user_id']);

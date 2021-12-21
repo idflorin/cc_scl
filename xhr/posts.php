@@ -1,6 +1,7 @@
 <?php 
 if ($f == 'posts') {
     if ($s == 'fetch_url') {
+        
         if (preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $_POST["url"], $match)) {
             $youtube_video = Wo_Secure($match[1]);
             $api_request   = file_get_contents('https://www.googleapis.com/youtube/v3/videos?id=' . $youtube_video . '&key='.$wo['config']['youtube_api_key'].'&part=snippet,contentDetails,statistics,status');
@@ -43,6 +44,7 @@ if ($f == 'posts') {
             $tweeturl  = 'https://publish.twitter.com/oembed?url=' . $tweet_url;
             $api_request = @file_get_contents($tweeturl);
             $thumbnail     = '';
+            
             if (!empty($api_request)) {
                 $json_decode = json_decode($api_request);
                 $title       = $json_decode->author_name;
@@ -66,6 +68,7 @@ if ($f == 'posts') {
             $tiktok_url  = 'https://www.tiktok.com/oembed?url=' . $tiktok_url;
             $api_request = @file_get_contents($tiktok_url);
             $thumbnail     = '';
+            
             if (!empty($api_request)) {
                 $json_decode = json_decode($api_request);
                 $title       = $json_decode->author_name;
@@ -86,6 +89,7 @@ if ($f == 'posts') {
         }
         elseif (preg_match("/^(http:\/\/|https:\/\/|www\.).*(\.mp4)$/", $_POST['url'])) {
             $thumbnail     = '';
+            
             $title       = '';
             $description = '';
             $wo['media'] = array('storyId' => 0,
@@ -107,7 +111,7 @@ if ($f == 'posts') {
             exit();
 
         }
-        elseif (preg_match('~([A-Za-z0-9]+)\/(.*)\/(?:t\.\d+/)?(\d+)~i', $_POST['url']) || preg_match('~fb.watch\/(.*)~', $_POST['url'])) {
+        elseif (preg_match('~facebook.com\/(.*)\/(?:t\.\d+/)?(\d+)~i', $_POST['url']) || preg_match('~fb.watch\/(.*)~', $_POST['url'])) {
             $output = array(
                 'title' => '',
                 'images' => array(
@@ -761,23 +765,23 @@ if ($f == 'posts') {
                         fastcgi_finish_request();
                     }
                     //Wo_RunInBackground($data);
-                    // if ($wo['config']['notify_new_post'] == 1) {
-                    //     if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && empty($wo['story']['event_id']) && $wo['story']['postPrivacy'] < 3) {
-                    //         $post_id = $wo['story']['id'];
-                    //         $users = Wo_GetFollowNotifyUsers($wo['user']['user_id']);
-                    //         if (!empty($users)) {
-                    //             foreach ($users as $key => $value) {
-                    //                 $notification_data_array = array(
-                    //                     'recipient_id' => $value,
-                    //                     'type' => 'new_post',
-                    //                     'post_id' => $post_id,
-                    //                     'url' => 'index.php?link1=post&id=' . $post_id
-                    //                 );
-                    //                 Wo_RegisterNotification($notification_data_array);
-                    //             }
-                    //         }
-                    //     }
-                    // }
+                    if ($wo['config']['notify_new_post'] == 1) {
+                        if (empty($wo['story']['page_id']) && empty($wo['story']['group_id']) && empty($wo['story']['event_id']) && $wo['story']['postPrivacy'] < 3) {
+                            $post_id = $wo['story']['id'];
+                            $users = Wo_GetFollowNotifyUsers($wo['user']['user_id']);
+                            if (!empty($users)) {
+                                foreach ($users as $key => $value) {
+                                    $notification_data_array = array(
+                                        'recipient_id' => $value,
+                                        'type' => 'new_post',
+                                        'post_id' => $post_id,
+                                        'url' => 'index.php?link1=post&id=' . $post_id
+                                    );
+                                    Wo_RegisterNotification($notification_data_array);
+                                }
+                            }
+                        }
+                    }
                 } 
             } else {
                 if ($invalid_file == false) {

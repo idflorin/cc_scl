@@ -855,6 +855,7 @@ $(function () {
 	    if ($("[name='recipient_id']").length > 0) {
 	    	if (node_socket_flow == "1") { socket.emit("user_notification", { to_id: $("[name='recipient_id']").val(), user_id: _getCookie("user_id")}); }
 	    }
+      if (node_socket_flow == "1") { socket.emit("update_new_posts", { user_id: _getCookie("user_id")}); }
 	    if ($("[name='page_id']").length > 0) {
 	    	if (node_socket_flow == "1") { socket.emit("page_notification", { to_id: $("[name='page_id']").val(), user_id: _getCookie("user_id")}); }
 	    }

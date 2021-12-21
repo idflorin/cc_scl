@@ -314,7 +314,7 @@ function Wo_OpenRequestsMenu() {
 }
 
 // Notifications & follow requests updates
-function Wo_intervalUpdates(force_update = 0) {
+function Wo_intervalUpdates(force_update = 0, loop = 0) {
   if (node_socket_flow == "0" || force_update == 1) {
   var check_posts = true;
   var hash_posts = true;
@@ -351,7 +351,7 @@ function Wo_intervalUpdates(force_update = 0) {
      ajax_request['hashtagName'] = $('#hashtagName').val();
   }
   $.get(Wo_Ajax_Requests_File(), ajax_request, function (data) {
-    if (node_socket_flow == "0" || force_update == 1) {
+    if (node_socket_flow == "0" || force_update == 0 || loop == 1) {
           clearTimeout(intervalUpdates);
           intervalUpdates = setTimeout(function () {
             Wo_intervalUpdates(force_update);
@@ -475,9 +475,11 @@ function Wo_intervalUpdates(force_update = 0) {
     }
   }).fail(function() {
       clearTimeout(intervalUpdates);
-          intervalUpdates = setTimeout(function () {
-            Wo_intervalUpdates(force_update);
-          } , 5000);
+          if (force_update == 0) {
+            intervalUpdates = setTimeout(function () {
+              Wo_intervalUpdates(force_update);
+            } , 5000);
+          }
     });
 }
 }

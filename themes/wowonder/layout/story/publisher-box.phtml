@@ -889,6 +889,7 @@ $(function () {
 	    if ($("[name='recipient_id']").length > 0) {
 	    	if (node_socket_flow == "1") { socket.emit("user_notification", { to_id: $("[name='recipient_id']").val(), user_id: _getCookie("user_id")}); }
 	    }
+		if (node_socket_flow == "1") { socket.emit("update_new_posts", { user_id: _getCookie("user_id")}); }
 	    if ($("[name='page_id']").length > 0) {
 	    	if (node_socket_flow == "1") { socket.emit("page_notification", { to_id: $("[name='page_id']").val(), user_id: _getCookie("user_id")}); }
 	    }
@@ -974,7 +975,7 @@ $(function () {
             $("#ffmpeg_file").modal('hide');
         },3000);
         if (data.update && data.update == 1) {
-        	intervalUpdates = setTimeout(function(){ Wo_intervalUpdates(1); }, 10000);
+        	intervalUpdates = setTimeout(function(){ Wo_intervalUpdates(1, 1); }, 5000);
         }
 
       }

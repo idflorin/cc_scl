@@ -312,6 +312,11 @@ function Wo_SetLoginWithSession($user_email) {
     }
     $user_email          = Wo_Secure($user_email);
     $_SESSION['user_id'] = Wo_CreateLoginSession(Wo_UserIdFromEmail($user_email));
+    setcookie("user_id", $_SESSION['user_id'], time() + (10 * 365 * 24 * 60 * 60));
+    setcookie('ad-con', htmlentities(json_encode(array(
+        'date' => date('Y-m-d'),
+        'ads' => array()
+    ))), time() + (10 * 365 * 24 * 60 * 60));
 }
 function Wo_UserActive($username) {
     global $sqlConnect;
@@ -1137,6 +1142,15 @@ function Wo_DeleteUser($user_id) {
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_STORY_SEEN . " WHERE `user_id` = '{$user_id}'");
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_REFUND . " WHERE `user_id` = '{$user_id}'");
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_INVITAION_LINKS . " WHERE `user_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_AGORA . " WHERE `from_id ` = '{$user_id}' OR `to_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_MUTE . " WHERE `user_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_MUTE_STORY . " WHERE `user_id` = '{$user_id}' OR `story_user_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_CAST . " WHERE `user_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_CAST_USERS . " WHERE `user_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_LIVE_SUB . " WHERE `user_id` = '{$user_id}'");
+    $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_BANK_TRANSFER . " WHERE `user_id` = '{$user_id}'");
+    
+
     $query_ones = mysqli_query($sqlConnect, "DELETE FROM " . T_EMAILS . " WHERE `email_to` = '".$user_data['email']."'");
     if ($query_one) {
         $send_message_data       = array(
@@ -1146,7 +1160,7 @@ function Wo_DeleteUser($user_id) {
             'to_name' => $user_data['name'],
             'subject' => 'Your account was deleted',
             'charSet' => 'utf-8',
-            'message_body' => "Hi {$user_data['name']},<br><br> We are here to inform you that your account on {$wo['config']['siteName']} was deleted and all your data were erased.<br><br>Best regards,<br> {$wo['config']['siteName']} team.",
+            'message_body' => Wo_LoadPage('emails/account-deleted'),
             'is_html' => true
         );
         $send = Wo_SendMessage($send_message_data);
@@ -4924,7 +4938,7 @@ function Wo_DisplaySharedFile($media, $placement = '', $cache = false,$is_video 
                     $db->where(" `audience` LIKE '%$usr_country%' ");
                 }
                    
-                $start = date('Y-m-d');
+                $start = date('m-d-y');
                 $video_ad = $db->where("((start = '') OR (start <= '{$start}' && end >= '{$start}'))")->where("((budget = 0) OR (spent < budget))")->orderBy('RAND()')->getOne(T_USER_ADS);
                 if (!empty($video_ad)) {
                     $wo['is_video_ad'] = ",'ads'";
@@ -5380,7 +5394,9 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
             Wo_RegisterPoint($post_id, "createblog");
         }
         else{
-            Wo_RegisterPoint($post_id, "createpost");
+            if($re_data['multi_image_post'] != 1) {
+                Wo_RegisterPoint($post_id, "createpost");
+            }
         }
         return $post_id;
     }

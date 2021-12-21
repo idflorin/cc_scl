@@ -130,17 +130,19 @@ if ($wo['loggedin'] == true && $wo['config']['profileVisit'] == 1 && $type == 't
     }
 }
 if ($type == 'page') {
-    $query = mysqli_query($sqlConnect, "SELECT COUNT(*) as count FROM " . T_OFFER . " WHERE `user_id` = {$wo['user']['user_id']} AND `expire_date` < CURDATE() AND `expire_time` < CURTIME()");
-    $query_select_fetch = mysqli_fetch_assoc($query);
-    if ($query_select_fetch['count'] > 0) {
-        $offers = $db->where("`user_id` = {$wo['user']['user_id']} AND `expire_date` < CURDATE() AND `expire_time` < CURTIME()")->get(T_OFFER);
-        foreach ($offers as $key => $offer) {
-            @unlink($offer->image);
-            Wo_DeleteFromToS3($offer->image);
-            $db->where('id',$offer->id)->delete(T_OFFER);
-            $post = $db->where('offer_id',$offer->id)->getOne(T_POSTS);
-            if (!empty($post)) {
-                Wo_DeletePost($post->id);
+    if ($wo['loggedin'] == true) {
+        $query = mysqli_query($sqlConnect, "SELECT COUNT(*) as count FROM " . T_OFFER . " WHERE `user_id` = {$wo['user']['user_id']} AND `expire_date` < CURDATE() AND `expire_time` < CURTIME()");
+        $query_select_fetch = mysqli_fetch_assoc($query);
+        if ($query_select_fetch['count'] > 0) {
+            $offers = $db->where("`user_id` = {$wo['user']['user_id']} AND `expire_date` < CURDATE() AND `expire_time` < CURTIME()")->get(T_OFFER);
+            foreach ($offers as $key => $offer) {
+                @unlink($offer->image);
+                Wo_DeleteFromToS3($offer->image);
+                $db->where('id',$offer->id)->delete(T_OFFER);
+                $post = $db->where('offer_id',$offer->id)->getOne(T_POSTS);
+                if (!empty($post)) {
+                    Wo_DeletePost($post->id);
+                }
             }
         }
     }

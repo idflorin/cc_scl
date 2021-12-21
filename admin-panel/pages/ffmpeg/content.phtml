@@ -7,8 +7,6 @@ $enabled = true;
 if (!isEnabled('shell_exec')) {
     $enabled = false;
 }
-
-
 ?>
 <div class="container-fluid">
     <div>
@@ -142,22 +140,6 @@ if (!isEnabled('shell_exec')) {
                 }
             }
         });
-
-        var debug_settings = $('form.debug-settings');
-        debug_settings.ajaxForm({
-            url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=ffmpeg_debug',
-            beforeSend: function() {
-                debug_settings.find('.waves-effect').text("Please wait..");
-            },
-            success: function(data) {
-                if (data.status == 200) {
-                    debug_settings.find('.waves-effect').text('Debug');
-                    $('#debug_ffmpeg').val(data.data);
-                    if (data.video_url) {
-                        $('.debug-settings-alert').html('<div class="alert alert-success"><a href="'+data.video_url+'" target="_blank">You can check the converted video test_240p_converted.mp4</a></div>');
-                    }
-                }
-            }
-        });
+        
     });
 </script>

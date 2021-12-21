@@ -15,42 +15,7 @@
     </div>
     <!-- Vertical Layout -->
     <div class="row">
-        <div class="col-lg-5 col-md-5">
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="card-title">Pro Features</h6>
-                    <div class="pro-settings-alert"></div>
-                    <form class="pro-settings" method="POST">
-                        <label for="who_upload">Upload</label>
-                        <div class="form-group">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="who_upload" id="who_upload-enabled" value="all" <?php echo ($wo['config']['who_upload'] == 'all') ? 'checked': '';?>>
-                                <label class="form-check-label" for="who_upload-enabled">All Users</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="who_upload" id="who_upload-disabled" value="pro" <?php echo ($wo['config']['who_upload'] == 'pro') ? 'checked': '';?>>
-                                <label class="form-check-label" for="who_upload-disabled" class="m-l-20">Pro Users</label>
-                            </div>
-                        </div>
-                        <label for="Who_call">Make Calls</label>
-                        <div class="form-group">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="Who_call" id="Who_call-enabled" value="all" <?php echo ($wo['config']['Who_call'] == 'all') ? 'checked': '';?>>
-                                <label class="form-check-label" for="Who_call-enabled">All Users</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="Who_call" id="Who_call-disabled" value="pro" <?php echo ($wo['config']['Who_call'] == 'pro') ? 'checked': '';?>>
-                                <label class="form-check-label" for="Who_call-disabled" class="m-l-20">Pro Users</label>
-                            </div>
-                        </div>
-                        <br>
-                        <div class="clearfix"></div>
-                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+        
         <div class="clearfix"></div>
         
     </div>

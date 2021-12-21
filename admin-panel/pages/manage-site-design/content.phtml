@@ -21,7 +21,7 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Change Site Design</h6>
-                    <div class="d-settings-alert"></div>
+                    
                     <form class="d-settings" method="POST">
 						<div class="btn-file d-flex align-items-center">
 							<input type="file" id="favicon" accept="image/x-png, image/gif, image/jpeg" name="favicon" class="hidden">
@@ -147,8 +147,10 @@
                                 <i></i>
                             </span>
                         </div>
-                        <div>Please make sure to clean your browser cache after changing the design settings.</div>
+                        <br>
+                        <div class="alert alert-info">Please make sure to clean your browser cache after changing the design settings.</div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <div class="d-settings-alert"></div>
                         <br>
                         <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                     </form>

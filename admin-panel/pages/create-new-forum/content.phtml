@@ -22,6 +22,7 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Create New Forum</h6>
+                    <div class="alert alert-info">You can create a forum, a forum is created inside sections.</div>
                     <div class="newforum-alert"></div>
                     <div class="newforum-error-alert"></div>
                     <form class="newforum" method="POST">
@@ -68,7 +69,7 @@ $(function() {
         success: function(data) {
             if (data.status == 200) {
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.newforum-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Forum successfully added</div>');
+                $('.newforum-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> New forum created successfully.</div>');
                 setTimeout(function () {
                     $('.newforum-alert').empty();
                 }, 2000);
@@ -78,7 +79,7 @@ $(function() {
                     $('.newforum-alert').empty();
                 }, 2000);
             } 
-            form_new_forum.find('.waves-effect').text('Create');
+            form_new_forum.find('.waves-effect').text('Create Forum');
         }
     });
 });

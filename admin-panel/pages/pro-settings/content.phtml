@@ -15,45 +15,47 @@
     </div>
     <!-- Vertical Layout -->
     <div class="row">
-        <div class="col-lg-5 col-md-5">
+        <div class="col-lg-6 col-md-6">
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Pro System Settings</h6>
                     <div class="pro-settings-alert"></div>
                     <form class="pro-settings" method="POST">
-                        <label for="pro">Pro System <span class="black" data-toggle="popover" data-trigger="hover" data-content="If you disbale Pro Mode, All features will be free and activated without the boost feature."><i class="fa fa-question-circle fa-fw"></i></span></label>
-                        <div class="form-group">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="pro" id="pro-enabled" value="1" <?php echo ($wo['config']['pro'] == 1) ? 'checked': '';?>>
-                                <label class="form-check-label" for="pro-enabled">Enabled</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="pro" id="pro-disabled" value="0" <?php echo ($wo['config']['pro'] == 0) ? 'checked': '';?>>
-                                <label class="form-check-label" for="pro-disabled" class="m-l-20">Disabled</label>
-                            </div>
-                        </div>
-                        <label for="recurring_payment">Recurring Payment</label>
-                        <div class="form-group">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="recurring_payment" id="recurring_payment-enabled" value="on" <?php echo ($wo['config']['recurring_payment'] == 'on') ? 'checked': '';?>>
-                                <label class="form-check-label" for="recurring_payment-enabled">Enabled</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="recurring_payment" id="recurring_payment-disabled" value="off" <?php echo ($wo['config']['recurring_payment'] == 'off') ? 'checked': '';?>>
-                                <label class="form-check-label" for="recurring_payment-disabled" class="m-l-20">Disabled</label>
-                            </div>
-                        </div>
-                        <label for="refund_system">Refund System</label>
-                        <div class="form-group">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="refund_system" id="refund_system-enabled" value="on" <?php echo ($wo['config']['refund_system'] == 'on') ? 'checked': '';?>>
-                                <label class="form-check-label" for="refund_system-enabled">Enabled</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="refund_system" id="refund_system-disabled" value="off" <?php echo ($wo['config']['refund_system'] == 'off') ? 'checked': '';?>>
-                                <label class="form-check-label" for="refund_system-disabled" class="m-l-20">Disabled</label>
-                            </div>
-                        </div>
+
+                      <div class="float-left">
+                          <label for="pro" class="main-label">Pro System</label>
+                          <br><small class="admin-info">If you disbale Pro Mode, <br>All features will be free and activated without the boost feature.</small>
+                      </div>
+                      <div class="form-group float-right switcher">
+                          <input type="hidden" name="pro" value="0" />
+                          <input type="checkbox" name="pro" id="chck-pro" value="1" <?php echo ($wo['config']['pro'] == 1) ? 'checked': '';?>>
+                          <label for="chck-pro" class="check-trail"><span class="check-handler"></span></label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+                      
+                      <div class="float-left">
+                          <label for="recurring_payment" class="main-label">Recurring Payment</label>
+                          <br><small class="admin-info">Enable automatic payments (cronjob)</small>
+                      </div>
+                      <div class="form-group float-right switcher">
+                          <input type="hidden" name="recurring_payment" value="off" />
+                          <input type="checkbox" name="recurring_payment" id="chck-recurring_payment" value="on" <?php echo ($wo['config']['recurring_payment'] == '1') ? 'checked': '';?>>
+                          <label for="chck-recurring_payment" class="check-trail"><span class="check-handler"></span></label>
+                      </div>
+                      <div class="clearfix"></div>
+                      <hr>
+                      
+                      <div class="float-left">
+                          <label for="refund_system" class="main-label">Refund System</label>
+                          <br><small class="admin-info">Allow users to request refund.</small>
+                      </div>
+                      <div class="form-group float-right switcher">
+                          <input type="hidden" name="refund_system" value="off" />
+                          <input type="checkbox" name="refund_system" id="chck-refund_system" value="on" <?php echo ($wo['config']['refund_system'] == '1') ? 'checked': '';?>>
+                          <label for="chck-refund_system" class="check-trail"><span class="check-handler"></span></label>
+                      </div>
+                      <div class="clearfix"></div>
                         <!-- <div class="form-group form-float">
                             <div class="form-line">
                                 <input type="text" id="weekly_price" name="weekly_price" class="form-control" value="<?php echo $wo['config']['weekly_price'];?>">
@@ -97,14 +99,12 @@
                             </div>
                         </div> -->
                         <div class="clearfix"></div>
-                        <br>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-lg-7 col-md-7">
+        <div class="col-lg-6 col-md-6">
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Edit Pro Packages</h6>
@@ -192,6 +192,42 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-6 col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Pro Membership Features</h6>
+                    <form class="pro-settings" method="POST">
+                         <div class="float-left">
+                            <label for="membership_system" class="main-label">Pro Membership On Sign Up</label>
+                            <br><small class="admin-info">Require Pro Memebership from users on sign up page.</small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="membership_system" value="0" />
+                            <input type="checkbox" name="membership_system" id="chck-membership_system" value="1" <?php echo ($wo['config']['membership_system'] == 1) ? 'checked': '';?>>
+                            <label for="chck-membership_system" class="check-trail"><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <label for="who_upload">Upload System</label>
+                        <select class="form-control show-tick" id="who_upload" name="who_upload">
+                          <option value="all" <?php echo ($wo['config']['who_upload'] == 'all') ? 'selected': '';?> >All Users</option>
+                          <option value="pro" <?php echo ($wo['config']['who_upload'] == 'pro') ? 'selected': '';?> >Pro Users Only</option>
+                        </select>
+                        <small class="admin-info">Who can upload images, videos and other data?</small>
+                      
+                        <label for="Who_call">Video & Audio Calls</label>
+                        <select class="form-control show-tick" id="Who_call" name="Who_call">
+                          <option value="all" <?php echo ($wo['config']['Who_call'] == 'all') ? 'selected': '';?> >All Users</option>
+                          <option value="pro" <?php echo ($wo['config']['Who_call'] == 'pro') ? 'selected': '';?> >Pro Users Only</option>
+                        </select>
+                        <small class="admin-info">Who can make Video / Audio calls?</small>
+                       
+                        
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="clearfix"></div>
         
     </div>
@@ -210,6 +246,69 @@ function ShowEditPro(self) {
 }
 
 $(function() {
+
+    $('.switcher input[type=checkbox]').click(function () {
+        setToTrue = 0;
+        if ($(this).is(":checked") === true) {
+            setToTrue = 1;
+        }
+        var configName = $(this).attr('name');
+        var hash_id = $('input[name=hash_id]').val();
+        var objData = {};
+        objData[configName] = setToTrue;
+        objData['hash_id'] = hash_id;
+        $.post( Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting', objData);
+    });
+
+    var setTimeOutColor = setTimeout(function (){});
+    $('select').on('change', function() {
+         clearTimeout(setTimeOutColor);
+        var thisElement = $(this);
+        var configName = thisElement.attr('name');
+        var hash_id = $('input[name=hash_id]').val();
+        var objData = {};
+        objData[configName] = this.value;
+        objData['hash_id'] = hash_id;
+        thisElement.addClass('warning');
+        $.post( Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting', objData, function (data) {
+            if (data.status == 200) {
+                thisElement.removeClass('warning');
+                thisElement.addClass('success');
+            } else {
+                thisElement.addClass('error');
+            }
+            var setTimeOutColor = setTimeout(function () {
+                thisElement.removeClass('success');
+                thisElement.removeClass('warning');
+                thisElement.removeClass('error');
+            }, 2000);
+        });
+    });
+    $('input[type=text], input[type=number]').on('keyup', delay(function() {
+            clearTimeout(setTimeOutColor);
+            var thisElement = $(this);
+            var configName = thisElement.attr('name');
+            var hash_id = $('input[name=hash_id]').val();
+            var objData = {};
+            objData[configName] = this.value;
+            objData['hash_id'] = hash_id;
+            thisElement.addClass('warning');
+            $.post( Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting', objData, function (data) {
+                if (data.status == 200) {
+                    thisElement.removeClass('warning');
+                    thisElement.addClass('success');
+                } else {
+                    thisElement.addClass('error');
+                }
+                var setTimeOutColor = setTimeout(function () {
+                    thisElement.removeClass('success');
+                    thisElement.removeClass('warning');
+                    thisElement.removeClass('error');
+                }, 2000);
+                //thisElement.focus();
+            });
+    }, 500));
+
     var form_pro = $('form.proModalForm');
     form_pro.ajaxForm({
         url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_pro_member',
@@ -274,23 +373,7 @@ $(function() {
             },300);
         }
     });
-   var form_site_settings = $('form.pro-settings');
-    form_site_settings.ajaxForm({
-        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
-        beforeSend: function() {
-            form_site_settings.find('.waves-effect').text('Please wait..');
-        },
-        success: function(data) {
-            if (data.status == 200) {
-                form_site_settings.find('.waves-effect').text('Save');
-                $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.pro-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
-                setTimeout(function () {
-                    $('.pro-settings-alert').empty();
-                }, 2000);
-            }
-        }
-    });
+  
 });
 function Wo_SubmitProForm(self) {
     $('#save_pro_btn').text('Please wait..');
@@ -339,8 +422,8 @@ function Wo_SubmitLangForm() {
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" onclick="Wo_SubmitLangForm();" class="btn btn-primary waves-effect">SAVE CHANGES</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                <button type="button" onclick="Wo_SubmitLangForm();" class="btn btn-success waves-effect">SAVE CHANGES</button>
             </div>
         </div>
     </div>

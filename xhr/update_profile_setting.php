@@ -9,6 +9,9 @@ if ($f == "update_profile_setting") {
                     $errors[] = $error_icon . $wo['lang']['website_invalid_characters'];
                 }
             }
+            if (preg_match('/[^\w\s]+/u',$_POST['first_name']) || preg_match('/[^\w\s]+/u',$_POST['last_name'])) {
+                $errors[] = $error_icon . $wo['lang']['username_invalid_characters'];
+            }
             if (!empty($_POST['working_link'])) {
                 if (!preg_match($pattern, $_POST['working_link'])) {
                     $errors[] = $error_icon . $wo['lang']['company_website_invalid'];

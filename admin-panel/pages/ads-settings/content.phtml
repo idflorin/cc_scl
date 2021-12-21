@@ -21,28 +21,30 @@
                     <h6 class="card-title">Advertisements Settings</h6>
                     <div class="ads-settings-alert"></div>
                     <form class="ads-settings" method="POST">
-                        <label for="user_ads">Advertisements System <span class="black" data-toggle="popover" data-trigger="hover" data-content="Allow users to create ads."><i class="fa fa-question-circle fa-fw"></i></span></label>
-                        <div class="form-group">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="user_ads" id="user_ads-enabled" value="1" <?php echo ($wo['config']['user_ads'] == 1) ? 'checked': '';?>>
-                                <label class="form-check-label" for="user_ads-enabled">Enabled</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="user_ads" id="user_ads-disabled" value="0" <?php echo ($wo['config']['user_ads'] == 0) ? 'checked': '';?>>
-                                <label class="form-check-label" for="user_ads-disabled" class="m-l-20">Disabled</label>
-                            </div>
-                        </div>
-                        <br>
+                      
+                          <div class="float-left">
+                              <label for="user_ads" class="main-label">Advertisements System</label>
+                              <br><small class="admin-info">Allow users to create ads.</small>
+                          </div>
+                          <div class="form-group float-right switcher">
+                              <input type="hidden" name="user_ads" value="0" />
+                              <input type="checkbox" name="user_ads" id="chck-user_ads" value="1" <?php echo ($wo['config']['user_ads'] == 1) ? 'checked': '';?>>
+                              <label for="chck-user_ads" class="check-trail"><span class="check-handler"></span></label>
+                          </div>
+                          <div class="clearfix"></div>
+                          <hr>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <label class="form-label">Cost by View (Per Ad)</label>
+                                <label class="form-label">Cost By View</label>
                                 <input type="text" id="ad_v_price" name="ad_v_price" class="form-control" value="<?php echo $wo['config']['ad_v_price'];?>">
+                                <small class="admin-info">Set a price for ads impressions.</small>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <label class="form-label">Cost by Click (Per Ad)</label>
+                                <label class="form-label">Cost By Click</label>
                                 <input type="text" id="ad_c_price" name="ad_c_price" class="form-control" value="<?php echo $wo['config']['ad_c_price'];?>">
+                                <small class="admin-info">Set a price for ads clicks.</small>
                             </div>
                         </div>
                         <!-- <div class="form-group form-float">
@@ -52,9 +54,7 @@
                             </div>
                         </div> -->
                         <div class="clearfix"></div>
-                        <br><br>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>
                     </form>
                 </div>
             </div>
@@ -69,6 +69,7 @@
                             <div class="form-line">
                                 <label class="form-label">Amount</label>
                                 <input type="text" id="amount" name="amount" class="form-control" value="<?php echo $wo['user']['wallet'];?>">
+                                <small class="admin-info">You can top your own wallet from here, set any number.</small>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -82,23 +83,67 @@
     <!-- #END# Vertical Layout -->
 <script>
 $(function() {
-    var form_ads_settings = $('form.ads-settings');
-    form_ads_settings.ajaxForm({
-        url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting',
-        beforeSend: function() {
-            form_ads_settings.find('.waves-effect').text('Please wait..');
-        },
-        success: function(data) {
-            if (data.status == 200) {
-                form_ads_settings.find('.waves-effect').text('Save');
-                $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.ads-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Settings updated successfully</div>');
-                setTimeout(function () {
-                    $('.ads-settings-alert').empty();
-                }, 2000);
-            }
+    $('.switcher input[type=checkbox]').click(function () {
+        setToTrue = 0;
+        if ($(this).is(":checked") === true) {
+            setToTrue = 1;
         }
+        var configName = $(this).attr('name');
+        var hash_id = $('input[name=hash_id]').val();
+        var objData = {};
+        objData[configName] = setToTrue;
+        objData['hash_id'] = hash_id;
+        $.post( Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting', objData);
     });
+
+    var setTimeOutColor = setTimeout(function (){});
+    $('select').on('change', function() {
+         clearTimeout(setTimeOutColor);
+        var thisElement = $(this);
+        var configName = thisElement.attr('name');
+        var hash_id = $('input[name=hash_id]').val();
+        var objData = {};
+        objData[configName] = this.value;
+        objData['hash_id'] = hash_id;
+        thisElement.addClass('warning');
+        $.post( Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting', objData, function (data) {
+            if (data.status == 200) {
+                thisElement.removeClass('warning');
+                thisElement.addClass('success');
+            } else {
+                thisElement.addClass('error');
+            }
+            var setTimeOutColor = setTimeout(function () {
+                thisElement.removeClass('success');
+                thisElement.removeClass('warning');
+                thisElement.removeClass('error');
+            }, 2000);
+        });
+    });
+    $('input[type=text], input[type=number]').on('keyup', delay(function() {
+            clearTimeout(setTimeOutColor);
+            var thisElement = $(this);
+            var configName = thisElement.attr('name');
+            var hash_id = $('input[name=hash_id]').val();
+            var objData = {};
+            objData[configName] = this.value;
+            objData['hash_id'] = hash_id;
+            thisElement.addClass('warning');
+            $.post( Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting', objData, function (data) {
+                if (data.status == 200) {
+                    thisElement.removeClass('warning');
+                    thisElement.addClass('success');
+                } else {
+                    thisElement.addClass('error');
+                }
+                var setTimeOutColor = setTimeout(function () {
+                    thisElement.removeClass('success');
+                    thisElement.removeClass('warning');
+                    thisElement.removeClass('error');
+                }, 2000);
+                //thisElement.focus();
+            });
+    }, 500));
 
     var form_top_settings = $('form.top-up-settings');
     form_top_settings.ajaxForm({
@@ -109,12 +154,12 @@ $(function() {
         success: function(data) {
             if (data.status == 200) {
                 $("html, body").animate({ scrollTop: 0 }, "slow");
-                $('.top-up-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Amount added to your wallet successfully</div>');
+                $('.top-up-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Amount added to your wallet successfully.</div>');
                 setTimeout(function () {
                     $('.top-up-settings-alert').empty();
                 }, 2000);
             }
-            form_top_settings.find('.waves-effect').text('Save');
+            form_top_settings.find('.waves-effect').text('Top Up');
         }
     });
 });

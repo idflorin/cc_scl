@@ -58,6 +58,7 @@ if (isset($_FILES['media_file'])) {
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Add New Sticker</h6>
+                     <div class="alert alert-info">You can upload your own stickers, one sticker per upload.</div>
                       <?php if (!empty($error)) { ?>
 				      <div class="alert alert-danger">
 				      	<?php echo $error;?>

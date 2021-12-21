@@ -49,12 +49,14 @@ $year_users = $db->where('lastseen',$year_end,'<=')->getValue(T_USERS,'COUNT(*)'
                             <div class="form-line">
                               <label class="form-label">Subject</label>
                                 <input type="text" id="subject" name="subject" class="form-control">
+                                <small class="admin-info">Choose the title for your message.</small>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
                               <label class="form-label">Message (HTML Allowed)</label>
                                 <textarea name="message" id="message" class="form-control" cols="30" rows="10"></textarea>
+                                <small class="admin-info">Write your message here.</small>
                             </div>
                         </div>
                         <label for="send_to">Send E-mail To</label>
@@ -66,17 +68,18 @@ $year_users = $db->where('lastseen',$year_end,'<=')->getValue(T_USERS,'COUNT(*)'
                           <option value="9month">Users who didn`t login for a 9 month ----- approximately (<?php echo $month_users9; ?> User)</option>
                           <option value="year">Users who didn`t login for a year ----- approximately (<?php echo $year_users; ?> User)</option>
                         </select>
+                        <small class="admin-info">Choose the type of users you want to send the message to.</small>
                         <div class="clearfix"></div>
-                        <br><br>
                         <div class="form-group form-float">
                             <div class="form-line">
                               <label class="form-label" id="mailing-selected-users">Search Users (Optional) <span></span></label>
                                 <input type="text" class="form-control" onkeydown="Wo_SearchMailingUsers(this.value)" autocomplete="off">
+                                <small class="admin-info">Send only to those users, leave it empty to send to all users.</small>
                             </div>
                         </div>
                         <div class="search-mailing-users hidden"></div>
                         <div class="form-group">
-                          <label for="test_message">Test Message <small>(Send to my email first)</small></label>
+                          <label for="test_message">Test Message (Send to my email first)</label>
                            <input type="checkbox" id="test_message" class="filled-in" name="test_message">
 			            </div>
                         

@@ -151,13 +151,13 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         }
         if (last_message.seen == 0) {
             var seen = Math.floor(Date.now() / 1000);
-            await ctx.wo_messages.update({
-                seen: seen
-            }, {
-                where: {
-                    id: data.message_id
-                }
-            })
+            // await ctx.wo_messages.update({
+            //     seen: seen
+            // }, {
+            //     where: {
+            //         id: data.message_id
+            //     }
+            // })
             let seenMsg = funcs.Wo_Time_Elapsed_String(ctx, seen)
             await io.to(data.recipient_id).emit("lastseen", {
                 can_seen: 1,
@@ -249,7 +249,7 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 from_id: ctx.userHashUserId[data.from_id],
                 group_id: data.group_id,
                 text: data.msg,
-                seen: Math.floor(Date.now() / 1000),
+                seen: 0,
                 time: Math.floor(Date.now() / 1000)
             })
             data.sent_message = m_sent;
@@ -445,6 +445,26 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             // if recepient has chat open then send last seen 
             if (ctx.userIdGroupChatOpen[ctx.userHashUserId[data.from_id]] && ctx.userIdGroupChatOpen[ctx.userHashUserId[data.from_id]].filter(d => d == data.group_id) ||
                 ctx.userIdExtra[data.to_id] && ctx.userIdExtra[data.to_id].active_message_group_id && +ctx.userIdExtra[data.to_id].active_message_group_id === +ctx.userHashUserId[data.from_id]) {
+                    if (data.message_reply_id > 0) {
+                     let cansendreplyID = await ctx.wo_messages.findOne({
+                    where: {
+                        id: data.message_reply_id,
+                        [Op.or]: [
+                            {
+                                from_id: {
+                                    [Op.or]: [ ctx.userHashUserId[data.from_id], data.group_id]
+                                },
+                                group_id: {
+                                    [Op.or]: [ ctx.userHashUserId[data.from_id], data.group_id]
+                                }
+                            }
+                        ],
+                    }
+                });
+                if (cansendreplyID === null) {
+                    data.message_reply_id = 0;
+                }
+            }
                 var m_sent = await ctx.wo_messages.create({
                     from_id: ctx.userHashUserId[data.from_id],
                     group_id: data.group_id,
@@ -457,6 +477,26 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                // await socketEvents.lastseen(ctx, socket, { seen: Math.floor(Date.now() / 1000) })
             }
             else {
+                if (data.message_reply_id > 0) {
+                    let cansendreplyID = await ctx.wo_messages.findOne({
+                        where: {
+                            id: data.message_reply_id,
+                            [Op.or]: [
+                                {
+                                    from_id: {
+                                        [Op.or]: [ ctx.userHashUserId[data.from_id], data.group_id]
+                                    },
+                                    group_id: {
+                                        [Op.or]: [ ctx.userHashUserId[data.from_id], data.group_id]
+                                    }
+                                }
+                            ],
+                        }
+                    });
+                    if (cansendreplyID === null) {
+                        data.message_reply_id = 0;
+                    }
+                }
                 var m_sent = await ctx.wo_messages.create({
                     from_id: ctx.userHashUserId[data.from_id],
                     group_id: data.group_id,
@@ -560,13 +600,33 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         }
         let hasHTML = false;
         if (data.record) {
+            if (data.message_reply_id > 0) {
+                let cansendreplyID = await ctx.wo_messages.findOne({
+                    where: {
+                        id: data.message_reply_id,
+                        [Op.or]: [
+                            {
+                                from_id: {
+                                    [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                },
+                                to_id: {
+                                    [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                }
+                            }
+                        ],
+                    }
+                });
+                if (cansendreplyID === null) {
+                    data.message_reply_id = 0;
+                }
+            }
             let ret = await ctx.wo_messages.create({
                 from_id: ctx.userHashUserId[data.from_id],
                 to_id: data.to_id,
                 text: "",
                 media: data.mediaFilename,
                 mediaFileName: data.mediaName,
-                seen: Math.floor(Date.now() / 1000),
+                seen: 0,
                 time: Math.floor(Date.now() / 1000),
                 reply_id: data.message_reply_id,
                 story_id: story_id,
@@ -648,6 +708,26 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             // if recepient has chat open then send last seen 
             if (ctx.userIdChatOpen[data.to_id] && ctx.userIdChatOpen[data.to_id].filter(d => d == ctx.userHashUserId[data.from_id]).length ||
                 ctx.userIdExtra[data.to_id] && ctx.userIdExtra[data.to_id].active_message_user_id && +ctx.userIdExtra[data.to_id].active_message_user_id === +ctx.userHashUserId[data.from_id]) {
+                    if (data.message_reply_id > 0) {
+                        let cansendreplyID = await ctx.wo_messages.findOne({
+                        where: {
+                            id: data.message_reply_id,
+                            [Op.or]: [
+                                {
+                                    from_id: {
+                                        [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                    },
+                                    to_id: {
+                                        [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                    }
+                                }
+                            ],
+                        }
+                    });
+                    if (cansendreplyID === null) {
+                        data.message_reply_id = 0;
+                    }
+                }
                 var m_sent = await ctx.wo_messages.create({
                     from_id: ctx.userHashUserId[data.from_id],
                     to_id: data.to_id,
@@ -663,6 +743,27 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                // await socketEvents.lastseen(ctx, socket, { seen: Math.floor(Date.now() / 1000) })
             }
             else {
+                if (data.message_reply_id > 0) {
+                let cansendreplyID = await ctx.wo_messages.findOne({
+                    where: {
+                        id: data.message_reply_id,
+                        [Op.or]: [
+                            {
+                                from_id: {
+                                    [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                },
+                                to_id: {
+                                    [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                }
+                            }
+                        ],
+                    }
+                });
+                
+                if (cansendreplyID === null) {
+                    data.message_reply_id = 0;
+                }
+            }
                 var m_sent = await ctx.wo_messages.create({
                     from_id: ctx.userHashUserId[data.from_id],
                     to_id: data.to_id,
@@ -743,6 +844,18 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             })
         }
         else {
+            var m_sent = await ctx.wo_messages.create({
+                from_id: ctx.userHashUserId[data.from_id],
+                to_id: data.to_id,
+                text: data.msg,
+                seen: 0,
+                time: Math.floor(Date.now() / 1000),
+                reply_id: data.message_reply_id,
+                story_id: story_id,
+                lng: lng,
+                lat: lat,
+            })
+            data.sent_message = m_sent;
             for (userSocket of remainingSameUserSockets) {
                 await userSocket.emit('private_message', {
                     messages_html: await compiledTemplates.chatListOwnerTrueWithMedia(ctx, data, fromUser, nextId, data.color),
@@ -775,15 +888,15 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             }
             await socketEvents.privateMessagePageToPersonOwnerFalseWithMedia(ctx, io, data, fromUser, data.isSticker)
             await socketEvents.privateMessageToPersonOwnerFalseWithMedia(ctx, io, data, fromUser, data.isSticker)
-            await ctx.wo_messages.update({
-                seen: Math.floor(Date.now() / 1000)
-            },
-                {
-                    where: {
-                        from_id: ctx.userHashUserId[data.from_id],
-                        to_id: data.to_id,
-                    }
-                })
+            // await ctx.wo_messages.update({
+            //     seen: Math.floor(Date.now() / 1000)
+            // },
+            //     {
+            //         where: {
+            //             from_id: ctx.userHashUserId[data.from_id],
+            //             to_id: data.to_id,
+            //         }
+            //     })
         }
         //await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
        // await socketEvents.emitUserStatus(ctx, io, data.to_id)
@@ -940,14 +1053,34 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             lat = data.lat;
         }
         if (data.record) {
-            hasHTML = true
+            hasHTML = true;
+            if (data.message_reply_id > 0) {
+            let cansendreplyID = await ctx.wo_messages.findOne({
+                where: {
+                    id: data.message_reply_id,
+                    [Op.or]: [
+                        {
+                            from_id: {
+                                [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                            },
+                            to_id: {
+                                [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                            }
+                        }
+                    ],
+                }
+            });
+            if (cansendreplyID === null) {
+                data.message_reply_id = 0;
+            }
+        }
             let ret = await ctx.wo_messages.create({
                 from_id: ctx.userHashUserId[data.from_id],
                 to_id: data.to_id,
                 text: "",
                 media: data.mediaFilename,
                 mediaFileName: data.mediaName,
-                seen: Math.floor(Date.now() / 1000),
+                seen: 0,
                 time: Math.floor(Date.now() / 1000),
                 reply_id: data.message_reply_id,
                 story_id: story_id,
@@ -1030,6 +1163,27 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             // if recepient has chat open then send last seen 
             if ((ctx.userIdChatOpen[data.to_id] && ctx.userIdChatOpen[data.to_id].filter(d => d == ctx.userHashUserId[data.from_id]).length) ||
                 ctx.userIdExtra[data.to_id] && ctx.userIdExtra[data.to_id].active_message_user_id && +ctx.userIdExtra[data.to_id].active_message_user_id === +ctx.userHashUserId[data.from_id]) {
+                    if (data.message_reply_id > 0) {
+                        let cansendreplyID = await ctx.wo_messages.findOne({
+                    where: {
+                        id: data.message_reply_id,
+                        [Op.or]: [
+                            {
+                                from_id: {
+                                    [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                },
+                                to_id: {
+                                    [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                }
+                            }
+                        ],
+                    }
+                });
+                if (cansendreplyID === null) {
+                    data.message_reply_id = 0;
+                }
+            }
+                       
                 var m_sent = await ctx.wo_messages.create({
                     from_id: ctx.userHashUserId[data.from_id],
                     to_id: data.to_id,
@@ -1045,6 +1199,26 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 //await socketEvents.lastseen(ctx, socket, { seen: Math.floor(Date.now() / 1000) })
 
             } else {
+                if (data.message_reply_id > 0) {
+                    let cansendreplyID = await ctx.wo_messages.findOne({
+                        where: {
+                            id: data.message_reply_id,
+                            [Op.or]: [
+                                {
+                                    from_id: {
+                                        [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                    },
+                                    to_id: {
+                                        [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                                    }
+                                }
+                            ],
+                        }
+                    });
+                    if (cansendreplyID === null) {
+                        data.message_reply_id = 0;
+                    }
+                }
                 var m_sent = await ctx.wo_messages.create({
                     from_id: ctx.userHashUserId[data.from_id],
                     to_id: data.to_id,
@@ -1174,15 +1348,15 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             }
             await socketEvents.privateMessagePageToPersonOwnerFalseWithMedia(ctx, io, data, fromUser, nextId, hasHTML, data.isSticker)
             await socketEvents.privateMessageToPersonOwnerFalseWithMedia(ctx, io, data, fromUser, nextId, hasHTML, data.isSticker)
-            await ctx.wo_messages.update({
-                seen: Math.floor(Date.now() / 1000)
-            },
-                {
-                    where: {
-                        from_id: ctx.userHashUserId[data.from_id],
-                        to_id: data.to_id,
-                    }
-                })
+            // await ctx.wo_messages.update({
+            //     seen: Math.floor(Date.now() / 1000)
+            // },
+            //     {
+            //         where: {
+            //             from_id: ctx.userHashUserId[data.from_id],
+            //             to_id: data.to_id,
+            //         }
+            //     })
         }
         //await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.from_id])
         //await socketEvents.emitUserStatus(ctx, io, data.to_id)
@@ -1863,6 +2037,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         
     })
 
+    socket.on("update_new_posts", async (data) => {
+        await io.emit("update_new_posts");
+    })
 
     socket.on("user_notification", async (data) => {
         let user_id = ctx.userHashUserId[data.user_id]

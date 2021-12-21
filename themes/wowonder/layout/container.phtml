@@ -559,6 +559,9 @@
             $("#online_" + data.user_id).find('svg path').attr('fill', '#dddddd');
             $("#messages-recipient-" + data.user_id).find('.dot').css({"background-color": "lightgray"});
           });
+          socket.on("update_new_posts", (data) => {
+            Wo_intervalUpdates(1);
+          });
           socket.on("on_avatar_changed", (data) => {
             $("#online_" + data.user_id).find('img').attr('src', data.name);
             $("#messages-recipient-" + data.user_id).find('img').attr('src', data.name);

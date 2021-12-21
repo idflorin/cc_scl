@@ -464,7 +464,13 @@ if ($f == 'chat') {
     if ($s == 'send_message') {
         $reply_id = 0;
         if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
-            $reply_id = Wo_Secure($_POST['reply_id']);
+            $me = Wo_Secure($wo['user']['user_id']);
+            $him = Wo_Secure($_POST['user_id']);  
+            $reply_id = Wo_Secure($_POST['reply_id']);          
+            $can_reply_to_messages = $db->where ("((to_id = ? AND from_id = ?)", [$me, $him])->orWhere("(to_id = ? AND from_id = ?))", [$him, $me])->where('id', $reply_id)->getOne(T_MESSAGES, 'id');
+            if (empty($can_reply_to_messages->id)) {
+                $reply_id = 0; 
+            }
         }
         if ($wo['config']['who_upload'] == 'pro' && $wo['user']['is_pro'] == 0 && !Wo_IsAdmin() && (!empty($_FILES['sendMessageFile']) || !empty($_POST['message-record']))) {
             $data['status']       = 500;

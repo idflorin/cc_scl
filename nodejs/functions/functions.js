@@ -517,7 +517,7 @@ class FunctionsUtils {
         } else if (ctx.globalconfig['spaces'] == 1) {
             return 'https://' + ctx.globalconfig['space_name'] + '.' + ctx.globalconfig['space_region'] + '.digitaloceanspaces.com/' + media;
         } else if (ctx.globalconfig['ftp_upload'] == 1) {
-            return addhttp(ctx.globalconfig['ftp_endpoint']) + '/' + media;
+            return 'https://' + ctx.globalconfig['ftp_endpoint'] + '/' + media;
         } else if (ctx.globalconfig['cloud_upload'] == 1) {
             return 'https://storage.googleapis.com/' + ctx.globalconfig['cloud_bucket_name'] + '/' + media;
         }

@@ -22,7 +22,8 @@
         <div class="col-lg-12 col-md-12">
             <div class="card">
                 <div class="card-body">
-                  <h6 class="card-title">Add Reaction</h6>
+                  <h6 class="card-title">Add New Reaction</h6>
+                  <div class="alert alert-info">You can add new reactions from here, note you should write the reaction name on every language.</div>
                   <div class="row">
                        <div class="col-md-12" style="margin-bottom:0;">
                         <div class="add_reaction_form_alert"></div>
@@ -76,7 +77,7 @@
 
                                 <div class="clearfix"></div>
                               <div class="col-md-2">
-                                  <button class="btn btn-primary">Add</button>
+                                  <button class="btn btn-primary">Add Reaction</button>
                               </div>
                               </div>
                               <div class="clearfix"></div>
@@ -187,8 +188,8 @@
       </div>
       <div class="modal-footer">
         
-        <button type="button" class="btn btn-secondary modal_close_btn" data-dismiss="modal">CLOSE</button>
-        <button type="button" class="btn btn-primary" id="save_edited_reaction">SAVE CHANGES</button>
+        <button type="button" class="btn btn-primary modal_close_btn" data-dismiss="modal">CLOSE</button>
+        <button type="button" class="btn btn-success" id="save_edited_reaction">SAVE CHANGES</button>
       </div>
     </div>
   </div>
@@ -272,11 +273,11 @@ add_reaction_form.ajaxForm({
 edit_reaction_form.ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=admin_setting&s=edit_reaction&hash=' + $('.main_session').val(),
     beforeSend: function() {
-        $('#editcategoryModal').find('.btn-primary').text("Please wait..");
+        $('#editcategoryModal').find('.btn-success').text("Please wait..");
     },
     success: function(data) {
         if (data.status == 200) {
-            $('#editcategoryModal').find('.btn-primary').text('SAVE CHANGES');
+            $('#editcategoryModal').find('.btn-success').text('SAVE CHANGES');
             $('.edit_reaction_form_alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Reaction successfully edited</div>');
             setTimeout(function () {
                 $('.edit_reaction_form_alert').empty();

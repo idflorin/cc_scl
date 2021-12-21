@@ -19,8 +19,8 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Create New Custom Field</h6>
+                    <div class="alert alert-info">Use {{LANG lang_variable}} to translate the field data. e.g: {{LANG first_name}}</div>
                     <div class="add-settings-alert"></div>
-                    <div class="help-block">Use {{LANG lang_variable}} to translate the field data. e.g: {{LANG first_name}}</div><br>
                     <form class="add-settings" method="POST">
                         <label for="type">Field Type</label>
                         <select class="form-control show-tick chosen-select" id="type" name="type">
@@ -39,14 +39,16 @@
                        
                         <div class="form-group form-float">
                             <div class="form-line">
-                                <label class="form-label">Field Length: <small>Default value is 32, and max value is 1000</small></label>
+                                <label class="form-label">Field Length</label>
                                 <input type="text" id="length" name="length" class="form-control" value="32">
+                                 <small class="admin-info">Default value is 32, and max value is 1000</small>
                             </div>
                         </div>
                          <div class="form-group form-float">
                             <div class="form-line">
-                                <label class="form-label">Field Description: <small>The description will show under the field</small></label>
+                                <label class="form-label">Field Description</label>
                                 <textarea name="description" id="description" class="form-control" cols="30" rows="3"></textarea>
+                                <small class="admin-info">The description will show under the field.</small>
                             </div>
                         </div>
                         <label for="placement">Field placement</label>
@@ -56,6 +58,7 @@
 		                 <option value="social">Social links</option>
 		                 <option value="none">Don't show the field in settings page</option>
                         </select>
+                        <small class="admin-info">Where you want to show this field?</small>
                         <div class="clearfix"></div>
                         <br>
                         <label for="registration_page">Show On The Registration Page</label>
@@ -63,6 +66,7 @@
                          		<option value="0" selected>No</option>
                  				<option value="1">Yes</option>
                         </select>
+                        <small class="admin-info">Do you want this field to show in registration page?</small>
                         <div class="clearfix"></div>
                         <br>
                         <label for="profile_page">Show On User Profile Page</label>
@@ -74,8 +78,9 @@
                         <br><br>
                         <div class="form-group form-float options" style="display:none">
                             <div class="form-line">
-                                <label class="form-label">Select Field Options: <small>One option per line.</small></label>
+                                <label class="form-label">Select Field Options</label>
                                 <textarea name="options" id="options" class="form-control" cols="30" rows="3"></textarea>
+                                <small class="admin-info">One option per line</small>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -96,6 +101,9 @@ $(function() {
        } else {
        	  $('.options').fadeOut(200);
        }
+       setTimeout(function () {
+                      $(".content").getNiceScroll().resize()
+                    }, 500);
    });
 });
 

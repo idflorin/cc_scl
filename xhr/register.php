@@ -20,6 +20,9 @@ if ($f == 'register') {
             ));
             exit();
         }
+        if (preg_match('/[^\w\s]+/u',$_POST['first_name']) || preg_match('/[^\w\s]+/u',$_POST['last_name'])) {
+            $errors = $error_icon . $wo['lang']['username_invalid_characters'];
+        }
     }
     $fields = Wo_GetWelcomeFileds();
     if (empty($_POST['email']) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['confirm_password']) || empty($_POST['gender'])) {

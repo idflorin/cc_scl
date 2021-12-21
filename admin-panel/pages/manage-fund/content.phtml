@@ -215,6 +215,42 @@ if (($page > $db->totalPages) && !empty($_GET['page-id'])) {
         <div class="col-lg-12 col-md-12">
             <div class="card">
                 <div class="card-body">
+                    <h6 class="card-title">Funding Settings</h6>
+                    <form class="funding-settings" method="POST">
+                        <div class="float-left">
+                            <label for="funding_system" class="main-label">Funding Settings</label>
+                            <br><small class="admin-info">Allow users to create funding requests and earn donations.</small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="funding_system" value="0" />
+                            <input type="checkbox" name="funding_system" id="chck-funding_system" value="1" <?php echo ($wo['config']['funding_system'] == 1) ? 'checked': '';?>>
+                            <label for="chck-funding_system" class="check-trail"><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <label for="funding_request">Who Can Create Funding Requests?</label>
+                        <select class="form-control show-tick" id="funding_request" name="funding_request">
+                          <option value="all" <?php echo ($wo['config']['funding_request'] == 'all')   ? ' selected' : '';?> >All Users</option>
+                          <option value="verified" <?php echo ($wo['config']['funding_request'] == 'verified')   ? ' selected' : '';?> >Verified Users Only</option>
+                        </select>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Commission (%)</label>
+                                <input type="text" id="donate_percentage" name="donate_percentage" class="form-control" value="<?php echo $wo['config']['donate_percentage']?>">
+                                <small class="admin-info">How much do you want to earn commissions from donations, Leave it 0 if you don't want to get any commissions.</small>
+                            </div>
+                        </div>
+                        <!-- <div class="funding-settings-alert"></div> -->
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <!-- <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button> -->
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+
 					<div id="dashboard-daterangepicker" class="btn btn-outline-light pull-right">
                             <?php 
                             if (!empty($_GET['range']) && in_array($_GET['range'], array('Today','Yesterday','This Week','This Month','Last Month','This Year'))) {
@@ -431,6 +467,67 @@ function DeleteSelected() {
     });
 }
 jQuery(document).ready(function($) {
+        $('.switcher input[type=checkbox]').click(function () {
+        setToTrue = 0;
+        if ($(this).is(":checked") === true) {
+            setToTrue = 1;
+        }
+        var configName = $(this).attr('name');
+        var hash_id = $('input[name=hash_id]').val();
+        var objData = {};
+        objData[configName] = setToTrue;
+        objData['hash_id'] = hash_id;
+        $.post( Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting', objData);
+    });
+
+    var setTimeOutColor = setTimeout(function (){});
+    $('select').on('change', function() {
+         clearTimeout(setTimeOutColor);
+        var thisElement = $(this);
+        var configName = thisElement.attr('name');
+        var hash_id = $('input[name=hash_id]').val();
+        var objData = {};
+        objData[configName] = this.value;
+        objData['hash_id'] = hash_id;
+        thisElement.addClass('warning');
+        $.post( Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting', objData, function (data) {
+            if (data.status == 200) {
+                thisElement.removeClass('warning');
+                thisElement.addClass('success');
+            } else {
+                thisElement.addClass('error');
+            }
+            var setTimeOutColor = setTimeout(function () {
+                thisElement.removeClass('success');
+                thisElement.removeClass('warning');
+                thisElement.removeClass('error');
+            }, 2000);
+        });
+    });
+    $('input[type=text], input[type=number], textarea').on('keyup', delay(function() {
+            clearTimeout(setTimeOutColor);
+            var thisElement = $(this);
+            var configName = thisElement.attr('name');
+            var hash_id = $('input[name=hash_id]').val();
+            var objData = {};
+            objData[configName] = this.value;
+            objData['hash_id'] = hash_id;
+            thisElement.addClass('warning');
+            $.post( Wo_Ajax_Requests_File() + '?f=admin_setting&s=update_general_setting', objData, function (data) {
+                if (data.status == 200) {
+                    thisElement.removeClass('warning');
+                    thisElement.addClass('success');
+                } else {
+                    thisElement.addClass('error');
+                }
+                var setTimeOutColor = setTimeout(function () {
+                    thisElement.removeClass('success');
+                    thisElement.removeClass('warning');
+                    thisElement.removeClass('error');
+                }, 2000);
+                //thisElement.focus();
+            });
+    }, 500));
         var range = { "All": [moment().startOf('year') , moment().endOf('year')],
                       "Today": [moment() , moment()], 
                       "Yesterday": [moment().subtract(1, 'days') , moment().subtract(1, 'days')], 

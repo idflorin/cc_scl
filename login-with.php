@@ -81,6 +81,9 @@ if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
             $user_email = $user_name . $notfound_email_com;
             if (!empty($user_profile->email)) {
                 $user_email = $user_profile->email;
+                if(empty($user_profile->emailVerified) && $provider == 'Discord') {
+                    exit("Your E-mail is not verfied on Discord.");
+                }
             }
             if (Wo_EmailExists($user_email) === true) {
                 Wo_SetLoginWithSession($user_email);

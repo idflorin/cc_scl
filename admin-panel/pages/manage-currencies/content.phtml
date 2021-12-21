@@ -14,17 +14,16 @@
         </nav>
     </div>
     <div class="alert alert-warning">
-      <i class="fa fa-question-circle fa-fw"></i>Please note that not all currencies are supported by PayPal, stripe, 2checkout, alipay. If the currency you adding isn't supported, You can set the default payment currency for each payment method from <a href="<?php echo Wo_LoadAdminLinkSettings('payment-settings'); ?>"> Payment Settings.</a>
+      <i class="fa fa-question-circle fa-fw"></i> Please note that not all currencies are supported by payment methods. If the currency you chose isn't supported, You can set the default payment currency for each payment method from <a href="<?php echo Wo_LoadAdminLinkSettings('payment-settings'); ?>"> Payment Settings.</a>
     </div>
     <!-- Vertical Layout -->
     <div class="row">
     	<div class="col-lg-12 col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <h6 class="card-title">Add Currency</h6>
+                    <h6 class="card-title">Add New Currency</h6>
                      <div class="add-curreny-settings-alert"></div>
                     <form class="add-curreny-settings" method="POST">
-
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <label class="form-label">Currency Code (e.g: USD)</label>
@@ -38,9 +37,8 @@
                             </div>
                         </div>
                         <div class="clearfix"></div>
-                        <br><br>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
-                        <button type="submit" class="btn btn-primary m-t-15 waves-effect">Add</button>
+                        <button type="submit" class="btn btn-info m-t-15 waves-effect">Add Currency</button>
                     </form>
                 </div>
             </div>
@@ -58,7 +56,7 @@
                                       <th>ID</th>
 					                  <th>Currency Code</th>
 					                  <th>Currency Symbol</th>
-                            <th>Status</th>
+                                        <th>Status</th>
 					                  <th>Action</th>
                                 </tr>
                             </thead>
@@ -122,15 +120,14 @@
                     </div>
                 </div>
                 <div class="clearfix"></div>
-                <br><br>
                 <input type="hidden" name="currency_id" id="edit_currency_id">
                 <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
             </form>
           </div>
           <div class="modal-footer">
             <input type="hidden" id="c_id_">
-            <button type="button" class="btn btn-secondary modal_close_btn" data-dismiss="modal">CLOSE</button>
-            <button type="button" class="btn btn-primary" onclick="Wo_SubmitCurrencyForm();">SAVE CHANGES</button>
+            <button type="button" class="btn btn-primary modal_close_btn" data-dismiss="modal">CLOSE</button>
+            <button type="button" class="btn btn-success" onclick="Wo_SubmitCurrencyForm();">SAVE CHANGES</button>
           </div>
         </div>
       </div>
@@ -176,7 +173,7 @@ form_add_site_settings.ajaxForm({
     },
     success: function(data) {
         if (data.status == 200) {
-            form_add_site_settings.find('.waves-effect').text('Save');
+            form_add_site_settings.find('.waves-effect').text('Add Currency');
             $("html, body").animate({ scrollTop: 0 }, "slow");
             $('.add-curreny-settings-alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Currency successfully added</div>');
             setTimeout(function () {
