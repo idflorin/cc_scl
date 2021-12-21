@@ -1,47 +1,16 @@
-<?php 
-
-if (!empty($_POST['recipient_id']) && is_numeric($_POST['recipient_id']) && $_POST['recipient_id'] > 0) {
-	$json_success_data   = array();
-	$user_id         = $wo['user']['id'];
-	$user_login_data = $wo['user'];
-	if (!empty($user_login_data)) {
-		$recipient_id    = $_POST['recipient_id'];
-        $user_login_data2 = Wo_UserData($recipient_id);
-        if (!empty($user_login_data2)) {
-
-        	$limit             = 20;
-            $after_message_id  = 0;
-            $before_message_id = 0;
-            $message_id = 0;
-            if (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0) {
-                $limit = $_POST['limit'];
-            }
-            if (!empty($_POST['after_message_id'])) {
-                $after_message_id = $_POST['after_message_id'];
-            }
-            if (!empty($_POST['before_message_id'])) {
-                $before_message_id = $_POST['before_message_id'];
-            }
-            if (!empty($_POST['message_id'])) {
-                $message_id = $_POST['message_id'];
-            }
-            $message_info = array(
-                'user_id' => $user_id,
-                'recipient_id' => $recipient_id,
-                'before_message_id' => $before_message_id,
-                'after_message_id' => $after_message_id,
-                'message_id' => $message_id
-            );
-            $message_info = Wo_GetMessagesAPPN($message_info,$limit);
-            $not_include_status = false;
-            $not_include_array = array();
-            if (!empty($_POST['not_include'])) {
-                $not_include_array = @explode(',', $_POST['not_include']);
-                $not_include_status = true;
-            }
-            $timezone = new DateTimeZone($user_login_data['timezone']);
-            foreach ($message_info as $message) {
-                $message['text'] = openssl_encrypt($message['text'], "AES-128-ECB", $message['time']);
+<?php
+if (!empty($_POST['chat_id']) && is_numeric($_POST['chat_id']) && $_POST['chat_id'] > 0) {
+    $chats = $db->where('user_id',$wo['user']['id'])->where('chat_id',Wo_Secure($_POST['chat_id']))->where('fav','yes')->where('message_id',0,'>')->get(T_MUTE);
+    $array = array();
+    if (!empty($chats)) {
+        foreach ($chats as $key => $value) {
+            $message = GetMessageById($value->message_id);
+            if (!empty($message)) {
+                foreach ($non_allowed as $key5 => $value5) {
+                    if (!empty($message['messageUser'])) {
+                        unset($message['messageUser'][$value5]);
+                    }
+                }
                 if ($not_include_status == true) {
                     foreach ($not_include_array as $value) {
                         if (!empty($value)) {
@@ -148,32 +117,17 @@ if (!empty($_POST['recipient_id']) && is_numeric($_POST['recipient_id']) && $_PO
                     $message['story']['time_text'] = Wo_Time_Elapsed_String($message['story']['posted']);
                     $message['story']['view_count'] = $db->where('story_id',$message['story']['id'])->where('user_id',$message['story']['user_id'],'!=')->getValue(T_STORY_SEEN,'COUNT(*)');
                 }
-                array_push($json_success_data, $message);
+                $array[] = $message;
             }
-            $send_messages_to_phones = Wo_MessagesPushNotifier();
-            $typing = 0;
-			$check_typing = Wo_IsTyping($recipient_id);
-			if ($check_typing) {
-			    $typing = 1;
-			}
-            $is_recording = $db->where('follower_id',$wo['user']['id'])->where('following_id',$recipient_id)->where('is_typing',2)->getValue(T_FOLLOWERS,"COUNT(*)");
-            $response_data = array('api_status' => 200,
-            	                   'messages' => $json_success_data,
-            	                   'typing' => $typing,
-                                   'is_recording' => $is_recording);
-
         }
-        else{
-        	$error_code    = 5;
-		    $error_message = 'recipient user not found';
-        }
-	}
-	else{
-		$error_code    = 4;
-	    $error_message = 'user not found';
-	}
+    }
+    $response_data = array(
+                        'api_status' => 200,
+                        'data' => $array
+                    );
 }
 else{
-	$error_code    = 3;
-    $error_message = 'recipient_id can not be empty';
+    $error_code    = 5;
+    $error_message = 'chat_id can not be empty';
 }
+    

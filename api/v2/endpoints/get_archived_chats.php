@@ -22,12 +22,14 @@ if (!empty($chats)) {
 		        $new_data['mute'] = array('notify' => 'yes',
 		                               'call_chat' => 'yes',
 		                               'archive' => 'no',
+		                               'fav' => 'no',
 		                               'pin' => 'no');
 		        $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$new_data['chat_id'])->where('type','user')->getOne(T_MUTE);
 		        if (!empty($mute)) {
 		            $new_data['mute']['notify'] = $mute->notify;
 		            $new_data['mute']['call_chat'] = $mute->call_chat;
 		            $new_data['mute']['archive'] = $mute->archive;
+		            $new_data['mute']['fav'] = $mute->fav;
 		            $new_data['mute']['pin'] = $mute->pin;
 		        }
 		        $new_data['last_message'] = Wo_GetMessagesHeader(array('user_id' => $new_data['user_id']), 'user');

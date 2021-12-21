@@ -25,21 +25,23 @@ $section = Wo_GetForumSec(array('id' => $wo['forum_data']['forum']['sections']))
 		<hr>
 		<div class="w-100">
 			<?php if (count($wo['forum_data']['threads']) > 0): ?>
+			<div class="table-responsive">
 				<table class="table threads-table">
-				<thead class="wow_forum_dis_thead">
-					<tr>
-				        <th><?php echo $wo['lang']['topic']; ?></th>
-						<th><?php echo $wo['lang']['last_post']; ?></th>
-				        <th class="text-center"><?php echo $wo['lang']['replies']; ?></th>
-						<th class="text-center"><?php echo $wo['lang']['views']; ?></th>
-					</tr>
-				</thead>
-				<tbody id="forum-threads">
-				    <?php foreach ($wo['forum_data']['threads'] as $wo['thread']): ?>
-				    	<?php echo Wo_LoadPage("forum/includes/post-list"); ?>
-				    <?php endforeach; ?>
-				</tbody>
-			</table>
+					<thead class="wow_forum_dis_thead">
+						<tr>
+							<th><?php echo $wo['lang']['topic']; ?></th>
+							<th><?php echo $wo['lang']['last_post']; ?></th>
+							<th class="text-center"><?php echo $wo['lang']['replies']; ?></th>
+							<th class="text-center"><?php echo $wo['lang']['views']; ?></th>
+						</tr>
+					</thead>
+					<tbody id="forum-threads">
+						<?php foreach ($wo['forum_data']['threads'] as $wo['thread']): ?>
+							<?php echo Wo_LoadPage("forum/includes/post-list"); ?>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			</div>
 		    <?php else: ?>
 				<?php echo '<div class="empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18,22A2,2 0 0,0 20,20V4C20,2.89 19.1,2 18,2H12V9L9.5,7.5L7,9V2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18Z" /></svg>' . $wo['lang']['no_threads_found'] .  '</div>'; ?>
 			<?php endif; ?>

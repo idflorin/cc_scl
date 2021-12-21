@@ -3514,11 +3514,12 @@ svg {vertical-align: middle;}
 .wow_weather {background-color: #2d3a4f;color: #9ca7ba;padding: 15px 0;}
 .wow_weather_date {font-size: 31px;text-align: center;color: #fff;margin-bottom: 7px;}
 .wow_weather_timezone {color: #9ca7ba;font-size: 25px;text-align: center;}
-.wow_weather_icon {padding: 25px;text-align: center;color: #fff;}
-.wow_weather_icon svg {width: 70px;height: 70px;}
+.wow_weather_icon {text-align: center;color: #fff;}
+.wow_weather_description {text-align: center;font-size: 16px;}
 .wow_weather_current {color: #fff;font-size: 23px;text-align: center;}
-.wow_weather_forecast {overflow: hidden;padding: 0 3px;margin-top: 10px;}
-.wow_weather_forecast .fivedays {text-align: center;float: left;width: 25%;padding: 0 5px;}
+.wow_weather_forecast {overflow: hidden;padding: 0 2px;margin-top: 10px;}
+.wow_weather_forecast .fivedays {text-align: center;float: left;width: 25%;padding: 0;}
+.wow_weather_forecast .fivedays > div {font-size: 13px;}
 
 /*Mat Modal*/
 .wow_pops_head {position: relative;background: #8b6060;color: #fff;text-align: center;padding: 25px 0 115px;border-radius: 3px 3px 0 0;margin-bottom: -50px;}
@@ -3876,6 +3877,7 @@ header .navbar-default .navbar-nav>.open>a.user-menu-combination {background: tr
 @media (min-width:1140px) {
 .online-content-toggler{display:block!important;max-height:100%}
 .wo_page_profile .page-info-cont .last_row {margin: 29px 0;}
+.wo_page_profile .page-info-cont .info {max-width: calc(100% - 95px);}
 .wo_page_profile .options-buttons {flex-direction: row;}
 .wo_page_profile .options-buttons a, .wo_page_profile .options-buttons button {margin: 3px 5px;}
 .wo_event_profile .profile-container .card.hovercard .cardheader img, .wo_group_profile .profile-container .card.hovercard .cardheader img {height: -webkit-fill-available;}
@@ -3924,6 +3926,7 @@ header .navbar-default .navbar-nav>.open>a.user-menu-combination {background: tr
 .wow_forum_sections table .forum-meta-d.small {	display: none;}
 .wow_thread_head .btn-glossy > a {float: none !important;}
 .wow_main_float_head > .container.wo_go_pro:after {display: none;}
+.text-sender-container .messagejoint {height: calc(100vh - 110px);}
 }
 
 @media (max-width:990px) {
@@ -4189,7 +4192,7 @@ to{opacity:1;margin-top:0}
 
 @media (max-width:520px) {
 .navbar-default li.dropdown.notification-container{margin-right:3px}
-.messages-container {padding: 30px 10px 0;}
+.messages-container {padding: 80px 10px 0;}
 .text-sender-container .msg_usr_info_top_list {padding: 8px 20px;height: 60px;}
 .wo_jlist_headimg, .wo_view_post_jcover {height: 200px;}
 }

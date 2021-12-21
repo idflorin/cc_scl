@@ -27,10 +27,10 @@ async function loadConfig(ctx) {
   ctx.globalconfig["site_url"] = configFile.site_url
   ctx.globalconfig['theme_url'] = ctx.globalconfig["site_url"] + '/themes/' + ctx.globalconfig['theme']
 
-  if (ctx.globalconfig["redis"] === "Y") {
-    const redisAdapter = require('socket.io-redis');
-    io.adapter(redisAdapter({ host: 'localhost', port: ctx.globalconfig["redis_port"] }));
-  }
+  // if (ctx.globalconfig["redis"] === "Y") {
+  //   const redisAdapter = require('socket.io-redis');
+  //   io.adapter(redisAdapter({ host: 'localhost', port: ctx.globalconfig["redis_port"] }));
+  // }
 
     
   if (ctx.globalconfig["nodejs_ssl"] == 1) {
@@ -87,6 +87,7 @@ async function init() {
   ctx.wo_reactions_types = require("./models/wo_reactions_types")(sequelize, DataTypes)
   ctx.wo_reactions = require("./models/wo_reactions")(sequelize, DataTypes)
   ctx.wo_blog_reaction = require("./models/wo_blog_reaction")(sequelize, DataTypes)
+  ctx.wo_mute = require("./models/wo_mute")(sequelize, DataTypes)
 
   ctx.globalconfig = {}
   ctx.globallangs = {}
@@ -110,7 +111,11 @@ async function main() {
   app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
   });
-  var io = require('socket.io')(server);
+  io = require('socket.io')(server);
+  if (ctx.globalconfig["redis"] === "Y") {
+    const redisAdapter = require('socket.io-redis');
+    io.adapter(redisAdapter({ host: 'localhost', port: ctx.globalconfig["redis_port"] }));
+  }
   io.on('connection', async (socket, query) => {
     await listeners.registerListeners(socket, io, ctx)
   })

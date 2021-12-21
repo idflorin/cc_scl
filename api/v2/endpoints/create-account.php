@@ -116,7 +116,11 @@ if (empty($error_code)) {
                 $access_token        = sha1(rand(111111111, 999999999)) . md5(microtime()) . rand(11111111, 99999999) . md5(rand(5555, 9999));
                 $time                = time();
                 $user_id             = Wo_UserIdFromUsername($username);
-                $create_access_token = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `time`) VALUES ('{$user_id}', '{$access_token}', 'phone', '{$time}')");
+                $device_type = 'phone';
+                if (!empty($_POST['device_type']) && in_array($_POST['device_type'], array('phone','windows'))) {
+                    $device_type = Wo_Secure($_POST['device_type']);
+                }
+                $create_access_token = mysqli_query($sqlConnect, "INSERT INTO " . T_APP_SESSIONS . " (`user_id`, `session_id`, `platform`, `time`) VALUES ('{$user_id}', '{$access_token}', '{$device_type}', '{$time}')");
                 if ($create_access_token) {
                     $response_data = array(
                         'api_status' => 200,

@@ -301,80 +301,80 @@ if (empty($error_code)) {
         }
     }
 
-    $e_liked             = 0;
-    $e_shared            = 0;
-    $e_wondered          = 0;
-    $e_commented         = 0;
-    $e_followed          = 0;
-    $e_liked_page        = 0;
-    $e_visited           = 0;
-    $e_mentioned         = 0;
-    $e_joined_group      = 0;
-    $e_accepted          = 0;
-    $e_profile_wall_post = 0;
-    $e_memory = 0;
+    $e_liked             = $wo['user']['API_notification_settings']['e_liked'];
+    $e_shared            = $wo['user']['API_notification_settings']['e_shared'];
+    $e_wondered          = $wo['user']['API_notification_settings']['e_wondered'];
+    $e_commented         = $wo['user']['API_notification_settings']['e_commented'];
+    $e_followed          = $wo['user']['API_notification_settings']['e_followed'];
+    $e_liked_page        = $wo['user']['API_notification_settings']['e_liked_page'];
+    $e_visited           = $wo['user']['API_notification_settings']['e_visited'];
+    $e_mentioned         = $wo['user']['API_notification_settings']['e_mentioned'];
+    $e_joined_group      = $wo['user']['API_notification_settings']['e_joined_group'];
+    $e_accepted          = $wo['user']['API_notification_settings']['e_accepted'];
+    $e_profile_wall_post = $wo['user']['API_notification_settings']['e_profile_wall_post'];
+    $e_memory = $wo['user']['API_notification_settings']['e_memory'];
     $array               = array(
-        '0',
-        '1'
+        0,
+        1
     );
-    if (!empty($_POST['e_liked'])) {
+    if (isset($_POST['e_liked'])) {
         if (in_array($_POST['e_liked'], $array)) {
-            $e_liked = 1;
+            $e_liked = $_POST['e_liked'];
         }
     }
-    if (!empty($_POST['e_shared'])) {
+    if (isset($_POST['e_shared'])) {
         if (in_array($_POST['e_shared'], $array)) {
-            $e_shared = 1;
+            $e_shared = $_POST['e_shared'];
         }
     }
-    if (!empty($_POST['e_wondered'])) {
+    if (isset($_POST['e_wondered'])) {
         if (in_array($_POST['e_wondered'], $array)) {
-            $e_wondered = 1;
+            $e_wondered = $_POST['e_wondered'];
         }
     }
-    if (!empty($_POST['e_commented'])) {
+    if (isset($_POST['e_commented'])) {
         if (in_array($_POST['e_commented'], $array)) {
-            $e_commented = 1;
+            $e_commented = $_POST['e_commented'];
         }
     }
-    if (!empty($_POST['e_followed'])) {
+    if (isset($_POST['e_followed'])) {
         if (in_array($_POST['e_followed'], $array)) {
-            $e_followed = 1;
+            $e_followed = $_POST['e_followed'];
         }
     }
-    if (!empty($_POST['e_liked_page'])) {
+    if (isset($_POST['e_liked_page'])) {
         if (in_array($_POST['e_liked_page'], $array)) {
-            $e_liked_page = 1;
+            $e_liked_page = $_POST['e_liked_page'];
         }
     }
-    if (!empty($_POST['e_visited'])) {
+    if (isset($_POST['e_visited'])) {
         if (in_array($_POST['e_visited'], $array)) {
-            $e_visited = 1;
+            $e_visited = $_POST['e_visited'];
         }
     }
-    if (!empty($_POST['e_mentioned'])) {
+    if (isset($_POST['e_mentioned'])) {
         if (in_array($_POST['e_mentioned'], $array)) {
-            $e_mentioned = 1;
+            $e_mentioned = $_POST['e_mentioned'];
         }
     }
-    if (!empty($_POST['e_joined_group'])) {
+    if (isset($_POST['e_joined_group'])) {
         if (in_array($_POST['e_joined_group'], $array)) {
-            $e_joined_group = 1;
+            $e_joined_group = $_POST['e_joined_group'];
         }
     }
-    if (!empty($_POST['e_accepted'])) {
+    if (isset($_POST['e_accepted'])) {
         if (in_array($_POST['e_accepted'], $array)) {
-            $e_accepted = 1;
+            $e_accepted = $_POST['e_accepted'];
         }
     }
-    if (!empty($_POST['e_profile_wall_post'])) {
+    if (isset($_POST['e_profile_wall_post'])) {
         if (in_array($_POST['e_profile_wall_post'], $array)) {
-            $e_profile_wall_post = 1;
+            $e_profile_wall_post = $_POST['e_profile_wall_post'];
         }
     }
-    if (!empty($_POST['e_memory'])) {
+    if (isset($_POST['e_memory'])) {
         if (in_array($_POST['e_memory'], $array)) {
-            $e_memory = 1;
+            $e_memory = $_POST['e_memory'];
         }
     }
     $Update_data = array(
@@ -392,9 +392,12 @@ if (empty($error_code)) {
         'e_memory' => $e_memory
     );
     $Update_data = json_encode($Update_data);
-    $update2 = Wo_UpdateUserData($wo['user']['user_id'], array(
+    $update2 = $db->where('user_id',$wo['user']['user_id'])->update(T_USERS,array(
             'notification_settings' => $Update_data
         ));
+    // $update2 = Wo_UpdateUserData($wo['user']['user_id'], array(
+    //         'notification_settings' => $Update_data
+    //     ));
 
 
 

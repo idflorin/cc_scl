@@ -2028,12 +2028,14 @@ svg.feather{vertical-align:middle;margin-top:-4px;width: 19px;height:19px;}
 .chat-messages-wrapper .deleteMessage.right{left:auto!important;right:-18px}
 .chat-messages-wrapper .deleteMessage svg.feather{margin-top:-3px;width:15px;height:15px}
 .text-sender-container .time{margin-top:2px;font-size:10px}
-.text-sender-container .message-model{width:auto!important;max-width:94%;font-size:14px;padding:0 2px 1px;position:relative}
+.text-sender-container .message-model{width:auto!important;/*max-width:94%;*/font-size:14px;padding:0 2px 1px;position:relative}
 .text-sender-container .message-model .message{padding:7px 13px;background:#fff;border-radius:17px;box-shadow:0 1px 1px 0 rgba(0,0,0,.15);margin-left:auto;display:table;line-height:1.4;margin-top:0;position:relative}
 .text-sender-container .message-model .video-js-responsive-container{min-width:300px}
 .text-sender-container .message-model .message p{padding:1px}
 .text-sender-container .message-model .message p .twa-lg{height:26px;width:26px;background-size:26px 26px}
 .text-sender-container .outgoing .message-model{border-bottom-right-radius:2px}
+.text-sender-container .outgoing .message-model .message .message-text {display: table-cell;}
+.text-sender-container .outgoing .message-model .message .message-media {display: table-row;}
 .text-sender-container .incoming .message-model .message{margin-right:auto;margin-left:0}
 .text-sender-container .incoming .message-model .time{text-align:left}
 .message-media{position:relative}
@@ -2461,11 +2463,12 @@ body.search_open .navbar-nav.left_part_header .search-container {top: 0;}
 .wow_weather {background-color: #2d3a4f;color: #9ca7ba;padding: 15px 0;}
 .wow_weather_date {font-size: 31px;text-align: center;color: #fff;margin-bottom: 7px;}
 .wow_weather_timezone {color: #9ca7ba;font-size: 25px;text-align: center;}
-.wow_weather_icon {padding: 25px;text-align: center;color: #fff;}
-.wow_weather_icon svg {width: 70px;height: 70px;}
+.wow_weather_icon {text-align: center;color: #fff;}
+.wow_weather_description {text-align: center;font-size: 16px;}
 .wow_weather_current {color: #fff;font-size: 23px;text-align: center;}
-.wow_weather_forecast {overflow: hidden;padding: 0 3px;margin-top: 10px;}
-.wow_weather_forecast .fivedays {text-align: center;float: left;width: 25%;padding: 0 5px;}
+.wow_weather_forecast {overflow: hidden;padding: 0 2px;margin-top: 10px;}
+.wow_weather_forecast .fivedays {text-align: center;float: left;width: 25%;padding: 0;}
+.wow_weather_forecast .fivedays > div {font-size: 13px;}
 
 /*New*/
 .btn-add-comm-postt {
@@ -2686,7 +2689,7 @@ body::-webkit-scrollbar-thumb, .notifications-dropdown::-webkit-scrollbar-thumb,
 .user_media_list_section .photo-data, .user_media_list_section .video-data {flex: 0 0 25%;width: 25%;}
 .mobileleftpane{position:fixed;height:100%;width:100%;z-index:1;padding:0;top:45px;left: 0;}
 .text-sender-container .red-list .mobilemsgclose{display:inline-block}
-.messages-container {height: calc(100vh - 146px);padding-bottom: 20px;padding-top: 80px;}
+.messages-container {height: calc(100vh - 146px);padding-bottom: 20px;padding-top: 100px;}
 .messages-container .message-contnaier:nth-child(1) {margin-top: 0;}
 #wo_nw_msg_page .messages-recipients-list .online_dot {top: 6px;right: 17px;}
 .mobilerightpane .inner-addon {display: flex !important;}

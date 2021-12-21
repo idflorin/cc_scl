@@ -237,7 +237,8 @@ $wo['countries_name'] = array(
     '239' => 'Yugoslavya',
     '240' => 'Zaire',
     '241' => 'Zambiya',
-    '242' => 'Zimbabve'
+    '242' => 'Zimbabve',
+    '243' => 'Palestine'
 );
 
 $wo['page_categories'] = array(

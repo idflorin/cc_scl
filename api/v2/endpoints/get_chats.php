@@ -11,25 +11,37 @@ $pages = array();
 $user_offset = (!empty($_POST['user_offset']) && is_numeric($_POST['user_offset']) && $_POST['user_offset'] > 0 ? Wo_Secure($_POST['user_offset']) : 0);
 $user_limit = (!empty($_POST['user_limit']) && is_numeric($_POST['user_limit']) && $_POST['user_limit'] > 0 && $_POST['user_limit'] <= 50 ? Wo_Secure($_POST['user_limit']) : 20);
 $user_type = (!empty($_POST['user_type']) && in_array($_POST['user_type'], array('online','offline')) ? Wo_Secure($_POST['user_type']) : '');
-$data_type = (!empty($_POST['data_type']) && in_array($_POST['data_type'], array('all','users','pages','groups')) ? Wo_Secure($_POST['data_type']) : 'all');
+
+//$data_type = (!empty($_POST['data_type']) && in_array($_POST['data_type'], array('all','users','pages','groups')) ? Wo_Secure($_POST['data_type']) : 'all');
 
 $group_offset = (!empty($_POST['group_offset']) && is_numeric($_POST['group_offset']) && $_POST['group_offset'] > 0 ? Wo_Secure($_POST['group_offset']) : 0);
 $group_limit = (!empty($_POST['group_limit']) && is_numeric($_POST['group_limit']) && $_POST['group_limit'] > 0 && $_POST['group_limit'] <= 50 ? Wo_Secure($_POST['group_limit']) : 20);
 
 $page_offset = (!empty($_POST['page_offset']) && is_numeric($_POST['page_offset']) && $_POST['page_offset'] > 0 ? Wo_Secure($_POST['page_offset']) : 0);
 $page_limit = (!empty($_POST['page_limit']) && is_numeric($_POST['page_limit']) && $_POST['page_limit'] > 0 && $_POST['page_limit'] <= 50 ? Wo_Secure($_POST['page_limit']) : 20);
-
+$data_type = array('all');
+if (!empty($_POST['data_type'])) {
+    $get_types = explode(',', $_POST['data_type']);
+    if (!empty($get_types)) {
+        $data_type = array();
+        foreach ($get_types as $key => $value) {
+            if ($value == 'users' || $value == 'pages' || $value == 'groups') {
+                $data_type[] = Wo_Secure($value);
+            }
+        }
+    }
+}
 $fetch_array = array(
     'user_id' => $wo['user']['id'],
     'limit' => $user_limit,
     'offset' => $user_offset,
     'type' => $user_type
 );
-if ($data_type == 'all' || $data_type == 'users') {
+if (in_array('all',$data_type) || in_array('users',$data_type)) {
     $messages = Wo_GetMessagesUsersAPP2($fetch_array);
 }
 
-if ($data_type == 'all' || $data_type == 'groups') {
+if (in_array('all',$data_type) || in_array('groups',$data_type)) {
     $groups = Wo_GetGroupsListAPP(array('offset' => $group_offset , 'limit' => $group_limit));
 }
 
@@ -39,7 +51,7 @@ $fetch_page_array = array(
     'offset' => $page_offset
 );
 
-if ($data_type == 'all' || $data_type == 'pages') {
+if (in_array('all',$data_type) || in_array('pages',$data_type)) {
     $pages = Wo_GetMessagesPagesAPP($fetch_page_array);
 }
 
@@ -51,12 +63,14 @@ if (!empty($messages)) {
         $value['mute'] = array('notify' => 'yes',
                                'call_chat' => 'yes',
                                'archive' => 'no',
+                               'fav' => 'no',
                                'pin' => 'no');
         $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$value['chat_id'])->where('type','user')->getOne(T_MUTE);
         if (!empty($mute)) {
             $value['mute']['notify'] = $mute->notify;
             $value['mute']['call_chat'] = $mute->call_chat;
             $value['mute']['archive'] = $mute->archive;
+            $value['mute']['fav'] = $mute->fav;
             $value['mute']['pin'] = $mute->pin;
         }
         $value['last_message'] = Wo_GetMessagesHeader(array('user_id' => $value['user_id']), 'user');
@@ -67,6 +81,7 @@ if (!empty($messages)) {
           
         }
         $message = $value['last_message'];
+        $message['text'] = openssl_encrypt($message['text'], "AES-128-ECB", $message['time']);
         if (empty($message['stickers'])) {
             $message['stickers'] = '';
         }
@@ -122,12 +137,14 @@ if (!empty($groups)) {
         $value['mute'] = array('notify' => 'yes',
                                'call_chat' => 'yes',
                                'archive' => 'no',
+                               'fav' => 'no',
                                'pin' => 'no');
         $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$value['chat_id'])->where('type','group')->getOne(T_MUTE);
         if (!empty($mute)) {
             $value['mute']['notify'] = $mute->notify;
             $value['mute']['call_chat'] = $mute->call_chat;
             $value['mute']['archive'] = $mute->archive;
+            $value['mute']['fav'] = $mute->fav;
             $value['mute']['pin'] = $mute->pin;
         }
     	if (!empty($value['user_data'])) {
@@ -156,6 +173,7 @@ if (!empty($groups)) {
             }
 
             $message = $value['last_message'];
+            $message['text'] = openssl_encrypt($message['text'], "AES-128-ECB", $message['time']);
             if (empty($message['stickers'])) {
                 $message['stickers'] = '';
             }
@@ -217,15 +235,19 @@ if (!empty($pages)) {
         $page['mute'] = array('notify' => 'yes',
                                'call_chat' => 'yes',
                                'archive' => 'no',
+                               'fav' => 'no',
                                'pin' => 'no');
         $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$value['chat_id'])->where('type','page')->getOne(T_MUTE);
         if (!empty($mute)) {
             $page['mute']['notify'] = $mute->notify;
             $page['mute']['call_chat'] = $mute->call_chat;
             $page['mute']['archive'] = $mute->archive;
+            $page['mute']['fav'] = $mute->fav;
             $page['mute']['pin'] = $mute->pin;
         }
         if (!empty($page) && !empty($value['message']) && !empty($value['message']['page_id']) && !empty($value['message']['user_id']) && !empty($value['message']['conversation_user_id'])) {
+            $user_id = $wo['user']['id'];
+            $timezone = new DateTimeZone($wo['user']['timezone']);
             $message = Wo_GetPageMessages(array(
                                         'page_id' => $value['message']['page_id'],
                                         'from_id' => $value['message']['user_id'],
@@ -237,6 +259,7 @@ if (!empty($pages)) {
                 $page['last_message'] = $message[0];
 
                 $message = $page['last_message'];
+                $message['text'] = openssl_encrypt($message['text'], "AES-128-ECB", $message['time']);
                 if (empty($message['stickers'])) {
                     $message['stickers'] = '';
                 }

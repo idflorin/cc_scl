@@ -255,9 +255,9 @@ function Wo_RegisterReaction(element,reaction_icon,is_html){
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'register_reaction', post_id: post_id, reaction: reaction}, function (data) {
       if(data.status == 200) {
         <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
-    if ($('#react_'+post_id).attr('data_react') == 0) {
+    //if ($('#react_'+post_id).attr('data_react') == 0) {
       socket.emit("post_notification", { post_id: post_id, user_id: _getCookie("user_id"), type: "added" });
-    }
+    //}
     <?php } ?>
         $('.post-reactions-icons-'+post_id).html(data.reactions);
 		    

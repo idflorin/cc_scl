@@ -353,9 +353,9 @@ if (!empty($wo['story']['parent_id'])) {
          <a  style="color:#9197a3" class="ajax-time" href="<?php echo $wo['story']['url'];?>" title="<?php echo date('c',$wo['story']['time']); ?>" target="_blank"><?php echo Wo_Time_Elapsed_String($wo['story']['time']); ?></a>
          </span>
          <?php if (strlen($wo['story']['postText']) >= 2): ?>
-         <!-- <span onclick="Wo_Translate($(this).attr('id'),$(this).attr('data-language'))" title="<?php echo $wo['lang']['translate'];?>" class="pointer time" id="<?php echo $wo['story']['id']; ?>" data-language="<?php echo DetermineUserLang(); ?>" data-trans-btn="<?php echo $wo['story']['id']; ?>">
+         <span onclick="Wo_Translate($(this).attr('id'),$(this).attr('data-language'))" title="<?php echo $wo['lang']['translate'];?>" class="pointer time" id="<?php echo $wo['story']['id']; ?>" data-language="<?php echo DetermineUserLang(); ?>" data-trans-btn="<?php echo $wo['story']['id']; ?>">
             - <?php echo $wo['lang']['translate'];?>
-            </span>  -->
+            </span>
          <?php endif ?>
          <?php  if ($wo['story']['admin'] === true && $wo['story']['group_recipient_exists'] == false && empty($wo['story']['product_id'])) { ?>
          <?php  if (empty($wo['story']['page_id'])) { ?>
@@ -943,9 +943,9 @@ if (!empty($wo['story']['parent_id'])) {
          <?php //if (empty($current_post['parent_id'])) { ?>
          <!-- Hide privacy -->
          <?php if (strlen($wo['story']['postText']) >= 2): ?>
-         <!--<span onclick="Wo_Translate($(this).attr('id'),$(this).attr('data-language'))" title="<?php echo $wo['lang']['translate'];?>" class="pointer time" id="<?php echo $wo['story']['id']; ?>" data-language="<?php echo DetermineUserLang(); ?>" data-trans-btn="<?php echo $wo['story']['id']; ?>">
+         <span onclick="Wo_Translate($(this).attr('id'),$(this).attr('data-language'))" title="<?php echo $wo['lang']['translate'];?>" class="pointer time" id="<?php echo $wo['story']['id']; ?>" data-language="<?php echo DetermineUserLang(); ?>" data-trans-btn="<?php echo $wo['story']['id']; ?>">
          - <?php echo $wo['lang']['translate'];?>
-         </span> -->
+         </span>
          <?php endif ?>
          <?php  if ($wo['story']['admin'] === true && $wo['story']['group_recipient_exists'] == false && empty($wo['story']['product_id'])) { ?>
          <?php  if (empty($wo['story']['page_id'])) { ?>

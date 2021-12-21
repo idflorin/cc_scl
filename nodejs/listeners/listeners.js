@@ -192,6 +192,152 @@ module.exports.registerListeners = async (socket, io, ctx) => {
        // await socketEvents.emitUserStatus(ctx, io, ctx.userHashUserId[data.user_id])
         //await socketEvents.updateMessageUsersList(ctx, io, ctx.userHashUserId[data.user_id])
     })
+    socket.on("page_message", async (data, callback) => {
+        if ((!data.msg || data.msg.trim() === "") && !data.mediaId) {
+            console.log("Message has no text, neither media, skipping")
+            return
+        }
+
+        let page_data = await ctx.wo_pages.findOne({
+            where: {
+                page_id: {
+                    [Op.eq]: data.page_id
+                }
+            }
+        });
+        var to_id = page_data.user_id;
+        if (page_data.user_id == ctx.userHashUserId[data.from_id]) {
+            if (page_data.user_id == data.to_id) {
+                to_id = ctx.userHashUserId[data.from_id];
+            }
+            else{
+                to_id = data.to_id;
+            }
+        }
+
+        let messageOwner = await ctx.wo_users.findOne({
+            where: {
+                user_id: {
+                    [Op.eq]: ctx.userHashUserId[data.from_id]
+                }
+            }
+        });
+        let hasHTML = false;
+        let msg;
+        ({ msg, hasHTML } = funcs.Wo_Emo(data.msg))
+        data.msg = msg
+        // if recepient has chat open then send last seen 
+        if ((ctx.userIdChatOpen[data.to_id] && ctx.userIdChatOpen[data.to_id].filter(d => d == ctx.userHashUserId[data.from_id]).length) ||
+                ctx.userIdExtra[data.to_id] && ctx.userIdExtra[data.to_id].active_message_user_id && +ctx.userIdExtra[data.to_id].active_message_user_id === +ctx.userHashUserId[data.from_id]) {
+            var m_sent = await ctx.wo_messages.create({
+                from_id: ctx.userHashUserId[data.from_id],
+                page_id: data.page_id,
+                to_id: to_id,
+                text: data.msg,
+                seen: 0,
+                time: Math.floor(Date.now() / 1000)
+            })
+            data.sent_message = m_sent;
+        }
+        else {
+            var m_sent = await ctx.wo_messages.create({
+                from_id: ctx.userHashUserId[data.from_id],
+                page_id: data.page_id,
+                to_id: to_id,
+                text: data.msg,
+                seen: 0,
+                time: Math.floor(Date.now() / 1000)
+            })
+            data.sent_message = m_sent;
+        }
+
+        let nextId = m_sent.id;
+        if (!data.mediaId) {
+            let link_regex = new RegExp('(http\:\/\/|https\:\/\/|www\.)([^\ ]+)', 'gi');
+            let mention_regex = new RegExp('@([A-Za-z0-9_]+)', 'gi');
+            // let hashtag_regex = new RegExp('#([^`~!@$%^&*\#()\-+=\\|\/\.,<>?\'\":;{}\[\]* ]+)', 'gi');
+
+            let linkSearch = msg.match(link_regex)
+            if (linkSearch && linkSearch.length > 0) {
+                hasHTML = true;
+                for (let linkSearchOne of linkSearch) {
+                    let matchUrl = striptags(linkSearchOne)
+                    let syntax = '[a]' + escape(matchUrl) + '[/a]'
+                    data.msg = data.msg.replace(link_regex, syntax)
+                }
+            }
+            let mentionSearch = msg.match(mention_regex)
+            if (mentionSearch && mentionSearch.length > 0) {
+                hasHTML = true;
+                for (let mentionSearchOne of mentionSearch) {
+                    let mention = await ctx.wo_users.findOne({
+                        where: {
+                            username: mentionSearchOne.substr(1, mentionSearchOne.length)
+                        }
+                    })
+                    if (mention) {
+                        let match_replace = '@[' + mention['user_id'] + ']';
+                        data.msg = data.msg.replace(mention_regex, match_replace)
+                    }
+                }
+            }
+            let hashTagSearch = msg.match(/#([^`~!@$%^&*\#()\-+=\\|\/\.,<>?\'\":;{}\[\]* ]+)/gi)
+            if (hashTagSearch && hashTagSearch.length > 0) {
+                hasHTML = true
+                for (let hashTagSearchOne of hashTagSearch) {
+                    let hashdata = await funcs.Wo_GetHashtag(ctx, hashTagSearchOne.substr(1))
+                    let replaceString = '#[' + hashdata['id'] + ']';
+                    data.msg = data.msg.replace(/#([^`~!@$%^&*\#()\-+=\\|\/\.,<>?\'\":;{}\[\]* ]+)/gi, replaceString)
+                    await ctx.wo_hashtags.update({
+                        last_trend_time: Math.floor(Date.now() / 1000),
+                        trend_use_num: hashdata["trend_use_num"] + 1
+                    },
+                        {
+                            where: {
+                                id: hashdata['id']
+                            }
+                        })
+                }
+            }
+            let sendable_message = await funcs.Wo_Markup(ctx, data.msg);
+            callback({
+                status: 200,
+                message_id: data.sent_message.id,
+                time_api: data.sent_message.time,
+            })
+            if (ctx.userIdSocket[messageOwner.user_id].filter(d => d.id === client).length) {
+                await io.to(client).emit('page_message', {
+                    status: 200,
+                    message: sendable_message,
+                    message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                    time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
+                });
+            } else {
+                await io.to(client).emit('page_message', {
+                    status: 200,
+                    message: sendable_message,
+                    message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                    time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
+                });
+            }
+        } else {
+            if (ctx.userIdSocket[messageOwner.user_id].filter(d => d.id === client).length) {
+                await io.to(client).emit('page_message', {
+                    status: 200,
+                    message: sendable_message,
+                    message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                    time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
+                });
+            } else {
+                await io.to(client).emit('page_message', {
+                    status: 200,
+                    message: sendable_message,
+                    message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                    time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
+                });
+            }
+        }
+    })
     socket.on("group_message", async (data, callback) => {
         if ((!data.msg || data.msg.trim() === "") && !data.mediaId) {
             console.log("Message has no text, neither media, skipping")
@@ -542,6 +688,12 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             console.log("Message has no text, neither media, skipping")
             return
         }
+        if(data.msg){
+            data.msg = data.msg.replace("\r\n", " <br>");
+            data.msg = data.msg.replace("\n\r", " <br>");
+            data.msg = data.msg.replace("\r", " <br>");
+            data.msg = data.msg.replace("\n", " <br>");
+        }
 
         let remainingSameUserSockets = []
         if (ctx.userIdSocket[ctx.userHashUserId[data.from_id]]) {
@@ -793,6 +945,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 await userSocket.emit('private_message', {
                     messages_html: await compiledTemplates.chatListOwnerTrue(ctx, data, fromUser, nextId, hasHTML, sendable_message, data.color),
                     id: data.to_id,
+                    username: ((fromUser && fromUser.first_name !== undefined && fromUser.first_name != '' && fromUser.last_name !== undefined && fromUser.last_name != '') ? fromUser.first_name + ' ' + fromUser.last_name : fromUser.username),
+                    avatar: ((fromUser && fromUser.avatar !== undefined) ? await funcs.Wo_GetMedia(ctx, fromUser.avatar) : ''),
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     status: 200,
@@ -860,6 +1014,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 await userSocket.emit('private_message', {
                     messages_html: await compiledTemplates.chatListOwnerTrueWithMedia(ctx, data, fromUser, nextId, data.color),
                     id: data.to_id,
+                    username: ((fromUser && fromUser.first_name !== undefined && fromUser.first_name != '' && fromUser.last_name !== undefined && fromUser.last_name != '') ? fromUser.first_name + ' ' + fromUser.last_name : fromUser.username),
+                    avatar: ((fromUser && fromUser.avatar !== undefined) ? await funcs.Wo_GetMedia(ctx, fromUser.avatar) : ''),
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     status: 200,
@@ -964,10 +1120,49 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         // await funcs.Wo_RegisterTyping(data.user_id, data.recipient_id, 1)
         await socketEvents.typing(ctx, io, fromUser.avatar, data.recipient_id, ctx.userHashUserId[data.user_id])
     })
+    socket.on('recording', async (data) => {
+        let fromUser = await ctx.wo_users.findOne({
+            where: {
+                user_id: {
+                    [Op.eq]: ctx.userHashUserId[data.user_id]
+                }
+            }
+        })
+        if (!fromUser) {
+            console.log("Skipping no from_user")
+            return
+        }
+        if (ctx.userIdExtra[ctx.userHashUserId[data.user_id]]) {
+            if (ctx.userIdExtra[ctx.userHashUserId[data.user_id]].recordingTimeout) {
+                clearTimeout(ctx.userIdExtra[ctx.userHashUserId[data.user_id]].recordingTimeout)
+            }
+            ctx.userIdExtra[ctx.userHashUserId[data.user_id]].recordingTimeout = setTimeout(async () => {
+                await socketEvents.recordingDone(ctx, io, data, ctx.userHashUserId[data.user_id])
+            }, 2000)
+        }
+        else {
+            ctx.userIdExtra[ctx.userHashUserId[data.user_id]] = {
+                recordingTimeout: setTimeout(async () => {
+                    await socketEvents.recordingDone(ctx, io, data, ctx.userHashUserId[data.user_id])
+                }, 2000)
+            }
+        }
+        // await funcs.Wo_RegisterTyping(data.user_id, data.recipient_id, 1)
+        await socketEvents.recording(ctx, io, fromUser.avatar, data.recipient_id, ctx.userHashUserId[data.user_id])
+    })
 
     socket.on('typing_done', async (data) => {
         // await funcs.Wo_RegisterTyping(data.user_id, data.recipient_id, 0)
         await socketEvents.typingDone(ctx, io, data, ctx.userHashUserId[data.user_id])
+    })
+
+    socket.on('get_reaction', async (data) => {
+        if(!data.id || !data.type || !data.user_id){
+            console.log("id , type , user_id can not be empty")
+            return;
+        }
+        var result = await funcs.Wo_GetPostReactionsTypes(ctx, data.id,data.type,ctx.userHashUserId[data.user_id]);
+        await socket.emit('get_reaction', Object.assign({}, result));
     })
 
     socket.on("color-change", async (data) => {
@@ -984,6 +1179,67 @@ module.exports.registerListeners = async (socket, io, ctx) => {
     socket.on("sync_groups", async (data) => {
         await socketEvents.updateMessageGroupsList(ctx, io, ctx.userHashUserId[data.from_id])
     })
+    socket.on("mute", async (data, callback) => {
+        if(!data.chat_id || !data.type || !data.user_id){
+            console.log("chat_id , type , user_id can not be empty")
+            return;
+        }
+        if(data.type != 'user' && data.type != 'page' && data.type != 'group'){
+            console.log("wrong type")
+            return;
+        }
+        if(!data.notify && data.call_chat && data.archive && data.pin){
+            console.log("empty data")
+            return;
+        }
+        let info = await ctx.wo_mute.findOne({
+            where: {
+                user_id: {
+                    [Op.eq]: ctx.userHashUserId[data.user_id]
+                },
+                type: {
+                    [Op.eq]: data.type
+                },
+                chat_id: {
+                    [Op.eq]: data.chat_id
+                }
+            }
+        })
+        var update_object = {};
+        if(data.notify && (data.notify == 'no' || data.notify == 'yes')){
+            update_object.notify = data.notify;
+        }
+        if(data.call_chat && (data.call_chat == 'no' || data.call_chat == 'yes')){
+            update_object.call_chat = data.call_chat;
+        }
+        if(data.archive && (data.archive == 'no' || data.archive == 'yes')){
+            update_object.archive = data.archive;
+        }
+        if(data.pin && (data.pin == 'no' || data.pin == 'yes')){
+            update_object.pin = data.pin;
+        }
+        update_object.chat_id = data.chat_id;
+
+        if(info && info.id){
+            await ctx.wo_mute.update(update_object,
+            {
+                where: {
+                    id: info.id
+                }
+            })
+
+        }
+        else{
+            update_object.user_id = ctx.userHashUserId[data.user_id];
+            update_object.type = data.type;
+            update_object.time = Math.floor(Date.now() / 1000);
+            await ctx.wo_mute.create(update_object)
+
+        }
+        await socket.emit('mute', update_object);
+        
+
+    })
 
     // Private message chat side
     socket.on("private_message", async (data, callback) => {
@@ -998,6 +1254,12 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         let remainingSameUserSockets = []
         if (ctx.userIdSocket[ctx.userHashUserId[data.from_id]]) {
             remainingSameUserSockets = ctx.userIdSocket[ctx.userHashUserId[data.from_id]].filter(d => d.id != socket.id)
+        }
+        if(data.msg){
+            data.msg = data.msg.replace("\r\n", " <br>");
+            data.msg = data.msg.replace("\n\r", " <br>");
+            data.msg = data.msg.replace("\r", " <br>");
+            data.msg = data.msg.replace("\n", " <br>");
         }
 
         let lastId = await ctx.wo_messages.findOne({
@@ -1092,6 +1354,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
             await socket.emit('private_message', {
                 messages_html: await compiledTemplates.chatListOwnerTrueWithMedia(ctx, data, fromUser, nextId, data.color, data.isSticker),
                 id: data.to_id,
+                username: ((fromUser && fromUser.first_name !== undefined && fromUser.first_name != '' && fromUser.last_name !== undefined && fromUser.last_name != '') ? fromUser.first_name + ' ' + fromUser.last_name : fromUser.username),
+                avatar: ((fromUser && fromUser.avatar !== undefined) ? await funcs.Wo_GetMedia(ctx, fromUser.avatar) : ''),
                 receiver: ctx.userHashUserId[data.from_id],
                 sender: ctx.userHashUserId[data.from_id],
                 status: 200,
@@ -1253,6 +1517,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 await userSocket.emit('private_message', {
                     messages_html: await compiledTemplates.chatListOwnerTrue(ctx, data, fromUser, nextId, hasHTML, sendable_message, data.color),
                     id: data.to_id,
+                    username: ((fromUser && fromUser.first_name !== undefined && fromUser.first_name != '' && fromUser.last_name !== undefined && fromUser.last_name != '') ? fromUser.first_name + ' ' + fromUser.last_name : fromUser.username),
+                    avatar: ((fromUser && fromUser.avatar !== undefined) ? await funcs.Wo_GetMedia(ctx, fromUser.avatar) : ''),
                     status: 200,
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
@@ -1314,6 +1580,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 await userSocket.emit('private_message', {
                     messages_html: await compiledTemplates.chatListOwnerTrueWithMedia(ctx, data, fromUser, nextId, hasHTML, data.color, data.isSticker),
                     id: data.to_id,
+                    username: ((fromUser && fromUser.first_name !== undefined && fromUser.first_name != '' && fromUser.last_name !== undefined && fromUser.last_name != '') ? fromUser.first_name + ' ' + fromUser.last_name : fromUser.username),
+                    avatar: ((fromUser && fromUser.avatar !== undefined) ? await funcs.Wo_GetMedia(ctx, fromUser.avatar) : ''),
                     receiver: ctx.userHashUserId[data.from_id],
                     sender: ctx.userHashUserId[data.from_id],
                     status: 200,
@@ -2019,17 +2287,17 @@ module.exports.registerListeners = async (socket, io, ctx) => {
     socket.on("user_followers_notification", async (data) => {
         let user_id = ctx.userHashUserId[data.user_id]
         let followers = await ctx.wo_followers.findAll({
-            attributes: ["following_id"],
+            attributes: ["follower_id"],
             where: {
-                follower_id: user_id,
-                following_id: {
+                following_id: user_id,
+                follower_id: {
                     [Op.not]: user_id
                 }
             },
             raw: true
         })
         for (let follow of followers) {
-            await io.to(follow.following_id).emit("new_notification", { user_id: user_id })
+            await io.to(follow.follower_id).emit("new_notification", { user_id: user_id })
         }
     })
 

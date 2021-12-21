@@ -10,6 +10,10 @@ if (is_numeric($_GET['id']) && $_GET['id'] > 0) {
 else{
 	$wo['fund'] = GetFundingById($_GET['id'],'hash');
 }
+if (empty($wo['fund'])) {
+	header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
+  exit();
+}
 
 $wo['description'] = $wo['config']['siteDesc'];
 $wo['keywords']    = $wo['config']['siteKeywords'];

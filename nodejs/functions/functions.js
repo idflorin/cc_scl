@@ -1118,6 +1118,43 @@ class FunctionsUtils {
         }
         return result;
     }
+    async Wo_GetPostReactionsTypes(ctx,object_id, col = "post",user_id,type = 'post') {
+        var name = col+'_id';
+        var reactions     = [];
+       var reactions_count = 0;
+       if (type == 'blog') {
+            var result = await ctx.wo_blog_reaction.findAll({
+                where: {
+                    [name]: object_id
+                },
+                raw: true
+            });
+       }
+       else{
+            var result = await ctx.wo_reactions.findAll({
+                where: {
+                    [name]: object_id
+                },
+                raw: true
+            });
+       }
+       result.forEach(element => {
+            reactions[element.reaction] = 1;
+            if (element.user_id == user_id) {
+               reactions['is_reacted'] = true;
+               reactions['type'] = element.reaction;
+            }
+            reactions_count++;
+
+       });
+       if (!reactions['is_reacted']) {
+            reactions['is_reacted'] = false;
+            reactions['type'] = '';
+       }
+       reactions['count'] = reactions_count;
+       return reactions;
+
+    }
     async Wo_GetPostReactions(ctx,object_id, col = "post",type = '') {
        var reactions_html = '';
        var reactions     = [];

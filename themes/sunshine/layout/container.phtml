@@ -694,6 +694,7 @@
             console.log(current_number);
             $('#online_' + data.id).find('.new-message-alert').html(Number(current_number) + 1).removeClass('hidden');
           }
+          new_current_messages = parseInt($("[data_messsages_count]").attr('data_messsages_count'));
           if (!chat_container.find("#sendMessage").is(":focus")) {
             if(data.sender != <?php echo $wo['user']['user_id'];?>){
                 document.getElementById('message-sound').play();

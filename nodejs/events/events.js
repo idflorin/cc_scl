@@ -136,8 +136,25 @@ module.exports.typing = async (ctx, io, senderAvatar, receiverId, senderId) => {
         typing: ctx.globalconfig["theme_url"] + '/img/loading_dots.gif'
     })
 }
+module.exports.recording = async (ctx, io, senderAvatar, receiverId, senderId) => {
+    await io.to(receiverId).emit("recording", {
+        is_recording: 200,
+        recipient_id: receiverId,
+        sender_id: senderId,
+        img: await funcs.Wo_GetMedia(ctx, senderAvatar),
+        recording: ctx.globalconfig["theme_url"] + '/img/loading_dots.gif'
+    })
+}
 
 
+module.exports.recordingDone = async (ctx, io, data, senderId) => {
+    // Anything other than 200 will remove the dots
+    await io.to(data.recipient_id).emit('recording', {
+        recipient_id: data.recipient_id,
+        sender_id: senderId,
+        is_recording: 300
+    })
+}
 module.exports.typingDone = async (ctx, io, data, senderId) => {
     // Anything other than 200 will remove the dots
     await io.to(data.recipient_id).emit('typing', {
@@ -173,6 +190,8 @@ module.exports.privateMessageToPersonOwnerFalse = async (ctx, io, data, fromUser
         messages_html: await compiledTemplates.chatListOwnerFalse(ctx, data, fromUser, nextId, hasHTML, sendable_message),
         id: ctx.userHashUserId[data.from_id],
         receiver: data.to_id,
+        username: ((fromUser && fromUser.first_name !== undefined && fromUser.first_name != '' && fromUser.last_name !== undefined && fromUser.last_name != '') ? fromUser.first_name + ' ' + fromUser.last_name : fromUser.username),
+        avatar: ((fromUser && fromUser.avatar !== undefined) ? await funcs.Wo_GetMedia(ctx, fromUser.avatar) : ''),
         sender: ctx.userHashUserId[data.from_id],
         color: color,
         message: data.msg,
@@ -227,6 +246,11 @@ module.exports.privateMessagePageToPersonOwnerFalseWithMedia = async (ctx, io, d
         lng = data.lng;
         lat = data.lat;
     }
+    var message_img = await ctx.wo_messages.findOne({
+        where: {
+            id: data.mediaId
+        }
+    })
     await io.to(data.to_id).emit('private_message_page', {
         html: await compiledTemplates.messageListOwnerFalseWithMedia(ctx, data, nextId, fromUser, isSticker),
         status: 200,
@@ -235,13 +259,13 @@ module.exports.privateMessagePageToPersonOwnerFalseWithMedia = async (ctx, io, d
         sender: ctx.userHashUserId[data.from_id],
         isMedia: true,
         time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
-        mediaLink: funcs.Wo_GetMedia(ctx, data.mediaId),
+        mediaLink: await funcs.Wo_GetMedia(ctx, message_img.media),
         isMedia: true,
         isRecord: true,
         lng: lng,
         lat: lat,
-        message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
-        time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
+        message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : data.mediaId),
+        time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : message_img.time),
     });
 }
 
@@ -252,20 +276,27 @@ module.exports.privateMessageToPersonOwnerFalseWithMedia = async (ctx, io, data,
         lng = data.lng;
         lat = data.lat;
     }
+    var message_img = await ctx.wo_messages.findOne({
+        where: {
+            id: data.mediaId
+        }
+    })
     await io.to(data.to_id).emit('private_message', {
         messages_html: await compiledTemplates.chatListOwnerFalseWithMedia(ctx, data, fromUser, nextId, hasHTML, isSticker),
         id: ctx.userHashUserId[data.from_id],
         receiver: data.to_id,
         sender: ctx.userHashUserId[data.from_id],
+        username: ((fromUser && fromUser.first_name !== undefined && fromUser.first_name != '' && fromUser.last_name !== undefined && fromUser.last_name != '') ? fromUser.first_name + ' ' + fromUser.last_name : fromUser.username),
+        avatar: ((fromUser && fromUser.avatar !== undefined) ? await funcs.Wo_GetMedia(ctx, fromUser.avatar) : ''),
         isMedia: true,
         time: '<div class="messages-last-sent pull-right time ajax-time" title="' + moment().toISOString() + '">..</div>',
-        mediaLink: funcs.Wo_GetMedia(ctx, data.mediaId),
+        mediaLink: await funcs.Wo_GetMedia(ctx, message_img.media),
         isMedia: true,
         isRecord: true,
         lng: lng,
         lat: lat,
-        message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
-        time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
+        message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : data.mediaId),
+        time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : message_img.time),
     });
 }
 

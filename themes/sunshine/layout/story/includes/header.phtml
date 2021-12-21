@@ -344,7 +344,7 @@ if (!empty($wo['story']['parent_id'])) {
       </div>
       <h6>
          <?php if (strlen($wo['story']['postText']) >= 2): ?>
-         <!-- <span onclick="Wo_Translate($(this).attr('id'),$(this).attr('data-language'))" title="<?php echo $wo['lang']['translate'];?>" class="pointer time" id="<?php echo $wo['story']['id']; ?>" data-language="<?php echo DetermineUserLang(); ?>" data-trans-btn="<?php echo $wo['story']['id']; ?>"><?php echo $wo['lang']['translate'];?></span> --> 
+         <span onclick="Wo_Translate($(this).attr('id'),$(this).attr('data-language'))" title="<?php echo $wo['lang']['translate'];?>" class="pointer time" id="<?php echo $wo['story']['id']; ?>" data-language="<?php echo DetermineUserLang(); ?>" data-trans-btn="<?php echo $wo['story']['id']; ?>"><?php echo $wo['lang']['translate'];?></span>
          <?php endif ?>
          <?php  if ($wo['story']['admin'] === true && $wo['story']['group_recipient_exists'] == false && empty($wo['story']['product_id'])) { ?>
          <?php  if (empty($wo['story']['page_id'])) { ?>
@@ -877,7 +877,7 @@ if (!empty($wo['story']['parent_id'])) {
       </div>
       <h6>
          <?php if (strlen($wo['story']['postText']) >= 2): ?>
-         <!-- <span onclick="Wo_Translate($(this).attr('id'),$(this).attr('data-language'))" title="<?php echo $wo['lang']['translate'];?>" class="pointer time" id="<?php echo $wo['story']['id']; ?>" data-language="<?php echo DetermineUserLang(); ?>" data-trans-btn="<?php echo $wo['story']['id']; ?>"><?php echo $wo['lang']['translate'];?></span> -->
+         <span onclick="Wo_Translate($(this).attr('id'),$(this).attr('data-language'))" title="<?php echo $wo['lang']['translate'];?>" class="pointer time" id="<?php echo $wo['story']['id']; ?>" data-language="<?php echo DetermineUserLang(); ?>" data-trans-btn="<?php echo $wo['story']['id']; ?>"><?php echo $wo['lang']['translate'];?></span>
          <?php endif ?>
          <?php  if ($wo['story']['admin'] === true && $wo['story']['group_recipient_exists'] == false && empty($wo['story']['product_id'])) { ?>
          <?php  if (empty($wo['story']['page_id'])) { ?>

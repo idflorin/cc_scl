@@ -744,6 +744,10 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
                         if (!empty($post)) {
                             $db->where('id',Wo_Secure($value))->update(T_BLOG,array('active' => '1'));
                             $db->where('blog_id',Wo_Secure($value))->update(T_POSTS,array('active' => 1));
+                            $b_post = $db->where('blog_id',Wo_Secure($value))->getOne(T_POSTS);
+                            if (!empty($b_post)) {
+                                Wo_RegisterPoint($b_post->id, "createblog",'+',$b_post->user_id);
+                            }
                             $notification_data_array = array(
                                 'recipient_id' => $post->user,
                                 'type' => 'admin_notification',
@@ -4241,6 +4245,10 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             if (!empty($post)) {
                 $db->where('id',Wo_Secure($_POST['blog_id']))->update(T_BLOG,array('active' => '1'));
                 $db->where('blog_id',Wo_Secure($_POST['blog_id']))->update(T_POSTS,array('active' => 1));
+                $b_post = $db->where('blog_id',Wo_Secure($_POST['blog_id']))->getOne(T_POSTS);
+                if (!empty($b_post)) {
+                    Wo_RegisterPoint($b_post->id, "createblog",'+',$b_post->user_id);
+                }
                 $notification_data_array = array(
                     'recipient_id' => $post->user,
                     'type' => 'admin_notification',

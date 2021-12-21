@@ -473,7 +473,7 @@ $wo['lang'] = array(
     'group_title' => 'Group title',
     'my_groups' => 'My Groups',
     'school' => 'School',
-    'site_keywords_help' => 'Example: social, default, social site',
+    'site_keywords_help' => 'Example: social, wowonder, social site',
     'message_seen' => 'Message Seen',
     'recommended_for_powerful' => 'Recommended for powerful servers',
     'message_typing' => 'Chat typing system',
@@ -1124,7 +1124,8 @@ $wo['countries_name'] = array(
     '239' => 'Yugoslavia',
     '240' => 'Zaire',
     '241' => 'Zambia',
-    '242' => 'Zimbabwe'
+    '242' => 'Zimbabwe',
+    '243' => 'Palestine'
 );
 
 

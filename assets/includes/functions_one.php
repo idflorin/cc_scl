@@ -692,7 +692,9 @@ function Wo_UserData($user_id, $password = true) {
         if ($is_muted > 0) {
             $fetched_data['is_story_muted'] = true;
         }
+        $fetched_data['is_following_me'] = (Wo_IsFollowing( $wo['user']['user_id'], $user_id)) ? 1 : 0;
     }
+
     return $fetched_data;
 }
 
@@ -3675,15 +3677,17 @@ function Wo_GetPageMessages($args = array()) {
             if (!empty($fetched_data['reply_id'])) {
                 $fetched_data['reply'] = GetMessageById($fetched_data['reply_id']);
             }
-            $message_data[]            = $fetched_data;
+            
             if ($fetched_data['from_id'] != $wo['user']['user_id']) {
                 $db->where('from_id',$fetched_data['from_id'])->where('to_id', $fetched_data['to_id'])->update(T_MESSAGES,array('seen' => time()));
             }
+            $fetched_data['reaction'] = Wo_GetPostReactionsTypes($fetched_data['id'],'message');
             $fetched_data['pin'] = 'no';
             $mute = $db->where('user_id',$wo['user']['id'])->where('message_id',$fetched_data['id'])->where('pin','yes')->getOne(T_MUTE);
             if (!empty($mute)) {
                 $fetched_data['pin'] = 'yes';
             }
+            $message_data[]            = $fetched_data;
         }
     }
         
@@ -5390,11 +5394,11 @@ function Wo_RegisterPost($re_data = array('recipient_id' => 0)) {
         }
 
         //Register point level system for createpost
-        if (!empty($re_data['blog_id'])) {
+        if (!empty($re_data['blog_id']) && $re_data['active'] == 1) {
             Wo_RegisterPoint($post_id, "createblog");
         }
         else{
-            if($re_data['multi_image_post'] != 1) {
+            if($re_data['multi_image_post'] != 1 && empty($re_data['blog_id'])) {
                 Wo_RegisterPoint($post_id, "createpost");
             }
         }

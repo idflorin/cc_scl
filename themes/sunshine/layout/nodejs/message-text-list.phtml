@@ -16,7 +16,7 @@
             {{#if chatTxt}}
             <div class="message-text" id="message_text_reply_{{chatMsgId}}" dir="auto" {{#if onwer}} style="background-color: {{backgroundColor}} {{/if}}">{{#if hasHTML}}                    {{{chatTxt}}}
                 {{else}}
-                    {{chatTxt}}
+                    {{{chatTxt}}}
                 {{/if}}{{#if have_reply}}<div class="wo_reply_msg_bg">
             <p class="message-text" dir="auto">{{{reply_text}}}</p>
             {{#if mediaReplyHTML}}

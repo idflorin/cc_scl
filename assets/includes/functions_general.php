@@ -1310,7 +1310,7 @@ function Wo_CheckUserSessionID($user_id = 0, $session_id = '', $platform = 'web'
         return false;
     }
     $platform  = Wo_Secure($platform);
-    $query     = mysqli_query($sqlConnect, "SELECT COUNT(`id`) as `session` FROM " . T_APP_SESSIONS . " WHERE `user_id` = '{$user_id}' AND `session_id` = '{$session_id}' AND `platform` = '{$platform}'");
+    $query     = mysqli_query($sqlConnect, "SELECT COUNT(`id`) as `session` FROM " . T_APP_SESSIONS . " WHERE `user_id` = '{$user_id}' AND `session_id` = '{$session_id}'");
     $query_sql = mysqli_fetch_assoc($query);
     if ($query_sql['session'] > 0) {
         return true;

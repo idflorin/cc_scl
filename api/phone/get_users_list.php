@@ -130,18 +130,21 @@ if ($type == 'get_users_list') {
                     'url' => $user_list['url'],
                     'chat_color' => Wo_GetChatColor($wo['user']['user_id'], $user_list['user_id']),
                     'chat_time'    => $user_list['chat_time'],
+                    'chat_id'    => $user_list['chat_id'],
                     'about' => $user_list['about']
                 );
                 if (!empty($user_list['chat_id'])) {
                     $json_data['mute'] = array('notify' => 'yes',
                                            'call_chat' => 'yes',
                                            'archive' => 'no',
+                                           'fav' => 'no',
                                            'pin' => 'no');
                     $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$user_list['chat_id'])->where('type','user')->getOne(T_MUTE);
                     if (!empty($mute)) {
                         $json_data['mute']['notify'] = $mute->notify;
                         $json_data['mute']['call_chat'] = $mute->call_chat;
                         $json_data['mute']['archive'] = $mute->archive;
+                        $json_data['mute']['fav'] = $mute->fav;
                         $json_data['mute']['pin'] = $mute->pin;
                     }
                 }
@@ -156,6 +159,7 @@ if ($type == 'get_users_list') {
                 ),'user');
 
                 if (!empty($json_data['last_message']['time'])) {
+                    $json_data['last_message']['text'] = openssl_encrypt($json_data['last_message']['text'], "AES-128-ECB", $json_data['last_message']['time']);
                     $time_today  = time() - 86400;
                     if (mb_strlen($json_data['last_message']['text']) > 20) {
                         $json_data['last_message']['text'] = mb_substr($json_data['last_message']['text'], 0, 20, "UTF-8") . '..';

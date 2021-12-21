@@ -323,8 +323,8 @@
                         <br><small class="admin-info">Choose the validation type, by SMS or E-mail, if you choose SMS, <br> make sure you have configured SMS.</small>
                         <div class="form-group">
                             <select class="form-control show-tick" id="sms_or_email" name="sms_or_email">
-                                <option value="phone" <?php echo ($wo['config']['sms_or_email'] == 'mail') ? 'selected': '';?>>E-mail address</option>
-                                <option value="email" <?php echo ($wo['config']['sms_or_email'] == 'sms') ? 'selected': '';?>>SMS / Phone Number</option>
+                                <option value="mail" <?php echo ($wo['config']['sms_or_email'] == 'mail') ? 'selected': '';?>>E-mail address</option>
+                                <option value="sms" <?php echo ($wo['config']['sms_or_email'] == 'sms') ? 'selected': '';?>>SMS / Phone Number</option>
                             </select>
                         </div>
                         <hr>

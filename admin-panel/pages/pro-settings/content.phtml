@@ -52,7 +52,7 @@
                       </div>
                       <div class="form-group float-right switcher">
                           <input type="hidden" name="refund_system" value="off" />
-                          <input type="checkbox" name="refund_system" id="chck-refund_system" value="on" <?php echo ($wo['config']['refund_system'] == '1') ? 'checked': '';?>>
+                          <input type="checkbox" name="refund_system" id="chck-refund_system" value="on" <?php echo ($wo['config']['refund_system'] == 'on') ? 'checked': '';?>>
                           <label for="chck-refund_system" class="check-trail"><span class="check-handler"></span></label>
                       </div>
                       <div class="clearfix"></div>
@@ -250,7 +250,13 @@ $(function() {
     $('.switcher input[type=checkbox]').click(function () {
         setToTrue = 0;
         if ($(this).is(":checked") === true) {
-            setToTrue = 1;
+            if ($(this).attr('name') != 'refund_system') {
+                setToTrue = 1;
+            }
+            else{
+                setToTrue = 'on';
+            }
+            
         }
         var configName = $(this).attr('name');
         var hash_id = $('input[name=hash_id]').val();

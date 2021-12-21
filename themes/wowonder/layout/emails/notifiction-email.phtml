@@ -66,11 +66,11 @@ if ($wo['emailNotification']['type'] == 'sent_message') {
 }
 $text = '';
 if (!empty($wo['emailNotification']['post_data']['text'])) {
-  $text $wo['emailNotification']['post_data'][ 'text'];
+  $text = $wo['emailNotification']['post_data'][ 'text'];
 }
 
 else if(!empty($wo['emailNotification']['msg_text'])){
-  $text "\"" . $wo['emailNotification']['msg_text'] . "\"";
+  $text = "\"" . $wo['emailNotification']['msg_text'] . "\"";
 }
 
 $data = $db->where('name','notification')->getOne(T_HTML_EMAILS);

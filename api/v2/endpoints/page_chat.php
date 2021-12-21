@@ -241,6 +241,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 $timezone = new DateTimeZone($wo['user']['timezone']);
                 $messages = array();
                 foreach ($message_info as $key => $message) {
+                    $message['text'] = openssl_encrypt($message['text'], "AES-128-ECB", $message['time']);
                     $message['time_text'] = Wo_Time_Elapsed_String($message['time']);
                     $message_po           = 'left';
                     if ($message['from_id'] == $wo['user']['user_id']) {
@@ -367,12 +368,14 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                 $page['mute'] = array('notify' => 'yes',
                                        'call_chat' => 'yes',
                                        'archive' => 'no',
+                                       'fav' => 'no',
                                        'pin' => 'no');
                 $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$value['chat_id'])->where('type','page')->getOne(T_MUTE);
                 if (!empty($mute)) {
                     $page['mute']['notify'] = $mute->notify;
                     $page['mute']['call_chat'] = $mute->call_chat;
                     $page['mute']['archive'] = $mute->archive;
+                    $page['mute']['fav'] = $mute->fav;
                     $page['mute']['pin'] = $mute->pin;
                 }
                 if (!empty($page) && !empty($value['message']) && !empty($value['message']['page_id']) && !empty($value['message']['user_id']) && !empty($value['message']['conversation_user_id'])) {
@@ -400,6 +403,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                         foreach ($non_allowed as $key4 => $value4) {
                           unset($page['last_message']['user_data'][$value4]);
                         }
+                        $page['last_message']['text'] = openssl_encrypt($page['last_message']['text'], "AES-128-ECB", $page['last_message']['time']);
 
                         $pages[] = $page;
                     }

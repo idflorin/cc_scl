@@ -4,7 +4,6 @@ if (file_exists('assets/init.php')) {
 } else {
     die('Please put this file in the home directory !');
 }
-
 ini_set('max_execution_time', 0);
 function check_($check) {
     $siteurl           = urlencode(getBaseUrl());
@@ -56,6 +55,257 @@ if (!empty($_POST['query'])) {
 }
 if (!empty($_POST['update_langs'])) {
     $data  = array();
+    $query = mysqli_query($sqlConnect, "SHOW COLUMNS FROM `Wo_Langs`");
+    while ($fetched_data = mysqli_fetch_assoc($query)) {
+        $data[] = $fetched_data['Field'];
+    }
+    unset($data[0]);
+    unset($data[1]);
+    unset($data[2]);
+    function Wo_UpdateLangs($lang, $key, $value) {
+        global $sqlConnect;
+        $update_query         = "UPDATE Wo_Langs SET `{lang}` = '{lang_text}' WHERE `lang_key` = '{lang_key}'";
+        $update_replace_array = array(
+            "{lang}",
+            "{lang_text}",
+            "{lang_key}"
+        );
+        return str_replace($update_replace_array, array(
+            $lang,
+            Wo_Secure($value),
+            $key
+        ), $update_query);
+    }
+    $lang_update_queries = array();
+    foreach ($data as $key => $value) {
+        $value = ($value);
+        if ($value == 'arabic') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'أحس كأنني');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'ضغط');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'الأشعة فوق البنفسجية');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'qr.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'توقعات ساعة');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'توقعات يومية');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'إجمالي المشاركات التي تم إنشاؤها');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'إجمالي المشاركات التي تم إنشاؤها هذا الشهر');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'تفاعل');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'كان رد فعل');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'ردود الفعل من قبل');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'هذا يدل على عدد المرات التي تتفاعل بها مشاركات المستخدمين الآخرين');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'هذا يدل على عدد مرات رد فعل المستخدمين على مشاركاتك');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'هذا يدل على عدد المرات التي أعجبتها المشاركات المستخدمين الآخرين');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'هذا يوضح كم مرة يحب المستخدمون مشاركاتك');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'كم مرة علقت على مشاركات المستخدمين الآخرين');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'كم مرة علق المستخدمين على مشاركاتك');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'إجمالي عدد المشاركات التي شاركتها');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'إجمالي عدد المستخدمين الذين شاركون مشاركاتك');
+        } else if ($value == 'dutch') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Voelt als');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Druk');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'Uv');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'Qr');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Uurlijkse voorspeling');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Dagelijkse voorspelling');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Totale berichten gemaakt');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Totale berichten gemaakt deze maand');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Reactie');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Reageerde');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Reacties door');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'Dit laat zien hoe vaak u reageerde op andere gebruikers');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'Dit laat zien hoe vaak gebruikers reageerden op uw berichten');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'Dit laat zien hoe vaak je andere gebruikersposten leuk vond');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'Dit laat zien hoe vaak gebruikers van je berichten leuk vonden');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'Hoe vaak heb je gereageerd op andere gebruikersposten');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'Hoe vaak hebben gebruikers gereageerd op uw berichten');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Totaal aantal berichten dat u hebt gedeeld');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Totaal aantal gebruikers dat uw berichten deelden');
+        } else if ($value == 'french') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Se sent comme');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Pression');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'Uv');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'Qr');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Prévision horaire');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Prévision quotidienne');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Total des messages créés');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Total des messages créés ce mois-ci');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Réaction');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Réagi');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Réactions par');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'Cela montre combien de fois vous avez réagi aux autres postes d\'utilisateurs');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'Cela montre le nombre de fois que les utilisateurs ont réagi à vos messages');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'Cela montre combien de fois vous avez aimé les autres postes d\'utilisateurs');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'Cela montre le nombre de fois que les utilisateurs ont aimé vos messages');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'Combien de fois avez-vous commenté les postes d\'autres utilisateurs?');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'Combien de fois ont commenté les utilisateurs sur vos messages');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Nombre total de messages que vous avez partagés');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Nombre total d\'utilisateurs ayant partagé vos messages');
+        } else if ($value == 'german') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Fühlt sich an wie');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Druck');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'Uv.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'Qr.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Stündliche Vorhersage');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Tägliche Prognose');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Gesamte Beiträge erstellt.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Gesamtpflege, die diesen Monat erstellt wurden');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Reaktion');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Reagiert');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Reaktionen von');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'Dies zeigt, wie oft Sie auf andere Benutzer-Beiträge reagiert haben');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'Dies zeigt, wie oft Benutzer auf Ihre Beiträge reagiert wurden');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'Dies zeigt, wie oft Ihnen andere Benutzer-Beiträge gefallen hat');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'Dies zeigt, wie oft Benutzer Ihre Beiträge mochten');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'Wie oft haben Sie mit anderen Nutzer Beiträgen kommentiert?');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'Wie oft haben Benutzer Ihre Beiträge kommentiert?');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Gesamtzahl der von Ihnen geteilten Beiträge');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Gesamtzahl der Benutzer, die Ihre Beiträge geteilt haben');
+        } else if ($value == 'italian') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Si sente come');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Pressione');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'UV.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'QR.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Previsione oraria');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Previsioni giornaliere');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Posti totali creati.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Posti totali creati questo mese');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Reazione');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Reagito');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Reazioni di');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'Questo mostra quante volte hai reagito ad altri post degli utenti');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'Questo mostra quante volte gli utenti hanno reagito ai tuoi post');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'Questo mostra quante volte ti sono piaciuti altri post degli utenti');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'Questo mostra quante volte gli utenti sono piaciuti i tuoi post');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'Quante volte hai commentato i post degli altri utenti');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'Quante volte gli utenti hanno commentato i tuoi post');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Numero totale di post che hai condiviso');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Numero totale di utenti che hanno condiviso i tuoi post');
+        } else if ($value == 'portuguese') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Parece');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Pressão');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'UV.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'Qr.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Previsão horária');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Previsão diária');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Postagens totais criadas');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Postagens totais criadas este mês');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Reação');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Reagiu');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Reações de.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'Isso mostra quantas vezes você reagiu a outros posts de usuários');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'Isso mostra quantas vezes os usuários reagiram aos seus posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'Isso mostra quantas vezes você gostou de outros usuários');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'Isso mostra quantas vezes os usuários gostaram de suas postagens');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'Quantas vezes você já comentou sobre outros posts de usuários?');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'Quantas vezes os usuários comentaram em suas postagens');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Número total de postagens que você compartilhou');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Número total de usuários que compartilharam suas postagens');
+        } else if ($value == 'russian') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Как будто');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Давление');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'УФ');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'QR.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Почасовой прогноз');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Суточный прогноз');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Общие посты созданы');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Общие посты созданы в этом месяце');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Реакция');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Отреагировал');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Реакции');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'Это показывает, сколько раз вы отреагировали на другие посты пользователей');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'Это показывает, сколько раз пользователи отреагировали на ваши сообщения');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'Это показывает, сколько раз вам понравились другие сообщения пользователя');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'Это показывает, сколько раз пользователи понравились ваши сообщения');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'Сколько раз вы прокомментировали другие сообщения пользователя');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'Сколько раз пользователи прокомментировали свои сообщения');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Общее количество постов, которые вы поделились');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Общее количество пользователей, которые поделились вашими сообщениями');
+        } else if ($value == 'spanish') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Se siente como');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Presión');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'UV');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'QR');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Pronóstico por hora');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Pronóstico diario');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Publicaciones totales creadas');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Publicaciones totales creadas este mes.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Reacción');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Reaccionado');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Reacciones por');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'Esto muestra cuántas veces reaccionó a otras publicaciones de usuarios');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'Esto muestra cuántas veces los usuarios reaccionaron a sus publicaciones.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'Esto muestra cuántas veces te gustó otros usuarios de usuarios');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'Esto muestra cuántas veces a los usuarios les gustó tus publicaciones.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', '¿Cuántas veces ha comentado en otras publicaciones de usuarios?');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', '¿Cuántas veces ha comentado los usuarios en sus publicaciones?');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Número total de publicaciones que compartiste');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Número total de usuarios que compartieron tus publicaciones.');
+        } else if ($value == 'turkish') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Gibi hissettiriyor');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Basınç');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'Uv');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'Qr');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Saatlik tahmin');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Günlük tahmin');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Oluşturulan toplam mesajlar');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Bu ay oluşturulan toplam mesajlar');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Reaksiyon');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Reaksiyona girmiş');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Tarafından reaksiyonlar');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'Bu, diğer kullanıcıların yayınlarına kaç kez reaksiyona girdiğinizi gösterir.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'Bu, kullanıcıların yayınlarınıza kaç kez tepki verdiğini gösterir.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'Bu, diğer kullanıcıların gönderilerini kaç kez sevdiğini gösterir.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'Bu, kullanıcıların yayınlarınızı kaç kez sevdiğini gösterir.');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'Kaç kez diğer kullanıcılar mesajlarına yorum yaptınız?');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'Kullanıcıların yayınlarınızda kaç kez yorum yaptılar?');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Paylaştığınız toplam yayın sayısı');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Mesajlarınızı paylaşan toplam kullanıcı sayısı');
+        } else if ($value == 'english') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Feels like');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Pressure');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'UV');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'QR');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Hourly forecast');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Daily forecast');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Total Posts created');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Total Posts Created this Month');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Reaction');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Reacted');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Reactions By');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'This shows how many times you reacted to other users posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'This shows how many times users reacted to your posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'This shows how many times you liked other users posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'This shows how many times users liked your posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'How many times have you commented on other users posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'How many times have users commented on your posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Total number of posts that you shared');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Total number of users who shared your posts');
+        } else if ($value != 'english') {
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'feels_like_temp', 'Feels like');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'pressure_temp', 'Pressure');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'uvi_temp', 'UV');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'qr_dash', 'QR');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'hourly_forecast', 'Hourly forecast');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'daily_forecast', 'Daily forecast');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created', 'Total Posts created');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'posts_created_month', 'Total Posts Created this Month');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reaction_dash', 'Reaction');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_dash', 'Reacted');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'reacted_by', 'Reactions By');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_reacted', 'This shows how many times you reacted to other users posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_reacted', 'This shows how many times users reacted to your posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_liked', 'This shows how many times you liked other users posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_liked', 'This shows how many times users liked your posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_commented', 'How many times have you commented on other users posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_commented', 'How many times have users commented on your posts');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'i_shared', 'Total number of posts that you shared');
+            $lang_update_queries[] = Wo_UpdateLangs($value, 'user_shared', 'Total number of users who shared your posts');
+        }
+    }
+    if (!empty($lang_update_queries)) {
+        foreach ($lang_update_queries as $key => $query) {
+            $sql = mysqli_query($sqlConnect, $query);
+        }
+    }
     $name = md5(microtime()) . '_updated.php';
     rename('update.php', $name);
 }
@@ -122,19 +372,23 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
                <div class="wo_install_wiz">
                  <?php if ($updated == false) { ?>
                   <div>
-                     <h2 class="light">Update to v3.2.1</span></h2>
+                     <h2 class="light">Update to v3.2.2</span></h2>
                      <div class="setting-well">
                         <h4>Changelog</h4>
                         <ul class="wo_update_changelog">
-                                <li> [Added] delete account E-mail to Manage Emails in admin panel.</li>
-                                <li> [Re-orginzed] admin panel links, content, texts and created auto save system.</li>
-                                <li> [Fixed] seen issue on nodejs.</li>
-                                <li> [Fixed] FTP support on nodejs.</li>
-                                <li> [Fixed] "View X Posts" on newsfeed (NodeJS).</li>
-                                <li> [Fixed] 2 security issues (important). </li>
-                                <li> [Fixed] double points when posting multi images.</li>
-                                <li> [Fixed] 500 Error when accessing a page without being logged in. </li>
-                                <li> [Fixed] URL fetcher, it wasn't fetching URLs from WoWonder blogs.</li>
+                                <li> [Added] Palestine to country list.</li>
+                                <li> [Removed] dublicated nginx rules in nginx.conf, update required for nginx users. </li>
+                                <li> [Replaced] Yahoo weather with new provider https://openweathermap.org</li>
+                                <li> [Fixed] live video not working on firefox.</li>
+                                <li> [Fixed] blog point issue, user will get points now after approving.</li>
+                                <li> [Fixed] nearby shops counter. </li>
+                                <li> [Fixed] line break issue in nodejs chat system.</li>
+                                <li> [Fixed] refund page wasn't apearing. </li>
+                                <li> [Fixed] add movies page in admin, sometimes it looks broken.</li>
+                                <li> [Fixed] bank details wasn't getting updated in admin panel. </li>
+                                <li> [Fixed] issues in desgin.</li>
+                                <li> [Fixed] video post on MySQL 8 and PHP 8.</li>
+                                <li> [Fixed] more minor bugs.</li>
                                 <li> [Fixed] bugs in API.</li>
                         </ul>
                         <p class="hide_print">Note: The update process might take few minutes.</p>
@@ -176,117 +430,28 @@ input.form-control:focus {background: #fff;box-shadow: 0 0 0 1.5px #a84849;}
 </html>
 <script>  
 var queries = [
-    "UPDATE `Wo_Config` SET `value` = '3.2.1' WHERE `name` = 'version';",
-    "ALTER TABLE `Wo_Reactions` ADD INDEX(`message_id`);",
-    "ALTER TABLE `Wo_Reactions` ADD INDEX(`message_id`);",
-    "ALTER TABLE `Wo_Reactions` ADD INDEX(`replay_id`);",
-    "ALTER TABLE `Wo_Reactions` ADD INDEX(`story_id`);",
-    "ALTER TABLE `Wo_Reactions` ADD INDEX(`comment_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`reply_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`broadcast_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`story_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`product_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`notification_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`page_id`);",
-    "ALTER TABLE `Wo_Polls` ADD INDEX(`time`);",
-    "ALTER TABLE `Wo_Users` ADD INDEX(`relationship_id`);",
-    "ALTER TABLE `Wo_Users` ADD INDEX(`post_privacy`);",
-    "ALTER TABLE `Wo_Users` ADD INDEX(`email_code`);",
-    "ALTER TABLE `bank_receipts` ADD INDEX(`user_id`);",
-    "ALTER TABLE `bank_receipts` ADD INDEX(`fund_id`);",
-    "ALTER TABLE `bank_receipts` ADD INDEX(`created_at`);",
-    "ALTER TABLE `bank_receipts` ADD INDEX(`approved_at`);",
-    "ALTER TABLE `bank_receipts` ADD INDEX(`approved`);",
-    "ALTER TABLE `bank_receipts` ADD INDEX(`mode`);",
-    "ALTER TABLE `broadcast` ADD INDEX(`user_id`);",
-    "ALTER TABLE `broadcast` ADD INDEX(`time`);",
-    "ALTER TABLE `broadcast_users` ADD INDEX(`user_id`);",
-    "ALTER TABLE `broadcast_users` ADD INDEX(`broadcast_id`);",
-    "ALTER TABLE `broadcast_users` ADD INDEX(`time`);",
-    "ALTER TABLE `Wo_Activities` ADD INDEX(`follow_id`);",
-    "ALTER TABLE `Wo_Albums_Media` ADD INDEX(`parent_id`);",
-    "ALTER TABLE `Wo_Apps` ADD INDEX(`app_user_id`);",
-    "ALTER TABLE `Wo_Apps` ADD INDEX(`app_id`);",
-    "ALTER TABLE `Wo_Apps` ADD INDEX(`active`);",
-    "ALTER TABLE `Wo_Apps_Hash` ADD INDEX(`user_id`);",
-    "ALTER TABLE `Wo_Blogs_Categories` ADD INDEX(`lang_key`);",
-    "ALTER TABLE `Wo_Colored_Posts` ADD INDEX(`color_1`);",
-    "ALTER TABLE `Wo_Colored_Posts` ADD INDEX(`color_2`);",
-    "ALTER TABLE `Wo_Comments` ADD INDEX(`time`);",
-    "ALTER TABLE `Wo_Comment_Replies` ADD INDEX(`time`);",
-    "ALTER TABLE `Wo_CustomPages` ADD INDEX(`page_type`);",
-    "ALTER TABLE `Wo_Custom_Fields` ADD INDEX(`name`);",
-    "ALTER TABLE `Wo_Custom_Fields` ADD INDEX(`active`);",
-    "ALTER TABLE `Wo_Einvited` ADD INDEX(`inviter_id`);",
-    "ALTER TABLE `Wo_Emails` ADD INDEX(`email_to`);",
-    "ALTER TABLE `Wo_Family` ADD INDEX(`user_id`);",
-    "ALTER TABLE `Wo_Family` ADD INDEX(`requesting`);",
-    "ALTER TABLE `Wo_Followers` ADD INDEX(`is_typing`);",
-    "ALTER TABLE `Wo_Followers` ADD INDEX(`notify`);",
-    "ALTER TABLE `Wo_Followers` ADD INDEX(`time`);",
-    "ALTER TABLE `Wo_Games` ADD INDEX(`active`);",
-    "ALTER TABLE `Wo_GroupAdmins` ADD INDEX(`members`);",
-    "ALTER TABLE `Wo_Groups` ADD INDEX(`active`);",
-    "ALTER TABLE `Wo_Groups` ADD INDEX(`group_title`);",
-    "ALTER TABLE `Wo_Groups` ADD INDEX(`group_name`);",
-    "ALTER TABLE `Wo_Groups` ADD INDEX(`registered`);",
-    "ALTER TABLE `Wo_Group_Members` ADD INDEX(`active`);",
-    "ALTER TABLE `Wo_Hashtags` ADD INDEX(`hash`);",
-    "ALTER TABLE `Wo_Job` ADD INDEX(`title`);",
-    "ALTER TABLE `Wo_Job` ADD INDEX(`category`);",
-    "ALTER TABLE `Wo_Job` ADD INDEX(`lng`);",
-    "ALTER TABLE `Wo_Job` ADD INDEX(`lat`);",
-    "ALTER TABLE `Wo_Job` ADD INDEX(`status`);",
-    "ALTER TABLE `Wo_Job` ADD INDEX(`job_type`);",
-    "ALTER TABLE `Wo_Job` ADD INDEX(`minimum`);",
-    "ALTER TABLE `Wo_Job` ADD INDEX(`maximum`);",
-    "ALTER TABLE `Wo_Job_Apply` ADD INDEX(`user_name`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`page_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`notification_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`product_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`story_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`reply_id`);",
-    "ALTER TABLE `Wo_Messages` ADD INDEX(`broadcast_id`);",
-    "ALTER TABLE `Wo_Mute` ADD INDEX(`user_id`);",
-    "ALTER TABLE `Wo_Mute` ADD INDEX(`chat_id`);",
-    "ALTER TABLE `Wo_Mute` ADD INDEX(`message_id`);",
-    "ALTER TABLE `Wo_Mute` ADD INDEX(`notify`);",
-    "ALTER TABLE `Wo_Mute` ADD INDEX(`type`);",
-    "ALTER TABLE `Wo_Mute_Story` ADD INDEX(`user_id`);",
-    "ALTER TABLE `Wo_Mute_Story` ADD INDEX(`story_user_id`);",
-    "ALTER TABLE `Wo_Notifications` ADD INDEX(`group_chat_id`);",
-    "ALTER TABLE `Wo_Notifications` ADD INDEX(`event_id`);",
-    "ALTER TABLE `Wo_Notifications` ADD INDEX(`thread_id`);",
-    "ALTER TABLE `Wo_Pages` ADD INDEX(`page_name`);",
-    "ALTER TABLE `Wo_Pages` ADD INDEX(`page_title`);",
-    "ALTER TABLE `Wo_Pages` ADD INDEX(`sub_category`);",
-    "ALTER TABLE `Wo_Payments` ADD INDEX(`date`);",
-    "ALTER TABLE `Wo_Payment_Transactions` ADD INDEX(`userid`);",
-    "ALTER TABLE `Wo_Payment_Transactions` ADD INDEX(`kind`);",
-    "ALTER TABLE `Wo_Payment_Transactions` ADD INDEX(`transaction_dt`);",
-    "ALTER TABLE `Wo_Posts` ADD INDEX(`forum_id`);",
-    "ALTER TABLE `Wo_Posts` ADD INDEX(`processing`);",
-    "ALTER TABLE `Wo_Products` ADD INDEX(`page_id`);",
-    "ALTER TABLE `Wo_Products` ADD INDEX(`active`);",
-    "ALTER TABLE `Wo_Products_Media` ADD INDEX(`product_id`);",
-    "ALTER TABLE `Wo_Reactions` ADD INDEX(`comment_id`);",
-    "ALTER TABLE `Wo_Reactions` ADD INDEX(`replay_id`);",
-    "ALTER TABLE `Wo_Reactions` ADD INDEX(`message_id`);",
-    "ALTER TABLE `Wo_Reactions` ADD INDEX(`story_id`);",
-    "ALTER TABLE `Wo_Relationship` ADD INDEX(`to_id`);",
-    "ALTER TABLE `Wo_Reports` ADD INDEX(`comment_id`);",
-    "ALTER TABLE `Wo_Tokens` ADD INDEX(`token`);",
-    "ALTER TABLE `Wo_UserAds` ADD INDEX(`page_id`);",
-    "ALTER TABLE `Wo_UserAds_Data` ADD INDEX(`ad_id`);",
-    "ALTER TABLE `Wo_Users` ADD INDEX(`password`);",
-    "ALTER TABLE `Wo_Users` ADD INDEX(`status`);",
-    "ALTER TABLE `Wo_Users` ADD INDEX(`type`);",
-    "ALTER TABLE `Wo_Users` ADD INDEX(`is_pro`);",
-    "ALTER TABLE `Wo_Users` ADD INDEX(`ref_user_id`);",
-    "ALTER TABLE `Wo_UsersChat` ADD INDEX(`page_id`);",
-    "ALTER TABLE `Wo_UsersChat` ADD INDEX(`color`);",
-    "ALTER TABLE `Wo_Wonders` ADD INDEX(`type`);",
-    "INSERT INTO `Wo_HTML_Emails` (`id`, `name`, `value`) VALUES (NULL, 'account_deleted', 'Hi {{name}},<br><br> We are here to inform you that your account on {{SITE_NAME}} was deleted and all your data were erased.<br><br>Best regards,<br> {{SITE_NAME}} team.');",
+    "UPDATE `Wo_Config` SET `value` = '3.2.2' WHERE `name` = 'version';",
+    "ALTER TABLE `Wo_Mute` ADD `fav` VARCHAR(11) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'no' AFTER `pin`, ADD INDEX (`fav`);",
+    "ALTER TABLE `Wo_Messages` ADD `forward` INT(2) NOT NULL DEFAULT '0' AFTER `broadcast_id`, ADD INDEX (`forward`);",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'feels_like_temp');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'pressure_temp');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'uvi_temp');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'qr_dash');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'hourly_forecast');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'daily_forecast');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'posts_created');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'posts_created_month');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'reaction_dash');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'reacted_dash');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'reacted_by');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'i_reacted');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'user_reacted');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'i_liked');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'user_liked');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'i_commented');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'user_commented');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'i_shared');",
+    "INSERT INTO `Wo_Langs` (`id`, `lang_key`) VALUES (NULL, 'user_shared');",
 ];
 
 $('#input_code').bind("paste keyup input propertychange", function(e) {

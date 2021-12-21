@@ -1842,7 +1842,7 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
       recipient_id: recipient_id,
       story_id: story_id
     }, function (data) {
-      document.location = data.url;
+      //document.location = data.url;
     });
     return false;
   }

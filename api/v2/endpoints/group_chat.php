@@ -540,6 +540,7 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             $timezone = new DateTimeZone($wo['user']['timezone']);
             $group_messages = array();
             foreach ($messages as $message) {
+                $message['text'] = openssl_encrypt($message['text'], "AES-128-ECB", $message['time']);
                 if ($not_include_status == true) {
                     foreach ($not_include_array as $value) {
                         if (!empty($value)) {
@@ -669,16 +670,19 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                       unset($groups[$key]['last_message']['user_data'][$value5]);
                     }
                 }
+                $groups[$key]['last_message']['text'] = openssl_encrypt($groups[$key]['last_message']['text'], "AES-128-ECB", $groups[$key]['last_message']['time']);
             }
             $groups[$key]['mute'] = array('notify' => 'yes',
                                'call_chat' => 'yes',
                                'archive' => 'no',
+                               'fav' => 'no',
                                'pin' => 'no');
             $mute = $db->where('user_id',$wo['user']['id'])->where('chat_id',$groups[$key]['chat_id'])->where('type','group')->getOne(T_MUTE);
             if (!empty($mute)) {
                 $groups[$key]['mute']['notify'] = $mute->notify;
                 $groups[$key]['mute']['call_chat'] = $mute->call_chat;
                 $groups[$key]['mute']['archive'] = $mute->archive;
+                $groups[$key]['mute']['fav'] = $mute->fav;
                 $groups[$key]['mute']['pin'] = $mute->pin;
             }
         }

@@ -769,7 +769,7 @@ function Wo_GetHashtagPosts($s_query, $after_post_id = 0, $limit = 5, $before_po
             $before_post_id = Wo_Secure($before_post_id);
             $query_one .= " AND id > {$before_post_id}";
         }
-        $query_one .= " ORDER BY `id` DESC LIMIT {$limit}";
+        $query_one .= " AND `multi_image_post` = 0  ORDER BY `id` DESC LIMIT {$limit}";
         $sql_query_one = mysqli_query($sqlConnect, $query_one);
         if (mysqli_num_rows($sql_query_one)) {
             while ($sql_fetch_one = mysqli_fetch_assoc($sql_query_one)) {
@@ -5722,7 +5722,7 @@ function Wo_PayPal($type = 'week', $type2 = '') {
         $plan->setState('ACTIVE');
         $agreement = new Agreement();
         $agreement->setName('Purchase Pro package user'.$wo['user']['id'])
-          ->setDescription('Upgrade to Pro Member - '.$p_currency.''.$total.'/mo user'.$wo['user']['id'])
+          ->setDescription('Upgrade to Pro Member - '.$p_currency.''.$total.'/'.$p_type.' user'.$wo['user']['id'])
           ->setStartDate(gmdate("Y-m-d\TH:i:s\Z", time()+2629743));
 
 
@@ -7567,6 +7567,7 @@ function IsSaveUrl($url)
     curl_setopt ($ch, CURLOPT_URL, $url);
     //curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, 20);
     curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 
     // Only calling the head
     curl_setopt($ch, CURLOPT_HEADER, true); // header will be at output

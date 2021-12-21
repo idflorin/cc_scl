@@ -155,8 +155,8 @@
 
                         <label for="can_blogs">Who Can Post Blogs?</label>
                         <select class="form-control show-tick" id="can_blogs" name="can_blogs">
-                          <option value="0" <?php echo ($wo['config']['can_blogs'] == 'us-east-1')   ? ' selected' : '';?> >Admins Only</option>
-                          <option value="1" <?php echo ($wo['config']['can_blogs'] == 'us-east-2')   ? ' selected' : '';?> >Users Only</option>
+                            <option value="0" <?php echo ($wo['config']['can_blogs'] == '0')   ? ' selected' : '';?> >Admins Only</option>
+                            <option value="1" <?php echo ($wo['config']['can_blogs'] == '1')   ? ' selected' : '';?> >Users Only</option>
                         </select>
                         <small class="admin-info">Who can create and post blog articles?</small>
                         <div class="clearfix"></div>
@@ -175,8 +175,8 @@
 
                         <label for="events_visibility">Events Visibility</label>
                         <select class="form-control show-tick" id="events_visibility" name="events_visibility">
-                          <option value="0" <?php echo ($wo['config']['events_visibility'] == '1')   ? ' selected' : '';?> >Registered Users Only</option>
-                          <option value="1" <?php echo ($wo['config']['events_visibility'] == '0')   ? ' selected' : '';?> >All Users</option>
+                          <option value="0" <?php echo ($wo['config']['events_visibility'] == '0')   ? ' selected' : '';?> >Registered Users Only</option>
+                          <option value="1" <?php echo ($wo['config']['events_visibility'] == '1')   ? ' selected' : '';?> >All Users</option>
                         </select>
                         <small class="admin-info">Who can view and access events?</small>
                         <div class="clearfix"></div>
@@ -295,6 +295,26 @@
                             <label for="chck-common_things" class="check-trail"><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
+                        <hr>
+                        <div class="float-left">
+                            <label for="weather_widget" class="main-label">Weather Widget</label>
+                            <br><small class="admin-info"><a href="https://openweathermap.org/">Please register to this site and use the key</a></small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="weather_widget" value="0" />
+                            <input type="checkbox" name="weather_widget" id="chck-weather_widget" value="1" <?php echo ($wo['config']['weather_widget'] == 1) ? 'checked': '';?>>
+                            <label for="chck-weather_widget" class="check-trail"><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Weather APP ID</label>
+                                <input type="text" name="weather_key" class="form-control" value="<?php echo $wo['config']['weather_key']?>">
+                                <small class="admin-info">Use the APP ID from openweathermap.org</small>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+
                         <!-- <label for="weather_widget">Weather Widget</label>
                         <div class="form-group">
                             <div class="form-check form-check-inline">
@@ -305,13 +325,14 @@
                                 <input class="form-check-input" type="radio" name="weather_widget" id="weather_widget-disabled" value="0" <?php echo ($wo['config']['weather_widget'] == 0) ? 'checked': '';?>>
                                 <label  class="form-check-label" for="weather_widget-disabled" class="m-l-20">Disabled</label>
                             </div>
-                        </div>
-                        <div class="form-group form-float">
+                        </div> -->
+                        <!-- <div class="form-group form-float">
                             <div class="form-line">
-                                <label class="form-label">Yahoo Weather App Id</label>
+                                <label class="form-label">Openweathermap Weather App Id</label>
                                 <input type="text" id="weather_key" name="weather_key" class="form-control" value="<?php echo $wo['config']['weather_key']?>">
                             </div>
-                        </div>
+                        </div> -->
+                        <!-- 
                         <div class="form-group form-float">
                             <div class="form-line">
                                 <label class="form-label">Yahoo Weather Consumer Key</label>

@@ -237,7 +237,8 @@ $wo['countries_name'] = array(
     '239' => 'Jugoslavia',
     '240' => 'lo Zaire',
     '241' => 'lo Zambia',
-    '242' => 'Zimbabwe'
+    '242' => 'Zimbabwe',
+    '243' => 'Palestine'
 );
 
 
