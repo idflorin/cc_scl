@@ -179,12 +179,12 @@ $pages = $db->where('time',$this_start,'>=')->where('time',$this_end,'<=')->get(
 $groups = $db->where('time',$this_start,'>=')->where('time',$this_end,'<=')->get(T_GROUPS);
 
 foreach ($users as $key => $value) {
-    $day = date($code,$value->time);
+    $day = date($code,$value->joined);
     if ($main_range == 'Custom' && !empty($first_code) && !empty($second_code)) {
-        $day = "'".(int)date($first_code,$value->time).'-'.(int)date($second_code,$value->time)."'";
+        $day = "'".(int)date($first_code,$value->joined).'-'.(int)date($second_code,$value->joined)."'";
     }
     elseif ($main_range == 'Custom') {
-        $day = "'".(int)date($code,$value->time)."'";
+        $day = "'".(int)date($code,$value->joined)."'";
     }
     if (in_array($day, array_keys($users_array))) {
         $users_array[$day] += 1; 
@@ -236,7 +236,7 @@ $g_array = implode(', ', $groups_array);
 ?>
 <div class="container-fluid">
     <div>
-        <h3>DASHBOARD</h3>
+        <h3>Welcome back, <?php echo $wo['user']['name'];?></h3>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">

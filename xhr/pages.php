@@ -41,7 +41,8 @@ if ($f == 'pages') {
                 'page_description' => Wo_Secure($_POST['page_description']),
                 'page_category' => Wo_Secure($_POST['page_category']),
                 'sub_category' => $sub_category,
-                'active' => '1'
+                'active' => '1',
+                'time' => time()
             );
             $fields = Wo_GetCustomFields('page'); 
             if (!empty($fields)) {

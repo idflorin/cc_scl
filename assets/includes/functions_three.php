@@ -199,7 +199,16 @@ function Wo_GetProduct($id = 0) {
     $fetched_data['post_id']          = Wo_GetPostIDFromProdcutID($fetched_data['id']);
     $fetched_data['edit_description'] = Wo_EditMarkup(br2nl($fetched_data['description'], true, false, false));
     $fetched_data['description']      = Wo_Markup($fetched_data['description'], true, false, false);
-    $fetched_data['url']              = Wo_SeoLink('index.php?link1=post&id=' . $fetched_data['post_id']);
+    if ($wo['config']['useSeoFrindly'] == 1) {
+        $fetched_data['url']           = Wo_SeoLink('index.php?link1=post&id=' . $fetched_data['post_id']) . '_' . Wo_SlugPost($fetched_data['name']);
+        $fetched_data['seo_id'] = $fetched_data['post_id'] . '_' . Wo_SlugPost($fetched_data['name']);
+    }
+    else{
+        $fetched_data['url']           = Wo_SeoLink('index.php?link1=post&id=' . $fetched_data['post_id']);
+        $fetched_data['seo_id'] = $fetched_data['post_id'];
+    }
+
+    //$fetched_data['url']              = Wo_SeoLink('index.php?link1=post&id=' . $fetched_data['post_id']);
     $fetched_data['product_sub_category'] = '';
     if (!empty($fetched_data['sub_category']) && !empty($wo['products_sub_categories'][$fetched_data['category']])) {
         foreach ($wo['products_sub_categories'][$fetched_data['category']] as $key => $value) {

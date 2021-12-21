@@ -1098,9 +1098,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 }
                 let sendable_message = await funcs.Wo_Markup(ctx, message.text);
                 if (message.from_id === ctx.userHashUserId[data.from_id]) {
-                    html += await compiledTemplates.chatListOwnerTrue(ctx, data, fromUser, message.id, hasHTML, sendable_message, data.color)
+                    html += await compiledTemplates.chatListOwnerTrue(ctx, data, fromUser, message.id, true, sendable_message, data.color)
                 } else {
-                    html += await compiledTemplates.chatListOwnerFalse(ctx, data, fromUser, message.id, hasHTML, sendable_message)
+                    html += await compiledTemplates.chatListOwnerFalse(ctx, data, fromUser, message.id, true, sendable_message)
                 }
             }
         }
@@ -1236,10 +1236,10 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 }
                 let sendable_message = await funcs.Wo_Markup(ctx, message.text);
                 if (message.from_id === ctx.userHashUserId[data.from_id]) {
-                    html += await compiledTemplates.messageListOwnerTrue(ctx, data, fromUser, message, hasHTML, sendable_message, data.color)
+                    html += await compiledTemplates.messageListOwnerTrue(ctx, data, fromUser, message, true, sendable_message, data.color)
                 }
                 else {
-                    html += await compiledTemplates.messageListOwnerFalse(ctx, data, message, fromUser, hasHTML, sendable_message)
+                    html += await compiledTemplates.messageListOwnerFalse(ctx, data, message, fromUser, true, sendable_message)
                 }
             }
         }
@@ -1349,9 +1349,9 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 }
                 let sendable_message = await funcs.Wo_Markup(ctx, message.text);
                 if (message.from_id === ctx.userHashUserId[data.from_id]) {
-                    html += await compiledTemplates.groupListOwnerTrue(ctx, fromUser, message.id, data, hasHTML, sendable_message)
+                    html += await compiledTemplates.groupListOwnerTrue(ctx, fromUser, message.id, data, true, sendable_message)
                 } else {
-                    html += await compiledTemplates.groupListOwnerFalse(ctx, fromUser, message.id, data, hasHTML, sendable_message)
+                    html += await compiledTemplates.groupListOwnerFalse(ctx, fromUser, message.id, data, true, sendable_message)
                 }
             }
         }
@@ -1460,10 +1460,10 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 }
                 let sendable_message = await funcs.Wo_Markup(ctx, message.text);
                 if (message.from_id === ctx.userHashUserId[data.from_id]) {
-                    html += await compiledTemplates.messageListOwnerTrue(ctx, data, fromUser, message, hasHTML, sendable_message, data.color)
+                    html += await compiledTemplates.messageListOwnerTrue(ctx, data, fromUser, message, true, sendable_message, data.color)
                 }
                 else {
-                    html += await compiledTemplates.messageListOwnerFalse(ctx, data, message, fromUser, hasHTML, sendable_message)
+                    html += await compiledTemplates.messageListOwnerFalse(ctx, data, message, fromUser, true, sendable_message)
                 }
             }
         }

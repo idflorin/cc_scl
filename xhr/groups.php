@@ -44,7 +44,8 @@ if ($f == 'groups') {
                 'category' => Wo_Secure($_POST['category']),
                 'sub_category' => $sub_category,
                 'privacy' => Wo_Secure($privacy),
-                'active' => '1'
+                'active' => '1',
+                'time' => time()
             );
             if ($privacy == 2) {
                 $re_group_data['join_privacy'] = 2;

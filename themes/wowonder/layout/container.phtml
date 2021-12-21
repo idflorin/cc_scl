@@ -536,30 +536,37 @@
               }
           }
         })
+        var new_current_messages = 0;
         socket.on("private_message", (data)=>{
           var chat_container = $('.chat-tab').find('.chat_main_' + data.id);
-         
-          chat_container.find('.chat-messages-wrapper').find("div[class*='message-seen']").empty();
-          chat_container.find('.chat-messages-wrapper').find("div[class*='message-typing']").empty();
-          chat_container.find('.chat-messages-wrapper').append(data.messages_html);
-          setTimeout(function(){
-               chat_container.find('.chat-messages-wrapper').scrollTop(chat_container.find('.chat-messages-wrapper')[0].scrollHeight);
-            }, 100);
-          if (data.sender == <?php echo $wo['user']['user_id'];?>) {
-            $(".chat_" + data.id).find('.outgoing .message-text, .outgoing .message-media').css('background', data.color);
-            $(".chat_" + data.id).find('.outgoing .message-text').css('color', '#fff');
-            $(".chat_" + data.id).find('.select-color path').css('fill', data.color);
-            $(".chat_" + data.id).find('#color').val(data.color);
-            $(".text-sender-container .red-list").css('background', data.color);
-            $(".text-sender-container .btn-file").css('background', data.color);
-            $(".text-sender-container .btn-file").css('border-color', data.color);
+          if (chat_container.length > 0) {
+             chat_container.find('.chat-messages-wrapper').find("div[class*='message-seen']").empty();
+             chat_container.find('.chat-messages-wrapper').find("div[class*='message-typing']").empty();
+             chat_container.find('.chat-messages-wrapper').append(data.messages_html);
+             setTimeout(function(){
+                  chat_container.find('.chat-messages-wrapper').scrollTop(chat_container.find('.chat-messages-wrapper')[0].scrollHeight);
+               }, 100);
+             if (data.sender == <?php echo $wo['user']['user_id'];?>) {
+               $(".chat_" + data.id).find('.outgoing .message-text, .outgoing .message-media').css('background', data.color);
+               $(".chat_" + data.id).find('.outgoing .message-text').css('color', '#fff');
+               $(".chat_" + data.id).find('.select-color path').css('fill', data.color);
+               $(".chat_" + data.id).find('#color').val(data.color);
+               $(".text-sender-container .red-list").css('background', data.color);
+               $(".text-sender-container .btn-file").css('background', data.color);
+               $(".text-sender-container .btn-file").css('border-color', data.color);
+             }
           }
           if(data.sender != <?php echo $wo['user']['user_id'];?>){
-            document.getElementById('message-sound').play();
+             document.getElementById('message-sound').play();
           }
-          if (!$('#sendMessage').is(':focus')) {
-              document.title = 'New Message | ' + document_title;
+          if (!$('#sendMessage').is(':focus') && chat_container.length == 0) {
+             new_current_messages = new_current_messages + 1;
+             current_messages_number = Number($("[data_messsages_count]").attr('data_messsages_count')) + 1;
+             $("[data_messsages_count]").text(current_messages_number);
+             $("[data_messsages_count]").attr('data_messsages_count', current_messages_number);
+             document.title = 'New Message | ' + document_title;
           }
+          
         })
 
         socket.on("group_message", (data)=>{

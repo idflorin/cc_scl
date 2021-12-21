@@ -2399,7 +2399,7 @@ table.wow_pymnt_table .label-danger {color: #F44336;background-color: rgba(244, 
 .messages-wrapper .user-avatar{width:40px;border-radius:3px}
 .message{margin-top:1px}
 .message p{color:#555;margin:0;word-wrap:break-word;word-break:break-word}
-#wo_msg_right_prt .message p {margin:0 0 15px;}
+#wo_msg_right_prt .message p {margin: 0 0 12px;}
 .message p:empty, #wo_msg_right_prt .message p:empty {padding:0;margin: 0;}
 .wo_about_wrapper_parent{position:absolute;box-shadow:0 1px 1px rgba(0,0,0,.1);top:45px;width:100%;left:0;min-height:370px}
 .wo_about_page_margin .list-group {box-shadow:0 1px 3px 0 rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 2px 1px -1px rgba(0,0,0,.12)}
@@ -3146,7 +3146,7 @@ svg {vertical-align: middle;}
 .chat-messages-wrapper .deleteMessage svg.feather{margin-top:-3px;width:15px;height:15px}
 .text-sender-container .time{margin-top: 4px;font-size: 13px;font-weight: 500;}
 .text-sender-container .message-model{width: 85%;max-width: 500px;font-size: 15px;padding: 0;position: relative;line-height: 1.4;}
-.text-sender-container .message-model .message{padding: 10px;margin-left: auto;display: table;line-height: 1.4;margin-top: 0;position: relative;background: #f5f5f5;border-radius: 10px;}
+.text-sender-container .message-model .message{padding: 7px;margin-left: auto;display: table;line-height: 1.2;margin-top: 0;position: relative;background: #f5f5f5;border-radius: 10px;}
 .text-sender-container .message-model .video-js-responsive-container{min-width:300px}
 .text-sender-container .message-model .message p .twa-lg{height:26px;width:26px;background-size:26px 26px}
 .text-sender-container .outgoing .message-model {border-bottom-right-radius:2px;margin-left: auto;}
@@ -4137,7 +4137,7 @@ to{opacity:1;margin-top:0}
 
 @media (max-width:520px) {
 .navbar-default li.dropdown.notification-container{margin-right:3px}
-.messages-container {padding: 65px 10px 0;}
+.messages-container {padding: 30px 10px 0;}
 .text-sender-container .msg_usr_info_top_list {padding: 8px 20px;height: 60px;}
 .wo_jlist_headimg, .wo_view_post_jcover {height: 200px;}
 }

@@ -563,6 +563,16 @@ if ($f == 'messages') {
                     $data['messages_count'] = Wo_CountMessages(array('new' => false,'user_id' => $user_id));
                     $data['posts_count'] = $recipient['details']['post_count'];
                 }
+                $data['is_typing'] = 0;
+                if (!empty($user_id) && $wo['config']['message_typing'] == 1) {
+                    $isTyping = Wo_IsTyping($user_id);
+                    if ($isTyping === true) {
+                        $img               = Wo_UserData($user_id);
+                        $data['is_typing'] = 200;
+                        $data['img']       = $img['avatar'];
+                        $data['typing']    = $wo['config']['theme_url'] . '/img/loading_dots.gif';
+                    }
+                }
             }
         } else if (isset($_GET['group_id']) && is_numeric($_GET['group_id']) && $_GET['group_id'] > 0 && Wo_CheckMainSession($hash_id) === true) {
             $group_id = Wo_Secure($_GET['group_id']);

@@ -44,7 +44,7 @@ if ($followers_alert == 0) {
 		</ul>
 	</li>
 	<li class="dropdown messages-notification-container" onclick="Wo_OpenMessagesMenu();">
-		<span class="new-update-alert<?php echo $messages_hidden_class;?>">
+		<span class="new-update-alert<?php echo $messages_hidden_class;?>" data_messsages_count="<?php echo $messages_alert?>">
 			<?php echo $messages_alert?>
 		</span>
 		<a href="#" class="dropdown-toggle <?php echo $unread_update_messages;?> sixteen-font-size" data-toggle="dropdown" role="button" aria-expanded="false">

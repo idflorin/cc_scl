@@ -800,6 +800,9 @@ function Wo_DeleteConversation(user_id) {
 }
 
 function Wo_GetUserMessages(user_id, user_name, userlink) {
+	if ($('#user-id').val() > 0) {
+		Wo_DeleteTyping($('#user-id').val());
+	}
   view_more_wrapper = $('.view-more-wrapper');
 
   <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
@@ -900,6 +903,9 @@ function Wo_GetUserMessages(user_id, user_name, userlink) {
 }
 
 function Wo_GetGroupMessages(group_id, group_name) {
+	if ($('#user-id').val() > 0) {
+		Wo_DeleteTyping($('#user-id').val());
+	}
   view_more_wrapper = $('.view-more-wrapper');
 
   <?php if ($wo['config']['node_socket_flow'] == "1") { ?>
@@ -992,6 +998,9 @@ function Wo_DeleteGroupChat(id = false){
     })
   }
 function Wo_GetPageMessages(page_id, page_user_id,page_name,user_id) {
+	if ($('#user-id').val() > 0) {
+		Wo_DeleteTyping($('#user-id').val());
+	}
   view_more_wrapper = $('.view-more-wrapper');
   
   $('.text-sender-container').find('.ball-pulse').fadeIn(100);
@@ -1152,7 +1161,19 @@ function Wo_getNewMessages() {
       from_id: from_id,	
       to_id: to_id,	
       message_id: message_id	
-    }, function (data) {	
+    }, function (data) {
+    if ( data.is_typing == 200) {
+      $('.message-contnaier:last').find('.message-typing').html('<div class="incoming pull-left" id="typing"><div class="message-typing message-details"><div class="message-user-image pull-left"><img src="' + data.img + '" alt="Profile Picture"></div><svg width="30" height="40" viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" fill="currentColor"> <circle cx="15" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="60" cy="15" r="9" fill-opacity="0.3"> <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s" values=".5;1;.5" calcMode="linear" repeatCount="indefinite"></animate> </circle> <circle cx="105" cy="15" r="15"> <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15" calcMode="linear" repeatCount="indefinite"></animate> <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1" calcMode="linear" repeatCount="indefinite"></animate> </circle> </svg></div></div>').fadeIn(300);
+      setTimeout(function(){
+              	$(".messages-container").animate({
+                scrollTop: $('.messages-container')[0].scrollHeight
+              }, 200);
+              }, 100);
+    } else {
+       for (let a of $('.message-contnaier')) {
+         $(a).find('.message-typing').empty()
+       }
+    }	
       if (data.color) {	
           $(".text-sender-container .red-list").css('background', data.color);	
       }	
@@ -1203,15 +1224,54 @@ function Wo_getMessageSeen() {
     }
   });
 }
+function Wo_RegisterTyping(recipient_id) {
+  <?php if ($wo['config']['node_socket_flow'] == "0") { ?>
+    $.get(Wo_Ajax_Requests_File(), {
+        f: 'chat',
+        s: 'recipient_is_typing',
+        recipient_id: recipient_id
+    });
+  <?php } ?>
 
+}
+function Wo_DeleteTyping(recipient_id) {
+  <?php if ($wo['config']['node_socket_flow'] == "0") { ?>
+    $.get(Wo_Ajax_Requests_File(), {
+        f: 'chat',
+        s: 'remove_typing',
+        recipient_id: recipient_id
+    });
+  <?php } ?>
+}
 function Wo_SubmitForm(e) {
-
   document.title = document_title;
+  id = $('#user-id').val();
+  <?php if ($wo['config']['node_socket_flow'] == "0") { ?>
+  <?php if ($wo['config']['message_typing'] == 1) { ?>
+	if ($('#sendMessage').val().length > 1) {
+	    if (typeof ($('#sendMessage').attr('data-typing')) == "undefined" || $('#sendMessage').attr('data-typing') == 'false') {
+	        $('#sendMessage').attr('data-typing', 'true');
+	        Wo_RegisterTyping(id);
+	    } 
+	}
+	else if ($('#sendMessage').val().length == 1 || $('#sendMessage').val().length == 0) {
+	    if (typeof ($('#sendMessage').attr('data-typing')) != "undefined") {
+	       if ($('#sendMessage').attr('data-typing') == 'true') {
+	           $('#sendMessage').attr('data-typing', 'false');
+	           //typing_chat_con.removeAttr('data-typing');
+	           Wo_DeleteTyping(id);
+	        }
+	       }
+	    }
+	<?php } ?>
+	<?php } ?>
   <?php if ($wo['config']['maxCharacters'] != 10000) { ?>
   $('.charsLeft-message').fadeIn(200);
   var chat_number = $('#user-id').val();
   if(e.keyCode && ![17, 18, 9, 13].includes(e.keyCode)){
+  	<?php if ($wo['config']['node_socket_flow'] != "0"){ ?>
     socket.emit("typing", { recipient_id: chat_number, user_id: _getCookie("user_id") })
+<?php } ?>
   }
   <?php } ?>
   if(e.keyCode == 13 && e.shiftKey == 0) {

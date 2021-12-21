@@ -378,10 +378,11 @@ function Wo_intervalUpdates() {
       messages_notification_container.find('.new-update-alert').removeClass('hidden');
       messages_notification_container.find('.sixteen-font-size').addClass('unread-update');
       messages_notification_container.find('.new-update-alert').text(data.messages).show();
-      if(data.messages != current_messages_number) {
-        if (data.notifications_sound == 0) {
+      if(data.messages != $("[data_messsages_count]").attr('data_messsages_count')) {
+        if (data.notifications_sound == 0 && $("[data_messsages_count]").attr('data_messsages_count') < data.messages) {
           document.getElementById('message-sound').play();
         }
+        $("[data_messsages_count]").attr('data_messsages_count', data.messages);
         current_messages_number = data.messages;
       }
     } else {
@@ -1823,6 +1824,7 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
           recipient_id: recipient_id,
           product_id: product_id
         }, function (data) {
+          Wo_intervalUpdates();
           if (data.messages.length > 0) {
              $('.chat-tab').find('.chat_' + recipient_id).find('.chat-messages').html(data.messages);
           } else {
@@ -1837,11 +1839,15 @@ function Wo_OpenChatTab(recipient_id, group_id,product_id = 0,page_id = 0,page_u
               recipient_id: recipient_id
             })
           }
-          setTimeout(function () {
+          if ($('.chat-messages-wrapper').length > 0) {
 
-            $('.chat-messages-wrapper').scrollTop($('.chat-messages-wrapper')[0].scrollHeight);
+            setTimeout(function () {
 
-          }, 1000);
+              $('.chat-messages-wrapper').scrollTop($('.chat-messages-wrapper')[0].scrollHeight);
+
+            }, 1000);
+          }
+          
         });
         }else if(group_id!==0){
         if (node_socket_flow === "1") {
@@ -2563,6 +2569,7 @@ function Wo_MarkAsSold(post_id, product_id) {
     if(data.status == 200) {
       post.find('.product-status').text(data.text);
       post.find('.mark-as-sold-post').html(data.text);
+      post.find('.mark-as-sold-post').removeAttr('onclick');
     }
   });
 }

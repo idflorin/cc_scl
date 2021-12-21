@@ -2711,6 +2711,7 @@ function Wo_GetNotifications($data = array()) {
     $sql_query_one = mysqli_query($sqlConnect, $query_one);
     if (mysqli_num_rows($sql_query_one) > 0) {
         while ($sql_fetch_one = mysqli_fetch_assoc($sql_query_one)) {
+            
             if (!empty($sql_fetch_one['page_id']) && empty($sql_fetch_one['notifier_id'])) {
                 $sql_fetch_one['notifier']        = Wo_PageData($sql_fetch_one['page_id']);
                 $sql_fetch_one['notifier']['url'] = Wo_SeoLink('index.php?link1=timeline&u=' . $sql_fetch_one['notifier']['page_name']);
@@ -2718,9 +2719,19 @@ function Wo_GetNotifications($data = array()) {
                 $sql_fetch_one['notifier']        = Wo_UserData($sql_fetch_one['notifier_id']);
                 $sql_fetch_one['notifier']['url'] = Wo_SeoLink('index.php?link1=timeline&u=' . $sql_fetch_one['notifier']['username']);
             }
-            $cutted_url                = substr($sql_fetch_one['url'], 9);
-            $sql_fetch_one['url']      = Wo_SeoLink($sql_fetch_one['url']);
-            $sql_fetch_one['ajax_url'] = $cutted_url;
+            if (preg_match_all('/^index\.php\?link1=post&id=(.*)$/i', $sql_fetch_one['url'],$matches)) {
+                if (!empty($matches[1][0]) && is_numeric($matches[1][0])) {
+                    $post = Wo_PostData($matches[1][0]);
+                    $sql_fetch_one['url']      = $post['url'];
+                    $sql_fetch_one['ajax_url']      = '?link1=post&id='.$post['seo_id'];
+                }
+            }
+            else{
+                $cutted_url                = substr($sql_fetch_one['url'], 9);
+                $sql_fetch_one['url']      = Wo_SeoLink($sql_fetch_one['url']);
+                $sql_fetch_one['ajax_url'] = $cutted_url;
+            }
+            
             $get[]                     = $sql_fetch_one;
         }
     }
@@ -5097,8 +5108,10 @@ function Wo_PostData($post_id, $placement = '', $limited = '',$comments_limit = 
     }
     if ($wo['config']['useSeoFrindly'] == 1) {
         $story['url'] = Wo_SeoLink('index.php?link1=post&id=' . $story['id']) . '_' . Wo_SlugPost($story['Orginaltext']);
+        $story['seo_id'] = $story['id'] . '_' . Wo_SlugPost($story['Orginaltext']);
     } else {
         $story['url'] = Wo_SeoLink('index.php?link1=post&id=' . $story['id']);
+        $story['seo_id'] = $story['id'];
     }
     $story['via_type'] = '';
     if ($story['id'] != $fetched_data['id'] && $story['user_id'] != $fetched_data['user_id']) {

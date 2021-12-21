@@ -487,7 +487,7 @@ function Wo_SeoLink($query = '') {
             '/^index\.php\?link1=welcome&link2=password_reset&user_id=([A-Za-z0-9_]+)$/i',
             '/^index\.php\?link1=welcome&last_url=(.*)$/i',
             '/^index\.php\?link1=([^\/]+)&query=$/i',
-            '/^index\.php\?link1=post&id=([A-Za-z0-9_]+)$/i',
+            '/^index\.php\?link1=post&id=(.*)$/i',
             '/^index\.php\?link1=post&id=([A-Za-z0-9_]+)&ref=([A-Za-z0-9_]+)$/i',
             '/^index\.php\?link1=terms&page=contact-us$/i',
             '/^index\.php\?link1=([^\/]+)&u=([A-Za-z0-9_]+)$/i',
@@ -1101,13 +1101,7 @@ function Wo_CompressImage($source_url, $destination_url, $quality) {
             }
         }
     }
-    if ($finfof == 'image/png') {
-        @imagepng($image);
-    }
-    else{
-        @imagejpeg($image, $destination_url, $quality);
-    }
-    
+    @imagejpeg($image, $destination_url, $quality);
     return $destination_url;
 }
 

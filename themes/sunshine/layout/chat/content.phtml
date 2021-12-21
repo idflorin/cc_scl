@@ -492,7 +492,7 @@ function Wo_ChatSide(id) {
                chat_container.find('.chat-messages-wrapper').scrollTop(chat_container.find('.chat-messages-wrapper')[0].scrollHeight);
             }, 100);
         }
-        if ( data.sender_id === +user_id && data.is_typing == 200) {
+        if (data.is_typing == 200) {
             chat_container.find('.messages-text:last').find('.message-typing').html('<img class="user-avatar-left" src="' + data.img + '" alt="Profile Picture"><div id="loading"> <img class="typing" src="' + data.typing + '"></div>').fadeIn(300);
 
             setTimeout(function(){
