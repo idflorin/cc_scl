@@ -1,5 +1,5 @@
 <?php
-// ini_set('display_errors', 1);
+// ini_set('display_errors', 0);
 // ini_set('display_startup_errors', 1);
 error_reporting(0);
 @ini_set("max_execution_time", 0);
@@ -122,6 +122,7 @@ $wo["QQLoginUrl"]         = $config["site_url"] . "/login-with.php?provider=QQ";
 $wo["WeChatLoginUrl"]     = $config["site_url"] . "/login-with.php?provider=WeChat";
 $wo["DiscordLoginUrl"]    = $config["site_url"] . "/login-with.php?provider=Discord";
 $wo["MailruLoginUrl"]     = $config["site_url"] . "/login-with.php?provider=Mailru";
+$wo["OkLoginUrl"]         = $config["site_url"] . "/login-with.php?provider=OkRu";
 // Defualt User Pictures
 $wo["userDefaultAvatar"]  = "upload/photos/d-avatar.jpg";
 $wo["userDefaultFAvatar"] = "upload/photos/f-avatar.jpg";

@@ -68,7 +68,12 @@
    <div class="modal-dialog modal-lg">
       <div class="modal-content">
          <div class="modal-body">
+         	<?php if ($wo['config']['google_map'] == 1) { ?>
             <iframe src="" frameborder="0" width="100%" style="height: calc(100vh - 300px);"></iframe>
+            <?php } ?>
+				<?php if ($wo['config']['yandex_map'] == 1) { ?>
+					<div id="show_user_location__map" <?php echo($wo['config']['yandex_map'] == 1 ? 'style="width: 100%; height: 300px; padding: 0; margin: 0;"' : '') ?>></div>
+				<?php } ?>
          </div>
          <div class="modal-footer">
          <button type="button" class="btn btn-default" data-dismiss="modal" onclick="javascript:$('#show_user_location_map').modal('hide');">
@@ -107,8 +112,22 @@ $.getScript('<?php echo $wo['config']['theme_url'];?>/javascript/leaflet.js?vers
 
 	function Wo_ShowUserLocationMap(user_geoData = false) {
 		if (!user_geoData) {return false;}
+		<?php if ($wo['config']['google_map'] == 1) { ?>
 		var google_map_api = 'https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=' + user_geoData;
 		$("#show_user_location_map").modal().find('iframe').attr('src', google_map_api);
+		<?php } ?>
+		<?php if ($wo['config']['yandex_map'] == 1) { ?>
+			$('#show_user_location__map').html('');
+			$("#show_user_location_map").modal();
+			let geo = user_geoData.split(",");
+			var userMap = new ymaps.Map('show_user_location__map', {
+		        center: [geo[0],geo[1]],
+		        zoom: 9
+		    });
+		    userMap.geoObjects.add(new ymaps.Placemark([geo[0],geo[1]], {
+	            balloonContent: ''
+	        }));
+	    <?php } ?>
 
 	}
 	function Wo_LoadNearByShops(self = false){

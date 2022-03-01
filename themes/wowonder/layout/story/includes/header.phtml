@@ -509,7 +509,7 @@ if (!empty($wo['story']['parent_id'])) {
             !empty($wo['story']['postLink']) || 
             !empty($wo['story']['postFacebook']) || 
             !empty($wo['story']['postDailymotion']) ||
-            !empty($wo['story']['album_name']) || $wo['config']['google_map'] == 0) { ?>
+            !empty($wo['story']['album_name']) || ($wo['config']['google_map'] == 0 && $wo['config']['yandex_map'] == 0)) { ?>
          <span style="color:#9197a3"> - <i class="fa fa-map-marker"></i> <?php echo $wo['story']['postMap'];?>.</span>
          <?php } ?>
          <?php } else { ?>
@@ -1127,7 +1127,7 @@ if (!empty($wo['story']['parent_id'])) {
             !empty($wo['story']['postLink']) || 
             !empty($wo['story']['postFacebook']) || 
             !empty($wo['story']['postDailymotion']) ||
-            !empty($wo['story']['album_name']) || $wo['config']['google_map'] == 0) { ?>
+            !empty($wo['story']['album_name']) || ($wo['config']['google_map'] == 0 && $wo['config']['yandex_map'] == 0)) { ?>
          <span style="color:#9197a3"> - <i class="fa fa-map-marker"></i> <?php echo $wo['story']['postMap'];?>.</span>
          <?php } ?>
          <?php } else { ?>

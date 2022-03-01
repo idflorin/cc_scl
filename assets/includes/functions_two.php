@@ -1656,7 +1656,7 @@ function Wo_GetMyPagesAPI($limit = 0, $offset = 0) {
     }
     return $data;
 }
-function Wo_IsPageOnwer($page_id) {
+function Wo_IsPageOnwer($page_id,$with_admin = true) {
     global $sqlConnect, $wo;
     if ($wo["loggedin"] == false) {
         return false;
@@ -1668,9 +1668,11 @@ function Wo_IsPageOnwer($page_id) {
     if (empty($user_id) || !is_numeric($user_id) || $user_id < 0) {
         return false;
     }
-    if (Wo_IsAdmin() || Wo_IsModerator()) {
-        return true;
-    }
+    if ($with_admin) {
+        if (Wo_IsAdmin() || Wo_IsModerator()) {
+            return true;
+        }
+    } 
     $query = mysqli_query($sqlConnect, " SELECT COUNT(`user_id`) FROM " . T_PAGES . " WHERE `page_id` = {$page_id} AND `user_id` = {$user_id} AND `active` = '1'");
     return Wo_Sql_Result($query, "0") == 1 || Wo_IsPageAdminExists($user_id, $page_id) ? true : false;
 }

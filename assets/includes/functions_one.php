@@ -1439,6 +1439,11 @@ function Wo_UploadImage($file, $name, $type, $type_file, $user_id = 0, $placemen
         $filename            = $dir . '/' . Wo_GenerateKey() . '_' . date('d') . '_' . md5(time()) . '_cover.' . $ext;
         $image_data['cover'] = $filename;
         if (move_uploaded_file($file, $filename)) {
+            $check_file = getimagesize($filename);
+            if (!$check_file) {
+                unlink($filename);
+                return false;
+            }
             $update_data = false;
             if ($placement == 'page') {
                 $update_data = Wo_UpdatePageData($image_data['page_id'], $image_data);
@@ -1505,6 +1510,11 @@ function Wo_UploadImage($file, $name, $type, $type_file, $user_id = 0, $placemen
         $image_data_d = array();
         @$image_data_d['avatar'] = $user_data['avatar'];
         if (move_uploaded_file($file, $filename)) {
+            $check_file = getimagesize($filename);
+            if (!$check_file) {
+                unlink($filename);
+                return false;
+            }
             if ($placement == 'page') {
                 $update_data = Wo_UpdatePageData($image_data['page_id'], $image_data);
                 Wo_Resize_Crop_Image($wo['profile_picture_width_crop'], $wo['profile_picture_height_crop'], $filename, $filename, $wo['profile_picture_image_quality']);
@@ -1571,6 +1581,11 @@ function Wo_UploadImage($file, $name, $type, $type_file, $user_id = 0, $placemen
             $filename                       = $dir . '/' . Wo_GenerateKey() . '_' . date('d') . '_' . md5(time()) . '_background_image.' . $ext;
             $image_data['background_image'] = $filename;
             if (move_uploaded_file($file, $filename)) {
+                $check_file = getimagesize($filename);
+                if (!$check_file) {
+                    unlink($filename);
+                    return false;
+                }
                 $upload_s3 = Wo_UploadToS3($filename);
                 if (isset($fetched_data['background_image']) && !empty($fetched_data['background_image'])) {
                     @unlink($fetched_data['background_image']);
@@ -1587,6 +1602,11 @@ function Wo_UploadImage($file, $name, $type, $type_file, $user_id = 0, $placemen
             $filename                       = $dir . '/' . Wo_GenerateKey() . '_' . date('d') . '_' . md5(time()) . '_background_image.' . $ext;
             $image_data['background_image'] = $filename;
             if (move_uploaded_file($file, $filename)) {
+                $check_file = getimagesize($filename);
+                if (!$check_file) {
+                    unlink($filename);
+                    return false;
+                }
                 $upload_s3 = Wo_UploadToS3($filename);
                 if (isset($fetched_data['background_image']) && !empty($fetched_data['background_image'])) {
                     @unlink($fetched_data['background_image']);
@@ -3143,7 +3163,7 @@ function Wo_GetSearchFilter($result, $limit = 30, $offset = 0) {
     $profile_search     = array();
     foreach ($_GET as $key => $val) {
         if (substr($key, 0, 4) == 'fid_' && !empty($val)) {
-            $custom_type = $db->where('name', substr($key, 4))->getOne(T_FIELDS);
+            $custom_type = $db->where('id', substr($key, 4))->getOne(T_FIELDS);
             if (!empty($custom_type)) {
                 $profile_search[$key] = Wo_Secure($val);
                 $profile_search_sql   = "AND (SELECT COUNT(*) FROM " . T_USERS_FIELDS . " WHERE ";
@@ -4660,6 +4680,11 @@ function Wo_UploadLogo($data = array()) {
     $dir      = "themes/" . $wo['config']['theme'] . "/img/";
     $filename = $dir . "logo.{$file_extension}";
     if (move_uploaded_file($data['file'], $filename)) {
+        $check_file = getimagesize($filename);
+        if (!$check_file) {
+            unlink($filename);
+            return false;
+        }
         if (Wo_SaveConfig('logo_extension', $file_extension)) {
             return true;
         }
@@ -4689,6 +4714,11 @@ function Wo_UploadBackground($data = array()) {
     $dir      = "themes/" . $wo['config']['theme'] . "/img/backgrounds/";
     $filename = $dir . "background-1.{$file_extension}";
     if (move_uploaded_file($data['file'], $filename)) {
+        $check_file = getimagesize($filename);
+        if (!$check_file) {
+            unlink($filename);
+            return false;
+        }
         if (Wo_SaveConfig('background_extension', $file_extension)) {
             return true;
         }
@@ -4718,6 +4748,11 @@ function Wo_UploadFavicon($data = array()) {
     $dir      = "themes/" . $wo['config']['theme'] . "/img/";
     $filename = $dir . "icon.{$file_extension}";
     if (move_uploaded_file($data['file'], $filename)) {
+        $check_file = getimagesize($filename);
+        if (!$check_file) {
+            unlink($filename);
+            return false;
+        }
         if (Wo_SaveConfig('favicon_extension', $file_extension)) {
             return true;
         }
@@ -4818,6 +4853,7 @@ function Wo_ShareFile($data = array(), $type = 0, $crop = true) {
             $check_file = getimagesize($filename);
             if (!$check_file) {
                 unlink($filename);
+                return false;
             }
             if ($crop == true) {
                 if ($type == 1) {
@@ -6249,7 +6285,7 @@ function Wo_DeletePost($post_id = 0, $type = '') {
         $is_this_post_shared = Wo_IsThisPostShared($post_id);
         $is_post_shared      = Wo_IsPostShared($post_id);
         //$fetched_data = mysqli_fetch_assoc($query);
-        if ($fetched_data['postType'] == 'profile_picture' || $fetched_data['postType'] == 'profile_picture_deleted' || $fetched_data['postType'] == 'profile_cover_picture') {
+        /* if ($fetched_data['postType'] == 'profile_picture' || $fetched_data['postType'] == 'profile_picture_deleted' || $fetched_data['postType'] == 'profile_cover_picture') {
             $Query       = mysqli_query($sqlConnect, "SELECT * FROM " . T_USERS . " WHERE `user_id` = '".$fetched_data['user_id']."'");
             if (mysqli_num_rows($Query)) {
                 $user_pic = mysqli_fetch_assoc($Query);
@@ -6291,7 +6327,7 @@ function Wo_DeletePost($post_id = 0, $type = '') {
                     }
                 }
             }
-        }
+        } */
         if (!empty($fetched_data['job_id'])) {
             $job_id = $fetched_data['job_id'];
             $row    = mysqli_query($sqlConnect, "SELECT * FROM " . T_JOB . " WHERE `id` = '{$job_id}'");

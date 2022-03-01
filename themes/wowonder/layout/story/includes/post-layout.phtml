@@ -1,4 +1,4 @@
-<?php 
+<?php
 $post_shared_from = array();
 $current_post = $wo['current_post'] = $wo['story'];
  ?>
@@ -17,7 +17,7 @@ $current_post = $wo['current_post'] = $wo['story'];
       <!-- header -->
       <?php include 'header.phtml'; ?>
       <!-- header -->
-      
+
 
       <div class="post-description" id="post-description-<?php echo $wo['story']['id']; ?>">
         <?php if (!empty($wo['story']['parent_id'])) { ?>
@@ -52,7 +52,7 @@ $current_post = $wo['current_post'] = $wo['story'];
 				</div>
 			<?php endif; ?>
 		<?php } ?>
-		
+
 		<?php if (!empty($wo['story']['fund_id']) && empty($wo['story']['parent_id'])) { ?>
 			<?php if (!empty($wo['story']['fund_data']['image'])): ?>
 				<div class="post-file" id="fullsizeimg">
@@ -82,11 +82,11 @@ $current_post = $wo['current_post'] = $wo['story'];
 			<?php endif; ?>
 		<?php } ?>
 
-        
+
         <!-- shared_post -->
          <?php include 'shared_post.phtml'; ?>
         <!-- shared_post -->
-		
+
 		<?php  if (empty($current_post['parent_id'])) { ?>
       <!-- product -->
        <?php include 'product.phtml'; ?>
@@ -99,15 +99,36 @@ $current_post = $wo['current_post'] = $wo['story'];
       <!-- colored post -->
       <?php include 'colored.phtml'; ?>
       <!-- colored post -->
-       
+
       <!-- embed -->
       <?php include 'embed.phtml'; ?>
       <!-- embed -->
-        
+
         <!-- postMap -->
-        <?php if(!empty($wo['story']['postMap']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postVimeo']) && empty($wo['story']['postDailymotion']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postPlaytube']) && empty($wo['story']['postDeepsound']) && empty($wo['story']['postFile']) && $wo['config']['google_map'] == 1) { ?>
+        <?php if(!empty($wo['story']['postMap']) && empty($wo['story']['postVine']) && empty($wo['story']['postSoundCloud']) && empty($wo['story']['postVimeo']) && empty($wo['story']['postDailymotion']) && empty($wo['story']['postYoutube']) && empty($wo['story']['postPlaytube']) && empty($wo['story']['postDeepsound']) && empty($wo['story']['postFile']) && ($wo['config']['google_map'] == 1 || $wo['config']['yandex_map'] == 1)) { ?>
         <div class="post-map">
+          <?php if ($wo['config']['google_map'] == 1) { ?>
           <img src="https://maps.googleapis.com/maps/api/staticmap?center=<?php echo $wo['story']['postMap'];?>&zoom=13&size=600x250&maptype=roadmap&markers=color:red%7C<?php echo $wo['story']['postMap'];?>&key=<?php echo $wo['config']['google_map_api'];?>" width="100%">
+          <?php } ?>
+           <?php if ($wo['config']['yandex_map'] == 1) { ?>
+            <div id="place_<?php echo($wo['story']['id']) ?>" <?php echo($wo['config']['yandex_map'] == 1 ? 'style="width: 100%; height: 300px; padding: 0; margin: 0;"' : '') ?>></div>
+            <script type="text/javascript">
+                  <?php if (!empty($wo['story']['postMap'])) { ?>
+                    setTimeout(function () {
+                      var myMap;
+                      ymaps.geocode("<?php echo($wo['story']['postMap']); ?>").then(function (res) {
+                          myMap = new ymaps.Map('place_<?php echo($wo['story']['id']) ?>', {
+                              center: res.geoObjects.get(0).geometry.getCoordinates(),
+                              zoom : 10
+                          });
+                          myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {
+                              balloonContent: ''
+                          }));
+                      });
+                    },1000);
+                  <?php } ?>
+                </script>
+          <?php } ?>
         </div>
         <?php } ?>
         <!-- postMap -->
@@ -123,7 +144,7 @@ $current_post = $wo['current_post'] = $wo['story'];
         <!-- blog -->
          <?php include 'blog.phtml'; ?>
         <!-- blog -->
-        
+
         <!-- forum -->
          <?php include 'forum.phtml'; ?>
         <!-- forum -->
@@ -132,13 +153,13 @@ $current_post = $wo['current_post'] = $wo['story'];
          <?php include 'thread.phtml'; ?>
         <!-- thread -->
         <!-- offer -->
-         <?php 
+         <?php
          if (!empty($wo['story']['offer']) && !empty($wo['story']['offer_id'])) {
            include 'offer.phtml';
          }
         ?>
         <!-- offer -->
-        
+
         <!-- postFile -->
         <?php if(!empty($wo['story']['postFile'])) { ?>
 
@@ -182,7 +203,7 @@ $current_post = $wo['current_post'] = $wo['story'];
         <!-- postRecord -->
         <?php if(!empty($wo['story']['postRecord'])) { ?>
         <div class="post-file">
-            <?php  
+            <?php
               $media = array(
                 'type' => 'post',
                 'storyId' => $wo['story']['id'],
@@ -193,11 +214,11 @@ $current_post = $wo['current_post'] = $wo['story'];
             ?>
         </div>
         <?php } ?>
-		
+
         <!-- Live Video -->
         <?php if (!empty($wo['story']['stream_name']) && empty($wo['story']['agora_resource_id']) && !$wo['story']['is_still_live']) { ?>
           <div class="post-file" <?php echo $wo['story']['is_still_live'] ? 'style="/*height: 440px;*/"' : ''; ?> id="fullsizeimg">
-            <?php 
+            <?php
             $wo['media'] = array('filename' => 'https://viewer.millicast.com/v2?streamId='.$wo['config']['live_account_id'].'/'.$wo['story']['stream_name']);
           $media = array(
              'type' => 'post',
@@ -224,11 +245,11 @@ $current_post = $wo['current_post'] = $wo['story'];
           <?php } ?>
 					<?php if ( $wo['story']['comments_status'] == 1) { ?>
 						<div id="live_post_comments_<?php echo($wo['story']['id']) ?>" class="wow_liv_comments_feed">
-							<?php if (!empty($wo['story']['get_post_comments'])) { 
+							<?php if (!empty($wo['story']['get_post_comments'])) {
 								$count = 0;
-								for ($i=count($wo['story']['get_post_comments'])-1; $i >= 0 ; $i--){ 
+								for ($i=count($wo['story']['get_post_comments'])-1; $i >= 0 ; $i--){
 									$wo['comment'] = $wo['story']['get_post_comments'][$i];
-									if (!empty($wo['comment']['text'])) { 
+									if (!empty($wo['comment']['text'])) {
 										echo Wo_LoadPage('story/includes/live_comment');
 										$count = $count + 1;
 										if ($count == 4) {
@@ -253,11 +274,11 @@ $current_post = $wo['current_post'] = $wo['story'];
           <?php } ?>
           <?php if ( $wo['story']['comments_status'] == 1) { ?>
             <div id="live_post_comments_<?php echo($wo['story']['id']) ?>" class="wow_liv_comments_feed">
-              <?php if (!empty($wo['story']['get_post_comments'])) { 
+              <?php if (!empty($wo['story']['get_post_comments'])) {
                 $count = 0;
-                for ($i=count($wo['story']['get_post_comments'])-1; $i >= 0 ; $i--){ 
+                for ($i=count($wo['story']['get_post_comments'])-1; $i >= 0 ; $i--){
                   $wo['comment'] = $wo['story']['get_post_comments'][$i];
-                  if (!empty($wo['comment']['text'])) { 
+                  if (!empty($wo['comment']['text'])) {
                     echo Wo_LoadPage('story/includes/live_comment');
                     $count = $count + 1;
                     if ($count == 4) {
@@ -284,7 +305,7 @@ $current_post = $wo['current_post'] = $wo['story'];
           <!-- multi_image -->
             <?php include 'photo_multi.phtml'; ?>
           <!-- multi_image -->
-        
+
         <div class="clear"></div>
         </div>
         <!-- poll -->
@@ -299,8 +320,8 @@ $current_post = $wo['current_post'] = $wo['story'];
         <!-- footer -->
          <?php include 'footer.phtml'; ?>
         <!-- footer -->
-        
-      <?php 
+
+      <?php
         if ($wo['loggedin'] == true) {
             echo Wo_LoadPage('modals/edit-post');
             echo Wo_LoadPage('modals/delete-post');
@@ -319,7 +340,7 @@ $(function () {
     $("#post-<?php echo $wo['story']['id']; ?> .textarea").triggeredAutocomplete({
        hidden: '#hidden_inputbox_comment',
        source: Wo_Ajax_Requests_File() + "?f=mention",
-       trigger: "@" 
+       trigger: "@"
     });
     $('[data-toggle="tooltip"]').tooltip();
     $('.dropdown-menu.post-recipient, .dropdown-menu.post-options, .wo_emoji_post').click(function (e) {
@@ -335,7 +356,7 @@ jQuery(document).click(function(event){
     }
 });
 <?php if ($wo['config']['live_video'] == 1 && !empty($wo['story']['stream_name']) && $wo['story']['is_still_live'] && $wo['story']['comments_status'] == 1 && $wo['story']['live_ended'] == 0) { ?>
-  var post_live_<?php echo $wo['story']['id']; ?> = setInterval(function(){ 
+  var post_live_<?php echo $wo['story']['id']; ?> = setInterval(function(){
       data = {};
       for (var i = 0; i < $('.live_comments').length; i++) {
         if ($($('.live_comments')[i]).attr('live_comment_id')) {
@@ -389,7 +410,7 @@ jQuery(document).click(function(event){
 <?php } ?>
 <?php if ($wo['config']['agora_live_video'] == 1 && !empty($wo['config']['agora_app_id']) && !empty($wo['story']['stream_name']) && $wo['story']['is_still_live']) { ?>
   RunLiveAgora("<?php echo $wo['story']['stream_name']; ?>","post_live_video_<?php echo($wo['story']['id']) ?>","<?php echo($wo['story']['agora_token']) ?>");
-  
+
 <?php } ?>
 
 </script>

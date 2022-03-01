@@ -16,7 +16,7 @@ if (!empty($wo['orders'])) {
         $wo['count']       = $db->where('hash_id', $wo['order']->hash_id)->getValue(T_USER_ORDERS, 'count(*)');
         $wo['items_count'] = $db->where('hash_id', $wo['order']->hash_id)->getValue(T_USER_ORDERS, 'sum(units)');
         $wo['price']       = $db->where('hash_id', $wo['order']->hash_id)->getValue(T_USER_ORDERS, 'sum(price)');
-        $wo['price']       = number_format($wo['price'], 2, '.');
+        $wo['price']       = number_format($wo['price'], 2);
         $wo['html'] .= Wo_LoadPage('orders/list');
     }
 }

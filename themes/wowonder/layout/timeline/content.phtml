@@ -1026,7 +1026,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
             <?php } ?>
             <li class="list-group-item">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M20 22H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1zm-1-2V4H5v16h14zM7 6h4v4H7V6zm0 6h10v2H7v-2zm0 4h10v2H7v-2zm6-9h4v2h-4V7z"></path></svg>
-               <span id="user_post_count"><?php echo $wo['user_profile']['details']['post_count'];?></span> <?php echo TextForMode('posts'); ?>
+               <span id="user_post_count"><?php echo number_format($wo['user_profile']['details']['post_count']);?></span> <?php echo TextForMode('posts'); ?>
             </li>
 
 			<?php if(!empty($wo['user_profile']['website'])) {  ?>
@@ -1106,6 +1106,25 @@ if ($wo['loggedin'] && $IsOwnerUser) {
                 <?php if (!empty($wo['config']['google_map_api']) && $wo['config']['google_map']) { ?>
                 <iframe width="100%" class="user-location-frame" frameborder="0" style="border:0;margin-top: 10px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=<?php echo $wo['user_profile']['address'];?>&language=en"></iframe>
                 <?php } ?>
+                <?php if ($wo['config']['yandex_map'] == 1) { ?>
+		            <div id="place_<?php echo($wo['user_profile']['user_id']) ?>" <?php echo($wo['config']['yandex_map'] == 1 ? 'style="width: 100%; height: 300px; padding: 0; margin: 0;"' : '') ?>></div>
+		            <script type="text/javascript">
+		                  <?php if (!empty($wo['user_profile']['address'])) { ?>
+		                    setTimeout(function () {
+		                      var myMap;
+		                      ymaps.geocode("<?php echo($wo['user_profile']['address']); ?>").then(function (res) {
+		                          myMap = new ymaps.Map('place_<?php echo($wo['user_profile']['user_id']) ?>', {
+		                              center: res.geoObjects.get(0).geometry.getCoordinates(),
+		                              zoom : 10
+		                          });
+		                          myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {
+		                              balloonContent: ''
+		                          }));
+		                      });
+		                    },1000);
+		                  <?php } ?>
+		                </script>
+		          <?php } ?>
             </li>
             <?php } ?>
 			
@@ -1306,10 +1325,11 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 						<h4 class="family_mbr_name"><?php echo $wo['user_profile']['name']; ?></h4>
 					</div>
 					<div class="add_as_cont">
-						<div id="family_list" class="add_as_cont_list">
+						<input type="hidden" id="family_list">
+						<div class="add_as_cont_list">
 							<?php foreach ($wo['family'] as $key => $value): ?>
 								<label>
-									<input type="radio" name="family_list" id="<?php echo $key; ?>" value="<?php echo $key; ?>">
+									<input type="radio" name="family_list" id="<?php echo $key; ?>" value="<?php echo $key; ?>" onclick="SelectFamilyList('<?php echo $key; ?>')">
 									<div class="btn-default"><?php echo $wo['lang'][$value]; ?></div>
 								</label>
 							<?php endforeach; ?>
@@ -1879,7 +1899,9 @@ function Wo_DeleteFamilyMember(id = false){
         console.log("error");
     })
 }
-
+function SelectFamilyList(id) {
+	$("#family_list").val(id);
+}
 function Wo_AddFamilyMember(){
     var member_type = $("#family_list").val();
     if (!member_type || member_type < 1 || member_type > 43) {

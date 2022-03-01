@@ -72,7 +72,7 @@
 
 		<?php if ($wo['config']['blogs'] == 1) { ?>
 		<li>
-			<a href="<?php echo Wo_SeoLink('index.php?link1=blogs'); ?>">
+			<a href="<?php echo Wo_SeoLink('index.php?link1=blogs'); ?>" data-ajax="?link1=blogs">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#f35d4d" d="M20,11H4V8H20M20,15H13V13H20M20,19H13V17H20M11,19H4V13H11M20.33,4.67L18.67,3L17,4.67L15.33,3L13.67,4.67L12,3L10.33,4.67L8.67,3L7,4.67L5.33,3L3.67,4.67L2,3V19A2,2 0 0,0 4,21H20A2,2 0 0,0 22,19V3L20.33,4.67Z"></svg><img src="<?php echo $wo['config']['theme_url'];?>/img/sidebar/blog.svg"> <?php echo $wo['lang']['blog'] ?>
 			</a>
 		</li>
@@ -116,7 +116,7 @@
 		<?php } ?>
 		<?php if ($wo['config']['movies'] == 1) { ?>
 		<li>
-			<a href="<?php echo Wo_SeoLink('index.php?link1=movies'); ?>">
+			<a href="<?php echo Wo_SeoLink('index.php?link1=movies'); ?>" data-ajax="?link1=movies">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#8d73cc" d="M18,9H16V7H18M18,13H16V11H18M18,17H16V15H18M8,9H6V7H8M8,13H6V11H8M8,17H6V15H8M18,3V5H16V3H8V5H6V3H4V21H6V19H8V21H16V19H18V21H20V3H18Z"></svg><img src="<?php echo $wo['config']['theme_url'];?>/img/sidebar/movie.svg"> <?php echo $wo['lang']['movies'];?>
 			</a>
 		</li>
@@ -138,7 +138,7 @@
 		
 		<?php if ($wo['config']['find_friends'] == 1) { ?>
 		<li>
-			<a href="<?php echo Wo_SeoLink('index.php?link1=friends-nearby'); ?>">
+			<a href="<?php echo Wo_SeoLink('index.php?link1=friends-nearby'); ?>" data-ajax="?link1=friends-nearby">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#b2c17c" d="M15.5,12C18,12 20,14 20,16.5C20,17.38 19.75,18.21 19.31,18.9L22.39,22L21,23.39L17.88,20.32C17.19,20.75 16.37,21 15.5,21C13,21 11,19 11,16.5C11,14 13,12 15.5,12M15.5,14A2.5,2.5 0 0,0 13,16.5A2.5,2.5 0 0,0 15.5,19A2.5,2.5 0 0,0 18,16.5A2.5,2.5 0 0,0 15.5,14M10,4A4,4 0 0,1 14,8C14,8.91 13.69,9.75 13.18,10.43C12.32,10.75 11.55,11.26 10.91,11.9L10,12A4,4 0 0,1 6,8A4,4 0 0,1 10,4M2,20V18C2,15.88 5.31,14.14 9.5,14C9.18,14.78 9,15.62 9,16.5C9,17.79 9.38,19 10,20H2Z"></svg><img src="<?php echo $wo['config']['theme_url'];?>/img/sidebar/find.svg"> <?php echo $wo['lang']['find_friends'];?>
 			</a>
 		</li>

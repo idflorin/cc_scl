@@ -204,9 +204,9 @@
 								<label for="camp_budget"><?php echo $wo['lang']['camp_budget']?></label>
 							</div>
 
-							<?php if ($wo['config']['google_map']) { ?>
+							<?php if ($wo['config']['google_map'] == 1 || $wo['config']['yandex_map'] == 1) { ?>
 								<div id="review-ads-location">
-									<div id="place"></div>
+									<div id="place" <?php echo($wo['config']['yandex_map'] == 1 ? 'class="yandex_ads_map"' : '') ?>></div>
 								</div>
 							<?php }?>
 					
@@ -409,6 +409,20 @@ $(document).ready(function() {
 	          Wo_Delay(function(){$("#review-ads-location #place").html('<iframe width="100%" frameborder="0" style="border:0;margin-bottom: 30px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=us&language=en"></iframe>')},1000)
 	        }
       	});
+	   <?php }else if($wo['config']['yandex_map'] == 1){ ?>
+	   	$("#ads-location").keyup(function(event) {
+		     	var myMap;
+	        ymaps.geocode($("#ads-location").val()).then(function (res) {
+	        	$("#review-ads-location #place").html('');
+	            myMap = new ymaps.Map('place', {
+	                center: res.geoObjects.get(0).geometry.getCoordinates(),
+	                zoom : 10
+	            });
+	            myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {
+			            balloonContent: ''
+			        }));
+	        });
+        });
 	   <?php } ?>
 
 	    $("#select-page").change(function(event) {

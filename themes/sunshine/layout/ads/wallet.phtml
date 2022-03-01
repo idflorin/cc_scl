@@ -1,4 +1,9 @@
+<?php if ($wo['config']['credit_card'] == 'yes') { ?>
 <script src="https://js.stripe.com/v3/"></script>
+<?php } ?>
+<?php if ($wo['config']['securionpay_payment'] == '1') { ?>
+    <script src="https://securionpay.com/checkout.js"></script>
+<?php } ?>
 <?php $loadPage = Wo_LoadPage('thirdparty/paypal-demo'); echo (!empty($loadPage)) ? $loadPage : '';?>
 <div class="row">
 	<div class="col-md-12">
@@ -337,7 +342,7 @@ function SignatureRazorpay() {
 		$('#paystack_btn').html("<?php echo($wo['lang']['please_wait']) ?>");
 	    $('#paystack_btn').attr('disabled','true');
 		email = $('#paystack_wallet_email').val();
-		amount = $('#amount').val() * 100;
+		amount = $('#amount').val();
 		$.post(Wo_Ajax_Requests_File() + '?f=paystack&s=initialize', {type:'wallet',email:email,amount:amount}, function(data) {
 			if (data.status == 200) {
 				window.location.href = data.url;
@@ -374,9 +379,9 @@ function SignatureRazorpay() {
 				show: false
 			});
 		} else if (payment_type == 'credit_card') {
-			$('.btn-cart').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
+			$('.btn-cart').attr('disabled', true);
 		} else if (payment_type == 'alipay') {
-			$('.btn-alipay').attr('disabled', true).text("<?php echo $wo["lang"]["please_wait"]?>");
+			$('.btn-alipay').attr('disabled', true);
 		}
 		var img = 'star';
 		if (type == 1) {
@@ -393,6 +398,18 @@ function SignatureRazorpay() {
 			$.post(Wo_Ajax_Requests_File() + '?f=stripe&s=session', {amount: $('#amount').val(),type:'wallet',payment_type:payment_type}, function(data, textStatus, xhr) {
 				if (data.status == 200) {
 					return stripe.redirectToCheckout({ sessionId: data.sessionId });
+				}
+				else{
+			    	$('.pay-go-pro-alert').html("<div class='alert alert-danger'>"+data.message+"</div>");
+					setTimeout(function () {
+						$('.pay-go-pro-alert').html("");
+					},3000);
+			    }
+			    if (payment_type == 'credit_card') {
+			    	$('.btn-cart').removeAttr('disabled');
+			    }
+			    if (payment_type == 'alipay') {
+				    $('.btn-alipay').removeAttr('disabled');
 				}
 			});
 		}
@@ -575,18 +592,243 @@ $(function() {
 <?php } ?>
 <?php if ($wo['config']['coinbase_payment'] == '1' && !empty($wo['config']['coinbase_key'])) { ?>
 function pay_using_coinbase() {
-    $('#pay-go-pro').modal({show: false});
     amount = $('#amount').val();
     $.get(Wo_Ajax_Requests_File() + '?f=coinbase&s=create',{amount:amount}, function (data) {
 	    if (data.status == 200) {
+	    	$('#pay-go-pro').modal('hide');
 	        window.location.href = data.url;
+	    }
+	    else{
+	    	$('.pay-go-pro-alert').html("<div class='alert alert-danger'>"+data.error+"</div>");
+			setTimeout(function () {
+				$('.pay-go-pro-alert').html("");
+			},3000);
 	    }
     });
 }
 <?php } ?>
+<?php if ($wo['config']['yoomoney_payment'] == '1' && !empty($wo['config']['yoomoney_wallet_id']) && !empty($wo['config']['yoomoney_notifications_secret'])) { ?>
+function pay_using_yoomoney() {
+    amount = $('#amount').val();
+    $.get(Wo_Ajax_Requests_File() + '?f=yoomoney&s=create',{amount:amount}, function (data) {
+	    if (data.status == 200) {
+	    	$('#pay-go-pro').modal('hide');
+	    	$('body').append(data.html);
+			document.getElementById("yoomoney_form").submit();
+			$("#yoomoney_form").remove();
+	    }
+	    else{
+	    	$('.pay-go-pro-alert').html("<div class='alert alert-danger'>"+data.error+"</div>");
+			setTimeout(function () {
+				$('.pay-go-pro-alert').html("");
+			},3000);
+	    }
+    });
+}
+<?php } ?>
+<?php if ($wo['config']['iyzipay_payment'] == '1' && !empty($wo['config']['iyzipay_key']) && !empty($wo['config']['iyzipay_secret_key'])) { ?>
+function pay_using_iyzipay() {
+    amount = $('#amount').val();
+    $.get(Wo_Ajax_Requests_File() + '?f=iyzipay&s=create',{amount:amount}, function (data) {
+	    if (data.status == 200) {
+	    	$('#pay-go-pro').modal('hide');
+	    	$('#iyzipay_content').html('');
+			$('#iyzipay_content').html(data.html);
+	    }
+	    else{
+	    	$('.pay-go-pro-alert').html("<div class='alert alert-danger'>"+data.error+"</div>");
+			setTimeout(function () {
+				$('.pay-go-pro-alert').html("");
+			},3000);
+	    }
+    });
+}
+<?php } ?>
+<?php if ($wo['config']['securionpay_payment'] == '1' && !empty($wo['config']['securionpay_public_key']) && !empty($wo['config']['securionpay_secret_key'])) { ?>
+$(function () {
+    SecurionpayCheckout.key = '<?php echo($wo['config']['securionpay_public_key']); ?>';
+    SecurionpayCheckout.success = function (result) {
+        $.post(Wo_Ajax_Requests_File() + '?f=securionpay&s=handle', result, function(data, textStatus, xhr) {
+            if (data.status == 200) {
+                window.location.href = data.url;
+            }
+        }).fail(function(data) {
+                  M.toast({html: data.responseJSON.message});
+        });
+    };
+    SecurionpayCheckout.error = function (errorMessage) {
+              M.toast({html: errorMessage});
+    };
+});
+function securionpay_pay(){
+	amount = $('#amount').val();
+	$.post(Wo_Ajax_Requests_File() + '?f=securionpay&s=create',{amount:amount}, function (data) {
+	    if (data.status == 200) {
+	    	$('#pay-go-pro').modal('hide');
+	    	SecurionpayCheckout.open({
+	            checkoutRequest: data.token,
+	            name: 'Top Up Wallet',
+	            description: 'Top Up Wallet'
+            });
+	    }
+	    else{
+	    	$('.pay-go-pro-alert').html("<div class='alert alert-danger'>"+data.error+"</div>");
+			setTimeout(function () {
+				$('.pay-go-pro-alert').html("");
+			},3000);
+	    }
+    });
+}
+<?php } ?>
+<?php if ($wo['config']['authorize_payment'] == '1' && !empty($wo['config']['authorize_login_id']) && !empty($wo['config']['authorize_transaction_key'])) { ?>
+	function open_authorize() {
+		$('#pay-go-pro').modal('hide');
+		$('#authorize_modal').modal({
+	     	show: true
+	    });
+	}
+	function AuthorizeRequest(self) {
+	  $('#authorize_btn').html("<?php echo($wo['lang']['please_wait']) ?>");
+	  $('#authorize_btn').attr('disabled','true');
+	  amount = $('#amount').val();
+	  authorize_number = $('#authorize_number').val();
+	  authorize_month = $('#authorize_month').val();
+	  authorize_year = $('#authorize_year').val();
+	  authorize_cvc = $('#authorize_cvc').val();
+	  $.post(Wo_Ajax_Requests_File() + '?f=authorize&s=pay', {card_number:authorize_number,card_month:authorize_month,card_year:authorize_year,card_cvc:authorize_cvc,amount:amount}, function(data) {
+	    if (data.status == 200) {
+	      window.location.href = data.url;
+	    } else {
+	      $('#authorize_alert').html("<div class='alert alert-danger'>"+data.error+"</div>");
+	      setTimeout(function () {
+	        $('#authorize_alert').html("");
+	      },3000);
+	    }
+	    $('#authorize_btn').html("<?php echo $wo['lang']['pay']; ?>");
+	      $('#authorize_btn').removeAttr('disabled');
+	  }).fail(function(data) {
+	      $('#authorize_alert').html("<div class='alert alert-danger'>"+data.responseJSON.error+"</div>");
+	    setTimeout(function () {
+	      $('#authorize_alert').html("");
+	    },3000);
+	    $('#authorize_btn').html("<?php echo $wo['lang']['pay']; ?>");
+	    $('#authorize_btn').removeAttr('disabled');
+	  });
+	}
+<?php } ?>
 </script>
 
+<div id="iyzipay_content"></div>
+<div class="modal fade" id="authorize_modal" role="dialog" data-keyboard="false" >
+    <div class="modal-dialog mat_box">
+        <div class="modal-content">
+		    <div class="modal-header">
+		    	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+				<h4 class="modal-title"><?php echo $wo['lang']['authorize'] ?></h4>
+		    </div>
+            <form class="form form-horizontal" method="post" id="authorize_form" action="#">
+            	<div id="authorize_alert"></div>
+                <div class="modal-body authorize_modal">
+                	<div class="row two_check_card">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
+						<div class="sun_input col-lg-12">
+							<input id="authorize_number" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['card_number']; ?>">
+						</div>
+						<div class="sun_input col-xs-4">
+							<select id="authorize_month" name="card_month" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['month']; ?> (01)">
+								<option value="01">01</option>
+								<option value="02">02</option>
+								<option value="03">03</option>
+								<option value="04">04</option>
+								<option value="05">05</option>
+								<option value="06">06</option>
+								<option value="07">07</option>
+								<option value="08">08</option>
+								<option value="09">09</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+							</select>
+							<!-- <input id="card_month" name="card_month" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['month']; ?> (01)"> -->
+						</div>
+						<div class="sun_input col-xs-4 no-padding-both">
+							<select id="authorize_year" name="card_year" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['year']; ?> (2019)">
+								<?php for ($i=date('Y'); $i <= date('Y')+15; $i++) {  ?>
+									<option value="<?php echo($i) ?>"><?php echo($i) ?></option>
+								<?php } ?>
+							</select>
+							<!-- <input id="card_year" name="card_year" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['year']; ?> (2019)"> -->
+						</div>
+						<div class="sun_input col-xs-4">
+							<input id="authorize_cvc" name="card_cvc" type="text" class="form-control input-md" autocomplete="off" placeholder="CVC" maxlength="3" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+						</div>
+					</div>
+                </div>
+                <div class="clear"></div>
+                <div class="modal-footer">
+                    <div class="ball-pulse"><div></div><div></div><div></div></div>
+                    <button type="button" class="btn btn-primary btn-mat" id="authorize_btn" onclick="AuthorizeRequest($(this))"><?php echo $wo['lang']['pay']; ?></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
+<div class="modal fade" id="payu_modal" role="dialog" data-keyboard="false" >
+    <div class="modal-dialog mat_box">
+        <div class="modal-content">
+		    <div class="modal-header">
+		    	<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+				<h4 class="modal-title"><?php echo $wo['lang']['payu'] ?></h4>
+		    </div>
+            <form class="form form-horizontal" method="post" id="payu_form" action="#">
+            	<div id="payu_alert"></div>
+                <div class="modal-body payu_modal">
+                	<div class="row two_check_card">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
+						<div class="sun_input col-lg-12">
+							<input id="payu_card_number" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['card_number']; ?>">
+						</div>
+						<div class="sun_input col-xs-4">
+							<select id="payu_card_month" name="card_month" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['month']; ?> (01)">
+								<option value="01">01</option>
+								<option value="02">02</option>
+								<option value="03">03</option>
+								<option value="04">04</option>
+								<option value="05">05</option>
+								<option value="06">06</option>
+								<option value="07">07</option>
+								<option value="08">08</option>
+								<option value="09">09</option>
+								<option value="10">10</option>
+								<option value="11">11</option>
+								<option value="12">12</option>
+							</select>
+							<!-- <input id="card_month" name="card_month" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['month']; ?> (01)"> -->
+						</div>
+						<div class="sun_input col-xs-4 no-padding-both">
+							<select id="payu_card_year" name="card_year" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['year']; ?> (2019)">
+								<?php for ($i=date('Y'); $i <= date('Y')+15; $i++) {  ?>
+									<option value="<?php echo($i) ?>"><?php echo($i) ?></option>
+								<?php } ?>
+							</select>
+							<!-- <input id="card_year" name="card_year" type="text" class="form-control input-md" autocomplete="off" placeholder="<?php echo $wo['lang']['year']; ?> (2019)"> -->
+						</div>
+						<div class="sun_input col-xs-4">
+							<input id="payu_card_cvc" name="card_cvc" type="text" class="form-control input-md" autocomplete="off" placeholder="CVC" maxlength="3" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+						</div>
+					</div>
+                </div>
+                <div class="clear"></div>
+                <input id="payu_type" type="hidden">
+                <div class="modal-footer">
+                    <div class="ball-pulse"><div></div><div></div><div></div></div>
+                    <button type="button" class="btn btn-primary btn-mat" id="payu_btn" onclick="pay_using_payu($(this))"><?php echo $wo['lang']['pay']; ?></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 

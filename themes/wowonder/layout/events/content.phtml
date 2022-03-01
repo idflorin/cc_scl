@@ -194,6 +194,27 @@
 					<iframe width="100%" frameborder="0" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=<?php echo $wo['event']['location']; ?>&language=en"></iframe>
 				</li>
 			<?php } ?>
+			<?php if ($wo['config']['yandex_map'] == 1) { ?>
+				<li class="user-social-links">
+					<div id="place_event_<?php echo($wo['event']['id']); ?>" <?php echo($wo['config']['yandex_map'] == 1 ? 'style="width: 100%; height: 300px; padding: 0; margin: 0;"' : '') ?>></div>
+					<script type="text/javascript">
+        			<?php if (!empty($wo['event']['location'])) { ?>
+        				setTimeout(function () {
+        					var myMap;
+					        ymaps.geocode("<?php echo($wo['event']['location']); ?>").then(function (res) {
+					            myMap = new ymaps.Map('place_event_<?php echo($wo['event']['id']); ?>', {
+					                center: res.geoObjects.get(0).geometry.getCoordinates(),
+					                zoom : 10
+					            });
+					            myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {
+							            balloonContent: ''
+							        }));
+					        });
+        				},1000);
+			        <?php } ?>
+        		</script>
+				</li>
+				<?php } ?>
 			<?php endif; ?>
 		</ul>
 		

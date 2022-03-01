@@ -17,11 +17,11 @@
 								<span class="badge success"><?php echo $transaction['kind']; ?></span>
 							<?php } else if ($transaction['kind'] == "PRO") { ?>
 								<span class="badge warning"><?php echo $transaction['kind']; ?></span>
-							<?php } else if ($transaction['kind'] == "DONATE") { ?>
+							<?php } else if ($transaction['kind'] == "SENT") { ?>
 								<span class="badge info"><?php echo $transaction['kind']; ?></span>
-							<?php } else if ($transaction['kind'] == "WALLET") { ?>
+							<?php } else if ($transaction['kind'] == "WALLET" || $transaction['kind'] == "RECEIVED" || $transaction['kind'] == "SALE") { ?>
 								<span class="badge success"><?php echo $transaction['kind']; ?></span>
-							<?php } else if ($transaction['kind'] == "PURCHASES") { ?>
+							<?php } else if ($transaction['kind'] == "PURCHASE") { ?>
 								<span class="badge danger"><?php echo $transaction['kind']; ?></span>
 							<?php } else { ?>
 								<span class="badge"><?php echo $transaction['kind']; ?></span>

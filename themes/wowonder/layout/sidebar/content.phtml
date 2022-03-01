@@ -36,20 +36,20 @@ if (!empty($user_stories)) {
 				<li>
 					<a class="menu_list" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['user']['username']);?>" data-ajax="?link1=timeline&u=<?php echo $wo['user']['username'];?>">
 						<span class="split-link"><b><?php echo $wo['lang']['posts']; ?></b></span>
-						<span id="user_post_count"><?php echo $wo['user']['details']['post_count'];?></span>
+						<span id="user_post_count"><?php echo number_format($wo['user']['details']['post_count']);?></span>
 					</a>
 				</li>
 				<?php if ($wo['config']['connectivitySystem'] == 1) {?>
 					<li>
 						<a class="menu_list" href="<?php echo Wo_SeoLink('index.php?link1=albums&user=' . $wo['user']['username']);?>" data-ajax="?link1=albums&user=<?php echo $wo['user']['username'];?>">
 							<span class="split-link"><b><?php echo $wo['lang']['albums'];?></b></span>
-							<span><?php echo $wo['user']['details']['album_count'];?></span>
+							<span><?php echo number_format($wo['user']['details']['album_count']);?></span>
 						</a>
 					</li>
 					<li>
 						<a class="menu_list" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['user']['username'] . '&type=followers');?>" data-ajax="?link1=timeline&u=<?php echo $wo['user']['username']?>&type=followers">
 							<span class="split-link"><b><?php echo $wo['lang']['friends_btn'];?></b></span>
-							<span><?php echo $wo['user']['details']['following_count'];?></span>
+							<span><?php echo number_format($wo['user']['details']['following_count']);?></span>
 						</a>
 					</li>	
 				<?php } ?>
@@ -57,13 +57,13 @@ if (!empty($user_stories)) {
 					<li>
 						<a class="menu_list" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['user']['username'] . '&type=following');?>" data-ajax="?link1=timeline&u=<?php echo $wo['user']['username']?>&type=following">
 							<span class="split-link"><b><?php echo $wo['lang']['following'];?></b></span>
-							<span><?php echo $wo['user']['details']['following_count'];?></span>
+							<span><?php echo number_format($wo['user']['details']['following_count']);?></span>
 						</a>
 					</li>
 					<li>
 						<a class="menu_list" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['user']['username'] . '&type=followers');?>" data-ajax="?link1=timeline&u=<?php echo $wo['user']['username']?>&type=followers">
 							<span class="split-link"><b><?php echo $wo['lang']['followers'];?></b></span>
-							<span><?php echo $wo['user']['details']['followers_count'];?></span>
+							<span><?php echo number_format($wo['user']['details']['followers_count']);?></span>
 						</a>
 					</li>
 				<?php } ?>
@@ -383,6 +383,46 @@ if (!empty($user_stories)) {
                 </li>
             </ul>
         </div>
+        <?php if (!empty($wo['config']['native_android_messenger_url']) || !empty($wo['config']['native_android_timeline_url']) || !empty($wo['config']['native_ios_messenger_url']) || !empty($wo['config']['native_ios_timeline_url']) || !empty($wo['config']['native_windows_messenger_url'])) { ?>
+        <ul class="list-group" id="sidebar-group-list-container">
+            <li class="list-group-item text-muted sidebar-title-back" contenteditable="false"><?php echo $wo['lang']['apps'];?>
+            </li>
+            <li class="list-group-item wo_side_apps">
+            	<?php if (!empty($wo['config']['native_android_timeline_url']) || !empty($wo['config']['native_ios_timeline_url'])) { ?>
+					<p><?php echo $wo['lang']['get_mobile_apps'];?></p>
+	            	<?php if (!empty($wo['config']['native_android_timeline_url'])) { ?>
+	            		<a href="<?php echo($wo['config']['native_android_timeline_url']) ?>" target="_blank">
+							<img width="130" src="<?php echo $wo['config']['theme_url'];?>/img/google.png"/>
+	                    </a>
+	            	<?php } ?>
+					<?php if (!empty($wo['config']['native_ios_timeline_url'])) { ?>
+	            		<a href="<?php echo($wo['config']['native_ios_timeline_url']) ?>" target="_blank">
+	            			<img width="130" src="<?php echo $wo['config']['theme_url'];?>/img/apple.png"/>
+	            		</a>
+	            	<?php } ?>
+            	<?php } ?>
+            	<?php if (!empty($wo['config']['native_android_messenger_url']) || !empty($wo['config']['native_ios_messenger_url']) || !empty($wo['config']['native_windows_messenger_url'])) { ?>
+					<p><?php echo $wo['lang']['get_messenger_apps'];?></p>
+					<?php if (!empty($wo['config']['native_android_messenger_url'])) { ?>
+	            		<a href="<?php echo($wo['config']['native_android_messenger_url']) ?>" target="_blank">
+							<img width="130" src="<?php echo $wo['config']['theme_url'];?>/img/google.png"/>
+	                    </a>
+	            	<?php } ?>
+	            	<?php if (!empty($wo['config']['native_ios_messenger_url'])) { ?>
+	            		<a  href="<?php echo($wo['config']['native_ios_messenger_url']) ?>" target="_blank">
+	            			<img width="130" src="<?php echo $wo['config']['theme_url'];?>/img/apple.png"/>
+	            		</a>
+	            	<?php } ?>
+	            	<?php if (!empty($wo['config']['native_windows_messenger_url'])) { ?>
+	            		<a href="<?php echo($wo['config']['native_windows_messenger_url']) ?>" target="_blank">
+	            			<img width="130" src="<?php echo $wo['config']['theme_url'];?>/img/microsoft.png"/>
+	            		</a>
+	            	<?php } ?>
+            	<?php } ?>
+            </li>
+        </ul>
+        <?php } ?>
+        
 		
         <?php if ($wo['config']['user_ads'] == 1): ?>
             <?php 

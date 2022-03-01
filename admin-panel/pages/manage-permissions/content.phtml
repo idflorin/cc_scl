@@ -1180,6 +1180,16 @@ else{
                     <div class="clearfix"></div>
                     <hr>
                     <div class="float-left">
+                        <label for="manage-currencies" class="main-label">Manage Currencies</label>
+                    </div>
+                    <div class="form-group float-right switcher">
+                        <input type="hidden" name="manage-currencies" value="0" />
+                        <input type="checkbox" name="manage-currencies" id="chck-manage-currencies" value="1" <?php echo ($user_data['permission']['manage-currencies'] == 1) ? 'checked': '';?>>
+                        <label for="chck-manage-currencies" class="check-trail"><span class="check-handler"></span></label>
+                    </div>
+                    <div class="clearfix"></div>
+                    <hr>
+                    <div class="float-left">
                         <label for="manage-site-ads" class="main-label">Manage Site Advertisements</label>
                     </div>
                     <div class="form-group float-right switcher">

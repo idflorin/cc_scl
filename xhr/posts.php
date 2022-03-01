@@ -597,6 +597,9 @@ if ($f == 'posts') {
                 }
             }
             if (isset($_POST['postSticker']) && Wo_IsUrl($_POST['postSticker']) && empty($_FILES) && empty($_POST['postRecord'])) {
+                $_POST['postSticker'] = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_POST['postSticker']);
+                $_POST['postSticker'] = preg_replace('/\((.*?)\)/m', '', $_POST['postSticker']);
+                $_POST['postSticker'] = strip_tags($_POST['postSticker']);
                 $re  = '/(http|https):\/\/(.*)\.giphy\.com\/media\/(.*)\/(.*)\.gif\?(.*)/';
                 $str = $_POST['postSticker'];
                 preg_match($re, $str, $matches, PREG_OFFSET_CAPTURE, 0);

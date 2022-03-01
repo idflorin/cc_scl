@@ -442,6 +442,9 @@ if ($type == 'new_post') {
                     'time' => time()
                 );
                 if (isset($_POST['postSticker']) && Wo_IsUrl($_POST['postSticker']) && empty($_FILES) && empty($_POST['postRecord'])) {
+                    $_POST['postSticker'] = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_POST['postSticker']);
+                    $_POST['postSticker'] = preg_replace('/\((.*?)\)/m', '', $_POST['postSticker']);
+                    $_POST['postSticker'] = strip_tags($_POST['postSticker']);
                     $post_data['postSticker'] = $_POST['postSticker'];
                 } else if (empty($_FILES['postPhotos']) && preg_match_all('/https?:\/\/(?:[^\s]+)\.(?:png|jpg|gif|jpeg)/', $post_data['postText'], $matches)) {
                     if (!empty($matches[0][0]) && Wo_IsUrl($matches[0][0])) {

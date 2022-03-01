@@ -156,6 +156,9 @@ if ($f == 'messages') {
                     }
                     $sticker = '';
                     if (isset($_POST['chatSticker']) && Wo_IsUrl($_POST['chatSticker']) && strpos($_POST['chatSticker'], '.gif') !== false && !$mediaFilename && !$mediaName) {
+                        $_POST['chatSticker'] = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_POST['chatSticker']);
+                        $_POST['chatSticker'] = preg_replace('/\((.*?)\)/m', '', $_POST['chatSticker']);
+                        $_POST['chatSticker'] = strip_tags($_POST['chatSticker']);
                         $re  = '/(http|https):\/\/(.*)\.giphy\.com\/media\/(.*)\/(.*)\.gif\?(.*)/';
                         $str = $_POST['chatSticker'];
                         preg_match($re, $str, $matches, PREG_OFFSET_CAPTURE, 0);

@@ -26,7 +26,9 @@ if (!empty($_REQUEST)) {
 }
 if (!empty($_POST)) {
     foreach ($_POST as $key => $value) {
-        $value       = preg_replace('/on[^<>=]+=[^<>]*/m', '', $value);
+        if ($key != 'url') {
+            $value       = preg_replace('/on[^<>=]+=[^<>]*/m', '', $value);
+        }
         $_POST[$key] = strip_tags($value);
     }
 }

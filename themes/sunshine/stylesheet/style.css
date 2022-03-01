@@ -2797,6 +2797,67 @@ body .wo_chat_story_innr p {position: absolute;top: 0;right: 0;bottom: 0;left: 0
 .wo_post_prod_full_related .info > div {margin-top: 3px;font-weight: normal;}
 .wo_post_prod_full_related .info > div svg {margin-top: -3px;}
 
+/*Apps*/
+.wo_side_apps {
+	padding: 0px 9px 5px;
+}
+.wo_side_apps p {
+	font-weight: bold;
+    margin: 10px 2px 5px;
+}
+.wo_side_apps a {
+	    margin: 4px 2px;
+    width: calc(50% - 6px);
+    display: inline-block;
+}
+.wo_side_apps a img {
+	width: calc(100% + 2px);
+    height: 38px;
+    border-radius: 8px;
+    margin: -1px;
+}
+
+/*Yandex Map*/
+.yandex_ads_map {
+	width: 100%;
+    height: 250px;
+    padding: 0;
+    margin: 0;
+}
+.yandex_search_user, .yandex_search_product, .yandex_search_job, .yandex_search_publisher {
+	position: absolute;
+    background-color: #fff;
+    max-height: 200px;
+    overflow-y: auto;
+    left: 0;
+    right: 0;
+    top: 100%;
+    box-shadow: rgb(0 0 0 / 10%) 0px 10px 15px -3px, rgb(0 0 0 / 10%) 0px 4px 6px -4px;
+    z-index: 99;
+    border-radius: 8px;
+    padding: 2px 10px;
+    border: 1px solid #e5e5e5;
+}
+.yandex_search_user:empty, .yandex_search_product:empty, .yandex_ads_map:empty, .yandex_search_job:empty, .yandex_search_publisher:empty {
+	display: none;
+}
+.yandex_search_user p, .yandex_search_product p, .yandex_search_job p, .yandex_search_publisher p {
+	border-bottom: 1px solid #e5e5e5;
+    margin: 0;
+    padding: 7px 0;
+}
+.yandex_search_user p:last-child, .yandex_search_product p:last-child, .yandex_search_job p:first-child, .yandex_search_publisher p:last-child {
+	border: 0;
+}
+.yandex_search_user {
+	left: 15px;
+    right: 15px;
+}
+.yandex_search_product, .yandex_search_job {
+	left: 15px;
+    right: 15px;top: calc(100% - 30px);
+}
+
 
 
 

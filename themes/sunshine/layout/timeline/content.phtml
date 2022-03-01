@@ -231,7 +231,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 						</li>-->
 					<?php } ?>
 					<li class="list-group-item">
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather"><path fill="currentColor" d="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" /></svg> <span id="user_post_count"><?php echo $wo['user_profile']['details']['post_count'];?></span> <?php echo TextForMode('posts'); ?>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather"><path fill="currentColor" d="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" /></svg> <span id="user_post_count"><?php echo number_format($wo['user_profile']['details']['post_count']);?></span> <?php echo TextForMode('posts'); ?>
 					</li>
 					<?php if(!empty($wo['user_profile']['website'])) {  ?>
 						<li class="list-group-item">
@@ -291,6 +291,25 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 							<?php if (!empty($wo['config']['google_map_api']) && $wo['config']['google_map']) { ?>
 								<iframe width="100%" class="user-location-frame" frameborder="0" style="border:0;margin-top: 10px;display:none;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=<?php echo $wo['user_profile']['address'];?>&language=en"></iframe>
 							<?php } ?>
+							<?php if ($wo['config']['yandex_map'] == 1) { ?>
+				            <div id="place_<?php echo($wo['user_profile']['user_id']) ?>" <?php echo($wo['config']['yandex_map'] == 1 ? 'style="width: 100%; height: 300px; padding: 0; margin: 0;"' : '') ?>></div>
+				            <script type="text/javascript">
+				                  <?php if (!empty($wo['user_profile']['address'])) { ?>
+				                    setTimeout(function () {
+				                      var myMap;
+				                      ymaps.geocode("<?php echo($wo['user_profile']['address']); ?>").then(function (res) {
+				                          myMap = new ymaps.Map('place_<?php echo($wo['user_profile']['user_id']) ?>', {
+				                              center: res.geoObjects.get(0).geometry.getCoordinates(),
+				                              zoom : 10
+				                          });
+				                          myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {
+				                              balloonContent: ''
+				                          }));
+				                      });
+				                    },1000);
+				                  <?php } ?>
+				                </script>
+				          <?php } ?>
 						</li>
 					<?php } ?>
 					<?php if(!empty($wo['user_profile']['facebook']) || !empty($wo['user_profile']['twitter']) || !empty($wo['user_profile']['linkedin']) || !empty($wo['user_profile']['vk']) || !empty($wo['user_profile']['youtube'])) { ?>

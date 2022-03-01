@@ -193,3 +193,22 @@ svg {vertical-align: middle;}
 .btn-discord {background-color: #6e85d2;}
 .btn-mailru {background-color: #005ff9;}
 .btn-wechat.active, .btn-wechat:active, .btn-wechat:focus, .btn-wechat:hover, .open>.dropdown-toggle.btn-wechat {background-color: #4caf50;}
+
+
+/*Apps*/
+.wo_side_apps {
+	padding: 20px 0 0;
+}
+.wo_side_apps p {
+	font-weight: bold;
+    margin: 10px 2px 5px;
+}
+.wo_side_apps a {
+	margin: 0 2px;display: inline-block;
+}
+.wo_side_apps a img {
+	width: calc(100% + 2px);
+    height: 38px;
+    border-radius: 8px;
+    margin: -1px;
+}

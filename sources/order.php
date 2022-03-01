@@ -30,9 +30,9 @@ foreach ($wo['orders'] as $key => $wo['order']) {
     $wo['address_id'] = $wo['order']->address_id;
     $wo['html'] .= Wo_LoadPage('order/list');
 }
-$wo['total']             = number_format($wo['total'], 2, '.');
-$wo['total_commission']  = number_format($wo['total_commission'], 2, '.');
-$wo['total_final_price'] = number_format($wo['total_final_price'], 2, '.');
+$wo['total']             = number_format($wo['total'], 2);
+$wo['total_commission']  = number_format($wo['total_commission'], 2);
+$wo['total_final_price'] = number_format($wo['total_final_price'], 2);
 $wo['address']           = $db->where('id', $wo['address_id'])->getOne(T_USER_ADDRESS);
 $wo['description']       = $wo['config']['siteDesc'];
 $wo['keywords']          = $wo['config']['siteKeywords'];

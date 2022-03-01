@@ -306,7 +306,7 @@ if (!empty($wo['reactions_types'])) {
     color: #333 !important;
 }
 }
-<?php if ($wo['config']['google_map'] == 0) { ?>
+<?php if ($wo['config']['google_map'] == 0 && $wo['config']['yandex_map'] == 0) { ?>
 #filterby-post li {
     width: 16.5%;
 }

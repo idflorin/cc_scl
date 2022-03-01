@@ -16,7 +16,7 @@ $fields = Wo_GetWelcomeFileds();
 			<div class="login_innre">
 			<form id="register" method="post">
 				<p class="title main"><?php echo $wo['lang']['register']?></p>
-				<p class="desc"><?php echo str_replace('{site_name}', $wo['config']['siteName'], $wo['lang']['register_create_account'])?></p>
+				<p class="desc"><?php echo str_replace(array('{site_name}', '{Site_Name}', '{sito_name}'), array($wo['config']['siteName'], $wo['config']['siteName'], $wo['config']['siteName']), $wo['lang']['register_create_account'])?></p>
 				<div class="alert alert-danger errors"></div>
 				<?php if ($wo['config']['auto_username'] == 1) { ?>
 					<div class="wow_form_fields">

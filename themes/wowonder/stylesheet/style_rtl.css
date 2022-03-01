@@ -883,11 +883,11 @@ body .friends_nearby_status_ul li, #search-nearby-users .nearby-users-gender-col
 body .wow_pop_gam_list .avatar {
     margin-right: 0px;margin-left: 10px;
 }
-body .wow_pop_gam_list .game-name, body .wow_pop_gam_list p, body .wow_dev_apps .ap_name {
+body .wow_pop_gam_list .game-name, body .wow_pop_gam_list p {
 	margin-left: 0px;margin-right: 70px;
 }
 body .wow_dev_apps .ap_hdr .avatar {
-    margin-right: 0;margin-left: 10px;
+    margin-right: 0;margin-left: 15px;
 }
 body .wow_main_float_head > .container.wo_go_pro:after {
 	right: auto;left: 0;
@@ -1213,17 +1213,28 @@ body .referres .ref-image {
 body .refs_caret_down::before {
     transform: scale(-1) rotate(-90deg);
 }
-body .wo_new_wallet > svg.left {
-	left: auto;right: 0;
-}
-body .wo_new_wallet > svg.right {
-	right: auto;left: 0;
-}
 body .wo_movie_head_filter > svg {
     right: auto;left: 10px;
 }
 body .wo_page_profile .page-info-cont .page_navbar .dropdown-menu li svg, body .wo_user_profile .options-buttons .dropdown-menu li svg {margin: -2px 0 auto 10px;}
 
+body .wow_dev_apps .info {margin: 0 98px 0 0;}
+
+body .sun_pub_privacy_menu {
+    transform-origin: right top;left: auto;right: 0;
+}
+body .sun_pub_privacy_dropdown > svg {
+    margin-left: 0;margin-right: 3px;
+}
+body .sun_pub_name {
+    margin: 0 50px 10px 0px;
+}
+body .publisher-box textarea.postText {
+    padding: 63px 50px 10px 35px;
+}
+body.pub-focus .publisher-box textarea.postText {
+    padding: 16px 50px 10px 35px;
+}
 
 
 

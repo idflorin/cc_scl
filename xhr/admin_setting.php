@@ -11,7 +11,8 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             'edit-lang',
             'edit-movie',
             'edit-profile-field',
-            'edit-terms-pages'
+            'edit-terms-pages',
+            'manage-permissions'
         );
         foreach ($files as $key => $file) {
             if (file_exists('./admin-panel/pages/' . $file . '/content.phtml') && !in_array($file, $not_allowed_files)) {
@@ -2831,6 +2832,16 @@ if ($f == 'admin_setting' AND (Wo_IsAdmin() || Wo_IsModerator())) {
             }
         }
         foreach ($_POST as $key => $value) {
+            if ($key == 'google_map') {
+                if ($wo['config']['yandex_map'] == 1) {
+                    Wo_SaveConfig('yandex_map', 0);
+                }
+            }
+            if ($key == 'yandex_map') {
+                if ($wo['config']['google_map'] == 1) {
+                    Wo_SaveConfig('google_map', 0);
+                }
+            }
             if ($key == 'website_mode') {
                 if (!empty($wo['website_modes_off'][$wo['config']['website_mode']])) {
                     foreach ($wo['website_modes_off'][$wo['config']['website_mode']] as $key5 => $value5) {

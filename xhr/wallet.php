@@ -1,5 +1,6 @@
 <?php
 if ($f == 'wallet') {
+    $dollar_to_point_cost = $wo['config']['dollar_to_point_cost'];
     if ($s == 'replenish-user-account') {
         $error = "";
         if (!isset($_GET['amount']) || !is_numeric($_GET['amount']) || $_GET['amount'] < 1) {

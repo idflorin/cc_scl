@@ -30,6 +30,7 @@
 				<h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20,8H4V6H20M20,18H4V12H20M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z"></path></svg> <?php echo $wo['lang']['choose_a_payment_method'] ?></h4>
 			</div>
 			<div class="modal-body">
+				<div class="pay-go-pro-alert"></div>
 				<!-- PayPal -->
 				<?php if ($wo['config']['paypal'] == 'yes') { ?>
 				<button class="btn btn-paypal" onclick="Wo_GetPayPalLink('{pro_type}');">
@@ -67,7 +68,7 @@
 						Alipay
 					</button>
 				<?php } ?>
-				<?php if ($wo['config']['bank_payment'] == 'yes') { ?>
+				<?php if ($wo['config']['bank_payment'] == '1') { ?>
 				<!-- Alipay -->
 					<button class="bank_payment btn" onclick="Wo_CheckOutCard({pro_type_id}, '{pro_type_description}', {pro_type_price}, 'bank_payment');">
 						<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="47.001px" height="47.001px" viewBox="0 0 47.001 47.001" xml:space="preserve"><path fill="currentColor"  d="M44.845,42.718H2.136C0.956,42.718,0,43.674,0,44.855c0,1.179,0.956,2.135,2.136,2.135h42.708c1.18,0,2.136-0.956,2.136-2.135C46.979,43.674,46.023,42.718,44.845,42.718z"/><path fill="currentColor"  d="M4.805,37.165c-1.18,0-2.136,0.956-2.136,2.136s0.956,2.137,2.136,2.137h37.37c1.18,0,2.136-0.957,2.136-2.137s-0.956-2.136-2.136-2.136h-0.533V17.945h0.533c0.591,0,1.067-0.478,1.067-1.067s-0.478-1.067-1.067-1.067H4.805c-0.59,0-1.067,0.478-1.067,1.067s0.478,1.067,1.067,1.067h0.534v19.219H4.805z M37.37,17.945v19.219h-6.406V17.945H37.37zM26.692,17.945v19.219h-6.406V17.945H26.692z M9.609,17.945h6.406v19.219H9.609V17.945z"/><path fill="currentColor" d="M2.136,13.891h42.708c0.007,0,0.015,0,0.021,0c1.181,0,2.136-0.956,2.136-2.136c0-0.938-0.604-1.733-1.443-2.021l-21.19-9.535c-0.557-0.25-1.194-0.25-1.752,0L1.26,9.808c-0.919,0.414-1.424,1.412-1.212,2.396C0.259,13.188,1.129,13.891,2.136,13.891z"/></svg>
@@ -111,6 +112,30 @@
 				<!-- Card -->
 					<button class="btn-paysera btn" onclick="pay_using_paysera('{pro_type}');">
 						<img src="<?php echo $wo['config']['theme_url'];?>/img/paysera.png"> <?php echo $wo['lang']['paysera'] ?>
+					</button>
+				<?php } ?>
+				<?php if ($wo['config']['yoomoney_payment'] == '1' && !empty($wo['config']['yoomoney_wallet_id']) && !empty($wo['config']['yoomoney_notifications_secret'])) { ?>
+				<!-- Card -->
+					<button class="btn-yoomoney btn" onclick="pay_using_yoomoney();">
+						<svg width="57" height="40" viewBox="0 0 57 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M36.33 0c-11.14 0-20 8.987-20 20 0 11.14 8.987 20 20 20 11.012 0 20-8.987 20-20s-8.988-20-20-20zm0 27.342c-4.051 0-7.47-3.418-7.47-7.469 0-4.05 3.419-7.468 7.47-7.468 4.05 0 7.468 3.418 7.468 7.468-.127 4.178-3.418 7.469-7.469 7.469zM16.203 5.696V34.81h-7.09L0 5.696h16.203z" fill="#8B3FFD"/></svg> <?php echo $wo['lang']['yoomoney'] ?>
+					</button>
+				<?php } ?>
+				<?php if ($wo['config']['iyzipay_payment'] == '1' && !empty($wo['config']['iyzipay_key']) && !empty($wo['config']['iyzipay_secret_key'])) { ?>
+				<!-- Card -->
+					<button class="btn-iyzipay btn" onclick="pay_using_iyzipay();">
+						<img src="<?php echo $wo['config']['theme_url'];?>/img/paysera.png"> <?php echo $wo['lang']['iyzipay'] ?>
+					</button>
+				<?php } ?>
+				<?php if ($wo['config']['securionpay_payment'] == '1' && !empty($wo['config']['securionpay_public_key']) && !empty($wo['config']['securionpay_secret_key'])) { ?>
+				<!-- Card -->
+					<button class="btn-securionpay btn" onclick="securionpay_pay();">
+						<img src="<?php echo $wo['config']['theme_url'];?>/img/paysera.png"> <?php echo $wo['lang']['securionpay'] ?>
+					</button>
+				<?php } ?>
+				<?php if ($wo['config']['authorize_payment'] == '1' && !empty($wo['config']['authorize_login_id']) && !empty($wo['config']['authorize_transaction_key'])) { ?>
+				<!-- Card -->
+					<button class="btn-authorize btn" onclick="open_authorize();">
+						<img src="<?php echo $wo['config']['theme_url'];?>/img/paysera.png"> <?php echo $wo['lang']['authorize'] ?>
 					</button>
 				<?php } ?>
 			</div>

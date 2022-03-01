@@ -33,6 +33,9 @@
 		<div class="wow_form_fields">
 			<label for="address"><?php echo $wo['lang']['location']; ?></label>  
 			<input id="address" name="address" type="text" value="<?php echo $wo['setting']['address'];?>">
+			<?php if ($wo['config']['yandex_map'] == 1) { ?>
+          <div class="yandex_search_user"></div>
+        <?php } ?>
 		</div>
 		<div class="wow_form_fields mb-0">
 			<label for="school"><?php echo $wo['lang']['school']; ?></label>  
@@ -289,4 +292,29 @@ $(function() {
      var autocomplete = new google.maps.places.Autocomplete(pac_input);
   });
   <?php }?>
+<?php if ($wo['config']['yandex_map'] == 1) { ?>
+  $(function() {
+    $('#address').on( "keydown", function() {
+      let self = this;
+      var myGeocoder = ymaps.geocode($(this).val());
+      myGeocoder.then(
+          function (res) {
+            if (res.geoObjects.getLength() == 0) {
+              $('.yandex_search_user').html('');
+            }
+            else{
+              let html = '';
+              for (var i = 0; i < res.geoObjects.getLength(); i++) {
+                html += '<p class="pointer" onclick="AddYandexResult(\'#address\',this,\'.yandex_search_user\')">'+res.geoObjects.get(i).properties.get('name')+'</p>';
+              }
+              $('.yandex_search_user').html(html);
+            }
+          },
+          function (err) {
+              $('.yandex_search_user').html('');
+          }
+      );
+    });
+  });
+<?php } ?>
 </script>

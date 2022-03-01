@@ -227,7 +227,7 @@ function Wo_GetProduct($id = 0) {
     $fetched_data['user_data']     = Wo_UserData($fetched_data['user_id']);
     $fetched_data['rating']        = $db->where('product_id', $fetched_data['id'])->getValue(T_PRODUCT_REVIEW, "FLOOR(sum(star)/count(id))");
     $fetched_data['reviews_count'] = $db->where('product_id', $fetched_data['id'])->getValue(T_PRODUCT_REVIEW, "count(id)");
-    $fetched_data['price_format']  = number_format($fetched_data['price'], 2, '.');
+    $fetched_data['price_format']  = number_format($fetched_data['price'], 2,",",".");
     return $fetched_data;
 }
 function Wo_DeleteProductImage($id) {
@@ -413,7 +413,7 @@ function Wo_UpdateProductData($product_id, $update_data) {
         }
     }
     foreach ($update_data as $field => $data) {
-        $update[] = '`' . $field . '` = \'' . Wo_Secure($data, 0) . '\'';
+        $update[] = '`' . $field . '` = \'' . Wo_Secure($data, 1,true,1) . '\'';
     }
     $impload   = implode(', ', $update);
     $query_one = " UPDATE " . T_PRODUCTS . " SET {$impload} WHERE `id` = {$product_id}";
@@ -5475,6 +5475,9 @@ function Wo_UpdateGChat($id = false, $update_data = array()) {
         return false;
     }
     $id = Wo_Secure($id);
+    if (!Wo_IsGChatOwner($id)) {
+       return false;
+    }
     foreach ($update_data as $field => $data) {
         $update[] = '`' . $field . '` = \'' . $data . '\'';
     }

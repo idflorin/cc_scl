@@ -10,8 +10,8 @@
            var percentVal = '0%';
            create_bar.width(percentVal);
            create_percent.html(percentVal);
-           
-           
+
+
             $('.edit-offer-form').find('.last-sett-btn .ball-pulse').fadeIn(100);
           },
           uploadProgress: function (event, position, total, percentComplete) {
@@ -43,17 +43,17 @@
            $('.edit-offer-form').find('.last-sett-btn .ball-pulse').fadeOut(100);
           }
       });
-    
+
   });
 function Wo_RegisterReactionLike(element,reaction_icon,is_html){
 
     var reaction = parseInt($(element).attr('data-reaction-id'));
     var post_id = $(element).attr('data-post-id');
-   
+
     if ($('#react_'+post_id).attr('data_react') == 1) {
       return false;
     }
-    
+
     var path = "<?php echo $wo['config']['theme_url']?>";
     var lang = $(element).attr('data-reaction-lang');
     if (!post_id || !reaction) {
@@ -124,7 +124,7 @@ function Wo_RegisterReactionLike(element,reaction_icon,is_html){
       reaction_html = '<div class="inline_post_emoji no_anim"><div class="reaction"><img src="'+reaction_icon+'"></div></div>';
       reaction_color = '';
     }
-   
+
 
     $('.status-reaction-'+post_id).html(''+reaction_html+'' + lang).css({"color": reaction_color});
     $('.status-reaction-'+post_id).addClass("active-like");
@@ -137,7 +137,7 @@ function Wo_RegisterReactionLike(element,reaction_icon,is_html){
       }
       <?php } ?>
         $('.post-reactions-icons-'+post_id).html(data.reactions);
-        
+
       }
       if (data.can_send == 1) {
         Wo_SendMessages();
@@ -163,7 +163,7 @@ function Wo_RegisterStoryReaction(element,reaction_icon,is_html) {
   }
   <?php } ?>
       $('.post-reactions-icons-'+post_id).html(data.reactions);
-      
+
     }
     if (data.can_send == 1) {
       Wo_SendMessages();
@@ -187,7 +187,7 @@ function Wo_RegisterMessageReaction(element,reaction_icon,is_html) {
         reaction: reaction,
         user_id: _getCookie("user_id")
       })
-    
+
   <?php }else{ ?>
     $.get(Wo_Ajax_Requests_File(), {f: 'messages', s: 'register_reaction', message_id: post_id, reaction: reaction}, function (data) {
         if(data.status == 200) {
@@ -202,7 +202,7 @@ function Wo_RegisterMessageReaction(element,reaction_icon,is_html) {
 
   <?php } ?>
   $('.reactions-box-container-'+post_id).fadeOut(50);
-      
+
 }
 function Wo_RegisterReaction(element,reaction_icon,is_html){
     var reaction = parseInt($(element).attr('data-reaction-id'));
@@ -249,7 +249,7 @@ function Wo_RegisterReaction(element,reaction_icon,is_html){
       reaction_html = '<div class="inline_post_count_emoji reaction"><img src="'+reaction_icon+'"></div>&nbsp;&nbsp;';
       reaction_color = '';
     }
-    
+
     $('.status-reaction-'+post_id).removeClass (function (index, css) {
        return (css.match (/(^|\s)active-like\S+/g) || []).join(' ');
     });
@@ -264,7 +264,7 @@ function Wo_RegisterReaction(element,reaction_icon,is_html){
     //}
     <?php } ?>
         $('.post-reactions-icons-'+post_id).html(data.reactions);
-		    
+
       }
       if (data.can_send == 1) {
         Wo_SendMessages();
@@ -314,8 +314,8 @@ function Wo_RegisterFollow(id, is_confirm,show_modal= false) {
     }
     if (_follow_con.find('button').hasClass('btn-active') || _follow_con.find('button').hasClass('btn-requested')) {
       html_ = '<button type="button" onclick="Wo_RegisterFollow(' + id + ', ' + is_confirm_f + ')" class="btn btn-default btn-sm wo_follow_btn" id="wo_useract_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span class="button-text"> <?php echo $wo["lang"]["follow"];?></span></button>';
-     
-    } 
+
+    }
   <?php else: ?>
     // if (_follow_con.find('button').hasClass('btn-active')) {
     //   if (!confirm("<?php echo $wo['lang']['are_you_sure_unfriend'] ?>")) {
@@ -325,17 +325,17 @@ function Wo_RegisterFollow(id, is_confirm,show_modal= false) {
     html_ = '<button type="button" onclick="Wo_RegisterFollow(' + id + ')" class="btn-requested btn btn-default btn-sm wo_request_btn" id="wo_useract_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span class="button-text"> <?php echo $wo["lang"]["requested"];?></span></button>';
     if (_follow_con.find('button').hasClass('btn-requested') || _follow_con.find('button').hasClass('btn-active')) {
       html_ = '<button type="button" onclick="Wo_RegisterFollow(' + id + ')" class="btn btn-default btn-sm wo_follow_btn" id="wo_useract_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span class="button-text"> <?php echo $wo["lang"]["add_friend"];?></span></button>';
-      
-    } 
+
+    }
 
   <?php endif; ?>
 
   _follow_con.html(html_);
-  
+
   $.get(Wo_Ajax_Requests_File(), {f: 'follow_user', following_id: id}, function(data) {
 
     <?php if ($wo['config']['connectivitySystem'] == 0): ?>
-    
+
     if (_follow_con.find('button').hasClass('btn-active') || _follow_con.find('button').hasClass('btn-requested')) {
       if (node_socket_flow == "1") {
         if (is_confirm_f == 1) {
@@ -343,7 +343,7 @@ function Wo_RegisterFollow(id, is_confirm,show_modal= false) {
         } else {
           socket.emit("user_notification", { to_id: id, user_id: _getCookie("user_id"), type: "added" });
         }
-        
+
       }
     } else {
       if (node_socket_flow == "1") {
@@ -488,7 +488,7 @@ function Wo_RegisterLike(post_id) {
     html_like = '<?php echo GetModeBtn('liked_btn'); ?>';
     if (post.find("[id^=like-button]").parent().find('.active-like').length > 0) {
       html_like = '<?php echo GetModeBtn('like_btn'); ?>';
-    } 
+    }
   <?php if ($wo['config']['second_post_button'] == 'dislike') { ?>
    post.find("[id^=wonder-button]").html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-thumbs-down"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"></path></svg> <span class="like-btn-mobile"> <?php echo $wo["lang"]["dislike"];?></span>');
   <?php } ?>
@@ -548,7 +548,7 @@ function Wo_RegisterWonder(post_id) {
   });
 }
 function Wo_IsLangValid(lang){
-  var langs = [ "en", "tr","fr","es","nl","de","it","pt","ru","ar"]; 
+  var langs = [ "en", "tr","fr","es","nl","de","it","pt","ru","ar"];
   if (lang && langs.indexOf(lang) != -1) {
     return true;
   }
@@ -685,7 +685,7 @@ $(document).on('change', '#share_type_select', function(event) {
 //   })
 //   .always(function() {
 //   });
-  
+
 // });
 // $(document).on('click', '#share_post_on_user_form_btn', function(event) {
 //   user_id = $('#SearchForInputUser').val();
@@ -702,7 +702,7 @@ $(document).on('change', '#share_type_select', function(event) {
 //   })
 //   .always(function() {
 //   });
-  
+
 // });
 
 
@@ -1059,7 +1059,7 @@ $(window).on('load', function() {
     }
     var self = this;
     var post_id = $( this ).attr( 'data-id' );
-   
+
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_reaction', post_id: post_id}, function (data) {
       if(data.status == 200) {
         <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
@@ -1073,7 +1073,7 @@ $(window).on('load', function() {
       $(self).attr('data_react','0');
     });
   });
-  
+
    $('body').delegate('.reactions-box','mouseleave', function() {
     var id = $( this ).attr( 'data-id' );
     setTimeout( function () {
@@ -1104,7 +1104,7 @@ $(window).on('load', function() {
 
   $('body').delegate('.like-btn-lightbox','click', function() {
     var post_id = $( this ).attr( 'data-id' );
-   
+
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_reaction', post_id: post_id}, function (data) {
       if(data.status == 200) {
          <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
@@ -1144,10 +1144,10 @@ $(window).on('load', function() {
         $('.reactions-comment-container-'+id).fadeOut(50);
     }, 500);
   });
-  
+
   $('body').delegate('.like-btn-comment','click', function() {
     var comment_id = $( this ).attr( 'data-id' );
-    
+
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_comment_reaction', comment_id: comment_id}, function (data) {
       if(data.status == 200) {
         <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
@@ -1159,7 +1159,7 @@ $(window).on('load', function() {
       }
     });
   });
-  
+
   //reactions replay
   $('body').delegate('.like-btn-replay','mouseenter', function() {
     var id = $( this ).attr( 'data-id' );
@@ -1195,7 +1195,7 @@ $(window).on('load', function() {
 
   $('body').delegate('.like-btn-replay','click', function() {
     var replay_id = $( this ).attr( 'data-id' );
-    
+
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_replay_reaction', replay_id: replay_id}, function (data) {
       if(data.status == 200) {
         if (node_socket_flow == "1") {
@@ -1225,7 +1225,7 @@ $(window).on('load', function() {
       }
     }, 500);
   });
-  
+
   $('body').delegate('.reactions-box','mouseleave', function() {
     if( !$( this ).hasClass( 'reactions-lightbox-comment-container-' + $( this ).attr( 'data-id' ) ) ){
       return false;
@@ -1238,7 +1238,7 @@ $(window).on('load', function() {
 
   $('body').delegate('.like-btn-lightbox-comment','click', function() {
     var comment_id = $( this ).attr( 'data-id' );
-    
+
     $.get(Wo_Ajax_Requests_File(), {f: 'posts', s: 'delete_comment_reaction', comment_id: comment_id}, function (data) {
       if(data.status == 200) {
         <?php if ($wo['config']['node_socket_flow'] == 1) { ?>
@@ -1309,14 +1309,14 @@ function NewAddress() {
   $("#add_address_modal").find('.btn-mat').text("<?php echo $wo['lang']['add'] ?>");
   $('#add_address_modal').modal('show');
 }
-$(document).ready(function() { 
-    var options = { 
+$(document).ready(function() {
+    var options = {
       url: Wo_Ajax_Requests_File() + '?f=address&s=add&hash=' + $('.main_session').val(),
         beforeSubmit:  function () {
           $('.modal_add_address_modal_alert').empty();
           $("#add_address_modal").find('.btn-mat').attr('disabled', 'true');
           $("#add_address_modal").find('.btn-mat').text("<?php echo($wo['lang']['please_wait']) ?>");
-        }, 
+        },
         success: function (data) {
           $("#add_address_modal").find('.btn-mat').text("<?php echo $wo['lang']['add'] ?>");
           $("#add_address_modal").find('.btn-mat').removeAttr('disabled')
@@ -1344,10 +1344,10 @@ $(document).ready(function() {
             $('.modal_add_address_modal_alert').html('<div class="alert alert-danger bg-danger"> '+
             data.message
             +'</div>');
-          } 
+          }
         }
-    }; 
-    $('.address_form').ajaxForm(options); 
+    };
+    $('.address_form').ajaxForm(options);
 });
 function BuyProducts(type = 'show',price) {
   if ($('.payment_address').length < 1) {
@@ -1597,11 +1597,11 @@ function Wo_LoadMoreApplyJobs(){
             $(".apply_job_container").append(data.html);
             $("[data-toggle]").tooltip();
             $("#load_more_nearby_users").html('<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg></span> <?php echo $wo['lang']['load_more']; ?>');
-            
-          } 
+
+          }
           else{
             $("#load_more_nearby_users").html('<?php echo $wo['lang']['no_result']; ?>');
-          } 
+          }
     })
     .fail(function() {
       console.log("error");
@@ -1616,8 +1616,8 @@ function Wo_LoadMoreApplyJobs(){
        var percentVal = '0%';
        create_bar.width(percentVal);
        create_percent.html(percentVal);
-       
-       
+
+
         $('.edit-job-form').find('.last-sett-btn .ball-pulse').fadeIn(100);
       },
       uploadProgress: function (event, position, total, percentComplete) {
@@ -1663,7 +1663,7 @@ function Wo_UpdatePostPrivacy(post_id, privacy_type, event) {
     privacy_type: privacy_type
   }, function (data) {
     if(data.status == 200) {
-		
+
       if(data.privacy_type == 0) {
         post_privacy_container.html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>');
       } else if(data.privacy_type == 1) {
@@ -1765,5 +1765,35 @@ function Wo_OpenBannedMenu(type = 'notification'){
   else if(type == 'requests'){
     $('#requests-list').html("<div class='empty_state'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24'><path d='M14 14.252v2.09A6 6 0 0 0 6 22l-2-.001a8 8 0 0 1 10-7.748zM12 13c-3.315 0-6-2.685-6-6s2.685-6 6-6 6 2.685 6 6-2.685 6-6 6zm0-2c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm7 6.586l2.121-2.122 1.415 1.415L20.414 19l2.122 2.121-1.415 1.415L19 20.414l-2.121 2.122-1.415-1.415L17.586 19l-2.122-2.121 1.415-1.415L19 17.586z' fill='currentColor'/></svg><?php echo($wo['lang']['your_requests_because_you_were_banned']); ?></div>");
   }
+}
+function AddYandexResult(target,self,result_co) {
+  $(target).val($(self).text());
+  $(result_co).html('');
+}
+function ReadMoreText(selector) {
+  let text = "<?php echo($wo['lang']['read_more_text']); ?>";
+  if (typeof selector == 'object') {
+    selector = $(selector).attr('class');
+  }
+  for (var i = 0; i < $(selector).length; i++) {
+    var t = $(selector)[i];
+    if (!$(t).hasClass('ReadMoreAdded') && $(t).text().trim().length > 0 && $(t).height() > 190) {
+      var c = new Date().getUTCMilliseconds() + (Math.floor(Math.random() * 9999)) + 100 + "_" + i;
+      $(t).addClass(c);
+      $(t).addClass('ReadMoreAdded');
+      $(t).css({ maxHeight: "170px" })
+      $(t).after('<a href="javascript:void(0)" onclick="ShowReadMoreText(\'.'+c+'\',this)">'+text+'</a>');
+    }
+  }
+}
+function ShowReadMoreText(selector,self) {
+  let text = "<?php echo($wo['lang']['read_less_text']); ?>";
+  $(selector).css({ maxHeight: "" })
+  $(self).replaceWith('<a href="javascript:void(0)" onclick="HideReadMoreText(\''+selector+'\',this)">'+text+'</a>')
+}
+function HideReadMoreText(selector,self) {
+  let text = "<?php echo($wo['lang']['read_more_text']); ?>";
+  $(selector).css({ maxHeight: "170px" })
+  $(self).replaceWith('<a href="javascript:void(0)" onclick="ShowReadMoreText(\''+selector+'\',this)">'+text+'</a>')
 }
 </script>

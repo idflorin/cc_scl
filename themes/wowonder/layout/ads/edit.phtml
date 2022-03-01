@@ -50,10 +50,12 @@
 					<label for="ads-location"><?php echo $wo['lang']['location']; ?></label>
 					<input id="ads-location" name="location" type="text" value="<?php echo $wo['ad-data']['location']; ?>">
 				</div>
-				<?php if ($wo['config']['google_map']) { ?>
+				<?php if ($wo['config']['google_map'] == 1 || $wo['config']['yandex_map'] == 1) { ?>
 					<div id="review-ads-location">
 						<div id="place">
+							<?php if ($wo['config']['google_map'] == 1) { ?>
 							<iframe width="100%" frameborder="0" style="border:0;margin-top: 10px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=<?php echo $wo['ad-data']['location']; ?>&language=en"></iframe>
+							<?php } ?>
 						</div>
 					</div>
 				<?php }?>
@@ -118,7 +120,7 @@
         });
 
 	    $('.selectpicker').selectpicker();
-
+        <?php if ($wo['config']['google_map']) { ?>
 	    $("#ads-location").change(function(event) {
 	        if ($(this).val().length >= 3) {
 	          Wo_Delay(function(){$("#review-ads-location #place").html('<iframe width="100%" frameborder="0" style="border:0;margin-top: 10px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=' + $("#ads-location").val() + '&language=en"></iframe>')},1000)
@@ -127,6 +129,36 @@
 	          Wo_Delay(function(){$("#review-ads-location #place").html('<iframe width="100%" frameborder="0" style="border:0;margin-top: 10px;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=us&language=en"></iframe>')},1000)
 	        }
       	});
+      	<?php }else if($wo['config']['yandex_map'] == 1){ ?>
+      		<?php if (!empty($wo['ad-data']['location'])) { ?>
+      			Wo_Delay(function(){
+		      		var myMap;
+			        ymaps.geocode("<?php echo($wo['ad-data']['location']); ?>").then(function (res) {
+			            myMap = new ymaps.Map('place', {
+			                center: res.geoObjects.get(0).geometry.getCoordinates(),
+			                zoom : 10
+			            });
+			            myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {
+					            balloonContent: ''
+					        }));
+			        });
+			    },1000);
+	        <?php } ?>
+
+	   	$("#ads-location").change(function(event) {
+	   		  $("#review-ads-location #place").html('');
+		     	var myMap;
+	        ymaps.geocode($("#ads-location").val()).then(function (res) {
+	            myMap = new ymaps.Map('place', {
+	                center: res.geoObjects.get(0).geometry.getCoordinates(),
+	                zoom : 10
+	            });
+	            myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {
+			            balloonContent: ''
+			        }));
+	        });
+        });
+	   <?php } ?>
 
       	$('#update-ads').ajaxForm({
 	       	url: Wo_Ajax_Requests_File() + '?f=ads&s=update&ad-id=<?php echo $_GET['id']; ?>&a=0',

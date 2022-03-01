@@ -20,25 +20,74 @@ $types = array(
     'QQ',
     'WeChat',
     'Discord',
-    'Mailru'
+    'Mailru',
+    'OkRu',
 );
+if (!empty($_GET['state']) && $_GET['state'] == 'OkRu' && !empty($_GET['code'])) {
+    $_GET['provider'] = 'OkRu';
+}
 if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
     $provider = Wo_Secure($_GET['provider']);
 }
-
-require_once('assets/libraries/social-login/config.php');
-require_once('assets/libraries/social-login/autoload.php');
+if (!empty($_GET['provider']) && $_GET['provider'] != 'OkRu') {
+    require_once('assets/libraries/social-login/config.php');
+    require_once('assets/libraries/social-login/autoload.php');
+}
+else{
+    if (empty($_GET['code'])) {
+        header("Location: https://connect.ok.ru/oauth/authorize?client_id=".$wo['config']['OkAppId']."&scope=VALUABLE_ACCESS&response_type=code&redirect_uri=".$wo['config']['site_url']."/login-with.php&layout=w&state=OkRu");
+        exit();
+    }
+    require_once('assets/libraries/odnoklassniki_sdk.php');
+}
 
 use Hybridauth\Hybridauth;
 use Hybridauth\HttpClient;
 
 if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
     try {
-        $hybridauth = new Hybridauth( $LoginWithConfig );
+        if ($provider == 'OkRu') {
+            OdnoklassnikiSDK::SetOkInfo();
+            if (!is_null(OdnoklassnikiSDK::getCode())){
+                if(OdnoklassnikiSDK::changeCodeToToken(OdnoklassnikiSDK::getCode())){
+                    $current_user = OdnoklassnikiSDK::makeRequest("users.getCurrentUser", null);
+                    if (!empty($current_user)) {
+                        $user_profile = ToObject($current_user);
+                        $user_profile->identifier = $user_profile->uid;
+                        $user_profile->lastName = $user_profile->last_name;
+                        if (!empty($user_profile->pic_3)) {
+                            $user_profile->photoURL = $user_profile->pic_3;
+                        }
+                        else if (!empty($user_profile->pic_2)) {
+                            $user_profile->photoURL = $user_profile->pic_2;
+                        }
+                        else if (!empty($user_profile->pic_1)) {
+                            $user_profile->photoURL = $user_profile->pic_1;
+                        }
+                    }
+                    else{
+                        echo " <b><a href='" . Wo_SeoLink('index.php?link1=welcome') . "'>Try again<a></b>";
+                        exit();
+                    }
+                }
+                else{
+                    echo " <b><a href='" . Wo_SeoLink('index.php?link1=welcome') . "'>Try again<a></b>";
+                    exit();
+                }
+            }
+            else{
+                echo " <b><a href='" . Wo_SeoLink('index.php?link1=welcome') . "'>Try again<a></b>";
+                exit();
+            }
+        }
+        else{
+            $hybridauth = new Hybridauth( $LoginWithConfig );
 
-        $authProvider = $hybridauth->authenticate($provider);
-        $tokens = $authProvider->getAccessToken();
-        $user_profile = $authProvider->getUserProfile();
+            $authProvider = $hybridauth->authenticate($provider);
+            $tokens = $authProvider->getAccessToken();
+            $user_profile = $authProvider->getUserProfile();
+        }
+            
         if ($user_profile && isset($user_profile->identifier)) {
             $name = $user_profile->firstName;
             if ($provider == 'Google') {
@@ -76,6 +125,10 @@ if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
                 $notfound_email     = 'mailru_';
                 $notfound_email_com = '@mailru.com';
                 $name = $user_profile->displayName;
+            } else if ($provider == 'OkRu') {
+                $notfound_email     = 'okru_';
+                $notfound_email_com = '@okru.com';
+                $name = $user_profile->first_name;
             }
             $user_name  = $notfound_email . $user_profile->identifier;
             $user_email = $user_name . $notfound_email_com;
@@ -154,6 +207,9 @@ if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
                 }
                 if ($provider == 'Mailru') {
                     $re_data['mailru']   = Wo_Secure($social_url);
+                }
+                if ($provider == 'OkRu') {
+                    $re_data['okru']   = Wo_Secure($user_profile->uid);
                 }
                 if (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 0) {
                     $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);

@@ -196,19 +196,19 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php //endif; ?>
 	  
-	  <?php if ($wo['page'] == 'friends_nearby'): ?>
+	  <?php //if ($wo['page'] == 'friends_nearby'): ?>
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/leaflet.css?version=<?php echo $wo['config']['version']; ?>">
       <script src="<?php echo $wo['config']['theme_url'];?>/javascript/leaflet.js?version=<?php echo $wo['config']['version']; ?>"></script>
-      <?php endif; ?>
+      <?php //endif; ?>
 
       <?php if ($wo['page'] == 'forum') { ?>
         <script src="<?php echo $wo['config']['theme_url'];?>/javascript/forum/script.master.js?version=<?php echo $wo['config']['version']; ?>"></script>
         <script src="<?php echo $wo['config']['theme_url'];?>/javascript/forum/forum.ajax.js?version=<?php echo $wo['config']['version']; ?>"></script>
       <?php } ?>
 
-      <?php if ($wo['page'] == 'movies' || $wo['page'] == 'watch_movie') { ?>
+      <?php //if ($wo['page'] == 'movies' || $wo['page'] == 'watch_movie') { ?>
         <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/movies/style.movies.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>" />
-      <?php } ?>
+      <?php //} ?>
       
       <?php if (isset($wo['bbcodeditor']) && $wo['bbcodeditor']):?>
       <!-- <script src="<?php echo $wo['config']['theme_url'];?>/javascript/bbcode/jquery.bbcode.js"></script>
@@ -740,6 +740,11 @@
 	  
 	  
 	  <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+    <?php if ($wo['config']['yandex_map'] == 1) { ?>
+      <script src="https://api-maps.yandex.ru/2.1/?lang=en_RU&amp;apikey=<?php echo $wo['config']['yandex_map_api'];?>" type="text/javascript"></script>
+      <?php } ?>
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/javascript/green-audio-player/green-audio-player.css?version=<?php echo $wo['config']['version']; ?>" />
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/green-audio-player/green-audio-player.js?version=<?php echo $wo['config']['version']; ?>"></script>
    </head>
    
    <body <?php if ($wo['config']['chatSystem'] == 0) { ?> chat-off="true" <?php } ?>>

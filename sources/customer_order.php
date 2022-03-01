@@ -36,7 +36,7 @@ foreach ($wo['orders'] as $key => $wo['order']) {
     }
     $wo['html'] .= Wo_LoadPage('customer_order/list');
 }
-$wo['total']       = number_format($wo['total'], 2, '.');
+$wo['total']       = number_format($wo['total'], 2);
 $wo['address']     = $db->where('id', $wo['address_id'])->getOne(T_USER_ADDRESS);
 $wo['refund']      = $db->where('order_hash_id', $wo['hash_id'])->getOne(T_REFUND);
 $wo['description'] = $wo['config']['siteDesc'];

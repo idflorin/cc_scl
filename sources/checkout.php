@@ -23,7 +23,7 @@ if (!empty($wo['items'])) {
 }
 $wo['addresses']   = $db->where('user_id', $wo['user']['user_id'])->get(T_USER_ADDRESS);
 $wo['topup']       = ($wo['user']['wallet'] < $wo['total'] ? 'show' : 'hide');
-$wo['total']       = number_format($wo['total'], '2', '.');
+$wo['total']       = number_format($wo['total'], '2');
 $wo['description'] = $wo['config']['siteDesc'];
 $wo['keywords']    = $wo['config']['siteKeywords'];
 $wo['page']        = 'checkout';

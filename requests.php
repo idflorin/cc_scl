@@ -34,7 +34,9 @@ $allow_array     = array(
     'funding',
     'stripe',
     'coinbase',
-    'load_more_products'
+    'load_more_products',
+    'yoomoney',
+    'iyzipay',
 );
 if ($f == 'certification' && $s == 'download_user_certification' && !empty($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
     $allow_array[] = 'certification';
@@ -80,7 +82,9 @@ $non_login_array = array(
     'search-blog-read',
     'search-blog',
     'coinbase',
-    'load_more_products'
+    'load_more_products',
+    'yoomoney',
+    'iyzipay',
 );
 if ($wo['config']['membership_system'] == 1) {
     $non_login_array[] = 'pro_register';

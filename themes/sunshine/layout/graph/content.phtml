@@ -19,7 +19,7 @@
                             <tr>
                                 <td><b>type</b></td>
                                 <td>Query type.</td>
-                                <td>get_user_data, posts_data</td>
+                                <td>get_user_data, posts_data,get_pages, get_groups, get_products, get_followers, get_following, get_friends</td>
                                 <td>This parameter specify the type of the query.</td>
                                 <td><i class="fa fa-check"></i></td>
                             </tr>
@@ -37,7 +37,7 @@
                     <hr>
                     <ol style="list-style: initial;">
                         <li>Create a <a href="<?php echo Wo_SeoLink('index.php?link1=create-app');?>" class="main">development application</a>.<br><br></li>
-                        <li>Once you have created the app, you'll get APP_ID, and APP_SECRET. <br>Example: <br><br> <img src="https://s3.postimg.org/4vaacpclf/Screenshot_24.png" alt=""><br><br></li>
+                        <li>Once you have created the app, you'll get APP_ID, and APP_SECRET. <br>Example: <br><br> <img src="<?php echo $wo['config']['theme_url'];?>/img/developer.png" alt=""><br><br></li>
                         <li>To start the Oauth process, use the link <?php echo $wo['config']['site_url'] ?>/oauth?app_id={YOUR_APP_ID}<br><br></li>
                         <li>Once the end user clicks this link, he/she will be redirected to the authorization page.<br><br></li>
                         <li>Once the end user authorization the app, he/she will be redirected to your domain name with a GET parameter "code", example: http://yourdomain/?code=XXX<br><br></li>

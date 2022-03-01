@@ -3754,20 +3754,3 @@ function Wo_progressIconLoader(e){e.each(function(){return progress_icon_elem=$(
             );
         });
 });
-function ReadMoreText(selector) {
-  if (typeof selector == 'object') {
-    selector = $(selector).attr('class');
-  }
-  if ($(selector).height() > 190) {
-    $(selector).css({ maxHeight: "190px" })
-    $(selector).after('<a href="javascript:void(0)" onclick="ShowReadMoreText(\''+selector+'\',this)">Read More</a>');
-  }
-}
-function ShowReadMoreText(selector,self) {
-  $(selector).css({ maxHeight: "" })
-  $(self).replaceWith('<a href="javascript:void(0)" onclick="HideReadMoreText(\''+selector+'\',this)">Read Less</a>')
-}
-function HideReadMoreText(selector,self) {
-  $(selector).css({ maxHeight: "190px" })
-  $(self).replaceWith('<a href="javascript:void(0)" onclick="ShowReadMoreText(\''+selector+'\',this)">Read More</a>')
-}

@@ -122,6 +122,9 @@ if (!empty($_GET['url'])) {
 			<div class="inner-addon <?php echo Wo_RightToLeft('left-addon');?>">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
 				<input name="postMap" id="searchTextField" type="text" class="form-control" placeholder="<?php echo $wo['lang']['maps_placeholder']?>">
+				<?php if ($wo['config']['yandex_map'] == 1) { ?>
+          <div class="yandex_search_publisher"></div>
+        <?php } ?>
 			</div>
 		</div>
 		<!--Add Emojis-->
@@ -1389,6 +1392,31 @@ $(function () {
      var autocomplete = new google.maps.places.Autocomplete(pac_input);
   });
   <?php } ?>
+<?php if ($wo['config']['yandex_map'] == 1) { ?>
+  $(function() {
+    $('#searchTextField').on( "keydown", function() {
+      let self = this;
+      var myGeocoder = ymaps.geocode($(this).val());
+      myGeocoder.then(
+          function (res) {
+            if (res.geoObjects.getLength() == 0) {
+              $('.yandex_search_publisher').html('');
+            }
+            else{
+              let html = '';
+              for (var i = 0; i < res.geoObjects.getLength(); i++) {
+                html += '<p class="pointer" onclick="AddYandexResult(\'#searchTextField\',this,\'.yandex_search_publisher\')">'+res.geoObjects.get(i).properties.get('name')+'</p>';
+              }
+              $('.yandex_search_publisher').html(html);
+            }
+          },
+          function (err) {
+              $('.yandex_search_publisher').html('');
+          }
+      );
+    });
+  });
+<?php } ?>
 
   var getUrl  = $('.form-control.postText'); //url to extract from text field
   var sent = 0;

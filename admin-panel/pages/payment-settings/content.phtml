@@ -391,6 +391,121 @@
                     </form>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Iyzipay payment</h6>
+                    <div class="iyzipay-settings-alert"></div>
+                    <form class="iyzipay-settings" method="POST">
+                        <div>
+                            <div class="float-left">
+                                <label for="iyzipay_payment" class="main-label">Iyzipay Payment Method</label>
+                                <br><small class="admin-info">Enable Iyzipay to receive payments by credit cards.</small>
+                            </div>
+                            <div class="form-group float-right switcher">
+                                <input type="hidden" name="iyzipay_payment" value="0">
+                                <input type="checkbox" name="iyzipay_payment" id="iyzipay_payment-enabled" value="1" <?php echo ($wo['config']['iyzipay_payment'] == '1') ? 'checked': '';?>>
+                                <label for="iyzipay_payment-enabled" class="check-trail"><span class="check-handler"></span></label>
+                            </div>
+                            <div class="clearfix"></div>
+                            <hr>
+                        </div>
+
+                        <label for="iyzipay_mode">Iyzipay Mode</label>
+                        <select class="form-control show-tick" id="iyzipay_mode" name="iyzipay_mode">
+                          <option value="0" <?php echo ($wo['config']['iyzipay_mode'] == '0') ? 'selected': '';?>>Live</option>
+                          <option value="1" <?php echo ($wo['config']['iyzipay_mode'] == '1') ? 'selected': '';?>>SandBox</option>
+                        </select>
+                        <small class="admin-info">Choose the mode your application is using, for testing use the SandBox mode.</small>
+                        <div class="clearfix"></div>
+
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Key</label>
+                                <input type="text" id="iyzipay_key" name="iyzipay_key" class="form-control" value="<?php echo $wo['config']['iyzipay_key'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Secret Key</label>
+                                <input type="text" id="iyzipay_secret_key" name="iyzipay_secret_key" class="form-control" value="<?php echo $wo['config']['iyzipay_secret_key'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer Id</label>
+                                <input type="text" id="iyzipay_buyer_id" name="iyzipay_buyer_id" class="form-control" value="<?php echo $wo['config']['iyzipay_buyer_id'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer Name</label>
+                                <input type="text" id="iyzipay_buyer_name" name="iyzipay_buyer_name" class="form-control" value="<?php echo $wo['config']['iyzipay_buyer_name'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer Surname</label>
+                                <input type="text" id="iyzipay_buyer_surname" name="iyzipay_buyer_surname" class="form-control" value="<?php echo $wo['config']['iyzipay_buyer_surname'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer Gsm Number (+905350000000)</label>
+                                <input type="text" id="iyzipay_buyer_gsm_number" name="iyzipay_buyer_gsm_number" class="form-control" value="<?php echo $wo['config']['iyzipay_buyer_gsm_number'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer Email</label>
+                                <input type="text" id="iyzipay_buyer_email" name="iyzipay_buyer_email" class="form-control" value="<?php echo $wo['config']['iyzipay_buyer_email'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer Identity Number</label>
+                                <input type="text" id="iyzipay_identity_number" name="iyzipay_identity_number" class="form-control" value="<?php echo $wo['config']['iyzipay_identity_number'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer Address</label>
+                                <input type="text" id="iyzipay_address" name="iyzipay_address" class="form-control" value="<?php echo $wo['config']['iyzipay_address'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer City</label>
+                                <input type="text" id="iyzipay_city" name="iyzipay_city" class="form-control" value="<?php echo $wo['config']['iyzipay_city'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer Country</label>
+                                <input type="text" id="iyzipay_country" name="iyzipay_country" class="form-control" value="<?php echo $wo['config']['iyzipay_country'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Iyzipay Buyer Zip</label>
+                                <input type="text" id="iyzipay_zip" name="iyzipay_zip" class="form-control" value="<?php echo $wo['config']['iyzipay_zip'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                    </form>
+                </div>
+            </div>
         </div>
 
 
@@ -438,7 +553,7 @@
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="bank_payment" value="0" />
-                            <input type="checkbox" name="bank_payment" id="chck-bank_payment" value="1" <?php echo ($wo['config']['bank_payment'] == 'yes') ? 'checked': '';?>>
+                            <input type="checkbox" name="bank_payment" id="chck-bank_payment" value="1" <?php echo ($wo['config']['bank_payment'] == '1') ? 'checked': '';?>>
                             <label for="chck-bank_payment" class="check-trail"><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
@@ -570,6 +685,122 @@
                                 <small class="admin-info">Your PaySera account password.</small>
                             </div>
                         </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Configure Yoomoney Payment Method</h6>
+                    <form class="yoomoney-settings" method="POST">
+                        <div class="float-left">
+                            <label for="yoomoney_payment" class="main-label">Yoomoney Payment Method</label>
+                            <br><small class="admin-info">Get paid by Yoomoney payment provider.</small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="yoomoney_payment" value="0" />
+                            <input type="checkbox" name="yoomoney_payment" id="chck-yoomoney_payment" value="1" <?php echo ($wo['config']['yoomoney_payment'] == '1') ? 'checked': '';?>>
+                            <label for="chck-yoomoney_payment" class="check-trail"><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                              <label class="form-label">Wallet ID</label>
+                                <input type="text" id="yoomoney_wallet_id" name="yoomoney_wallet_id" class="form-control" value="<?php echo $wo['config']['yoomoney_wallet_id'];?>">
+                                <small class="admin-info">Your Yoomoney Wallet ID.</small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                              <label class="form-label">Notifications Authentication Secret</label>
+                                <input type="text" id="yoomoney_notifications_secret" name="yoomoney_notifications_secret" class="form-control" value="<?php echo $wo['config']['yoomoney_notifications_secret'];?>">
+                                <small class="admin-info">Your Yoomoney Notifications Authentication Secret.</small>
+                            </div>
+                        </div>
+                        <small class="admin-info">Please add this url <?php echo($wo['config']['site_url']) ?>/requests.php?f=yoomoney&s=success <a href="https://yoomoney.ru/transfer/myservices/http-notification" target="_blank">in HTTP notifications</a></small>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Securionpay payment</h6>
+                    <div class="securionpay-settings-alert"></div>
+                    <form class="securionpay-settings" method="POST">
+                        <div>
+                            <div class="float-left">
+                                <label for="securionpay_payment" class="main-label">Securionpay Payment Method</label>
+                                <br><small class="admin-info">Enable Securionpay to receive payments by credit cards.</small>
+                            </div>
+                            <div class="form-group float-right switcher">
+                                <input type="hidden" name="securionpay_payment" value="0">
+                                <input type="checkbox" name="securionpay_payment" id="securionpay_payment-enabled" value="1" <?php echo ($wo['config']['securionpay_payment'] == '1') ? 'checked': '';?>>
+                                <label for="securionpay_payment-enabled" class="check-trail"><span class="check-handler"></span></label>
+                            </div>
+                            <div class="clearfix"></div>
+                            <hr>
+                        </div>
+
+                        <label for="securionpay_public_key">Securionpay Public key</label>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="securionpay_public_key" name="securionpay_public_key" class="form-control" value="<?php echo $wo['config']['securionpay_public_key'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <label class="form-check-label" for="securionpay_secret_key">Securionpay Secret key</label>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="securionpay_secret_key" name="securionpay_secret_key" class="form-control" value="<?php echo $wo['config']['securionpay_secret_key'];?>">
+                                <small class="admin-info"></small>
+                            </div>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Authorize.Net payment</h6>
+                    <div class="authorize-settings-alert"></div>
+                    <form class="authorize-settings" method="POST">
+                        <div>
+                            <div class="float-left">
+                                <label for="authorize_payment" class="main-label">Authorize.Net Payment Method</label>
+                                <br><small class="admin-info">Enable Authorize.Net to receive payments by credit cards.</small>
+                            </div>
+                            <div class="form-group float-right switcher">
+                                <input type="hidden" name="authorize_payment" value="0">
+                                <input type="checkbox" name="authorize_payment" id="authorize_payment-enabled" value="1" <?php echo ($wo['config']['authorize_payment'] == '1') ? 'checked': '';?>>
+                                <label for="authorize_payment-enabled" class="check-trail"><span class="check-handler"></span></label>
+                            </div>
+                            <div class="clearfix"></div>
+                            <label for="authorize_test_mode">Test mode</label>
+                        <select class="form-control show-tick" id="authorize_test_mode" name="authorize_test_mode">
+                          <option value="PRODUCTION" <?php echo ($wo['config']['authorize_test_mode'] == 'PRODUCTION') ? 'selected': '';?>>Live</option>
+                          <option value="SANDBOX" <?php echo ($wo['config']['authorize_test_mode'] == 'SANDBOX') ? 'selected': '';?>>Test</option>
+                        </select>
+                        <small class="admin-info">Choose the mode your application is using, for testing use the SandBox mode.</small>
+                        <div class="clearfix"></div>
+                            <hr>
+                        </div>
+
+                        <label for="authorize_login_id">Authorize.Net API LOGIN ID</label>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="authorize_login_id" name="authorize_login_id" class="form-control" value="<?php echo $wo['config']['authorize_login_id'];?>">
+                                <small class="admin-info">Your Authorize.Net API LOGIN ID.</small>
+                            </div>
+                        </div>
+                        <label class="form-check-label" for="authorize_transaction_key">Authorize.Net TRANSACTION KEY</label>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <input type="text" id="authorize_transaction_key" name="authorize_transaction_key" class="form-control" value="<?php echo $wo['config']['authorize_transaction_key'];?>">
+                                <small class="admin-info">Your Authorize.Net TRANSACTION KEY.</small>
+                            </div>
+                        </div>
+
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                     </form>
                 </div>

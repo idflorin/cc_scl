@@ -31,6 +31,7 @@ if ($f == 'paystack') {
                 if (!empty($_POST['amount']) && is_numeric($_POST['amount']) && $_POST['amount'] > 0) {
                     $price        = $_POST['amount'];
                     $callback_url = $wo['config']['site_url'] . "/requests.php?f=paystack&s=wallet&amount=" . $price;
+                    $price = $price * 100;
                 } else {
                     $data['status']  = 400;
                     $data['message'] = $error_icon . $wo['lang']['please_check_details'];

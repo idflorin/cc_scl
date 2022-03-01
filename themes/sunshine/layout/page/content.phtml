@@ -61,10 +61,10 @@
 
 							<a href="<?php echo Wo_SeoLink('index.php?link1=page-setting&page=' .  $wo['page_profile']['page_name']); ?>" data-ajax="?link1=page-setting&page=<?php echo $wo['page_profile']['page_name'];?>" class="btn btn-info btn-sm"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg> <?php echo $wo['lang']['edit']; ?></a>
 							
-							<?php if ($wo['config']['job_system'] == 1) { ?>
+							<?php if ($wo['config']['job_system'] == 1 && Wo_IsPageOnwer($wo['page_profile']['page_id'],false)) { ?>
 							<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=jobs" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=jobs');?>" class="btn btn-info btn-sm"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> <?php echo $wo['lang']['create_job']; ?></a>
 						<?php } ?>
-							<?php if ($wo['config']['offer_system'] == 1) { ?>
+							<?php if ($wo['config']['offer_system'] == 1 && Wo_IsPageOnwer($wo['page_profile']['page_id'],false)) { ?>
 							<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=offer" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=offer');?>" class="btn btn-info btn-sm"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> <?php echo $wo['lang']['offer']; ?></a>
 						<?php } ?>
 
@@ -151,7 +151,7 @@
 			<div class="list-group profile-lists">
 				<div class="list-group-item">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-					<?php echo $wo['lang']['reviews']; ?>: <span><?php echo  number_format($wo['page_profile']['rating'], 1, '.', ' '); ?></span>
+					<?php echo $wo['lang']['reviews']; ?>: <span><?php echo  number_format($wo['page_profile']['rating'], 1); ?></span>
 				</div>
 				<div class="setting-well" id="page_reviews_cont">
 					<?php
@@ -201,7 +201,7 @@
 				<div class="clear"></div>
 			</div>
 		<?php }
-		elseif ($_GET['type'] == 'jobs' && $wo['config']['job_system'] == 1) { 
+		elseif ($_GET['type'] == 'jobs' && $wo['config']['job_system'] == 1 && Wo_IsPageOnwer($wo['page_profile']['page_id'],false)) { 
 			//$page_jobs = Wo_GetPageJobs($wo['page_profile']['page_id']);
 			$page_jobs = Wo_GetPosts(array('filter_by' => 'job', 'page_id' => $wo['page_profile']['page_id'])); 
 			if (!empty($page_jobs)) { 
@@ -254,7 +254,7 @@
 				</div>
 		  <?php  }
 		}
-		elseif ($_GET['type'] == 'offer' && $wo['config']['offer_system'] == 1) {
+		elseif ($_GET['type'] == 'offer' && $wo['config']['offer_system'] == 1 && Wo_IsPageOnwer($wo['page_profile']['page_id'],false)) {
 			if ($wo['page_profile']['is_page_onwer'] == true) {
 				echo '<div class="list-group profile-lists"><h5 class="search-filter-center-text empty_state" style="margin: 30px 0;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>' . str_replace('{{page_name}}', $wo['page_profile']['page_name'], $wo['lang']['post_offer_text']).' '.$wo['config']['siteName'] . '.<br><br><br><br><span class="btn btn-main" onclick="OpenCreateOfferModal()">'.$wo['lang']['create_offer'].' </span></h5></div>';
 			}
@@ -358,7 +358,7 @@
 						</fieldset>
 						<span class="clear"></span>
 					</span>
-					<span><?php echo  number_format($wo['page_profile']['rating'], 1, '.', ' '); ?></span>
+					<span><?php echo  number_format($wo['page_profile']['rating'], 1); ?></span>
 				</li>
 			</ul>
 		<?php endif; ?>
@@ -486,6 +486,25 @@
 					<span class="pointer" onclick="$('.user-location-frame').fadeToggle();"><?php echo $wo['lang']['located_in']; ?> <?php echo $wo['page_profile']['address'];?></span>
 					<?php if (!empty($wo['config']['google_map_api']) && $wo['config']['google_map'] == 1) { ?>
 						<iframe class="user-location-frame" width="100%" frameborder="0" style="border:0;margin-top: 10px;display: none;" src="https://www.google.com/maps/embed/v1/place?key=<?php echo $wo['config']['google_map_api']; ?>&q=<?php echo $wo['page_profile']['address'];?>&language=en"></iframe>
+					<?php } ?>
+					<?php if ($wo['config']['yandex_map'] == 1) { ?>
+						<div id="place" <?php echo($wo['config']['yandex_map'] == 1 ? 'style="width: 100%; height: 300px; padding: 0; margin: 0;"' : '') ?>></div>
+						<script type="text/javascript">
+		        			<?php if (!empty($wo['page_profile']['address'])) { ?>
+		        				setTimeout(function () {
+		        					var myMap;
+							        ymaps.geocode("<?php echo($wo['page_profile']['address']); ?>").then(function (res) {
+							            myMap = new ymaps.Map('place', {
+							                center: res.geoObjects.get(0).geometry.getCoordinates(),
+							                zoom : 10
+							            });
+							            myMap.geoObjects.add(new ymaps.Placemark(res.geoObjects.get(0).geometry.getCoordinates(), {
+									            balloonContent: ''
+									        }));
+							        });
+		        				},1000);
+					        <?php } ?>
+		        		</script>
 					<?php } ?>
 				</li>
 			<?php } ?>
@@ -1026,9 +1045,12 @@ function Wo_LoadPageReviews(self = false){
 							</div>
 							<div class="col-lg-6">
 								<div class="sun_input">
-									<input id="location" name="location" type="text" class="form-control input-md" placeholder="<?php echo $wo['lang']['location'] ?>" value="<?php echo $wo['user']['address'];?>">
+									<input id="location" class="job_location" name="location" type="text" class="form-control input-md" placeholder="<?php echo $wo['lang']['location'] ?>" value="<?php echo $wo['user']['address'];?>">
 									<label for="location"><?php echo $wo['lang']['location'] ?></label>  
 								</div>
+								<?php if ($wo['config']['yandex_map'] == 1) { ?>
+									<div class="yandex_search_job"></div>
+								<?php } ?>
 							</div>
 							<div class="col-lg-12 no-padding-right">
 								<div><?php echo $wo['lang']['salary_range'] ?></div>
@@ -1359,6 +1381,31 @@ var create_pac_input = document.getElementById('location');
   $(function () {
      var autocompleteproduct = new google.maps.places.Autocomplete(create_pac_input);
   });
+<?php } ?>
+<?php if ($wo['config']['yandex_map'] == 1) { ?>
+	$(function() {
+		$('.job_location').on( "keydown", function() {
+			let self = this;
+		  var myGeocoder = ymaps.geocode($(this).val());
+      myGeocoder.then(
+          function (res) {
+          	if (res.geoObjects.getLength() == 0) {
+          		$('.yandex_search_job').html('');
+          	}
+          	else{
+          		let html = '';
+          		for (var i = 0; i < res.geoObjects.getLength(); i++) {
+          			html += '<p class="pointer" onclick="AddYandexResult(\'.job_location\',this,\'.yandex_search_job\')">'+res.geoObjects.get(i).properties.get('name')+'</p>';
+              }
+              $('.yandex_search_job').html(html);
+          	}
+          },
+          function (err) {
+              $('.yandex_search_job').html('');
+          }
+      );
+		});
+	});
 <?php } ?>
 </script>
 

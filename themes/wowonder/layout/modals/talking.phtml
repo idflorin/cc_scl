@@ -151,14 +151,22 @@ Twilio.Video.connect('<?php echo $wo['incall']['access_token'];?>', { name: '<?p
     room.localParticipant.tracks.forEach(publication => {
       const attachedElements = publication.track.detach();
       attachedElements.forEach(element => element.remove());
+      $.get(Wo_Ajax_Requests_File(), {f:'cancel_call'}, function (data) {});
       location.href = "<?php echo($wo['config']['site_url']) ?>";
     });
   });
+  room.on('participantDisconnected', function(participant) {
+    console.log(participant.identity + ' left the Room');
+    $.get(Wo_Ajax_Requests_File(), {f:'cancel_call'}, function (data) {});
+    location.href = "<?php echo($wo['config']['site_url']) ?>";
+  });
   
   $(document).on('click', 'a[data-ajax]', function(e) {
+    $.get(Wo_Ajax_Requests_File(), {f:'cancel_call'}, function (data) {});
       room.disconnect();
   });
   $(document).on('click', '.decline-call', function(e) {
+    $.get(Wo_Ajax_Requests_File(), {f:'cancel_call'}, function (data) {});
       room.disconnect();
   });
 });
@@ -176,7 +184,7 @@ function participantConnected(participant) {
     }
   });
   participant.on('trackSubscribed', track => {
-    $('#remote-media').html('');
+    /*$('#remote-media').html('');*/
     document.getElementById('remote-media').appendChild(track.attach());
   });
  

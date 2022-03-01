@@ -212,7 +212,7 @@ if ($f == 'products') {
                 'name' => $_POST['name'],
                 'category' => $_POST['category'],
                 'sub_category' => $sub_category,
-                'description' => Wo_Secure($_POST['description'],1,true,1),
+                'description' => $_POST['description'],
                 'price' => $price,
                 'location' => Wo_Secure($_POST['location']),
                 'type' => $type,
@@ -479,7 +479,7 @@ if ($f == 'products') {
                             $db->where('user_id',$wo['user']['user_id'])->update(T_USERS,array('wallet' => $db->dec($total)));
                             $db->where('user_id',$key)->update(T_USERS,array('balance' => $db->inc($total_final_price)));
                             $notes = $wo['lang']['product_purchase'];
-                            $notes_2 = $wo['lang']['sale_products'];
+                            $notes_2 = $wo['lang']['product_sale'];
                             mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$wo['user']['user_id']}, 'PURCHASE', {$total}, '{$notes}')");
                             mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$key}, 'SALE', {$total_final_price}, '{$notes_2}')");
                             $db->insert(T_PURCHAES,array('user_id' => $wo['user']['user_id'],
@@ -557,13 +557,13 @@ if ($f == 'products') {
                         $wo['total_final_price'] += $order->final_price;
                         $wo['address_id'] = $order->address_id;
                         $user_id = $order->product['user_id'];
-                        $wo['html'] .= '<tr><td><h6 class="mb-0">'.$wo['main_product']['name'].'</h6></td><td>'.number_format(($order->price/$order->units),2,'.').'</td><td>'.$order->units.'</td><td><span class="font-weight-semibold">'.$wo['config']['currency_symbol_array'][$wo['config']['currency']].number_format(($order->price),2,'.').'</span></td></tr>';
+                        $wo['html'] .= '<tr><td><h6 class="mb-0">'.$wo['main_product']['name'].'</h6></td><td>'.number_format(($order->price/$order->units),2).'</td><td>'.$order->units.'</td><td><span class="font-weight-semibold">'.$wo['config']['currency_symbol_array'][$wo['config']['currency']].number_format(($order->price),2).'</span></td></tr>';
                     }
                     $wo['product_owner'] = Wo_UserData($user_id);
                     $wo['address'] = $db->where('id',$wo['address_id'])->getOne(T_USER_ADDRESS);
-                    $wo['total'] = number_format($wo['total'],2,'.');
-                    $wo['total_commission'] = number_format($wo['total_commission'],2,'.');
-                    $wo['total_final_price'] = number_format($wo['total_final_price'],2,'.');
+                    $wo['total'] = number_format($wo['total'],2);
+                    $wo['total_commission'] = number_format($wo['total_commission'],2);
+                    $wo['total_final_price'] = number_format($wo['total_final_price'],2);
                     $wo['html'] = Wo_LoadPage('pdf/invoice');
                     $data['status'] = 200;
                     $data['html'] = $wo['html'];
@@ -826,7 +826,7 @@ if ($f == 'products') {
                     $wo['count'] = $db->where('hash_id',$wo['order']->hash_id)->getValue(T_USER_ORDERS,'count(*)');
                     $wo['items_count'] = $db->where('hash_id',$wo['order']->hash_id)->getValue(T_USER_ORDERS,'sum(units)');
                     $wo['price'] = $db->where('hash_id',$wo['order']->hash_id)->getValue(T_USER_ORDERS,'sum(price)');
-                    $wo['price'] = number_format($wo['price'],2,'.');
+                    $wo['price'] = number_format($wo['price'],2);
                     $wo['html'] .= Wo_LoadPage('orders/list');
                 }
                 $data['status'] = 200;
