@@ -5,11 +5,35 @@
 				<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></span> <?php echo $wo['lang']['general'];?>
 			</a>
 		</li>
+		<?php if ($wo['config']['website_mode'] != 'linkedin') { ?>
 		<li class="<?php echo ($wo['setting_page'] == 'profile-setting') ? 'active': '';?>" dir="auto">
 			<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=profile-setting');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=profile-setting">
 				<span><svg class="feather feather-user" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span> <?php echo $wo['lang']['profile'];?>
 			</a>
 		</li>
+		<?php }else{ ?>
+			<li class="sun_sett_submenu <?php echo ($wo['setting_page'] == 'profile-setting' || $wo['setting_page'] == 'experience' || $wo['setting_page'] == 'certifications' || $wo['setting_page'] == 'projects') ? 'active': '';?>" dir="auto">
+				<a href="javascript:void(0);" data-toggle="collapse" data-target="#profile-sett">
+					<span><svg class="feather feather-user" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span> <?php echo $wo['lang']['profile'];?>
+					<svg xmlns="http://www.w3.org/2000/svg" class="<?php echo Wo_RightToLeft('pull-right');?>" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7,10L12,15L17,10H7Z" /></svg>
+				</a>
+				<ul class="collapse <?php echo ($wo['setting_page'] == 'profile-setting' || $wo['setting_page'] == 'experience' || $wo['setting_page'] == 'certifications' || $wo['setting_page'] == 'projects') ? 'in': '';?>" id="profile-sett">
+					<li class="<?php echo ($wo['setting_page'] == 'profile-setting') ? 'active': '';?>" dir="auto">
+						<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=profile-setting');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=profile-setting"><?php echo $wo['lang']['profile_setting'];?></a>
+					</li>
+					<li class="<?php echo ($wo['setting_page'] == 'experience') ? 'active': '';?>" dir="auto">
+						<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=experience');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=experience"><?php echo $wo['lang']['experience'];?></a>
+					</li>
+					<li class="<?php echo ($wo['setting_page'] == 'certifications') ? 'active': '';?>" dir="auto">
+						<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=certifications');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=certifications"><?php echo $wo['lang']['certifications'];?></a>
+					</li>
+					<li class="<?php echo ($wo['setting_page'] == 'projects') ? 'active': '';?>" dir="auto">
+						<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=projects');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=projects"><?php echo $wo['lang']['projects'];?></a>
+					</li>
+				</ul>
+			</li>
+
+		<?php } ?>
 		
 		<li class="sun_sett_submenu <?php echo ($wo['setting_page'] == 'privacy-setting' || $wo['setting_page'] == 'change-password-setting' || $wo['setting_page'] == 'manage-sessions' || $wo['setting_page'] == 'two-factor') ? 'active': '';?>" dir="auto">
 			<a href="javascript:void(0);" data-toggle="collapse" data-target="#security-sett">
@@ -65,6 +89,13 @@
 				</li>
 			</ul>
 		</li>
+		<?php if ($wo['config']['website_mode'] == 'patreon') { ?>
+			<li class="<?php echo ($wo['setting_page'] == 'tiers') ? 'active': '';?>" dir="auto">
+				<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=tiers');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=tiers">
+					<span><svg class="feather" version="1.0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet"> <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#607d8b" stroke="currentColor"> <path d="M4668 5027 c-9 -7 -73 -107 -142 -223 -136 -226 -148 -262 -106 -304 17 -17 33 -20 120 -20 l100 0 0 -560 0 -560 -180 0 -180 0 0 233 c0 203 -3 237 -19 272 -23 51 -89 111 -138 125 l-39 12 28 55 c70 138 9 310 -130 369 -48 20 -156 20 -204 0 -139 -59 -200 -231 -130 -369 l28 -55  -115 -74 -138 -125 -16 -35 -19 -69 -19 -272 l0 -233 -160 0 c-147 0 -162 -2 -180 -20 -20 -20 -20 -33 -20 -640 l0 -620 -180 0 -180 0 0 233 c0 203 -3 237 -19 272 -23 51 -89 111 -138 125 l-39 12 28 55 c70 138 9 310 -130 369 -48 20 -156 20 -204 0 -139 -59 -200 -231 -130 -369 l28 -55 -39 -12 c-49 -14 -115 -74 -138 -125 -16 -35 -19 -69 -19 -272 l0 -233 -160 0 c-147 0 -162 -2 -180 -20 -20 -20 -20 -33 -20 -640 l0 -620 -180 0 -180 0 0 233 c0 203 -3 237 -19 272 -23 51 -89 111 -138 125 l-39 12 28 55 c70 138 9 310 -130 369 -48 20 -156 20 -204 0 -139 -59 -200 -231 -130 -369 l28 -55 -39 -12 c-49 -14 -115 -74 -138 -125 -16 -35 -19 -69 -19 -272 l0 -233 -160 0 c-147 0 -162 -2 -180 -20 -19 -19 -20 -33 -20 -340 0 -307 1 -321 20 -340 20 -20 33 -20 2320 -20 l2300 0 0 80 0 80 -2240 0 -2240 0 0 200 0 200 740 0 c727 0 740 0 760  20 20 33 20 640 l0 620 740 0 c727 0 740 0 760 20 20 20 20 33 20 640 l0 620 740 0 c727 0 740 0 760 20 20 20 20 33 20 640 l0 620 100 0 c87 0 103 3 120 20 42 42 30 78 -106 304 -69 116 -133 216 -142 223 -9 7 -33 12 -52 12 -19 0 -43 -5 -52 -12z m-723 -782 c19 -18 25 -35 25 -65 0 -56 -34 -90 -90 -90 -56 0 -90 34 -90 90 0 30 6 47 25 65 34 35 96 35 130 0z m115 -416 c53 -19 60 -51 60 -274 l0 -195 -240 0 -240 0 0 194 c0 218 7 251 54 272 39 17 318 19 366 3z m-1635 -864 c19 -18 25 -35 25 -65 0 -56 -34 -90 -90 -90 -56 0 -90 34 -90 90 0 56 34 90 90 90 30 0 47 -6 65 -25z m115 -416 c53 -19 60 -51 60 -274 l0 -195 -240 0 -240 0 0 194 c0 218 7 251 54 272 39 17 318 19 366 3z m-1635 -864 c19 -18 25 -35 25 -65 0 -56 -34 -90 -90 -90 -56 0 -90 34 -90 90 0 56 34 90 90 90 30 0 47 -6 65 -25z m115 -416 c53 -19 60 -51 60 -274 l0 -195 -240 0 -240 0 0 194 c0 218 7 251 54 272 39 17 318 19 366 3z"/><path d="M4880 160 l0 -80 80 0 80 0 0 80 0 80 -80 0 -80 0 0 -80z"/></g></svg></span> <?php echo $wo['lang']['tiers'];?>
+				</a>
+			</li>
+		<?php } ?>
 
 		<li class="<?php echo ($wo['setting_page'] == 'blocked-users') ? 'active': '';?>" dir="auto">
 			<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=blocked-users');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=blocked-users">
@@ -76,6 +107,13 @@
 				<span><svg class="feather feather-bell" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path></svg></span> <?php echo $wo['lang']['notification_settings'];?>
 			</a>
 		</li>
+		<?php if ($wo['config']['store_system'] == 'on') { ?>
+        <li class="<?php echo ($wo['setting_page'] == 'addresses') ? 'active': '';?>" dir="auto">
+			<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=addresses');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=addresses">
+				<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span> <?php echo $wo['lang']['my_addresses'];?>
+			</a>
+		</li>
+		<?php } ?>
 
 		<?php if (!Wo_IsAdmin() && $wo['user']['verified'] == 0): ?>
 		<li class="<?php echo ($wo['setting_page'] == 'verification') ? 'active': '';?>" dir="auto">
@@ -97,24 +135,9 @@
 				</li>
 				
 				<?php } ?>
-				<?php if ($wo['config']['affiliate_system'] == 1 || $wo['config']['point_allow_withdrawal'] == 1 || $wo['config']['funding_system'] == 1) { ?>
-				<li class="<?php echo ($wo['setting_page'] == 'payments') ? 'active': '';?>" dir="auto">
-					<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=payments');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=payments"><?php echo $wo['lang']['my_balance'];?></a>
-				</li>
-				<?php } ?>
 				<?php if ($wo['config']['point_level_system'] == 1) {?>
 				<li class="<?php echo ($wo['setting_page'] == 'my_points') ? 'active': '';?>" dir="auto">
 					<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=my_points');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=my_points"><?php echo $wo['lang']['my_points'];?></a>
-				</li>
-				<?php if ($wo['config']['point_allow_withdrawal'] == 1) {?>
-					<!-- <li class="<?php echo ($wo['setting_page'] == 'payments') ? 'active': '';?>" dir="auto">
-						<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=payments');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=payments"><?php echo $wo['lang']['my_earnings'];?></a>
-					</li> -->
-				<?php } ?>
-				<?php } ?>
-				<?php if ($wo['config']['transaction_log'] == "yes") {?>
-				<li class="<?php echo ($wo['setting_page'] == 'transaction_log') ? 'active': '';?>" dir="auto">
-					<a href="<?php echo Wo_SeoLink('index.php?link1=setting&' . $wo['user_setting'] . 'page=transaction_log');?>" data-ajax="?link1=setting&<?php echo $wo['user_setting'];?>page=transaction_log"><?php echo $wo['lang']['transaction_log'];?></a>
 				</li>
 				<?php } ?>
 			</ul>

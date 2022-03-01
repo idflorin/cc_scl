@@ -88,7 +88,12 @@
 <div class="form-group form-float">
     <div class="form-line focused">
         <label class="form-label">Time (day)</label>
-        <input type="number" name="time" class="form-control" value="<?php echo $wo['pro']['time'];?>">
+        <select class="form-control show-tick" id="time" name="time">
+            <option value="week" <?php echo ($wo['pro']['time'] == 'week') ? 'selected': '';?> >Week</option>
+            <option value="month" <?php echo ($wo['pro']['time'] == 'month') ? 'selected': '';?> >Month</option>
+            <option value="year" <?php echo ($wo['pro']['time'] == 'year') ? 'selected': '';?> >Year</option>
+            <option value="unlimited" <?php echo ($wo['pro']['time'] == 'unlimited') ? 'selected': '';?> >Unlimited</option>
+        </select>
     </div>
 </div>
 <div class="form-group form-float">

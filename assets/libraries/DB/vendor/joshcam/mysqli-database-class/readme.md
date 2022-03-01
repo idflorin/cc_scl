@@ -17,7 +17,7 @@ MysqliDb -- Simple MySQLi wrapper and object mapper with prepared statements
 **[Order Conditions](#ordering-method)**  
 **[Group Conditions](#grouping-method)**  
 **[Properties Sharing](#properties-sharing)**  
-**[Joining Tables](#join-method)**  
+**[Joining Tables](#join-method)**   
 **[Subqueries](#subqueries)**  
 **[EXISTS / NOT EXISTS condition](#exists--not-exists-condition)**  
 **[Has method](#has-method)**  
@@ -57,7 +57,7 @@ Advanced initialization:
 ```php
 $db = new MysqliDb (Array (
                 'host' => 'host',
-                'username' => 'username', 
+                'username' => 'username',
                 'password' => 'password',
                 'db'=> 'databaseName',
                 'port' => 3306,
@@ -78,7 +78,7 @@ If no table prefix were set during object creation its possible to set it later 
 $db->setPrefix ('my_');
 ```
 
-If connection to mysql will be dropped Mysqlidb will try to automatically reconnect to the database once. 
+If connection to mysql will be dropped Mysqlidb will try to automatically reconnect to the database once.
 To disable this behavoir use
 ```php
 $db->autoReconnect = false;
@@ -235,7 +235,7 @@ $db->update ('users', $data, 10);
 ### Select Query
 After any select/get function calls amount or returned rows is stored in $count variable
 ```php
-$users = $db->get('users'); //contains an Array of all users 
+$users = $db->get('users'); //contains an Array of all users
 $users = $db->get('users', 10); //contains an Array 10 users
 ```
 
@@ -245,7 +245,7 @@ or select with custom columns set. Functions also could be used
 $cols = Array ("id", "name", "email");
 $users = $db->get ("users", null, $cols);
 if ($db->count > 0)
-    foreach ($users as $user) { 
+    foreach ($users as $user) {
         print_r ($user);
     }
 ```
@@ -418,7 +418,7 @@ $q = "(
         WHERE a = ? AND B = ?
         ORDER BY a LIMIT ?
 ) UNION (
-    SELECT a FROM t2 
+    SELECT a FROM t2
         WHERE a = ? AND B = ?
         ORDER BY a LIMIT ?
 )";
@@ -649,7 +649,7 @@ Subquery init without an alias to use in inserts/updates/where Eg. (select * fro
 $sq = $db->subQuery();
 $sq->get ("users");
 ```
- 
+
 A subquery with an alias specified to use in JOINs . Eg. (select * from users) sq
 ```php
 $sq = $db->subQuery("sq");
@@ -714,7 +714,7 @@ if($db->has("users")) {
 } else {
     return "Wrong user/password";
 }
-``` 
+```
 ### Helper methods
 Disconnect from the database:
 ```php
@@ -762,7 +762,7 @@ if (!$db->insert ('myTable', $insertData)) {
 
 
 ### Error helpers
-After you executed a query you have options to check if there was an error. You can get the MySQL error string or the error code for the last executed query. 
+After you executed a query you have options to check if there was an error. You can get the MySQL error string or the error code for the last executed query.
 ```php
 $db->where('login', 'admin')->update('users', ['firstName' => 'Jack']);
 
@@ -801,7 +801,7 @@ print_r ($db->trace);
 ```
 
 ### Table Locking
-To lock tables, you can use the **lock** method together with **setLockMethod**. 
+To lock tables, you can use the **lock** method together with **setLockMethod**.
 The following example will lock the table **users** for **write** access.
 ```php
 $db->setLockMethod("WRITE")->lock("users");
@@ -820,4 +820,3 @@ $db->setLockMethod("READ")->lock(array("users", "log"));
 ```
 This will lock the tables **users** and **log** for **READ** access only.
 Make sure you use **unlock()* afterwards or your tables will remain locked!
-

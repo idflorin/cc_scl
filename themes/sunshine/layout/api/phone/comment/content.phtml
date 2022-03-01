@@ -121,11 +121,7 @@
    <?php echo Wo_LoadPage('modals/delete-comment');?>
    <script>
    $(function () {
-   $("#comment_<?php echo $wo['comment']['id'];?> .comment-text").readmore({
-   speed: 75,
-   moreLink: '<a href="#" class="hash font-13"><?php echo $wo["lang"]["read_more"];?></a>',
-   lessLink: '<a href="#" class="hash font-13"><?php echo $wo["lang"]["read_less"];?></a>',
-   });
+      ReadMoreText("#comment_<?php echo $wo['comment']['id'];?> .comment-text");
    $("#comment_<?php echo $wo['comment']['id']; ?> .comment-reply input").triggeredAutocomplete({
    hidden: '#hidden_inputbox_comment_reply',
    source: Wo_Ajax_Requests_File() + "?f=mention",

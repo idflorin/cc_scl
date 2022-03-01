@@ -1,5 +1,5 @@
 <?php
-
+ 
 class Twocheckout_Api_Requester
 {
     public $baseUrl;

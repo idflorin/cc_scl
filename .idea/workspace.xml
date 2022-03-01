@@ -2,76 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="683aca33-aa82-47a1-bd6c-8d99a27e15be" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/admin-panel/pages/add-new-movies/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/admin-panel/pages/add-new-movies/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin-panel/pages/changelog/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/admin-panel/pages/changelog/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin-panel/pages/general-settings/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/admin-panel/pages/general-settings/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin-panel/pages/pro-settings/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/admin-panel/pages/pro-settings/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admin-panel/pages/site-features/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/admin-panel/pages/site-features/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/phone/get_users_list.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/phone/get_users_list.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/auth.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/auth.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/create-account.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/create-account.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/get_archived_chats.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/get_archived_chats.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/get_chats.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/get_chats.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/get_pin_chats.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/get_pin_chats.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/get_pin_message.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/get_pin_message.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/get_story_views.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/get_story_views.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/get_user_messages.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/get_user_messages.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/group_chat.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/group_chat.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/mute.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/mute.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/page_chat.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/page_chat.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/pin_message.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/pin_message.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/social-login.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/social-login.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/v2/endpoints/update-user-data.php" beforeDir="false" afterPath="$PROJECT_DIR$/api/v2/endpoints/update-user-data.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/includes/app_start.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/includes/app_start.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/includes/functions_general.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/includes/functions_general.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/includes/functions_one.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/includes/functions_one.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/includes/functions_three.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/includes/functions_three.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/includes/functions_two.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/includes/functions_two.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/english.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/english.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/arabic.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/arabic.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/dutch.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/dutch.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/english.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/english.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/farsi.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/farsi.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/french.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/french.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/german.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/german.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/italian.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/italian.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/new.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/new.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/portuguese.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/portuguese.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/russian.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/russian.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/spanish.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/spanish.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/languages/extra/turkish.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/languages/extra/turkish.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/nginx.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nodejs/events/events.js" beforeDir="false" afterPath="$PROJECT_DIR$/nodejs/events/events.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nodejs/functions/functions.js" beforeDir="false" afterPath="$PROJECT_DIR$/nodejs/functions/functions.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nodejs/listeners/listeners.js" beforeDir="false" afterPath="$PROJECT_DIR$/nodejs/listeners/listeners.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nodejs/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/nodejs/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nodejs/models/wo_pages.js" beforeDir="false" afterPath="$PROJECT_DIR$/nodejs/models/wo_pages.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sources/show_fund.php" beforeDir="false" afterPath="$PROJECT_DIR$/sources/show_fund.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/javascript/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/javascript/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/container.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/container.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/emails/notifiction-email.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/emails/notifiction-email.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/extra_js/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/extra_js/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/forum/forumdisplay.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/forum/forumdisplay.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/nodejs/chat-list.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/nodejs/chat-list.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/nodejs/message-text-list.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/nodejs/message-text-list.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/sidebar/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/sidebar/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/story/includes/fetched_url.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/story/includes/fetched_url.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/story/includes/header.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/story/includes/header.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/layout/style.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/layout/style.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/sunshine/stylesheet/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/themes/sunshine/stylesheet/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/javascript/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/javascript/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/layout/emails/notifiction-email.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/layout/emails/notifiction-email.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/layout/extra_js/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/layout/extra_js/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/layout/forum/forumdisplay.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/layout/forum/forumdisplay.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/layout/nodejs/chat-list.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/layout/nodejs/chat-list.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/layout/nodejs/message-text-list.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/layout/nodejs/message-text-list.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/layout/page/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/layout/page/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/layout/sidebar/content.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/layout/sidebar/content.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/layout/story/includes/fetched_url.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/layout/story/includes/fetched_url.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/layout/story/includes/header.phtml" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/layout/story/includes/header.phtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/themes/wowonder/stylesheet/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/themes/wowonder/stylesheet/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xhr/admin_setting.php" beforeDir="false" afterPath="$PROJECT_DIR$/xhr/admin_setting.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/xhr/recover.php" beforeDir="false" afterPath="$PROJECT_DIR$/xhr/recover.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,7 +41,8 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1640067482816</updated>
-      <workItem from="1640067484324" duration="5381000" />
+      <workItem from="1640067484324" duration="5952000" />
+      <workItem from="1640335488907" duration="765000" />
     </task>
     <servers />
   </component>

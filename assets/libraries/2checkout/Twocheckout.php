@@ -17,7 +17,7 @@ abstract class Twocheckout
         self::$sid = $value;
     }
 
-    public static function privateKey($value = null) {
+    public static function privateKey($value = null) { 
         self::$privateKey = $value;
     }
 

@@ -3,15 +3,7 @@
 		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
 		<div class="col-md-7 middlecol">
 			<?php if ($wo['config']['user_status'] == 1) { ?>
-				<div class="wow_content user-status-home wow_home_stories">
-					<div class="wo_page_hdng pag_neg_padd">
-						<div class="wo_page_hdng_innr">
-							<?php echo $wo['lang']['stories'] ?>
-							<?php if (Wo_CountStories() > 4) { ?>
-								<div class="view-more-stories"><a href="<?php echo Wo_SeoLink('index.php?link1=more-status'); ?>"><?php echo $wo['lang']['see_all'] ?></a></div>
-							<?php } ?>
-						</div>
-					</div>
+				<div class="user-status-home wow_home_stories">
 					<ul class="status-list">
 						<li class="create_new">
 							<a href="<?php echo Wo_SeoLink('index.php?link1=create-status'); ?>" data-ajax="?link1=create-status">
@@ -31,11 +23,19 @@
 							}
 						?>
 						<?php } ?>
+						<?php if (Wo_CountStories() > 4) { ?>
+							<li class="view-more-stories">
+								<a href="<?php echo Wo_SeoLink('index.php?link1=more-status'); ?>">
+									<div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M21.47,4.35L20.13,3.79V12.82L22.56,6.96C22.97,5.94 22.5,4.77 21.47,4.35M1.97,8.05L6.93,20C7.24,20.77 7.97,21.24 8.74,21.26C9,21.26 9.27,21.21 9.53,21.1L16.9,18.05C17.65,17.74 18.11,17 18.13,16.26C18.14,16 18.09,15.71 18,15.45L13,3.5C12.71,2.73 11.97,2.26 11.19,2.25C10.93,2.25 10.67,2.31 10.42,2.4L3.06,5.45C2.04,5.87 1.55,7.04 1.97,8.05M18.12,4.25A2,2 0 0,0 16.12,2.25H14.67L18.12,10.59" /></svg></div>
+									<p><?php echo $wo['lang']['see_all'] ?></p>
+								</a>
+							</li>
+						<?php } ?>
 					</ul>
 				</div>
-			<?php 
+			<?php
 				}
-				if (Wo_IsThereAnnouncement() === true) { 
+				if (Wo_IsThereAnnouncement() === true) {
 				$announcement = Wo_GetHomeAnnouncements();
 			?>
 			<div class="home-announcement">
@@ -48,15 +48,15 @@
 			</div>
 			<!-- .home-announcement -->
 			<?php
-				} 
+				}
 				if($wo['loggedin'] == true) {
-					echo Wo_LoadPage('story/publisher-box');
-				} 
+						echo Wo_LoadPage('story/publisher-box');
+				}
 			?>
-			
+
 			<?php if (Wo_IsMobile() == true) { ?>
 			<?php if ($wo['config']['order_posts_by'] == 0) { ?>
-				<div class="order-by"> 
+				<div class="order-by">
 					<div class="dropdown">
 						<?php echo $wo['lang']['store_posts_by'] ?>: <a class="dropdown-toggle" type="button" data-toggle="dropdown">
 						<span class="order-text"><?php echo ($wo['user']['order_posts_by'] == 0) ? $wo['lang']['all'] : $wo['lang']['people_i_follow']; ?></span>
@@ -69,15 +69,15 @@
 				</div>
 			<?php } ?>
 			<?php } ?>
-			
+
 			<?php if ($wo['config']['afternoon_system'] == 1) { ?>
 			<div class="alert alert-dismissible greetalert hidden" role="alert">
 				<button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="setCookie('day_status', '1', 3);"><span aria-hidden="true">&times;</span></button>
 				<div id="daynightmsg"></div>
 			</div>
 			<?php } ?>
-		
-			<?php if ($wo['page'] == 'home') { ?>
+
+			<?php if ($wo['page'] == 'home' && in_array($wo['config']['website_mode'], array('facebook','linkedin'))) { ?>
 				<div id="scroll_filter_click"></div>
 				<ul class="list-group filterby" id="filterby-post">
 					<li class="list-group-item hidden" contenteditable="false">Filter by</li>
@@ -108,7 +108,7 @@
 					<?php } ?>
 				</ul>
 			<?php } ?>
-		
+
 			<div class="btn btn-main btn-active posts-count" onclick="Wo_GetNewPosts();"></div>
 			<div class="posts_load">
 				<div id="posts-laoded">
@@ -123,7 +123,7 @@
 			<!-- #posts -->
 		</div>
 		<!-- .col-md-8 -->
-		<?php echo Wo_LoadPage('sidebar/content');?>
+		<?php echo Wo_LoadPage('sidebar/content'); ?>
 	</div>
 </div>
 <!-- .page-margin -->
@@ -131,22 +131,24 @@
 .post-youtube iframe {height: 277px !important;}
 </style>
 
-<?php 
-if ($wo['user']['social_login'] == 1) { 
+<?php
+if ($wo['user']['social_login'] == 1) {
   echo Wo_LoadPage('modals/create-password');
-} 
+}
 ?>
 
 <script type="text/javascript">
+
 $(function() {
     loadposts();
 });
+
 
 // $(document).on('click', '.story-image-wrapper', function(event) {
 //   event.preventDefault();
 //   $value = $(this).parents(".story-container").attr('data-status-id');
 //   $.post(Wo_Ajax_Requests_File() + '?f=story_view', {id: $value}, function(data, textStatus, xhr) {
-    	
+
 //   });
 // });
 
@@ -182,16 +184,12 @@ function loadposts() {
 		  });
 		};
 	  	$(".post-description p, .product-description").each(function(index, el) {
-	  		$(this).readmore({
-		      speed: 75,
-		      moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
-		      lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
-		    });
+	  		ReadMoreText(this);
 	  	});
 	  	$(".post-commet-textarea .textarea").triggeredAutocomplete({
 	       hidden: '#hidden_inputbox_comment',
 	       source: Wo_Ajax_Requests_File() + "?f=mention",
-	       trigger: "@" 
+	       trigger: "@"
 	    });
 	  	$(".comment-reply textarea").triggeredAutocomplete({
 	       hidden: '#hidden_inputbox_comment_reply',

@@ -46,7 +46,20 @@ if ($f == 'payment') {
             exit();
         }
         $pro_type = $_GET['pro_type'];
-        if ($wo['config']['recurring_payment'] == 'off') {
+        $time_type = '';
+        if ($pro_type == 1) {
+            $time_type = $wo['pro_packages']['star']['time'];
+        }
+        elseif ($pro_type == 2) {
+            $time_type = $wo['pro_packages']['ultima']['time'];
+        }
+        elseif ($pro_type == 3) {
+            $time_type = $wo['pro_packages']['hot']['time'];
+        }
+        elseif ($pro_type == 4) {
+            $time_type = $wo['pro_packages']['vip']['time'];
+        }
+        if ($wo['config']['recurring_payment'] == 0 || $time_type == 'unlimited') {
             $payment  = Wo_CheckPayment($_GET['paymentId'], $_GET['PayerID']);
         }
         else{

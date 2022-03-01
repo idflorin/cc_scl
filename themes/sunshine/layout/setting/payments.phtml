@@ -1,5 +1,5 @@
 <div class="wo_settings_page sun_sett_page">
-	<h3><?php echo $wo['lang']['my_balance'] ?>: <b><?php echo Wo_GetCurrency($wo['config']['ads_currency']) . $wo['setting']['balance'];?></b></h3>
+	<h3><?php echo $wo['lang']['my_balance'] ?>: <b><?php echo Wo_GetCurrency($wo['config']['ads_currency']) . ($wo['setting']['balance'] + $wo['setting']['wallet']);?></b></h3>
   
 	<?php if ($wo['setting']['balance'] < $wo['config']['m_withdrawal']): ?>
 	<div class="alert alert-danger">

@@ -242,6 +242,8 @@ class FunctionsUtils {
         let hasHTML = false;
         if (str) {
             //replace all using regex
+            str = str.replace('&lt;', '<');
+            str = str.replace('&gt;', '>');
             for (let code of Object.keys(emo).reverse()) {
                 let searchRegExp = new RegExp(this.escapeRegExp(code), "gi");
 
@@ -514,6 +516,8 @@ class FunctionsUtils {
     async Wo_GetMedia(ctx, media) {
         if (ctx.globalconfig['amazone_s3'] == 1) {
             return ctx.globalconfig['s3_site_url'] + '/' + media;
+        } else if(ctx.globalconfig['wasabi_storage'] == 1){
+            return ctx.globalconfig['wasabi_site_url'] + '/' + media;
         } else if (ctx.globalconfig['spaces'] == 1) {
             return 'https://' + ctx.globalconfig['space_name'] + '.' + ctx.globalconfig['space_region'] + '.digitaloceanspaces.com/' + media;
         } else if (ctx.globalconfig['ftp_upload'] == 1) {
@@ -1036,7 +1040,9 @@ class FunctionsUtils {
 
 
                 if (element.wowonder_icon && element.wowonder_icon != '' && element.wowonder_icon !== undefined) {
-                    element.wowonder_icon = element.wowonder_small_icon = Wo_GetMedia(element.wowonder_icon);
+                    (async () => {
+                    element.wowonder_icon = element.wowonder_small_icon = await this.Wo_GetMedia(ctx,element.wowonder_icon);
+                    })();
                     element.is_html = 0;
                 }
                 else if (!fs.existsSync(path.resolve('../themes/',ctx.globalconfig["theme"]+'/reaction/like-sm.png'))) {
@@ -1063,7 +1069,9 @@ class FunctionsUtils {
                 }
 
                 if (element.sunshine_icon && element.sunshine_icon != '' && element.sunshine_icon !== undefined) {
-                    element.sunshine_icon = element.sunshine_small_icon = Wo_GetMedia(element.sunshine_icon);
+                    (async () => {
+                    element.sunshine_icon = element.sunshine_small_icon = await this.Wo_GetMedia(ctx,element.sunshine_icon);
+                })();
                 }
                 else if (fs.existsSync(path.resolve('../themes/',ctx.globalconfig["theme"]+'/reaction/like-sm.png'))) {
                     if (element.id == 1) {

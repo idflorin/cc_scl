@@ -22,11 +22,12 @@
                 <form class="third-party-sites-settings" method="POST">
                     <div class="form-group form-float">
                         <div class="form-line">
-                            <label class="form-label">Site that uses PlayTube script, e.g. https://playtubescript.com</label>
+                            <label class="form-label">PlayTube</label>
                             <input type="text" name="playtube_url" class="form-control" value="<?php echo $wo['config']['playtube_url'];?>">
+                            <small class="admin-info">Your website that uses PlayTube Script, e.g. https://demo.playtubescript.com</small>
                         </div>
                     </div>
-                    <p>This feature allows you to integrate PlayTube script with your site, so videos will be embedded in the post box if someone shares a link from your site.</p>
+                    <div class="alert alert-warning">This feature allows you to integrate PlayTube script with your site, so videos will be embedded in the post box if someone shares a link from your site.</div>
                     <p>What is <a href="https://goo.gl/KvoSwz" target="_blank">PlayTube</a>?</p>
                     <div class="clearfix"></div>
                     <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -44,12 +45,13 @@
                 <form class="third-party-sites-settings-deep" method="POST">
                     <div class="form-group form-float">
                         <div class="form-line">
+                            <label class="form-label">DeepSound</label>
                             <input type="text" name="deepsound_url" class="form-control" value="<?php echo $wo['config']['deepsound_url'];?>">
-                            <label class="form-label">Site that uses Deep Sound script, e.g. https://deepsoundscript.com</label>
+                            <small class="admin-info">Your website that uses DeepSound Script, e.g. https://demo.deepsoundscript.com</small>
                         </div>
                     </div>
-                    <p>This feature allows you to integrate Deep Sound script with your site, so Sounds will be embedded in the post box if someone shares a link from your site.</p>
-                    <p>What is <a href="https://codecanyon.net/item/deepsound-the-ultimate-php-music-sharing-platform/23609470?s_rank=1" target="_blank">Deep Sound</a>?</p>
+                    <div class="alert alert-warning">This feature allows you to integrate Deep Sound script with your site, so Sounds will be embedded in the post box if someone shares a link from your site.</div>
+                    <p>What is <a href="https://codecanyon.net/item/deepsound-the-ultimate-php-music-sharing-platform/23609470?s_rank=1" target="_blank">DeepSound</a>?</p>
                     <div class="clearfix"></div>
                     <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                     <button type="submit" class="btn btn-primary m-t-15 waves-effect">Save</button>

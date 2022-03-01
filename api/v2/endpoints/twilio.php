@@ -102,6 +102,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     'id' => $insertData,
                     'room_name' => $room_script
 		        );
+                if ($_POST['call_type'] == 'video') {
+                    $response_data['url'] = $wo['config']['site_url'] . '/video-call-api/' . $insertData . '?c_id=' . $_GET['access_token'] . '&user_id=' . $user_id;
+                }
 		    } else {
 		        $error_code    = 6;
 			    $error_message = "Can\'t create a video call";
@@ -157,9 +160,13 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
             } else if ($_POST['action'] == 'decline') {
 		        $query = mysqli_query($sqlConnect, "UPDATE " . $table . " SET  `declined` = '1' , `active` = '0' WHERE `id` = '$id'");
     		}
+            $call = $db->where('id',$id)->getOne($table);
     		$response_data               = array(
 	            'api_status' => 200
 	        );
+            if (!empty($call) && $_POST['action'] == 'answer') {
+                $response_data['url'] = $wo['config']['site_url'] . '/video-call-api/' . $call->id . '?c_id=' . $_GET['access_token'] . '&user_id=' . $call->to_id;
+            }
     	}
     	else{
     		$error_code    = 5;

@@ -172,7 +172,7 @@
       <?php if ($wo['page'] == 'welcome') { ?>
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/welcome.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
       <?php } else { ?>
-      <script src="//media.twiliocdn.com/sdk/js/video/releases/2.8.0/twilio-video.min.js"></script>
+      <script src="//sdk.twilio.com/js/video/releases/2.18.1/twilio-video.min.js"></script>
       <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/style.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
 	  <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/theme-style.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>">
       <?php } ?>
@@ -258,6 +258,10 @@
       <style>
       <?php echo $wo['config']['styles_cc']; ?>
       </style>
+      <?php if ($wo['config']['classified'] == 1) { ?>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/qrcode.js"></script>
+      <?php } ?>
 
       <script type="text/javascript">
          <?php echo $wo['config']['header_cc']; ?>
@@ -281,6 +285,9 @@
            var box = $('#contnet');
            var ISAPI = $('#ISAPI').val();
            $(document).on('click', 'a[data-ajax]', function(e) {
+            if (typeof(check_wallet) != 'undefined') {
+              clearInterval(check_wallet);
+            }
             if ($('#live_post_id').length > 0) {
                   DeleteLive();
                   window.location = $(this).attr('href');
@@ -727,6 +734,12 @@
         ?>
       });
       </script>
+      <?php if ($wo['config']['job_system'] == 1 || $wo['config']['blogs'] == 1 || $wo['config']['website_mode'] == 'linkedin') { ?>
+        <script src="<?php echo $wo['config']['theme_url'];?>/javascript/bootstrap-tagsinput-latest/src/bootstrap-tagsinput.js"></script>
+      <?php } ?>
+	  
+	  
+	  <script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
    </head>
    
    <body <?php if ($wo['config']['chatSystem'] == 0) { ?> chat-off="true" <?php } ?>>
@@ -1268,8 +1281,163 @@
 
     <div class="modal fade sun_modal" id="apply-job-modal" role="dialog">
     </div>
+    <div id="pay_modal_wallet">
+      <div class="modal fade" id="pay-go-pro" role="dialog" data-keyboard="false" style="overflow-y: auto;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+              <h4 class="modal-title"><?php echo $wo['lang']['pay_from_wallet'] ?></h4>
+            </div>
+              <div class="modal-body">
+                <div class="pay_modal_wallet_alert"></div>
+                <h4 class="pay_modal_wallet_text"></h4>
+                <div class="clear"></div>
+              </div>
+              <div class="clear"></div>
+              <div class="modal-footer">
+                <div class="ball-pulse"><div></div><div></div><div></div></div>
+                <button type="button" class="btn btn-main" id="pay_modal_wallet_btn"><?php echo $wo['lang']['pay']; ?></button>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- HTML NOTIFICATION POPUP -->
     <div id="notification-popup"></div>
     <!-- HTML NOTIFICATION POPUP -->
+    <div class="modal fade sun_modal" id="add_address_modal" role="dialog" data-keyboard="false" style="overflow-y: auto;">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+					<h4 class="modal-title"><?php echo $wo['lang']['add_new_address'] ?></h4>
+				</div>
+				<form class="form form-horizontal address_form" method="post" action="#">
+					<div class="modal-body twocheckout_modal">
+						<div class="modal_add_address_modal_alert"></div>
+						<div class="clear"></div>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="sun_input">
+									<label for="name"><?php echo $wo['lang']['name']; ?></label>
+									<input id="name" name="name" type="text" autocomplete="off" placeholder="<?php echo $wo['lang']['name']; ?>" value="<?php echo($wo['user']['name']) ?>">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="sun_input">
+									<label for="phone"><?php echo $wo['lang']['phone_number']; ?></label>
+									<input id="phone" name="phone" type="text" autocomplete="off" placeholder="<?php echo $wo['lang']['phone_number']; ?>" value="<?php echo($wo['user']['phone_number']) ?>">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="sun_input">
+									<label for="country"><?php echo $wo['lang']['country']; ?></label>
+									<input id="country" name="country" type="text" autocomplete="off" placeholder="<?php echo $wo['lang']['country']; ?>">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="sun_input">
+									<label for="city"><?php echo $wo['lang']['city']; ?></label>
+									<input id="city" name="city" type="text" autocomplete="off" placeholder="<?php echo $wo['lang']['city']; ?>">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="sun_input">
+									<label for="zip"><?php echo $wo['lang']['zip']; ?></label>
+									<input id="zip" name="zip" type="text" autocomplete="off" placeholder="<?php echo $wo['lang']['zip']; ?>">
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="sun_input">
+									<label for="address"><?php echo $wo['lang']['name']; ?></label>
+									<textarea id="address" placeholder="<?php echo $wo['lang']['address']; ?>" name="address" rows="3"></textarea>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="clear"></div>
+					<div class="modal-footer">
+						<div class="ball-pulse"><div></div><div></div><div></div></div>
+						<button type="submit" class="btn btn-main btn-mat"><?php echo $wo['lang']['add']; ?></button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="modal fade sun_modal" id="delete-address" tabindex="-1" role="dialog" aria-labelledby="delete-address" aria-hidden="true" data-id="0">
+		<div class="modal-dialog modal-md mat_box" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+					<h4 class="modal-title"><?php echo $wo['lang']['delete_your_address'] ?></h4>
+				</div>
+				<div class="modal-body">
+					<?php echo $wo['lang']['are_you_delete_your_address']; ?>
+				</div>  
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger btn-mat" data-dismiss="modal"><?php echo $wo['lang']['delete']; ?></button>
+				</div>
+			</div>
+		</div>
+	</div>
+    <div class="modal fade ch_payment_box" id="buy_product_modal" tabindex="-1" role="dialog" aria-labelledby="buy_product" aria-hidden="true" data-id="0">
+		<div class="modal-dialog modal-md mat_box" role="document">
+			<div class="modal-content">
+				<div class="ch_payment_head">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,13A5,5 0 0,1 7,8H9A3,3 0 0,0 12,11A3,3 0 0,0 15,8H17A5,5 0 0,1 12,13M12,3A3,3 0 0,1 15,6H9A3,3 0 0,1 12,3M19,6H17A5,5 0 0,0 12,1A5,5 0 0,0 7,6H5C3.89,6 3,6.89 3,8V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V8C21,6.89 20.1,6 19,6Z"></path></svg>
+					<h4><?php echo $wo['lang']['payment_alert']; ?></h4>
+				</div>
+				<div class="modal-body">
+					<div class="modal_product_pay_alert"></div>
+					<?php echo $wo['lang']['purchase_the_items']; ?>
+				</div>  
+				<div class="modal-footer">
+					<input type="hidden" id="product_id">
+					<input type="hidden" id="product_price">
+					<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $wo['lang']['cancel']; ?></button>
+					<button type="button" class="btn btn-main btn-mat"><?php echo $wo['lang']['pay']; ?></button>
+				</div>
+			</div>
+		</div>
+    </div>
+    <div class="modal fade sun_modal" id="refund_order" tabindex="-1" role="dialog" aria-labelledby="refund_order" aria-hidden="true" data-id="0">
+		<div class="modal-dialog mat_box" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"><?php echo $wo['lang']['request_refund']; ?></h5>
+				</div>
+				<form class="refund_order_form" method="post">
+					<div class="modal-body">
+						<div class="modal_refund_order_modal_alert"></div>
+						<br>
+						<div class="form-group sun_input">
+							<label class="form-label"><?php echo $wo['lang']['please_explain_the_reason']; ?></label>
+							<textarea placeholder="<?php echo $wo['lang']['please_explain_the_reason']; ?>" rows="5" name="message" id="refund_order_message"></textarea>
+						</div>
+					</div>  
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-primary btn-mat"><?php echo $wo['lang']['request']; ?></button>
+						<br>
+						<button type="button" class="btn btn-default" data-dismiss="modal"><?php echo $wo['lang']['cancel']; ?></button>
+					</div>
+				</form>
+			</div>
+		</div>
+    </div>
+    <?php if ($wo['config']['website_mode'] == 'askfm') { ?>
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/website_mode/askfm.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>" />
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/website_mode/askfm.js"></script>
+    <?php }elseif ($wo['config']['website_mode'] == 'twitter') { ?>
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/website_mode/twitter.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>" />
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/website_mode/twitter.js"></script>
+    <?php }elseif ($wo['config']['website_mode'] == 'instagram') { ?>
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/website_mode/instagram.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>" />
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/website_mode/instagram.js"></script>
+    <?php }elseif ($wo['config']['website_mode'] == 'linkedin') { ?>
+      <link rel="stylesheet" href="<?php echo $wo['config']['theme_url'];?>/stylesheet/website_mode/linkedin.css<?php echo $wo['update_cache']; ?>?version=<?php echo $wo['config']['version']; ?>" />
+      <script src="<?php echo $wo['config']['theme_url'];?>/javascript/website_mode/linkedin.js"></script>
+    <?php } ?>
+    <a href="<?php echo $wo['config']['site_url'].'/checkout';?>" data-ajax="?link1=checkout" id="load_checkout" style="display: none;"></a>
    </body>
 </html>

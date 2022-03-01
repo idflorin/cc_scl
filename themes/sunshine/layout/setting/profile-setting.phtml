@@ -77,6 +77,19 @@
 				</select>
 				<label class="plr15" for="relationship"><?php echo $wo['lang']['relationship']; ?></label>
 			</div>
+			<?php if ($wo['config']['website_mode'] == 'linkedin') { ?>
+			<div class="sun_input col-lg-12 skills_div">
+				<input id="skills" name="skills" type="text" class="form-control input-md" value="<?php echo $wo['setting']['skills'];?>">
+				<label class="plr15" for="skills"><?php echo $wo['lang']['skills']; ?></label>  
+				<div class="skills_result"></div>
+			</div>
+			<div class="sun_input col-lg-12 languages_div">
+				<input id="languages" name="languages" type="text" class="form-control input-md" value="<?php echo implode(",", $wo['setting']['formated_langs']);?>">
+				<label class="plr15" for="languages"><?php echo $wo['lang']['languages']; ?></label>  
+				<div class="dropdown-menu languages_result"></div>
+			</div>
+		  <?php } ?>
+			
 		 </div>
 
          <?php
@@ -140,6 +153,18 @@
 	</div>
 </div>
 <script type="text/javascript">
+<?php if ($wo['config']['website_mode'] == 'linkedin') { ?>
+	$("#skills").tagsinput({});
+	$("#languages").tagsinput({});
+
+	$($('.skills_div .bootstrap-tagsinput').find('input')).on('keyup', function(event) {
+			SearchSkill($(this).val())
+	});
+
+	$($('.languages_div .bootstrap-tagsinput').find('input')).on('keyup', function(event) {
+			SearchLanguages($(this).val())
+	});
+<?php } ?>
 var relationship_users = [];
 var relationship_user  = 0;
 function Wo_RelationshipSearch(name = ''){
@@ -185,6 +210,7 @@ $(function() {
       $('.wo_settings_page').find('.last-sett-btn .ball-pulse').fadeIn(100);
     },
     success: function(data) {
+    	$('.skills_result').html('');
       if (data.status == 200) {
         <?php if($wo['user']['user_id'] == $wo['setting']['user_id']) { ?>
         if (data.first_name != '' || data.last_name != '') {

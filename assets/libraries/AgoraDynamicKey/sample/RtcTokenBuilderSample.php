@@ -16,8 +16,5 @@ if (!empty($wo['config']['agora_app_certificate'])) {
 	// echo "<h1>".$wo['AgoraToken']."</h1>";
 	// echo "<h1>".$wo['AgorachannelName']."</h1>";
 }
-// echo 'Token with int uid: ' . $token . PHP_EOL;
 
-// $token = RtcTokenBuilder::buildTokenWithUserAccount($appID, $appCertificate, $channelName, $uidStr, $role, $privilegeExpiredTs);
-// echo 'Token with user account: ' . $token . PHP_EOL;
 ?>

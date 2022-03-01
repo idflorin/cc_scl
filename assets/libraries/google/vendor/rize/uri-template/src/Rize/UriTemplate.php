@@ -8,7 +8,7 @@ use Rize\UriTemplate\Parser;
  * URI Template
  */
 class UriTemplate
-{
+{ 
              /**
               * @var Parser
               */

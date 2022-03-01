@@ -23,7 +23,7 @@ git config --global user.name "Travis"
 git init
 git remote add origin https://${GH_TOKEN}@github.com/paypal/PayPal-PHP-SDK.git > /dev/null
 git checkout -B gh-pages
-
+ 
 # Push generated files
 git add .
 git commit -m "Docs updated by Travis"

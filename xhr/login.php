@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == 'login') {
     if (!empty($_SESSION['user_id'])) {
         $_SESSION['user_id'] = '';
@@ -8,7 +8,7 @@ if ($f == 'login') {
         $_COOKIE['user_id'] = '';
         unset($_COOKIE['user_id']);
         setcookie('user_id', null, -1);
-        setcookie('user_id', null, -1,'/');
+        setcookie('user_id', null, -1, '/');
     }
     $data_ = array();
     $phone = 0;
@@ -61,7 +61,9 @@ if ($f == 'login') {
             $update              = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `ip_address` = '{$ip}' WHERE `user_id` = '{$userid}'");
             $session             = Wo_CreateLoginSession(Wo_UserIdForLogin($username));
             $_SESSION['user_id'] = $session;
-            setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
+            if ($wo['config']['remember_device'] == 1 && !empty($_POST['remember_device']) && $_POST['remember_device'] == 'on') {
+                setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
+            }
             setcookie('ad-con', htmlentities(json_encode(array(
                 'date' => date('Y-m-d'),
                 'ads' => array()
@@ -72,7 +74,7 @@ if ($f == 'login') {
             if (!empty($_POST['last_url'])) {
                 $data['location'] = $_POST['last_url'];
             } else {
-                $data['location'] = $wo['config']['site_url']."/?cache=".time();
+                $data['location'] = $wo['config']['site_url'] . "/?cache=" . time();
             }
             $user_data = Wo_UserData($userid);
             if ($wo['config']['membership_system'] == 1 && $user_data['is_pro'] == 0) {

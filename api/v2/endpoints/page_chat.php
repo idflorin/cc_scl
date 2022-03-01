@@ -16,7 +16,8 @@ $required_fields =  array(
                         'send',
                         'fetch',
                         'get_list',
-                        'delete_chat'
+                        'delete_chat',
+                        'get_message_by_id'
                     );
 if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
 
@@ -432,6 +433,120 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
         else{
             $error_code    = 5;
             $error_message = 'page_id And recipient_id can not be empty';
+        }
+    }
+    if ($_POST['type'] == 'get_message_by_id') {
+        if (!empty($_POST['page_id']) && is_numeric($_POST['page_id']) && $_POST['page_id'] > 0 && !empty($_POST['message_id']) && is_numeric($_POST['message_id']) && $_POST['message_id'] > 0) {
+            $last_id = Wo_Secure($_POST['message_id']);
+            $page_id = Wo_Secure($_POST['page_id']);
+
+            if ($last_id && $last_id > 0) {
+                if (!empty($_POST['reply_id']) && is_numeric($_POST['reply_id']) && $_POST['reply_id'] > 0) {
+                    $reply_id = Wo_Secure($_POST['reply_id']);
+                    $db->where('id',$last_id)->update(T_MESSAGES,array('reply_id' => $reply_id));
+                }
+                $message_info = Wo_GetPageMessages(array(
+                    'id' => $last_id,
+                    'page_id' => Wo_Secure($_POST['page_id'])
+                ));
+
+                foreach ($non_allowed as $key => $value) {
+                   unset($message_info[0]['user_data'][$value]);
+                }
+                if (empty($wo['user']['timezone'])) {
+                    $wo['user']['timezone'] = 'UTC';
+                }
+                $timezone = new DateTimeZone($wo['user']['timezone']);
+                $messages = array();
+                foreach ($message_info as $key => $message) {
+                    $message['time_text'] = Wo_Time_Elapsed_String($message['time']);
+                    $message_po           = 'left';
+                    if ($message['from_id'] == $wo['user']['user_id']) {
+                        $message_po = 'right';
+                    }
+                    $message['position'] = $message_po;
+                    $message['type']     = Wo_GetFilePosition($message['media']);
+                    if ($message['type_two'] == 'contact') {
+                        $message['type']   = 'contact';
+                    }
+                    if (!empty($message['lng']) && !empty($message['lat'])) {
+                        $message['type']   = 'map';
+                    }
+                    $message['type']     = $message_po . '_' . $message['type'];
+                    $message['file_size'] = 0;
+                    if (!empty($message['media'])) {
+                        $message['file_size'] = '0MB';
+                        if (file_exists($message['file_size'])) {
+                            $message['file_size'] = Wo_SizeFormat(filesize($message['media']));
+                        }
+                        $message['media']     = Wo_GetMedia($message['media']);
+                    }
+                    if (!empty($message['time'])) {
+                        $time_today = time() - 86400;
+                        if ($message['time'] < $time_today) {
+                            $message['time_text'] = date('m.d.y', $message['time']);
+                        } else {
+                            $time = new DateTime('now', $timezone);
+                            $time->setTimestamp($message['time']);
+                            $message['time_text'] = $time->format('H:i');
+                        }
+                    }
+
+                    if (!empty($message['reply'])) {
+                        foreach ($non_allowed as $key => $value) {
+                           unset($message['reply']['messageUser'][$value]);
+                        }
+
+                        $message['reply']['time_text'] = Wo_Time_Elapsed_String($message['reply']['time']);
+                        $message_po           = 'left';
+                        if ($message['reply']['from_id'] == $wo['user']['user_id']) {
+                            $message_po = 'right';
+                        }
+                        $message['reply']['position'] = $message_po;
+                        $message['reply']['type']     = Wo_GetFilePosition($message['reply']['media']);
+                        if ($message['reply']['type_two'] == 'contact') {
+                            $message['reply']['type']   = 'contact';
+                        }
+                        if (!empty($message['reply']['lng']) && !empty($message['reply']['lat'])) {
+                            $message['reply']['type']   = 'map';
+                        }
+                        $message['reply']['type']     = $message_po . '_' . $message['reply']['type'];
+                        $message['reply']['file_size'] = 0;
+                        if (!empty($message['reply']['media'])) {
+                            $message['reply']['file_size'] = '0MB';
+                            if (file_exists($message['reply']['file_size'])) {
+                                $message['reply']['file_size'] = Wo_SizeFormat(filesize($message['reply']['media']));
+                            }
+                            $message['reply']['media']     = Wo_GetMedia($message['reply']['media']);
+                        }
+                        if (!empty($message['reply']['time'])) {
+                            $time_today = time() - 86400;
+                            if ($message['reply']['time'] < $time_today) {
+                                $message['reply']['time_text'] = date('m.d.y', $message['reply']['time']);
+                            } else {
+                                $time = new DateTime('now', $timezone);
+                                $time->setTimestamp($message['reply']['time']);
+                                $message['reply']['time_text'] = $time->format('H:i');
+                            }
+                        }
+                        $message['reply']['message_hash_id'] = '';
+                        if (!empty($_POST['message_hash_id'])) {
+                            $message['reply']['message_hash_id'] = $_POST['message_hash_id'];
+                        }
+                    }
+
+                    array_push($messages, $message);
+                }
+
+                $response_data = array(
+                    'api_status' => 200,
+                    'data' => $messages
+                );
+            }
+        }
+        else{
+            $error_code    = 5;
+            $error_message = 'page_id and message_id can not be empty';
         }
     }
 }

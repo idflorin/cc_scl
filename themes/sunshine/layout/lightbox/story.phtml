@@ -76,11 +76,11 @@
 				</video>
 			<?php } ?>
 		</div>
-		<?php if (!$wo['story']['is_owner']) { ?>
+		<?php //if (!$wo['story']['is_owner']) { ?>
 			<?php if (!empty($wo['story']['description'])) { ?>
 				<div class="draggableHelper_story_content"><?php echo $wo['story']['description']; ?></div>
 			<?php } ?>
-		<?php } ?>
+		<?php //} ?>
 	</div>
 	<?php if ($wo['story']['is_owner']) { ?>
 	<div class="comment-section">

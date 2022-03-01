@@ -45,7 +45,7 @@
 								</select>
 							</div>
 						</div>
-						<div class="col-md-8">
+						<div class="col-md-8 product_sub_category_class" style="<?php echo((empty($wo['products_sub_categories'][$wo['product']['category']]) ? 'display: none;' : '')) ?>">
 							<div class="wow_form_fields">
 								<label for="product_sub_category"><?php echo $wo['lang']['sub_category'] ?></label>
 								<select name="product_sub_category" id="product_sub_category">
@@ -85,6 +85,14 @@
 										<option value="<?php echo $key; ?>" <?php echo ($wo['product']['currency'] == $key) ? 'selected' : ''; ?>><?php echo  $currency['text'] ?> (<?php echo  $currency['symbol'] ?>)</option>
 									<?php } ?>
 								</select>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-8">
+							<div class="wow_form_fields">
+								<label for="units"><?php echo $wo['lang']['total_item'] ?></label>
+								<input id="units" name="units" type="number" value="<?php echo $wo['product']['units']?>">
 							</div>
 						</div>
 					</div>
@@ -159,11 +167,13 @@ echo "var sub_categories_array = ". $js_array . ";\n";
 ?>
 	function GetProductSubCategory(self) {
 		id = $(self).val();
+		$('.product_sub_category_class').slideUp();
 		var text = "";
 		if (typeof(sub_categories_array[id]) == 'undefined') {
 		    $('#product_sub_category').html('');
 		}
 		else{
+			$('.product_sub_category_class').slideDown();
 		   	sub_categories_array[id].forEach(function(entry) {
 				text = text + "<option value='"+entry.id+"'>"+entry.lang+"</option>";
 			});

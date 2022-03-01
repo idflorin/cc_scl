@@ -160,13 +160,18 @@ if (isset($_GET['provider']) && in_array($_GET['provider'], $types)) {
                     if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
                         $re_data['referrer'] = Wo_Secure($ref_user_id);
                         $re_data['src']      = Wo_Secure('Referrer');
-                        $update_balance      = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
+                        if ($wo['config']['affiliate_level'] < 2) {
+                            $update_balance      = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
+                        }
                         unset($_SESSION['ref']);
                     }
                 }
                 if (Wo_RegisterUser($re_data) === true) {
                     Wo_SetLoginWithSession($user_email);
                     $user_id = Wo_UserIdFromEmail($user_email);
+                    if (!empty($re_data['referrer']) && is_numeric($wo['config']['affiliate_level']) && $wo['config']['affiliate_level'] > 1) {
+                        AddNewRef($re_data['referrer'],$user_id,$wo['config']['amount_ref']);
+                    }
                     if (!empty($wo['config']['auto_friend_users'])) {
                         $autoFollow = Wo_AutoFollow($user_id);
                     }

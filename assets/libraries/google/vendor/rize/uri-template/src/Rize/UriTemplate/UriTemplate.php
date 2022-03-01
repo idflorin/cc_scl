@@ -9,4 +9,4 @@ use Rize\UriTemplate as Template;
  */
 class UriTemplate extends Template
 {
-}
+} 

@@ -475,16 +475,16 @@
 			<tr>
 				<td class="labels_col"></td>
 				<?php if ($wo['pro_packages']['star']['status'] == 1) { ?>
-				<td class="text-center"><button class="btn btn-mat btn-mat-raised btn_week" onclick="Wo_GetPaymentLink(1);"><?php echo $wo['lang']['upgrade_now'];?></button></td>
+				<td class="text-center"><button class="btn btn-mat btn-mat-raised btn_week" onclick="Wo_GetPaymentLink(1,'<?php echo $wo['pro_packages']['star']['price']; ?>','pro','hide');"><?php echo $wo['lang']['upgrade_now'];?></button></td>
 				<?php } ?>
 					<?php if ($wo['pro_packages']['hot']['status'] == 1) { ?>
-				<td class="text-center"><button class="btn btn-mat btn-mat-raised btn_month" onclick="Wo_GetPaymentLink(2);"><?php echo $wo['lang']['upgrade_now'];?></button></td>
+				<td class="text-center"><button class="btn btn-mat btn-mat-raised btn_month" onclick="Wo_GetPaymentLink(2,'<?php echo $wo['pro_packages']['hot']['price']; ?>','pro','hide');"><?php echo $wo['lang']['upgrade_now'];?></button></td>
 			<?php } ?>
 			<?php if ($wo['pro_packages']['ultima']['status'] == 1) { ?>
-				<td class="text-center"><button class="btn btn-mat btn-mat-raised btn_year" onclick="Wo_GetPaymentLink(3);"><?php echo $wo['lang']['upgrade_now'];?></button></td>
+				<td class="text-center"><button class="btn btn-mat btn-mat-raised btn_year" onclick="Wo_GetPaymentLink(3,'<?php echo $wo['pro_packages']['ultima']['price']; ?>','pro','hide');"><?php echo $wo['lang']['upgrade_now'];?></button></td>
 			<?php } ?>
 			<?php if ($wo['pro_packages']['vip']['status'] == 1) { ?>
-				<td class="text-center"><button class="btn btn-mat btn-mat-raised btn_life" onclick="Wo_GetPaymentLink(4);"><?php echo $wo['lang']['upgrade_now'];?></button></td>
+				<td class="text-center"><button class="btn btn-mat btn-mat-raised btn_life" onclick="Wo_GetPaymentLink(4,'<?php echo $wo['pro_packages']['vip']['price']; ?>','pro','hide');"><?php echo $wo['lang']['upgrade_now'];?></button></td>
 			<?php } ?>
 			</tr>
 		</tbody>
@@ -900,17 +900,7 @@ $(document).on('change', '#thumbnail', function(event) {
 	$('#bank_transfer_modal').addClass('up_rec_img_ready');
 });
 
-function Wo_GetPaymentLink(type) {
-	$.get(Wo_Ajax_Requests_File() + '?f=get_payment_method&type=' + type, function (data) {
-        if (data.status == 200) {
-          	$('#pay-modal').html(data.html);
-          	$('#pay-go-pro').modal({
-             show: true
-            });
 
-        }
-    });
-}
 jQuery(document).ready(function($) {
 	$('#bank_transfer_form').ajaxForm({
 	  url: Wo_Ajax_Requests_File() + '?f=bank_transfer',

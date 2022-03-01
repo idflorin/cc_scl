@@ -2,18 +2,22 @@
 <script src="https://js.stripe.com/v3/"></script>
 <?php $loadPage = Wo_LoadPage('thirdparty/paypal-demo'); echo (!empty($loadPage)) ? $loadPage : '';?>
 <div class="row">
-	<div class="col-md-4 ads_col_4">
-		<?php echo Wo_LoadPage('ads/includes/header'); ?>
-	</div>
-	<div class="col-md-8 ads_col_8">
+	<div class="col-md-12 ads_col_12">
 		<div class="page-margin wowonder-well">
-			<div class="wo_page_hdng pag_neg_padd pag_alone">
+			<div class="wo_page_hdng pag_neg_padd pag_alone wo_page_hdng_menu">
 				<div class="wo_page_hdng_innr">
 					<span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M21,18V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5A2,2 0 0,1 5,3H19A2,2 0 0,1 21,5V6H12C10.89,6 10,6.9 10,8V16A2,2 0 0,0 12,18M12,16H22V8H12M16,13.5A1.5,1.5 0 0,1 14.5,12A1.5,1.5 0 0,1 16,10.5A1.5,1.5 0 0,1 17.5,12A1.5,1.5 0 0,1 16,13.5Z"></path></svg></span> <?php echo $wo['lang']['my_wallet']; ?>
 				</div>
+				<?php if ($wo['config']['affiliate_system'] == 1 || $wo['config']['point_allow_withdrawal'] == 1 || $wo['config']['funding_system'] == 1 || $wo['config']['store_system'] == 'on') { ?>
+					<a href="<?php echo Wo_SeoLink('index.php?link1=withdrawal'); ?>" data-ajax="?link1=withdrawal" class="btn btn-main btn-mat btn-mat-raised">
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M15,14V11H18V9L22,12.5L18,16V14H15M14,7.7V9H2V7.7L8,4L14,7.7M7,10H9V15H7V10M3,10H5V15H3V10M13,10V12.5L11,14.3V10H13M9.1,16L8.5,16.5L10.2,18H2V16H9.1M17,15V18H14V20L10,16.5L14,13V15H17Z"></path></svg> <?php echo($wo['lang']['withdrawal']) ?>
+					</a>
+				<?php } ?>
 			</div>
 		</div>
-		<div class="page-margin wowonder-well">
+		<div class="page-margin wowonder-well wo_new_wallet">
+			<svg width="1440px" height="440px" viewBox="0 0 1440 440" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="left"><path d="M419.926103,0 L310,440 L443.848191,440 L622,0 L419.926103,0 Z M0,0 L0,440 L4.17447744,440 L201.702756,20.0642544 L88.6232679,440 L224.045093,440 L416,0 L0,0 Z" fill="<?php echo $wo['config']['btn_background_color'];?>"></path></svg>
+			<svg width="1440px" height="440px" viewBox="0 0 1440 440" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="right"><path d="M1637.54411,0 L1440.42864,419.308462 L1553.2683,0 L1417.83408,0 L1226,440 L1440.74819,440 L1440.42864,439.571503 L1440.98341,440 L1642,440 L1642,0 L1637.54411,0 Z M1198.09412,0 L1020,440 L1222.1112,440 L1332,0 L1198.09412,0 Z" fill="<?php echo $wo['config']['btn_background_color'];?>"></path></svg>
 			<?php if (isset($wo['replenishment_notif'])): ?>
 				<div id="replenish-user-account-alert">
 					<div class="alert alert-success"><?php echo $wo['replenishment_notif'];?></div>
@@ -54,7 +58,9 @@
 				$wo['trans'] = Wo_GetMytransactions();
 			?>
 			<div class="wallet_transactions">
-				<p class="bold"><?php echo $wo['lang']['transaction_log']; ?></p>
+				<p class="bold">
+					<?php echo $wo['lang']['transaction_log']; ?>
+				</p>
 				<div class="tabbable">
 					<?php echo Wo_LoadPage('ads/includes/latest_activities');?>
 				</div>
@@ -228,7 +234,14 @@ function SignatureRazorpay() {
                 dataType: 'json',
                 success: function (data) {
                 	if (data.status == 200) {
-                		window.location = data.url;
+                		<?php if (!empty($_COOKIE['redirect_page'])) { 
+                			$redirect_page = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_COOKIE['redirect_page']);
+					        $redirect_page = preg_replace('/\((.*?)\)/m', '', $redirect_page);
+                			?>
+                			window.location = "<?php echo($redirect_page); ?>";
+                		<?php }else{ ?>
+	                		window.location = data.url;
+                	    <?php } ?>
                 	}
                 	else{
                 		if (data.url != '') {
@@ -482,7 +495,14 @@ var successCallback = function(data) {
     	$('#2checkout_btn_wallet').removeAttr('disabled');
     	$('#2checkout_form_wallet').find('.ball-pulse').fadeOut(100);
     	if (data.status == 200) {
-      	 	window.location.href = data.location;
+    		<?php if (!empty($_COOKIE['redirect_page'])) { 
+    			$redirect_page = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_COOKIE['redirect_page']);
+		        $redirect_page = preg_replace('/\((.*?)\)/m', '', $redirect_page);
+    			?>
+    			window.location = "<?php echo($redirect_page); ?>";
+    		<?php }else{ ?>
+        		window.location.href = data.location;
+    	    <?php } ?>
       	} else {
       	 	$('#2checkout_alert_wallet').html("<div class='alert alert-danger'>"+data.error+"</div>");
 			setTimeout(function () {
@@ -545,6 +565,17 @@ $(function() {
     // Pull in the public encryption key for our environment
     TCO.loadPubKey("<?php echo($wo['config']['checkout_mode']) ?>");
 });
+<?php } ?>
+<?php if ($wo['config']['coinbase_payment'] == '1' && !empty($wo['config']['coinbase_key'])) { ?>
+function pay_using_coinbase() {
+    $('#pay-go-pro').modal({show: false});
+    amount = $('#amount').val();
+    $.get(Wo_Ajax_Requests_File() + '?f=coinbase&s=create',{amount:amount}, function (data) {
+	    if (data.status == 200) {
+	        window.location.href = data.url;
+	    }
+    });
+}
 <?php } ?>
 </script>
 

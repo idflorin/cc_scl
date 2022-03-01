@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == "bank_transfer") {
     if (Wo_CheckSession($hash_id) === true) {
         $request   = array();
@@ -7,8 +7,8 @@ if ($f == "bank_transfer") {
             $error = $error_icon . $wo['lang']['please_check_details'];
         }
         if (empty($error)) {
-            $description = !empty($_POST['description']) ? Wo_Secure($_POST['description']) : '';
-            $pro = $wo['pro_packages'][$wo['pro_packages_types'][$_POST['type']]];
+            $description   = !empty($_POST['description']) ? Wo_Secure($_POST['description']) : '';
+            $pro           = $wo['pro_packages'][$wo['pro_packages_types'][$_POST['type']]];
             $fileInfo      = array(
                 'file' => $_FILES["thumbnail"]["tmp_name"],
                 'name' => $_FILES['thumbnail']['name'],
@@ -19,21 +19,22 @@ if ($f == "bank_transfer") {
             $media         = Wo_ShareFile($fileInfo);
             $mediaFilename = $media['filename'];
             if (!empty($mediaFilename)) {
-                $insert_id = Wo_InsertBankTrnsfer(array('user_id' => $wo['user']['id'],
-                                                       'description' => $description,
-                                                       'price'       => $pro['price'],
-                                                       'receipt_file' => $mediaFilename,
-                                                       'mode'         => Wo_Secure($_POST['type'])));
+                $insert_id = Wo_InsertBankTrnsfer(array(
+                    'user_id' => $wo['user']['id'],
+                    'description' => $description,
+                    'price' => $pro['price'],
+                    'receipt_file' => $mediaFilename,
+                    'mode' => Wo_Secure($_POST['type'])
+                ));
                 if (!empty($insert_id)) {
                     $data = array(
                         'message' => $success_icon . $wo['lang']['bank_transfer_request'],
                         'status' => 200
                     );
                 }
-            }
-            else{
+            } else {
                 $error = $error_icon . $wo['lang']['file_not_supported'];
-                $data = array(
+                $data  = array(
                     'status' => 500,
                     'message' => $error
                 );

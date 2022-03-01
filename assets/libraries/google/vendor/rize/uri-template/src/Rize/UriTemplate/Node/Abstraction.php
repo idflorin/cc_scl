@@ -8,7 +8,7 @@ use Rize\UriTemplate\Parser;
  * Base class for all Nodes
  */
 abstract class Abstraction
-{
+{ 
     /**
      * @var string
      */

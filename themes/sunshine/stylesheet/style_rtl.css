@@ -598,13 +598,6 @@ body .right_user_info li svg.feather{
 .sun_head_onboard .sho_img {
 	left: auto;right: 30px;
 }
-.select_radio_btn label {
-    margin-right: 0 !important;
-    margin-left: 10px !important;
-}
-.select_radio_btn label:last-child {
-    margin: 0 !important;
-}
 body .fake_ad_post .fads_meta .fads_avatar {
 	float: right;
 	margin-right: 0px;margin-left: 10px;
@@ -1244,4 +1237,32 @@ body .navbar-default .dropdown-menu.ani-acc-menu li a svg.mobi_hd_ico {
 .post .post-footer .comments-list .reply .comment-body .reactions-box {
     right: -30px;
 }
+}
+
+
+
+body .pr_stars .star {margin: 0 0 0 2px;}
+body .reviewMeta--author-avatar { margin-right: 0; margin-left: 10px; }
+body .ch_checkout_title::after {left: auto;right: 0;}
+body .ch_cart .ch_title {padding-left: 0;padding-right: 45px;}
+body .ch_cart .ch_title h4 svg {left: auto;right: 0;}
+body .ch_main_items .prod_img > div {right: auto;left: 7px;}
+body .ch_main_items .prod_img > .btn {left: auto;right: 7px;}
+body .ch_main_items .closed {right: auto;left: 10px;}
+body .ch_total_price > svg {left: auto;right: -25px;transform: scale(-1) scaleX(-1);}
+body .cart_chos_addrs label {padding: 10px 45px 10px 10px;}
+body .cart_chos_addrs label:before {left: auto;right: 10px;}
+body .cart_chos_addrs label:after {left: auto;right: 19px;transform: translate(-50%,-50%);}
+
+body .refs_caret::before {
+    left: auto;
+    right: 0;
+    transform: scale(-1);
+}
+body .referres .ref-image {
+    float: right;
+    margin-right: 0;margin-left: 10px;
+}
+body .refs_caret_down::before {
+    transform: scale(-1) rotate(-90deg);
 }

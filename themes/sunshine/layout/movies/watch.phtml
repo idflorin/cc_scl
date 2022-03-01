@@ -1,6 +1,17 @@
 <div class="page-margin">
 	<div class="row">
 		<div class="col-md-12 watch_main_movie">
+			<?php if ($wo['config']['user_ads'] == 1): ?>
+				<div id="sidebar-sticky-movies">
+					<?php 
+					  $wo['sidebar-ad'] = Wo_GetAdsByType('movies');
+					  if (!empty($wo['sidebar-ad'])) {
+					  	echo Wo_LoadPage('ads/includes/movies-ad');
+					  }
+					?>
+					<div class="clear"></div>
+				</div>
+		    <?php endif; ?>
 			<div class="row sun_watch_movie_top">
 				<div class="col-md-4 col-sm-4">
 					<div class="played-film-image-wrap">

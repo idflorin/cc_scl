@@ -300,9 +300,11 @@ function Wo_RegisterTabMessage(id,type = '') {
       else{
         if (type == 'page') {
           $('form.page-chat-sending-'+id).submit();
+          $('[name=chatSticker]').val('');
         }
         else{
           $('form.chat-sending-form-'+id).submit();
+          $('[name=chatSticker]').val('');
         }
       }
 
@@ -311,9 +313,11 @@ function Wo_RegisterTabMessage(id,type = '') {
   else{
     if (type == 'page') {
       $('form.page-chat-sending-'+id).submit();
+      $('[name=chatSticker]').val('');
     }
     else{
       $('form.chat-sending-form-'+id).submit();
+      $('[name=chatSticker]').val('');
     }
   }
 }

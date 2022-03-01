@@ -56,50 +56,97 @@
 					</div>
 				</div>
 				
-				<div class="row">
-					<div class="col-md-6">
-						<div class="select_radio_btn small_rbtn">
-							<h4><?php echo $wo['lang']['appears']?></h4>
-							<div class="select_radio_btn_innr">
-								<label>
-									<input type="radio" name="appears" id="post" value="post">
-									<div class="sr_btn_lab_innr">
-										<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/post.svg')"></div>
-										<span><?php echo $wo['lang']['post'];?></span>
-									</div>
-								</label>
-								<label>
-									<input type="radio" name="appears" id="sidebar" value="sidebar" >
-									<div class="sr_btn_lab_innr">
-										<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/sidebar.svg')"></div>
-										<span><?php echo $wo['lang']['sidebar'];?></span>
-									</div>
-								</label>
+				<div class="select_radio_btn small_rbtn">
+					<h4><?php echo $wo['lang']['appears']?></h4>
+					<div class="select_radio_btn_innr">
+						<label>
+							<input type="radio" name="appears" id="entire" value="entire">
+							<div class="sr_btn_lab_innr">
+								<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/entire.png')"></div>
+								<span><?php echo $wo['lang']['entire_site'];?></span>
 							</div>
-						</div>
+						</label>
+						<label>
+							<input type="radio" name="appears" id="post" value="post">
+							<div class="sr_btn_lab_innr">
+								<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/post.svg')"></div>
+								<span><?php echo $wo['lang']['post'];?></span>
+							</div>
+						</label>
+						<label>
+							<input type="radio" name="appears" id="sidebar" value="sidebar" >
+							<div class="sr_btn_lab_innr">
+								<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/sidebar.svg')"></div>
+								<span><?php echo $wo['lang']['sidebar'];?></span>
+							</div>
+						</label>
+						<?php if ($wo['config']['job_system'] == 1) { ?>
+							<label>
+								<input type="radio" name="appears" id="jobs" value="jobs" >
+								<div class="sr_btn_lab_innr">
+									<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/jobs.png')"></div>
+									<span><?php echo $wo['lang']['jobs'];?></span>
+								</div>
+							</label>
+						<?php } ?>
+						<?php if ($wo['config']['forum'] != 0) { ?>
+							<label>
+								<input type="radio" name="appears" id="forum" value="forum" >
+								<div class="sr_btn_lab_innr">
+									<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/forum.png')"></div>
+									<span><?php echo $wo['lang']['forum'];?></span>
+								</div>
+							</label>
+						<?php } ?>
+						<?php if ($wo['config']['movies'] != 0) { ?>
+							<label>
+								<input type="radio" name="appears" id="movies" value="movies" >
+								<div class="sr_btn_lab_innr">
+									<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/movies.png')"></div>
+									<span><?php echo $wo['lang']['movies'];?></span>
+								</div>
+							</label>
+						<?php } ?>
+						<?php if ($wo['config']['offer_system'] != 0) { ?>
+							<label>
+								<input type="radio" name="appears" id="offer" value="offer" >
+								<div class="sr_btn_lab_innr">
+									<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/offers.png')"></div>
+									<span><?php echo $wo['lang']['offer'];?></span>
+								</div>
+							</label>
+						<?php } ?>
+						<?php if ($wo['config']['funding_system'] != 0) { ?>
+							<label>
+								<input type="radio" name="appears" id="funding" value="funding" >
+								<div class="sr_btn_lab_innr">
+									<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/funding.png')"></div>
+									<span><?php echo $wo['lang']['funding'];?></span>
+								</div>
+							</label>
+						<?php } ?>
 					</div>
-					<div class="col-md-6">
-						<div class="select_radio_btn small_rbtn">
-							<h4><?php echo $wo['lang']['bidding']?></h4>
-							<div class="select_radio_btn_innr">
-								<label>
-									<input type="radio" name="bidding" id="clicks" value="clicks">
-									<div class="sr_btn_lab_innr">
-										<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/clicks.svg')"></div>
-										<span><?php echo $wo['lang']['pay_per_clicks']; ?></span>
-										<span class="bid_price"><?php echo Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price']; ?></span>
-									</div>
-								</label>
-								<label>
-									<input type="radio" name="bidding" id="views" value="views" >
-									<div class="sr_btn_lab_innr">
-										<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/views.svg')"></div>
-										<span><?php echo $wo['lang']['pay_per_imprssions']; ?></span>
-										<span class="bid_price"><?php echo Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price']; ?></span>
-									</div>
-								</label>
+				</div>
+				
+				<div class="select_radio_btn small_rbtn">
+					<h4><?php echo $wo['lang']['bidding']?></h4>
+					<div class="select_radio_btn_innr">
+						<label>
+							<input type="radio" name="bidding" id="clicks" value="clicks">
+							<div class="sr_btn_lab_innr">
+								<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/clicks.svg')"></div>
+								<span><?php echo $wo['lang']['pay_per_clicks']; ?></span>
+								<span class="bid_price entire_site_clicks"><?php echo Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price']; ?></span>
 							</div>
-						</div>
+						</label>
+						<label>
+							<input type="radio" name="bidding" id="views" value="views" >
+							<div class="sr_btn_lab_innr">
+								<div class="sr_btn_img" style="background-image:url('<?php echo $wo['config']['theme_url'];?>/img/cads/views.svg')"></div>
+								<span><?php echo $wo['lang']['pay_per_imprssions']; ?></span>
+								<span class="bid_price entire_site_views"><?php echo Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price']; ?></span>
+							</div>
+						</label>
 					</div>
 				</div>
 				
@@ -306,6 +353,16 @@ $(document).ready(function() {
 });
 
 	jQuery(document).ready(function($) {
+		$(".select_radio_btn_innr input").change(function(event) {
+			if ($(this).val() == 'entire') {
+				$('.entire_site_clicks').html("<?php echo Wo_GetCurrency($wo['config']['currency']) . ($wo['config']['ad_c_price'] * 1.5); ?>");
+				$('.entire_site_views').html("<?php echo Wo_GetCurrency($wo['config']['currency']) . ($wo['config']['ad_v_price'] * 1.5); ?>");
+			}
+			else{
+				$('.entire_site_clicks').html("<?php echo Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price']; ?>");
+				$('.entire_site_views').html("<?php echo Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price']; ?>");
+			}
+		});
 		$("#ads-audience").change(function(event) {
 			var self = $(this);
 				get_estimated_users();

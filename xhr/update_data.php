@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == 'update_data') {
     if (Wo_CheckMainSession($hash_id) === true) {
         $sql_query             = mysqli_query($sqlConnect, "UPDATE " . T_APP_SESSIONS . " SET `time` = " . time() . " WHERE `session_id` = '{$session_id}'");
@@ -28,7 +28,7 @@ if ($f == 'update_data') {
         $data['messages'] = Wo_CountMessages(array(
             'new' => true
         ), 'interval');
-        $chat_groups = Wo_CheckLastGroupUnread();
+        $chat_groups      = Wo_CheckLastGroupUnread();
         $data['messages'] = $data['messages'] + count($chat_groups);
         $data['calls']    = 0;
         $data['is_call']  = 0;
@@ -57,37 +57,33 @@ if ($f == 'update_data') {
     $data['count_num'] = 0;
     if ($_GET['check_posts'] == 'true') {
         if (!empty($_GET['before_post_id']) && isset($_GET['user_id'])) {
-            $html              = '';
-            $postsData         = array(
+            $html      = '';
+            $postsData = array(
                 'before_post_id' => $_GET['before_post_id'],
                 'publisher_id' => $_GET['user_id'],
                 'limit' => 20,
                 'ad-id' => 0,
                 'placement' => 'multi_image_post'
             );
-            $posts             = Wo_GetPosts($postsData);
-            $count             = count($posts);
+            $posts     = Wo_GetPosts($postsData);
+            $count     = count($posts);
             if ($count == 1) {
-                $data['count']     = str_replace('{count}', $count, $wo['lang']['view_more_post']);
+                $data['count'] = str_replace('{count}', $count, $wo['lang']['view_more_post']);
+            } else {
+                $data['count'] = str_replace('{count}', $count, $wo['lang']['view_more_posts']);
             }
-            else{
-                $data['count']     = str_replace('{count}', $count, $wo['lang']['view_more_posts']);
-            }
-            
             $data['count_num'] = $count;
         }
     } else if ($_GET['hash_posts'] == 'true') {
         if (!empty($_GET['before_post_id']) && isset($_GET['user_id'])) {
-            $html              = '';
-            $posts             = Wo_GetHashtagPosts($_GET['hashtagName'], 0, 20, $_GET['before_post_id']);
-            $count             = count($posts);
+            $html  = '';
+            $posts = Wo_GetHashtagPosts($_GET['hashtagName'], 0, 20, $_GET['before_post_id']);
+            $count = count($posts);
             if ($count == 1) {
-                $data['count']     = str_replace('{count}', $count, $wo['lang']['view_more_post']);
+                $data['count'] = str_replace('{count}', $count, $wo['lang']['view_more_post']);
+            } else {
+                $data['count'] = str_replace('{count}', $count, $wo['lang']['view_more_posts']);
             }
-            else{
-                $data['count']     = str_replace('{count}', $count, $wo['lang']['view_more_posts']);
-            }
-            
             $data['count_num'] = $count;
         }
     }

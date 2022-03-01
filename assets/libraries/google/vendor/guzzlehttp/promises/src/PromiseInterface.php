@@ -11,7 +11,7 @@ namespace GuzzleHttp\Promise;
  * @link https://promisesaplus.com/
  */
 interface PromiseInterface
-{
+{ 
     const PENDING = 'pending';
     const FULFILLED = 'fulfilled';
     const REJECTED = 'rejected';

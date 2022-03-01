@@ -1,5 +1,5 @@
 <?php
-
+ 
 class Twocheckout_Coupon extends Twocheckout
 {
 

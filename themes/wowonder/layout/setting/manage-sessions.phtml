@@ -1,14 +1,15 @@
 <div class="wo_settings_page wow_content">
-	<div class="avatar-holder">
+	<div class="avatar-holder security">
 		<img src="<?php echo $wo['setting']['avatar']?>" alt="<?php echo $wo['setting']['name']?> Profile Picture" class="avatar">
 		<div class="infoz">
 			<h5 title="<?php echo $wo['setting']['name']?>"><a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['setting']['username'] . '');?>" data-ajax="?link1=timeline&u=<?php echo $wo['setting']['username'] ?>"><?php echo $wo['setting']['name']?></a></h5>
 			<p><?php echo $wo['lang']['manage_sessions']; ?></p>
-			<a href="javascript:void();" class="btn btn-sm btn-mat btn-glossy" id="upgrade-button" onclick="Wo_RemoveAllSessions();"><?php echo $wo['lang']['remove_all_sessions'];?></a>
 		</div>
 	</div>
 	<hr>
-
+	<div class="text-center">
+		<a href="javascript:void();" class="btn btn-danger btn-mat" id="upgrade-button" onclick="Wo_RemoveAllSessions();"><?php echo $wo['lang']['remove_all_sessions'];?></a>
+	</div>
 	<div class="active_sessions">
 		<div class="table-responsive">
 			<?php

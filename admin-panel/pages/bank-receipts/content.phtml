@@ -34,7 +34,6 @@ if (($page > $db->totalPages) && !empty($_GET['page-id'])) {
 
 $approved_count = $db->where('approved',1)->getValue('bank_receipts','count(id)');
 $disapproved_count = $db->where('approved',0)->getValue('bank_receipts','count(id)');
-$db->where('recipient_id',0)->where('admin',1)->where('seen',0)->where('type','bank')->update(T_NOTIFICATION,array('seen' => time()));
 ?>
 <div class="container-fluid">
     <div>

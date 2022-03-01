@@ -11,7 +11,6 @@
  */
 
 namespace Composer\Autoload;
-
 /**
  * ClassLoader implements a PSR-0, PSR-4 and classmap class loader.
  *

@@ -1,19 +1,19 @@
 <div class="wo_settings_page wow_content">
-	<div class="avatar-holder">
+	<div class="avatar-holder earning">
 		<img src="<?php echo $wo['setting']['avatar']?>" alt="<?php echo $wo['setting']['name']?> Profile Picture" class="avatar">
 		<div class="infoz">
 			<h5 title="<?php echo $wo['setting']['name']?>"><a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['setting']['username'] . '');?>" data-ajax="?link1=timeline&u=<?php echo $wo['setting']['username'] ?>"><?php echo $wo['setting']['name']?></a></h5>
-			<h5 class="mt-0"><a href="<?php echo Wo_SeoLink('index.php?link1=setting&page=payments');?>" data-ajax="?link1=setting&page=payments"><?php echo Wo_GetCurrency($wo['config']['ads_currency']) . $wo['setting']['balance'];?></a></h5>
-			<p><?php echo $wo['lang']['my_affiliates']; ?></p>
+
+			<p><?php echo $wo['lang']['my_affiliates']; ?> </p>
 		</div>
 	</div>
 	<hr>
-
+	<!-- <a href="<?php echo Wo_SeoLink('index.php?link1=setting&page=payments');?>" data-ajax="?link1=setting&page=payments"><?php echo Wo_GetCurrency($wo['config']['ads_currency']) . $wo['setting']['balance'];?></a> -->
 	<div class="setting-panel">
 		<div class="wow_affs_main">
 			<img src="<?php echo $wo['config']['theme_url'];?>/img/affs.svg" alt="<?php echo $wo['lang']['my_affiliates']?>">
 			<h4>
-			<?php 
+			<?php
 				if( $wo['config']['amount_percent_ref'] > 0 ){
 					$earn_users = str_replace('{amount}', $wo['config']['amount_percent_ref'], $wo['lang']['earn_users']);
 					$earn_users = str_replace('$', '%', $earn_users);
@@ -63,16 +63,48 @@
 				</div>
 			</div>
 		</div>
-		<div class="referres wo_referres"><?php
-      	 	$refs = Wo_GetReferrers();
-      	 	if (count($refs) > 0) {
-      	 	 	foreach ($refs as $key => $wo['ref']) {
-      	 	 		echo Wo_LoadPage('setting/refs');
-      	 	 	}
-      	 	} 
-      	 	?></div>
+		<div class="referres wo_referres">
+			<?php if (!empty($wo['setting']['ref_level'])) {
+				$ref_level = json_decode($wo['setting']['ref_level'],true);
+				if (!empty($ref_level)) {
+			?>
+				<ul class="multi_ref_sys" id="refs_myUL">
+					<?php foreach ($ref_level as $key => $value) {
+						$wo['ref'] = Wo_UserData($key);
+					?>
+					<?php if (!empty($value)) { ?>
+						<li><span class="refs_caret" users_data="<?php echo $wo['ref']['user_id']; ?>" onclick="GetNextUsers(this)"><?php echo Wo_LoadPage('setting/refs'); ?></span>
+					    </li>
+					<?php }else{ ?>
+					    <li><span><?php echo Wo_LoadPage('setting/refs'); ?></span></li>
+				  <?php } ?>
+				  <?php } ?>
+				</ul>
+			<?php }}else{
+				$refs = Wo_GetReferrers();
+	      	 	if (count($refs) > 0) {
+	      	 	 	foreach ($refs as $key => $wo['ref']) {
+	      	 	 		echo Wo_LoadPage('setting/refs');
+	      	 	 	}
+	      	 	}
+	      	 }
+			?>
+
+		</div>
 	</div>
 </div>
+<script>
+	function GetNextUsers(self){
+		next_users = $(self).attr('users_data');
+		$.post( Wo_Ajax_Requests_File() + '?f=next_users', {user_id:"<?php echo $wo['setting']['user_id']; ?>",next_users:next_users}, function(data, textStatus, xhr) {
+			if (data.status == 200) {
+				$(self).after(data.html);
+				self.parentElement.querySelector(".refs_nested").classList.toggle("refs_active");
+			    self.classList.toggle("refs_caret_down");
+			}
+		});
+	}
+</script>
 <style>
 .social-btn {width: 100%;display: inline;}
 .social-btn-parent {text-decoration: none;}

@@ -32,8 +32,13 @@ $allow_array     = array(
     'download_user_info',
     'movies',
     'funding',
-    'stripe'
+    'stripe',
+    'coinbase',
+    'load_more_products'
 );
+if ($f == 'certification' && $s == 'download_user_certification' && !empty($_GET['id']) && is_numeric($_GET['id']) && $_GET['id'] > 0) {
+    $allow_array[] = 'certification';
+}
 $non_login_array = array(
     'session_status',
     'open_lightbox',
@@ -73,7 +78,9 @@ $non_login_array = array(
     'load-recent-blogs',
     'get_no_posts_name',
     'search-blog-read',
-    'search-blog'
+    'search-blog',
+    'coinbase',
+    'load_more_products'
 );
 if ($wo['config']['membership_system'] == 1) {
     $non_login_array[] = 'pro_register';
@@ -104,11 +111,17 @@ if (!in_array($f, $non_login_array)) {
         }
     }
 }
+if ($wo['loggedin'] && $wo['user']['banned'] == 1 && !in_array($f, $non_login_array)) {
+    exit();
+}
 $files = scandir('xhr');
 unset($files[0]);
 unset($files[1]);
 if (file_exists('xhr/' . $f . '.php') && in_array($f . '.php', $files)) {
     include 'xhr/' . $f . '.php';
+}
+elseif (!empty($_GET['mode_type']) && in_array($_GET['mode_type'], array('linkedin'))) {
+    include 'xhr/modes/' . Wo_Secure($_GET['mode_type']) . '.php';
 }
 mysqli_close($sqlConnect);
 unset($wo);

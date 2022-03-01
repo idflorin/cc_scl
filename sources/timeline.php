@@ -9,22 +9,22 @@ if (isset($_GET['u'])) {
     $check_user = Wo_IsNameExist($_GET['u'], 1);
     if (in_array(true, $check_user)) {
         if ($check_user['type'] == 'user') {
-            $id                 = $user_id = Wo_UserIdFromUsername($_GET['u']);
-            $wo['user_profile'] = Wo_UserData($user_id);
-            $type               = 'timeline';
-            $about              = $wo['user_profile']['about'];
-            $name               = $wo['user_profile']['name'];
+            $id                           = $user_id = Wo_UserIdFromUsername($_GET['u']);
+            $wo['user_profile']           = Wo_UserData($user_id);
+            $type                         = 'timeline';
+            $about                        = $wo['user_profile']['about'];
+            $name                         = $wo['user_profile']['name'];
             $wo['user_profile']['fields'] = Wo_UserFieldsData($user_id);
-            $wo['have_stories'] = false;
+            $wo['have_stories']           = false;
             if ($wo['loggedin'] == true) {
-                $user_stories = $db->where('user_id', $wo['user_profile']['user_id'])->get(T_USER_STORY,null,array('id'));
+                $user_stories = $db->where('user_id', $wo['user_profile']['user_id'])->get(T_USER_STORY, null, array(
+                    'id'
+                ));
                 if (!empty($user_stories)) {
-                    $wo['have_stories'] = true;
+                    $wo['have_stories']     = true;
                     $wo['story_seen_class'] = 'seen_story';
-
                     foreach ($user_stories as $key => $value) {
-                        $is_seen = $db->where('story_id',$value->id)->where('user_id',$wo['user']['user_id'])->getValue(T_STORY_SEEN,'COUNT(*)');
-
+                        $is_seen = $db->where('story_id', $value->id)->where('user_id', $wo['user']['user_id'])->getValue(T_STORY_SEEN, 'COUNT(*)');
                         if ($is_seen == 0) {
                             $wo['story_seen_class'] = 'unseen_story';
                         }
@@ -52,6 +52,10 @@ if (isset($_GET['u'])) {
     header("Location: " . $wo['config']['site_url']);
     exit();
 }
+if (empty($type)) {
+    header("Location: " . Wo_SeoLink('index.php?link1=404'));
+    exit();
+}
 if ($wo['config']['pages'] == 0 && $type == 'page') {
     header("Location: " . $wo['config']['site_url']);
     exit();
@@ -69,9 +73,9 @@ $con2 = 1;
 if ($type == 'timeline') {
     $user_data = Wo_UpdateUserDetails($wo['user_profile'], true, true, true);
     if (is_array($user_data)) {
-        $wo['user_profile'] = $user_data;
-        $about  = $wo['user_profile']['about'];
-        $name   = $wo['user_profile']['name'];
+        $wo['user_profile']           = $user_data;
+        $about                        = $wo['user_profile']['about'];
+        $name                         = $wo['user_profile']['name'];
         $wo['user_profile']['fields'] = Wo_UserFieldsData($user_id);
     }
 }
@@ -97,17 +101,16 @@ if ($type == 'timeline' && $wo['loggedin'] == true) {
         }
     }
     if ($is_blocked) {
-       $con2 = 0;
-       if (!isset($came_from)) {
-           header("Location: " . $wo['config']['site_url']);
-           exit(); 
-       } else {
-           Wo_RedirectSmooth(Wo_SeoLink('index.php?link1=404'));
-       }
+        $con2 = 0;
+        if (!isset($came_from)) {
+            header("Location: " . $wo['config']['site_url']);
+            exit();
+        } else {
+            Wo_RedirectSmooth(Wo_SeoLink('index.php?link1=404'));
+        }
     }
 }
-
-$can_ = 0;
+$can_                           = 0;
 $wo['nodejs_send_notification'] = false;
 if ($wo['loggedin'] == true && $wo['config']['profileVisit'] == 1 && $type == 'timeline' && $con2 == 1) {
     if ($wo['user_profile']['user_id'] != $wo['user']['user_id'] && $wo['user']['visit_privacy'] == 0) {
@@ -119,7 +122,7 @@ if ($wo['loggedin'] == true && $wo['config']['profileVisit'] == 1 && $type == 't
             $can_ = 1;
         }
         if ($wo['user_profile']['visit_privacy'] == 0 && $can_ == 1) {
-            $notification_data_array = array(
+            $notification_data_array        = array(
                 'recipient_id' => $wo['user_profile']['user_id'],
                 'type' => 'visited_profile',
                 'url' => 'index.php?link1=timeline&u=' . $wo['user']['username']
@@ -131,49 +134,48 @@ if ($wo['loggedin'] == true && $wo['config']['profileVisit'] == 1 && $type == 't
 }
 if ($type == 'page') {
     if ($wo['loggedin'] == true) {
-        $query = mysqli_query($sqlConnect, "SELECT COUNT(*) as count FROM " . T_OFFER . " WHERE `user_id` = {$wo['user']['user_id']} AND `expire_date` < CURDATE() AND `expire_time` < CURTIME()");
+        $query              = mysqli_query($sqlConnect, "SELECT COUNT(*) as count FROM " . T_OFFER . " WHERE `user_id` = {$wo['user']['user_id']} AND `expire_date` < CURDATE() AND `expire_time` < CURTIME()");
         $query_select_fetch = mysqli_fetch_assoc($query);
         if ($query_select_fetch['count'] > 0) {
             $offers = $db->where("`user_id` = {$wo['user']['user_id']} AND `expire_date` < CURDATE() AND `expire_time` < CURTIME()")->get(T_OFFER);
             foreach ($offers as $key => $offer) {
                 @unlink($offer->image);
                 Wo_DeleteFromToS3($offer->image);
-                $db->where('id',$offer->id)->delete(T_OFFER);
-                $post = $db->where('offer_id',$offer->id)->getOne(T_POSTS);
+                $db->where('id', $offer->id)->delete(T_OFFER);
+                $post = $db->where('offer_id', $offer->id)->getOne(T_POSTS);
                 if (!empty($post)) {
                     Wo_DeletePost($post->id);
                 }
             }
         }
     }
-
     if (isset($_GET['boosted']) && $wo['config']['pro'] == 1 && $wo['loggedin'] == true && $wo['page_profile']['boosted'] == 0) {
         if ($wo['page_profile']['is_page_onwer'] == true) {
             if ($wo['user']['is_pro'] == 1) {
-                $user_id = $wo['user']['user_id'];
-                $query = mysqli_query($sqlConnect, "SELECT COUNT(`page_id`) as count FROM " . T_PAGES . " WHERE `user_id` = {$user_id} AND `boosted` = '1'");
+                $user_id            = $wo['user']['user_id'];
+                $query              = mysqli_query($sqlConnect, "SELECT COUNT(`page_id`) as count FROM " . T_PAGES . " WHERE `user_id` = {$user_id} AND `boosted` = '1'");
                 $query_select_fetch = mysqli_fetch_assoc($query);
-                $continue = 0;
+                $continue           = 0;
                 if ($wo['user']['pro_type'] == 1) {
-                     if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
-                           $continue = 1;
-                     }
+                    if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
+                        $continue = 1;
+                    }
                 } else if ($wo['user']['pro_type'] == 2) {
-                     if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
-                           $continue = 1;
-                     }
+                    if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
+                        $continue = 1;
+                    }
                 } else if ($wo['user']['pro_type'] == 3) {
-                     if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
-                           $continue = 1;
-                     }
+                    if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
+                        $continue = 1;
+                    }
                 } else if ($wo['user']['pro_type'] == 4) {
-                     if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
-                           $continue = 1;
-                     }
+                    if ($query_select_fetch['count'] > ($wo['pro_packages'][$wo['pro_packages_types'][$wo['user']['pro_type']]]['pages_promotion'] - 1)) {
+                        $continue = 1;
+                    }
                 }
                 if ($continue == 1) {
                     $query_textt = "UPDATE " . T_PAGES . " SET `boosted` = '0' WHERE `page_id` IN (SELECT * FROM (SELECT `page_id` FROM " . T_PAGES . " WHERE `boosted` = '1' AND (`user_id` = {$user_id} OR `page_id` IN (SELECT `page_id` FROM " . T_PAGES . " WHERE `user_id` = {$user_id})) ORDER BY `page_id` DESC LIMIT 1) as t)";
-                    $query_two = mysqli_query($sqlConnect, $query_textt);
+                    $query_two   = mysqli_query($sqlConnect, $query_textt);
                 }
                 $array  = array(
                     'boosted' => 1
@@ -199,11 +201,26 @@ if ($type == 'page') {
         }
     }
 }
-if (!empty($_GET['type']) && in_array($_GET['type'], array('activities','mutual_friends','following','followers','videos','photos','likes','groups','family_list','requests'))) {
-    $name = $name ." | ".Wo_Secure($_GET['type']);
+if (!empty($_GET['type']) && in_array($_GET['type'], array(
+    'activities',
+    'mutual_friends',
+    'following',
+    'followers',
+    'videos',
+    'photos',
+    'likes',
+    'groups',
+    'family_list',
+    'requests'
+))) {
+    $name = $name . " | " . Wo_Secure($_GET['type']);
 }
 $wo['description'] = $about;
 $wo['keywords']    = '';
 $wo['page']        = $type;
 $wo['title']       = str_replace('&#039;', "'", $name);
-$wo['content']     = Wo_LoadPage("{$type}/content");
+if ($type == 'timeline' && $wo['config']['website_mode'] == 'patreon') {
+    $wo['content'] = Wo_LoadPage("{$type}/tiers");
+} else {
+    $wo['content'] = Wo_LoadPage("{$type}/content");
+}

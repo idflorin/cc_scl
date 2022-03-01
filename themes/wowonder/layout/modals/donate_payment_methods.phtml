@@ -29,6 +29,11 @@
 					</button>
 				<?php } ?>
 				
+				<!-- Coinbase -->
+					<button class="btn-coinbase btn">
+						<img src="<?php echo $wo['config']['theme_url'];?>/img/coinbase.png"> <?php echo $wo['lang']['coinbase'] ?>
+					</button>
+				
 				<?php if ($wo['config']['alipay'] == 'yes') { ?>
 				<!-- Alipay -->
 					<button class="btn-alipay btn" onclick="Wo_StripeDonate(<?php echo $wo['donate_fund_id']; ?>,<?php echo $wo['donate_fund_amount']; ?>,'alipay');">

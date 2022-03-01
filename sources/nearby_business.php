@@ -1,6 +1,6 @@
 <?php
 if ($wo['loggedin'] == false || $wo['config']['nearby_business_system'] == 0 || $wo['config']['job_system'] == 0) {
-	header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
+		header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
     exit();
 }
 

@@ -108,7 +108,12 @@ module.exports.chatListOwnerFalse = async (ctx, data, fromUser, nextId, hasHTML,
                         })
         if (story && story.id) {
             data.have_story = true;
-            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            if (story.thumbnail && story.thumbnail != '') {
+                story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            }
+            else{
+                story.thumbnail = (await funcs.Wo_UserData(ctx, story.user_id)).avatar;
+            }
         }
         data.story = story;
     }
@@ -192,7 +197,12 @@ module.exports.chatListOwnerTrue = async (ctx, data, fromUser, nextId, hasHTML, 
                         })
         if (story && story.id) {
             data.have_story = true;
-            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            if (story.thumbnail && story.thumbnail != '') {
+                story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            }
+            else{
+                story.thumbnail = (await funcs.Wo_UserData(ctx, story.user_id)).avatar;
+            }
         }
         data.story = story;
     }
@@ -276,7 +286,12 @@ module.exports.chatListOwnerTrueWithMedia = async (ctx, data, fromUser, nextId, 
                         })
         if (story && story.id) {
             data.have_story = true;
-            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            if (story.thumbnail && story.thumbnail != '') {
+                story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            }
+            else{
+                story.thumbnail = (await funcs.Wo_UserData(ctx, story.user_id)).avatar;
+            }
         }
         data.story = story;
     }
@@ -318,7 +333,7 @@ module.exports.chatListOwnerTrueWithMedia = async (ctx, data, fromUser, nextId, 
     });
     reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
     var file_size = "0MB";
-    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
+    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['wasabi_storage'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
         var current_message = await funcs.Wo_GetMessageByID(ctx,data.mediaId);
         if (current_message && current_message != undefined && current_message.media && current_message.media != undefined) {
             s = fs.statSync(path.resolve(__dirname, '../../'+current_message.media));
@@ -370,7 +385,12 @@ module.exports.chatListOwnerFalseWithMedia = async (ctx, data, fromUser, nextId,
                         })
         if (story && story.id) {
             data.have_story = true;
-            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            if (story.thumbnail && story.thumbnail != '') {
+                story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            }
+            else{
+                story.thumbnail = (await funcs.Wo_UserData(ctx, story.user_id)).avatar;
+            }
         }
         data.story = story;
     }
@@ -412,7 +432,7 @@ module.exports.chatListOwnerFalseWithMedia = async (ctx, data, fromUser, nextId,
     });
     reactions_info_html = await funcs.Wo_GetPostReactions(ctx,nextId,'message');
     var file_size = "0MB";
-    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
+    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['wasabi_storage'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
         var current_message = await funcs.Wo_GetMessageByID(ctx,data.mediaId);
         if (current_message && current_message != undefined && current_message.media && current_message.media != undefined) {
             s = fs.statSync(path.resolve(__dirname, '../../'+current_message.media));
@@ -465,7 +485,12 @@ module.exports.messageListOwnerTrue = async (ctx, data, fromUser, message, hasHT
                         })
         if (story && story.id) {
             data.have_story = true;
-            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            if (story.thumbnail && story.thumbnail != '') {
+                story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            }
+            else{
+                story.thumbnail = (await funcs.Wo_UserData(ctx, story.user_id)).avatar;
+            }
         }
         data.story = story;
     }
@@ -565,7 +590,12 @@ module.exports.messageListOwnerTrueWithMedia = async (ctx, data, fromUser, messa
                         })
         if (story && story.id) {
             data.have_story = true;
-            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            if (story.thumbnail && story.thumbnail != '') {
+                story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            }
+            else{
+                story.thumbnail = (await funcs.Wo_UserData(ctx, story.user_id)).avatar;
+            }
         }
         data.story = story;
     }
@@ -618,7 +648,7 @@ module.exports.messageListOwnerTrueWithMedia = async (ctx, data, fromUser, messa
         }
     }
     var file_size = "0MB";
-    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
+    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['wasabi_storage'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
         var current_message = await funcs.Wo_GetMessageByID(ctx,data.mediaId);
         if (current_message && current_message != undefined && current_message.media && current_message.media != undefined) {
             s = fs.statSync(path.resolve(__dirname, '../../'+current_message.media));
@@ -671,7 +701,12 @@ module.exports.messageListOwnerFalse = async (ctx, data, message, fromUser, hasH
                         })
         if (story && story.id) {
             data.have_story = true;
-            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            if (story.thumbnail && story.thumbnail != '') {
+                story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            }
+            else{
+                story.thumbnail = (await funcs.Wo_UserData(ctx, story.user_id)).avatar;
+            }
         }
         data.story = story;
     }
@@ -773,7 +808,12 @@ module.exports.messageListOwnerFalseWithMedia = async (ctx, data, message, fromU
                         })
         if (story && story.id) {
             data.have_story = true;
-            story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            if (story.thumbnail && story.thumbnail != '') {
+                story.thumbnail = await funcs.Wo_GetMedia(ctx, story.thumbnail);
+            }
+            else{
+                story.thumbnail = (await funcs.Wo_UserData(ctx, story.user_id)).avatar;
+            }
         }
         data.story = story;
     }
@@ -828,7 +868,7 @@ module.exports.messageListOwnerFalseWithMedia = async (ctx, data, message, fromU
         }
     }
     var file_size = "0MB";
-    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
+    if (ctx.globalconfig['amazone_s3'] != 1 && ctx.globalconfig['wasabi_storage'] != 1 && ctx.globalconfig['spaces'] != 1 && ctx.globalconfig['ftp_upload'] != 1 && ctx.globalconfig['cloud_upload'] != 1) {
         var current_message = await funcs.Wo_GetMessageByID(ctx,data.mediaId);
         if (current_message && current_message != undefined && current_message.media && current_message.media != undefined) {
             s = fs.statSync(path.resolve(__dirname, '../../'+current_message.media));

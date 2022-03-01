@@ -6,6 +6,17 @@
 	<div class="row">
 		
 		<div class="col-md-9">
+			<?php if ($wo['config']['user_ads'] == 1): ?>
+				<div id="sidebar-sticky-offer">
+					<?php 
+					  $wo['sidebar-ad'] = Wo_GetAdsByType('offer');
+					  if (!empty($wo['sidebar-ad'])) {
+					  	echo Wo_LoadPage('ads/includes/offer-ad');
+					  }
+					?>
+					<div class="clear"></div>
+				</div>
+		    <?php endif; ?>
 			<div class="latest-products">
 				<div class="market_bottom">
 					<?php

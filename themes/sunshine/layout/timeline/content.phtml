@@ -48,6 +48,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 					<input class="image_type" name="image_type" value="0" type="hidden">
 					<input name="cover_image" id="cover-input-image" value="<?php echo $wo['user_profile']['cover_org']?>" type="hidden">
 					<input name="real_image" id="full-input-image" value="<?php echo Wo_GetMedia($wo['user_profile']['cover_full']); ?>" type="hidden">
+					<input type="hidden" name="user_id" value="<?php echo $wo['user_profile']['user_id'];?>">
 				</form>
 			<?php } ?>
 			<div class="user-cover-uploading-container"></div>
@@ -111,6 +112,11 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 							<?php if($wo['user_profile']['verified'] == 1) {   ?>
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="verified-color feather feather-check-circle" title="<?php echo $wo['lang']['verified_user'];?>"><path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"></path></svg>
 							<?php } ?>
+							
+							<?php if (!empty($wo['user_profile']['is_open_to_work']) && $wo['config']['website_mode'] == 'linkedin') { ?>
+								<span class="wo_open_job_badge" title="<?php echo $wo['lang']['open_to_work'];?>" data-toggle="tooltip"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"><path fill="currentColor" d="M10,2H14A2,2 0 0,1 16,4V6H20A2,2 0 0,1 22,8V19A2,2 0 0,1 20,21H4C2.89,21 2,20.1 2,19V8C2,6.89 2.89,6 4,6H8V4C8,2.89 8.89,2 10,2M14,6V4H10V6H14Z"></path></svg></span>
+							<?php } ?>
+							
 							<?php if (Wo_IsUserPro($wo['user_profile']['is_pro']) === true) { 
 							$user_pro_type = Wo_GetUserProType($wo['user_profile']['pro_type']);
 							?>
@@ -133,7 +139,39 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 							</span>
 							<?php if($IsOwnerUser === true) { ?>
 								<a class="btn btn-link" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['user_profile']['username'] . '&type=activities');?>" data-ajax="?link1=timeline&u=<?php echo $wo['user_profile']['username'] . '&type=activities'; ?>"><?php echo $wo['lang']['activities'];?></a>
+								<?php if ($wo['config']['website_mode'] == 'linkedin') { ?>
+									<span class="dropdown wo_job_open_gloss_btn">
+									<button class="btn btn-main dropdown-toggle" type="button" id="opento-dropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+										<?php echo $wo['lang']['open_to']; ?>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="opento-dropdownMenu">
+										<?php if ($wo['user_profile']['is_open_to_work'] == 0) { ?>
+											<li>
+												<label class="menu-item">
+													<input type="radio" value="finding_a_job" onchange="OpenToModal(this)">
+													<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>&nbsp;&nbsp;&nbsp;<?php echo $wo['lang']['finding_a_job']; ?>
+												</label>
+											</li>
+										<?php } ?>
+										<?php if ($wo['user_profile']['is_providing_service'] == 0) { ?>
+											<li>
+												<label class="menu-item">
+													<input type="radio" value="providing_services" onchange="OpenToModal(this)">
+													<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>&nbsp;&nbsp;&nbsp;<?php echo $wo['lang']['providing_services']; ?>
+												</label>
+											</li>
+										<?php } ?>
+										<li>
+											<label class="menu-item">
+												<input type="radio" value="hiring" onchange="OpenToModal(this)">
+												<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-code"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>&nbsp;&nbsp;&nbsp;<?php echo $wo['lang']['hiring']; ?>
+											</label>
+										</li>
+									</ul>
+								</span>
+								<?php } ?>
 							<?php } ?>
+							
 						
 						
 						<!--Mobile Buttons-->
@@ -193,7 +231,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 						</li>-->
 					<?php } ?>
 					<li class="list-group-item">
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather"><path fill="currentColor" d="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" /></svg> <span id="user_post_count"><?php echo $wo['user_profile']['details']['post_count'];?></span> <?php echo $wo['lang']['posts']; ?>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather"><path fill="currentColor" d="M21,6V8H3V6H21M3,18H12V16H3V18M3,13H21V11H3V13Z" /></svg> <span id="user_post_count"><?php echo $wo['user_profile']['details']['post_count'];?></span> <?php echo TextForMode('posts'); ?>
 					</li>
 					<?php if(!empty($wo['user_profile']['website'])) {  ?>
 						<li class="list-group-item">
@@ -231,6 +269,11 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 					<?php if(!empty($wo['user_profile']['school'])) {  ?>
 						<li class="list-group-item">
 							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather"><path fill="currentColor" d="M18,22A2,2 0 0,0 20,20V4C20,2.89 19.1,2 18,2H12V9L9.5,7.5L7,9V2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18Z" /></svg> <span><?php echo ($wo['user_profile']['school_completed'] == 1)   ? $wo['lang']['studied_at'] : $wo['lang']['studying_at'] ;?> <?php echo $wo['user_profile']['school']; ?></span>
+						</li>
+					<?php } ?>
+					<?php if($wo['config']['website_mode'] == 'linkedin' && !empty($wo['user_profile']['currently_working']) && in_array($wo['user_profile']['currently_working'], array('yes','am_looking_to_work','am_looking_for_employees'))) {  ?>
+						<li class="list-group-item">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> <span><?php echo $wo['lang'][$wo['user_profile']['currently_working']]; ?></span>
 						</li>
 					<?php } ?>
 					<?php 
@@ -292,7 +335,7 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 			<?php if ($IsOwnerUser === true && array_sum($wo['pr_complition']) < 100): ?>
 				<?php echo Wo_LoadPage('timeline/profile-completion'); ?>
 			<?php endif; ?>
-		
+
 			<div class="sun_side_widget mini">
 				<h3 class="sun_side_widget_title"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#8bc34a" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" /></svg> <a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['user_profile']['username'] . '&type=photos');?>" data-ajax="?link1=timeline&u=<?php echo $wo['user_profile']['username']?>&type=photos"><?php echo $wo['lang']['photos']; ?></a></h3>
 				<div id="photos-list" class="user_media_list_section">
@@ -340,13 +383,15 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 								<span class="split-link"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z" /></svg></span>
 								<span><?php echo $wo['lang']['photos'];?></span>
 							</a>
-						</li>                    
+						</li> 
+						<?php if ($wo['config']['video_upload'] == 1) { ?>                   
 						<li>
 							<a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['user_profile']['username'] . '&type=videos');?>" data-ajax="?link1=timeline&u=<?php echo $wo['user_profile']['username']?>&type=videos">
 								<span class="split-link"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><path fill="currentColor" d="M17,10.5V7A1,1 0 0,0 16,6H4A1,1 0 0,0 3,7V17A1,1 0 0,0 4,18H16A1,1 0 0,0 17,17V13.5L21,17.5V6.5L17,10.5Z" /></svg></span>
 								<span><?php echo $wo['lang']['videos'];?></span>
 							</a>
 						</li>
+						<?php } ?>
 						<?php if ($wo['config']['pages'] == 1) {?>
 							<li>
 								<a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['user_profile']['username'] . '&type=likes');?>" data-ajax="?link1=timeline&u=<?php echo $wo['user_profile']['username']?>&type=likes">
@@ -657,11 +702,339 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 					</div>
 					<div class="clear"></div>
 				</div>
+			<?php }else if ($_GET['type'] == 'job_apply' && $wo['user_profile']['user_id'] == $wo['user']['id']) {
+				$job_apply = Wo_GetApplyJob(array('job_id' => $_GET['id']));
+			if (!empty($job_apply)) { ?>
+				<div id="posts" data-story-page="<?php echo $wo['user_profile']['user_id'];?>" class="apply_job_info" data_apply_job="<?php echo($_GET['id']) ?>">
+					<div class="post-container sun_post apply_job_container">
+		<?php 	foreach ($job_apply as $key => $wo['job_apply']) {
+					echo Wo_LoadPage('page/job_apply');
+				} ?>
+					</div>
+					<div class="posts_load">
+						<?php if (count($job_apply) >= 1): ?>
+							<div class="load-more">
+								<div class="btn btn-default text-center pointer" id="load_more_nearby_users" onclick="Wo_LoadMoreApplyJobs();">
+									<i class="fa fa-arrow-down progress-icon" data-icon="arrow-down"></i> 
+									<?php echo $wo['lang']['load_more'] ?>
+								</div>
+							</div>
+						<?php endif ?>
+					</div>
+				</div>
+		  <?php  }
+
+			}else if ($_GET['type'] == 'products' && $wo['config']['store_system'] == 'on') { ?>
+				<div class="list-group profile-lists sun_side_widget">
+					<h3 class="sun_side_widget_title mainpage">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#4caf50" d="M12,18H6V14H12M21,14V12L20,7H4L3,12V14H4V20H14V14H18V20H20V14M20,4H4V6H20V4Z"></path></svg> <?php echo $wo['lang']['products'];?>
+					</h3>
+					<div class="">
+						<div id="products-list" class="row" style="margin: 0;">
+							<?php
+							$products = Wo_GetProducts(array('user_id' => $wo['user_profile']['user_id'] , 'limit' => 20));
+								if (count($products) == 0) {
+									echo '<div class="empty_state"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M5 3A2 2 0 0 0 3 5H5M7 3V5H9V3M11 3V5H13V3M15 3V5H17V3M19 3V5H21A2 2 0 0 0 19 3M3 7V9H5V7M7 7V11H11V7M13 7V11H17V7M19 7V9H21V7M3 11V13H5V11M19 11V13H21V11M7 13V17H11V13M13 13V17H17V13M3 15V17H5V15M19 15V17H21V15M3 19A2 2 0 0 0 5 21V19M7 19V21H9V19M11 19V21H13V19M15 19V21H17V19M19 19V21A2 2 0 0 0 21 19Z" fill="currentColor"></path></svg>' . $wo['lang']['no_available_data'] . '</div>';
+								} else {
+									foreach ($products as $wo['product']) {
+									echo Wo_LoadPage('timeline/product-list');
+									} 
+								}
+							?>
+						</div>
+					</div>
+					<?php if (count($products) > 0) { ?>
+						<div class="load-more">
+							<button class="btn btn-default text-center wo_load_more" id="load_more_users_products" onclick="Wo_LoadMoreUserProducts('<?php echo $wo['user_profile']['user_id']; ?>');">
+								<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg></span> <?php echo $wo['lang']['load_more'] ?>
+							</button>
+						</div>
+					<?php } ?>
+					<div class="clear"></div>
+				</div>
 			<?php } else { 
                header("Location: " . Wo_SeoLink('index.php?link1=timeline&u=' . $_GET['u'])); 
                exit(); 
             } ?>
-			<?php } else { echo Wo_GetPostPublisherBox(0, $wo['user_profile']['user_id']); ?>
+			<?php } else { ?>
+				
+				<?php if ($wo['config']['website_mode'] == 'linkedin') { ?>
+				<?php if ($wo['user_profile']['is_open_to_work'] != 0) { ?>
+					<div class="sun_side_widget wo_job_detail_block">
+						<div class="wo_job_detail_block_title">
+							<h3 class="sun_side_widget_title mainpage">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#607d8b" d="M20,6H16V4A2,2 0 0,0 14,2H10C8.89,2 8,2.89 8,4V6H4C2.89,6 2,6.89 2,8V19A2,2 0 0,0 4,21H20A2,2 0 0,0 22,19V8A2,2 0 0,0 20,6M10,4H14V6H10V4M12,9A2.5,2.5 0 0,1 14.5,11.5A2.5,2.5 0 0,1 12,14A2.5,2.5 0 0,1 9.5,11.5A2.5,2.5 0 0,1 12,9M17,19H7V17.75C7,16.37 9.24,15.25 12,15.25C14.76,15.25 17,16.37 17,17.75V19Z"></path></svg> <?php echo $wo['lang']['open_to_work']; ?>
+							</h3>
+							<?php if ($wo['user_profile']['user_id'] == $wo['user']['user_id']) { ?>
+								<div>
+									<button type="submit" class="btn btn-default" data-toggle="modal" data-target="#delete_open_to_work" title="<?php echo $wo['lang']['delete']; ?>">
+										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M9,8H11V17H9V8M13,8H15V17H13V8Z" /></svg>
+									</button>
+									<button type="submit" class="btn btn-default" onclick="EditOpenToWork()" title="<?php echo $wo['lang']['edit']; ?>">
+										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z" /></svg>
+									</button>
+								</div>
+							<?php } ?>
+						</div>
+						<hr>
+						
+						<div class="wo_job_detail_item">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M10,2H14A2,2 0 0,1 16,4V6H20A2,2 0 0,1 22,8V19A2,2 0 0,1 20,21H4C2.89,21 2,20.1 2,19V8C2,6.89 2.89,6 4,6H8V4C8,2.89 8.89,2 10,2M14,6V4H10V6H14Z" /></svg>&nbsp;
+							<div>
+								<h4><?php echo $wo['lang']['job_title'] ?></h4>
+								<p><?php echo $wo['user_profile']['open_to_work_data']->job_title; ?></p>
+							</div>
+						</div>
+						<div class="wo_job_detail_item">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z" /></svg>&nbsp;
+							<div>
+								<h4><?php echo $wo['lang']['job_location'] ?></h4>
+								<p><?php echo $wo['user_profile']['open_to_work_data']->job_location; ?></p>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-6">
+								<div class="wo_job_detail_item">
+									<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M17.9,17.39C17.64,16.59 16.89,16 16,16H15V13A1,1 0 0,0 14,12H8V10H10A1,1 0 0,0 11,9V7H13A2,2 0 0,0 15,5V4.59C17.93,5.77 20,8.64 20,12C20,14.08 19.2,15.97 17.9,17.39M11,19.93C7.05,19.44 4,16.08 4,12C4,11.38 4.08,10.78 4.21,10.21L9,15V16A2,2 0 0,0 11,18M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>&nbsp;
+									<div>
+										<h4><?php echo $wo['lang']['workplaces'] ?></h4>
+										<p><?php echo implode(",", $wo['user_profile']['open_to_work_data']->formated_workplaces); ?></p>
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="wo_job_detail_item">
+									<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z" /></svg>&nbsp;
+									<div>
+										<h4><?php echo $wo['lang']['job_types'] ?></h4>
+										<p><?php echo implode(",", $wo['user_profile']['open_to_work_data']->formated_job_type); ?></p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<svg class="wo_job_detail_block_svg" width="360" height="151" viewBox="0 0 360 151" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_6292:339055)"><g clip-path="url(#clip1_6292:339055)"><path fill-rule="evenodd" opacity="0.5" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="url(#paint0_linear_6292:339055)"></path><mask id="mask0_6292:339055" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="-691" y="0" width="1400" height="546"><path fill-rule="evenodd" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="#fff"></path></mask><g mask="url(#mask0_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-913.136 614.601c11.712-50.877 48.311-145.532 258.022-219.362 209.711-73.831 250.702-55.61 470.294-138.196C34.773 174.456 708.128-23.685 727.526-66.753c19.397-43.068 73.26 721.109 73.26 721.109s-1725.634 11.122-1713.922-39.755z" fill="url(#paint1_linear_6292:339055)"></path><g filter="url(#filter0_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-697.69 718.643c-11.711-102.603-4.392-247.05 473.202-416.321C253.105 133.052 1710.39 214.93 1681.11 261.03c-29.27 46.1-1176.229 652.022-1176.229 652.022l-573.478-32.388s-617.382-59.419-629.093-162.021z" fill="url(#paint2_linear_6292:339055)"></path></g><g filter="url(#filter1_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-860.426 901.635c38.439-65.776 190.798-517.687 665.685-477.465C280.146 464.393 1550.53 119.426 1550.53 119.426S-82.391 811.962 443.13 1059.21c525.521 247.25-1341.994-91.8-1303.556-157.575z" fill="#B568FF"></path></g></g></g></g><defs><linearGradient id="paint0_linear_6292:339055" x1="-96.404" y1="-64.382" x2="-374.596" y2="626.546" gradientUnits="userSpaceOnUse"><stop stop-color="gray"></stop><stop offset=".25" stop-color="gray"></stop></linearGradient><linearGradient id="paint1_linear_6292:339055" x1="-185.259" y1="-154.588" x2="-576.643" y2="741.167" gradientUnits="userSpaceOnUse"><stop stop-color="#607d8b"></stop><stop offset="1" stop-color="gray"></stop></linearGradient><linearGradient id="paint2_linear_6292:339055" x1="-324.255" y1="33.32" x2="-465.04" y2="720.68" gradientUnits="userSpaceOnUse"><stop stop-color="#D089FF"></stop><stop offset="1" stop-color="#2AA1FF"></stop></linearGradient><clipPath id="clip0_6292:339055"><path fill="#fff" d="M0 0h360v151H0z"></path></clipPath><clipPath id="clip1_6292:339055"><path fill="#fff" transform="translate(-536)" d="M0 0h896v151H0z"></path></clipPath><filter id="filter0_f_6292:339055" x="-770.984" y="129.547" width="2523.21" height="854.179" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="35.338" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter><filter id="filter1_f_6292:339055" x="-996.926" y="-16.488" width="2683.37" height="1300.68" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="67.957" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter></defs></svg>
+					</div>
+				<?php } ?>
+				
+				<?php if ($wo['user_profile']['is_providing_service'] != 0) { ?>
+					<div class="sun_side_widget wo_job_detail_block">
+						<div class="wo_job_detail_block_title">
+							<h3 class="sun_side_widget_title mainpage">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#2ebf94" d="M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22,15 22,17.5C22,20 20,22 17.5,22C15,22 13,20 13,17.5C13,15 15,13 17.5,13Z"></path></svg> <?php echo $wo['lang']['providing_services']; ?>
+							</h3>
+							<?php if ($wo['user_profile']['user_id'] == $wo['user']['user_id']) { ?>
+								<div>
+									<button type="submit" class="btn btn-default" data-toggle="modal" data-target="#delete_providing_service" title="<?php echo $wo['lang']['delete']; ?>">
+										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M9,8H11V17H9V8M13,8H15V17H13V8Z" /></svg>
+									</button>
+									<button type="submit" class="btn btn-default" onclick="EditProvidingService()" title="<?php echo $wo['lang']['edit']; ?>">
+										<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M14.06,9L15,9.94L5.92,19H5V18.08L14.06,9M17.66,3C17.41,3 17.15,3.1 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18.17,3.09 17.92,3 17.66,3M14.06,6.19L3,17.25V21H6.75L17.81,9.94L14.06,6.19Z" /></svg>
+									</button>
+								</div>
+							<?php } ?>
+						</div>
+						<hr>
+						<div class="delete_service_modal_alert"></div>
+						<div class="wo_job_detail_item">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M11,13.5V21.5H3V13.5H11M12,2L17.5,11H6.5L12,2M17.5,13C20,13 22,15 22,17.5C22,20 20,22 17.5,22C15,22 13,20 13,17.5C13,15 15,13 17.5,13Z" /></svg>&nbsp;
+							<div>
+								<h4><?php echo $wo['lang']['services'] ?></h4>
+								<p><?php echo $wo['user_profile']['providing_service']->services; ?></p>
+							</div>
+						</div>
+						<div class="wo_job_detail_item">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z" /></svg>&nbsp;
+							<div>
+								<h4><?php echo $wo['lang']['location'] ?></h4>
+								<p><?php echo $wo['user_profile']['providing_service']->job_location; ?></p>
+							</div>
+						</div>
+						<div class="wo_job_detail_item">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="currentColor" d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>&nbsp;
+							<div>
+								<h4><?php echo $wo['lang']['description'] ?></h4>
+								<p><?php echo $wo['user_profile']['providing_service']->description; ?></p>
+							</div>
+						</div>
+						<svg class="wo_job_detail_block_svg" width="360" height="151" viewBox="0 0 360 151" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip10_6292:339055)"><g clip-path="url(#clip11_6292:339055)"><path fill-rule="evenodd" opacity="0.5" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="url(#paint10_linear_6292:339055)"></path><mask id="mask10_6292:339055" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="-691" y="0" width="1400" height="546"><path fill-rule="evenodd" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="#fff"></path></mask><g mask="url(#mask10_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-913.136 614.601c11.712-50.877 48.311-145.532 258.022-219.362 209.711-73.831 250.702-55.61 470.294-138.196C34.773 174.456 708.128-23.685 727.526-66.753c19.397-43.068 73.26 721.109 73.26 721.109s-1725.634 11.122-1713.922-39.755z" fill="url(#paint11_linear_6292:339055)"></path><g filter="url(#filter10_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-697.69 718.643c-11.711-102.603-4.392-247.05 473.202-416.321C253.105 133.052 1710.39 214.93 1681.11 261.03c-29.27 46.1-1176.229 652.022-1176.229 652.022l-573.478-32.388s-617.382-59.419-629.093-162.021z" fill="url(#paint12_linear_6292:339055)"></path></g><g filter="url(#filter11_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-860.426 901.635c38.439-65.776 190.798-517.687 665.685-477.465C280.146 464.393 1550.53 119.426 1550.53 119.426S-82.391 811.962 443.13 1059.21c525.521 247.25-1341.994-91.8-1303.556-157.575z" fill="#B568FF"></path></g></g></g></g><defs><linearGradient id="paint10_linear_6292:339055" x1="-96.404" y1="-64.382" x2="-374.596" y2="626.546" gradientUnits="userSpaceOnUse"><stop stop-color="#58e5bb"></stop><stop offset=".25" stop-color="#58e5bb"></stop></linearGradient><linearGradient id="paint11_linear_6292:339055" x1="-185.259" y1="-154.588" x2="-576.643" y2="741.167" gradientUnits="userSpaceOnUse"><stop stop-color="#2ebf94"></stop><stop offset="1" stop-color="#58e5bb"></stop></linearGradient><linearGradient id="paint12_linear_6292:339055" x1="-324.255" y1="33.32" x2="-465.04" y2="720.68" gradientUnits="userSpaceOnUse"><stop stop-color="#D089FF"></stop><stop offset="1" stop-color="#2AA1FF"></stop></linearGradient><clipPath id="clip10_6292:339055"><path fill="#fff" d="M0 0h360v151H0z"></path></clipPath><clipPath id="clip11_6292:339055"><path fill="#fff" transform="translate(-536)" d="M0 0h896v151H0z"></path></clipPath><filter id="filter10_f_6292:339055" x="-770.984" y="129.547" width="2523.21" height="854.179" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="35.338" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter><filter id="filter11_f_6292:339055" x="-996.926" y="-16.488" width="2683.37" height="1300.68" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="67.957" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter></defs></svg>
+					</div>
+				<?php } ?>
+
+				<?php $experience = $db->where('user_id',$wo['user_profile']['user_id'])->orderBy("id","Desc")->get(T_USER_EXPERIENCE);
+				if (!empty($experience)) { ?>
+					<div class="sun_side_widget wo_job_detail_block">
+						<div class="wo_job_detail_block_title">
+							<h3 class="sun_side_widget_title mainpage">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#585fe5" d="M5,3V21H11V17.5H13V21H19V3H5M7,5H9V7H7V5M11,5H13V7H11V5M15,5H17V7H15V5M7,9H9V11H7V9M11,9H13V11H11V9M15,9H17V11H15V9M7,13H9V15H7V13M11,13H13V15H11V13M15,13H17V15H15V13M7,17H9V19H7V17M15,17H17V19H15V17Z"></path></svg> <?php echo $wo['lang']['experience']; ?>
+							</h3>
+						</div>
+						<hr>
+						<div>
+						<?php foreach ($experience as $key => $wo['experience']) { ?>
+							<div class="border-bottom wo_job_experience">
+								<?php if (!empty($wo['experience']->image)) { ?>
+									<div class="avatar"><img src="<?php echo Wo_GetMedia($wo['experience']->image); ?>"></div>&nbsp;&nbsp;&nbsp;&nbsp;
+								<?php } else { ?>
+									<div class="avatar bg"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18,15H16V17H18M18,11H16V13H18M20,19H12V17H14V15H12V13H14V11H12V9H20M10,7H8V5H10M10,11H8V9H10M10,15H8V13H10M10,19H8V17H10M6,7H4V5H6M6,11H4V9H6M6,15H4V13H6M6,19H4V17H6M12,7V3H2V21H22V7H12Z" /></svg></div>&nbsp;&nbsp;&nbsp;&nbsp;
+								<?php } ?>
+								<div class="wo_job_experience_info">
+									<h4 class="title"><?php echo $wo['experience']->title ?></h4>
+									<p class="sub-title">
+										<?php echo $wo['experience']->company_name; ?>
+										<?php if (!empty($wo['experience']->employment_type) && in_array($wo['experience']->employment_type, array_keys($wo['employment_type']))) { ?>
+											&nbsp;• &nbsp;<?php echo $wo['lang'][$wo['employment_type'][$wo['experience']->employment_type]]; ?>
+										<?php } ?>
+										&nbsp;• &nbsp;<?php echo $wo['experience']->location; ?>
+									</p>
+									<p class="sub-title">
+										<?php echo $wo['experience']->experience_start; ?>
+										<?php if (!empty($wo['experience']->experience_end) && strpos($wo['experience']->experience_end, 00) != 0) { ?>
+											&nbsp;– &nbsp;<?php echo $wo['experience']->experience_end; ?>
+										<?php } ?>
+									</p>
+									<?php if (!empty($wo['experience']->link)) { ?>
+										<p><a href="<?php echo $wo['experience']->link; ?>"><?php echo $wo['experience']->link; ?></a></p>
+									<?php } ?>
+									<hr>
+									<p class="sub-title">
+										<span class="bold"><?php echo $wo['lang']['industry']; ?></span>: <?php echo $wo['experience']->industry; ?>
+										<?php if (!empty($wo['experience']->headline)) { ?>
+											&nbsp;• &nbsp;<span class="bold"><?php echo $wo['lang']['headline']; ?></span>: <?php echo $wo['experience']->headline; ?>
+										<?php } ?>
+									</p>
+									<p><?php echo $wo['experience']->description; ?></p>
+								</div>
+							</div>
+						<?php } ?>
+						</div>
+						<svg class="wo_job_detail_block_svg" width="360" height="151" viewBox="0 0 360 151" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip20_6292:339055)"><g clip-path="url(#clip21_6292:339055)"><path fill-rule="evenodd" opacity="0.5" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="url(#paint20_linear_6292:339055)"></path><mask id="mask20_6292:339055" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="-691" y="0" width="1400" height="546"><path fill-rule="evenodd" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="#fff"></path></mask><g mask="url(#mask20_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-913.136 614.601c11.712-50.877 48.311-145.532 258.022-219.362 209.711-73.831 250.702-55.61 470.294-138.196C34.773 174.456 708.128-23.685 727.526-66.753c19.397-43.068 73.26 721.109 73.26 721.109s-1725.634 11.122-1713.922-39.755z" fill="url(#paint21_linear_6292:339055)"></path><g filter="url(#filter20_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-697.69 718.643c-11.711-102.603-4.392-247.05 473.202-416.321C253.105 133.052 1710.39 214.93 1681.11 261.03c-29.27 46.1-1176.229 652.022-1176.229 652.022l-573.478-32.388s-617.382-59.419-629.093-162.021z" fill="url(#paint22_linear_6292:339055)"></path></g><g filter="url(#filter21_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-860.426 901.635c38.439-65.776 190.798-517.687 665.685-477.465C280.146 464.393 1550.53 119.426 1550.53 119.426S-82.391 811.962 443.13 1059.21c525.521 247.25-1341.994-91.8-1303.556-157.575z" fill="#B568FF"></path></g></g></g></g><defs><linearGradient id="paint20_linear_6292:339055" x1="-96.404" y1="-64.382" x2="-374.596" y2="626.546" gradientUnits="userSpaceOnUse"><stop stop-color="#7e84f6"></stop><stop offset=".25" stop-color="#7e84f6"></stop></linearGradient><linearGradient id="paint21_linear_6292:339055" x1="-185.259" y1="-154.588" x2="-576.643" y2="741.167" gradientUnits="userSpaceOnUse"><stop stop-color="#585fe5"></stop><stop offset="1" stop-color="#7e84f6"></stop></linearGradient><linearGradient id="paint22_linear_6292:339055" x1="-324.255" y1="33.32" x2="-465.04" y2="720.68" gradientUnits="userSpaceOnUse"><stop stop-color="#D089FF"></stop><stop offset="1" stop-color="#2AA1FF"></stop></linearGradient><clipPath id="clip20_6292:339055"><path fill="#fff" d="M0 0h360v151H0z"></path></clipPath><clipPath id="clip11_6292:339055"><path fill="#fff" transform="translate(-536)" d="M0 0h896v151H0z"></path></clipPath><filter id="filter20_f_6292:339055" x="-770.984" y="129.547" width="2523.21" height="854.179" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="35.338" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter><filter id="filter21_f_6292:339055" x="-996.926" y="-16.488" width="2683.37" height="1300.68" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="67.957" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter></defs></svg>
+					</div>
+				<?php } ?>
+				
+				<?php $certifications = $db->where('user_id',$wo['user_profile']['user_id'])->orderBy("id","Desc")->get(T_USER_CERTIFICATION);
+			    if (!empty($certifications)) { ?>
+					<div class="sun_side_widget wo_job_detail_block">
+						<div class="wo_job_detail_block_title">
+							<h3 class="sun_side_widget_title mainpage">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#d1684c" d="M4,3C2.89,3 2,3.89 2,5V15A2,2 0 0,0 4,17H12V22L15,19L18,22V17H20A2,2 0 0,0 22,15V8L22,6V5A2,2 0 0,0 20,3H16V3H4M12,5L15,7L18,5V8.5L21,10L18,11.5V15L15,13L12,15V11.5L9,10L12,8.5V5M4,5H9V7H4V5M4,9H7V11H4V9M4,13H9V15H4V13Z"></path></svg> <?php echo $wo['lang']['licenses_certifications']; ?>
+							</h3>
+						</div>
+						<hr>
+						<div>
+						<?php foreach ($certifications as $key => $wo['certification']) { ?>
+							<div class="border-bottom wo_job_experience wo_job_certificate">
+								<div class="wo_job_experience_info">
+									<h4 class="title"><?php echo $wo['certification']->name ?></h4>
+									<p class="sub-title">
+										<span class="bold"><?php echo $wo['lang']['issuing_organization']; ?></span>: <?php echo $wo['certification']->issuing_organization; ?>
+									</p>
+									<p class="sub-title">
+										<span class="bold"><?php echo $wo['lang']['issue_date']; ?></span>: <?php echo $wo['certification']->certification_start; ?>
+										<?php if (!empty($wo['certification']->certification_end) && strpos($wo['certification']->certification_end, 00) != 0) { ?>
+											&nbsp;– &nbsp;<span class="bold"><?php echo $wo['lang']['expiration_date']; ?></span>: <?php echo $wo['certification']->certification_end; ?>
+										<?php } ?>
+									</p>
+									<?php if (!empty($wo['certification']->credential_url)) { ?>
+										<p class="sub-title">
+											<span class="bold"><?php echo $wo['lang']['credential_url']; ?></span>: <a href="<?php echo $wo['certification']->credential_url; ?>"><?php echo $wo['certification']->credential_url; ?></a>
+										</p>
+									<?php } ?>
+									<?php if (!empty($wo['certification']->credential_id)) { ?>
+										<p class="sub-title">
+											<span class="bold"><?php echo $wo['lang']['credential_id']; ?></span>: <?php echo $wo['certification']->credential_id; ?>
+										</p>
+									<?php } ?>
+									<?php if (!empty($wo['certification']->pdf)) { ?>
+										<p><a class="btn btn-sm btn-main btn-mat" href="<?php echo($wo['config']['site_url'].'/requests.php?f=certification&s=download_user_certification&id='.$wo['certification']->id.'&mode_type=linkedin'); ?>"><?php echo $wo['lang']['download']; ?> <?php echo $wo['lang']['certification_file']; ?></a></p>
+									<?php } ?>
+								</div>
+							</div>
+						<?php } ?>
+						</div>
+						<svg class="wo_job_detail_block_svg" width="360" height="151" viewBox="0 0 360 151" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip30_6292:339055)"><g clip-path="url(#clip31_6292:339055)"><path fill-rule="evenodd" opacity="0.5" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="url(#paint30_linear_6292:339055)"></path><mask id="mask30_6292:339055" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="-691" y="0" width="1400" height="546"><path fill-rule="evenodd" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="#fff"></path></mask><g mask="url(#mask30_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-913.136 614.601c11.712-50.877 48.311-145.532 258.022-219.362 209.711-73.831 250.702-55.61 470.294-138.196C34.773 174.456 708.128-23.685 727.526-66.753c19.397-43.068 73.26 721.109 73.26 721.109s-1725.634 11.122-1713.922-39.755z" fill="url(#paint31_linear_6292:339055)"></path><g filter="url(#filter30_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-697.69 718.643c-11.711-102.603-4.392-247.05 473.202-416.321C253.105 133.052 1710.39 214.93 1681.11 261.03c-29.27 46.1-1176.229 652.022-1176.229 652.022l-573.478-32.388s-617.382-59.419-629.093-162.021z" fill="url(#paint32_linear_6292:339055)"></path></g><g filter="url(#filter31_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-860.426 901.635c38.439-65.776 190.798-517.687 665.685-477.465C280.146 464.393 1550.53 119.426 1550.53 119.426S-82.391 811.962 443.13 1059.21c525.521 247.25-1341.994-91.8-1303.556-157.575z" fill="#B568FF"></path></g></g></g></g><defs><linearGradient id="paint30_linear_6292:339055" x1="-96.404" y1="-64.382" x2="-374.596" y2="626.546" gradientUnits="userSpaceOnUse"><stop stop-color="#f6977e"></stop><stop offset=".25" stop-color="#f6977e"></stop></linearGradient><linearGradient id="paint31_linear_6292:339055" x1="-185.259" y1="-154.588" x2="-576.643" y2="741.167" gradientUnits="userSpaceOnUse"><stop stop-color="#d1684c"></stop><stop offset="1" stop-color="#f6977e"></stop></linearGradient><linearGradient id="paint22_linear_6292:339055" x1="-324.255" y1="33.32" x2="-465.04" y2="720.68" gradientUnits="userSpaceOnUse"><stop stop-color="#D089FF"></stop><stop offset="1" stop-color="#2AA1FF"></stop></linearGradient><clipPath id="clip30_6292:339055"><path fill="#fff" d="M0 0h360v151H0z"></path></clipPath><clipPath id="clip31_6292:339055"><path fill="#fff" transform="translate(-536)" d="M0 0h896v151H0z"></path></clipPath><filter id="filter30_f_6292:339055" x="-770.984" y="129.547" width="2523.21" height="854.179" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="35.338" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter><filter id="filter31_f_6292:339055" x="-996.926" y="-16.488" width="2683.37" height="1300.68" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="67.957" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter></defs></svg>
+					</div>
+				<?php } ?>
+				
+				<?php $projects = $db->where('user_id',$wo['user_profile']['user_id'])->orderBy("id","Desc")->get(T_USER_PROJECTS);
+			    if (!empty($projects)) { ?>
+					<div class="sun_side_widget wo_job_detail_block">
+						<div class="wo_job_detail_block_title">
+							<h3 class="sun_side_widget_title mainpage">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#607d8b" d="M8,3A2,2 0 0,0 6,5V9A2,2 0 0,1 4,11H3V13H4A2,2 0 0,1 6,15V19A2,2 0 0,0 8,21H10V19H8V14A2,2 0 0,0 6,12A2,2 0 0,0 8,10V5H10V3M16,3A2,2 0 0,1 18,5V9A2,2 0 0,0 20,11H21V13H20A2,2 0 0,0 18,15V19A2,2 0 0,1 16,21H14V19H16V14A2,2 0 0,1 18,12A2,2 0 0,1 16,10V5H14V3H16Z"></path></svg> <?php echo $wo['lang']['projects']; ?>
+							</h3>
+						</div>
+						<hr>
+						<div>
+						<?php foreach ($projects as $key => $wo['project']) { ?>
+							<div class="border-bottom wo_job_experience wo_job_certificate">
+								<div class="wo_job_experience_info">
+									<h4 class="title"><?php echo $wo['project']->name ?></h4>
+									<p class="sub-title">
+										<span class="bold"><?php echo $wo['lang']['start_date']; ?></span>: <?php echo $wo['project']->project_start; ?>
+										<?php if (!empty($wo['project']->project_end) && strpos($wo['project']->project_end, 00) != 0) { ?>
+											&nbsp;– &nbsp;<span class="bold"><?php echo $wo['lang']['end_date']; ?></span>: <?php echo $wo['project']->project_end; ?>
+										<?php } ?>
+									</p>
+									<?php if (!empty($wo['project']->project_url)) { ?>
+										<p class="sub-title">
+											<span class="bold"><?php echo $wo['lang']['project_url']; ?></span>: <a href="<?php echo $wo['project']->project_url; ?>"><?php echo($wo['project']->project_url); ?></a>
+										</p>
+									<?php } ?>
+									<?php if (!empty($wo['project']->associated_with)) { ?>
+										<p>
+											<span class="bold"><?php echo $wo['lang']['associated_with']; ?></span>: <?php echo $wo['project']->associated_with; ?>
+										</p>
+									<?php } ?>
+									<?php if (!empty($wo['project']->description)) { ?>
+										<p>
+											<span class="bold"><?php echo $wo['lang']['description']; ?></span>: <?php echo $wo['project']->description; ?>
+										</p>
+									<?php } ?>
+								</div>
+							</div>
+						<?php } ?>
+						</div>
+						<svg class="wo_job_detail_block_svg" width="360" height="151" viewBox="0 0 360 151" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_6292:339055)"><g clip-path="url(#clip1_6292:339055)"><path fill-rule="evenodd" opacity="0.5" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="url(#paint0_linear_6292:339055)"></path><mask id="mask0_6292:339055" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="-691" y="0" width="1400" height="546"><path fill-rule="evenodd" clip-rule="evenodd" d="M-691 298L709 0v248L-691 546V298z" fill="#fff"></path></mask><g mask="url(#mask0_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-913.136 614.601c11.712-50.877 48.311-145.532 258.022-219.362 209.711-73.831 250.702-55.61 470.294-138.196C34.773 174.456 708.128-23.685 727.526-66.753c19.397-43.068 73.26 721.109 73.26 721.109s-1725.634 11.122-1713.922-39.755z" fill="url(#paint1_linear_6292:339055)"></path><g filter="url(#filter0_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-697.69 718.643c-11.711-102.603-4.392-247.05 473.202-416.321C253.105 133.052 1710.39 214.93 1681.11 261.03c-29.27 46.1-1176.229 652.022-1176.229 652.022l-573.478-32.388s-617.382-59.419-629.093-162.021z" fill="url(#paint2_linear_6292:339055)"></path></g><g filter="url(#filter1_f_6292:339055)"><path fill-rule="evenodd" clip-rule="evenodd" d="M-860.426 901.635c38.439-65.776 190.798-517.687 665.685-477.465C280.146 464.393 1550.53 119.426 1550.53 119.426S-82.391 811.962 443.13 1059.21c525.521 247.25-1341.994-91.8-1303.556-157.575z" fill="#B568FF"></path></g></g></g></g><defs><linearGradient id="paint0_linear_6292:339055" x1="-96.404" y1="-64.382" x2="-374.596" y2="626.546" gradientUnits="userSpaceOnUse"><stop stop-color="gray"></stop><stop offset=".25" stop-color="gray"></stop></linearGradient><linearGradient id="paint1_linear_6292:339055" x1="-185.259" y1="-154.588" x2="-576.643" y2="741.167" gradientUnits="userSpaceOnUse"><stop stop-color="#607d8b"></stop><stop offset="1" stop-color="gray"></stop></linearGradient><linearGradient id="paint2_linear_6292:339055" x1="-324.255" y1="33.32" x2="-465.04" y2="720.68" gradientUnits="userSpaceOnUse"><stop stop-color="#D089FF"></stop><stop offset="1" stop-color="#2AA1FF"></stop></linearGradient><clipPath id="clip0_6292:339055"><path fill="#fff" d="M0 0h360v151H0z"></path></clipPath><clipPath id="clip1_6292:339055"><path fill="#fff" transform="translate(-536)" d="M0 0h896v151H0z"></path></clipPath><filter id="filter0_f_6292:339055" x="-770.984" y="129.547" width="2523.21" height="854.179" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="35.338" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter><filter id="filter1_f_6292:339055" x="-996.926" y="-16.488" width="2683.37" height="1300.68" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"></feBlend><feGaussianBlur stdDeviation="67.957" result="effect1_foregroundBlur_6292:339055"></feGaussianBlur></filter></defs></svg>
+					</div>
+				<?php } ?>
+				
+				<?php if (!empty($wo['user_profile']['skills'])) { ?>
+					<div class="sun_side_widget wo_job_detail_block">
+						<div class="wo_job_detail_block_title">
+							<h3 class="sun_side_widget_title mainpage">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#4d91ea" d="M17.8,20C17.4,21.2 16.3,22 15,22H5C3.3,22 2,20.7 2,19V18H5L14.2,18C14.6,19.2 15.7,20 17,20H17.8M19,2C20.7,2 22,3.3 22,5V6H20V5C20,4.4 19.6,4 19,4C18.4,4 18,4.4 18,5V18H17C16.4,18 16,17.6 16,17V16H5V5C5,3.3 6.3,2 8,2H19M8,6V8H15V6H8M8,10V12H14V10H8Z"></path></svg> <?php echo $wo['lang']['skills']; ?>
+							</h3>
+						</div>
+						<hr>
+						<div>
+							<p class="wo_job_detail_skill">
+								<?php $skills = explode(',', $wo['user_profile']['skills']); foreach ($skills as $key => $skill) { ?>
+									<span class="btn-default"><?php echo $skill; ?></span>
+								<?php } ?>
+							</p>
+						</div>
+					</div>
+				<?php } ?>
+				<?php if (!empty($wo['user_profile']['languages'])) { ?>
+					<div class="sun_side_widget wo_job_detail_block">
+						<div class="wo_job_detail_block_title">
+							<h3 class="sun_side_widget_title mainpage">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#4d91ea" d="M12.87,15.07L10.33,12.56L10.36,12.53C12.1,10.59 13.34,8.36 14.07,6H17V4H10V2H8V4H1V6H12.17C11.5,7.92 10.44,9.75 9,11.35C8.07,10.32 7.3,9.19 6.69,8H4.69C5.42,9.63 6.42,11.17 7.67,12.56L2.58,17.58L4,19L9,14L12.11,17.11L12.87,15.07M18.5,10H16.5L12,22H14L15.12,19H19.87L21,22H23L18.5,10M15.88,17L17.5,12.67L19.12,17H15.88Z"></path></svg> <?php echo $wo['lang']['languages']; ?>
+							</h3>
+						</div>
+						<hr>
+						<div>
+							<p class="wo_job_detail_skill">
+								<?php foreach ($wo['user_profile']['formated_langs'] as $key => $formated_lang) { ?>
+									<span class="btn-default"><?php echo $formated_lang; ?></span>
+								<?php } ?>
+							</p>
+						</div>
+					</div>
+				<?php } ?>
+			<?php } ?>
+				
+			<?php echo Wo_GetPostPublisherBox(0, $wo['user_profile']['user_id']); ?>
 			<?php if ($wo['loggedin'] == true) { echo Wo_LoadPage('story/filter-by'); } ?>
 				<div class="posts_load">
 					<div id="posts" data-story-user="<?php echo $wo['user_profile']['user_id'];?>">
@@ -792,7 +1165,26 @@ if ($wo['loggedin'] && $IsOwnerUser) {
 				if ($wo['config']['groups'] == 1) {
 					echo Wo_LoadPage('timeline/groups-sidebar');
 				}
-			?>
+            if ($wo['config']['store_system'] == 'on') { ?>
+				<ul class="list-group sun_side_widget" id="sidebar-products-list-container">
+					<li class="list-group-item text-muted hidden" contenteditable="false"><?php echo $wo['lang']['more_info']; ?></li>
+					<h3 class="sun_side_widget_title">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#4caf50" d="M12,18H6V14H12M21,14V12L20,7H4L3,12V14H4V20H14V14H18V20H20V14M20,4H4V6H20V4Z"></path></svg> 
+						<a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['user_profile']['username'] . '&type=products');?>" data-ajax="?link1=timeline&u=<?php echo $wo['user_profile']['username']?>&type=products"><?php echo $wo['lang']['products_for_sale'];?></a>
+					</h3>
+					<li>
+						<div class="sidebar-groups-container sun_prof_foll_ing">
+							<?php 
+							foreach (Wo_GetProducts(array('user_id' => $wo['user_profile']['user_id'] , 'limit' => 6)) as $wo['product']) {
+								$wo['product']['name'] = mb_substr($wo['product']['name'], 0, 10, "utf-8");
+								echo Wo_LoadPage('timeline/sidebar-product-list');
+							}
+							?>
+						</div>
+					</li>
+					<li><div class="clear"></div></li>
+				</ul>
+            <?php } ?>
 			<?php 
             $sidebar_ad = Wo_GetAd('sidebar', false);
             if (!empty($sidebar_ad)) {?>
@@ -995,13 +1387,281 @@ if ($wo['loggedin'] && $IsOwnerUser) {
             </div>
         </div>
     <?php endif; ?>
+    <?php if ($wo['config']['website_mode'] == 'linkedin') { ?>
+    	<div class="modal fade sun_modal" id="finding_a_job_modal" role="dialog" data-keyboard="false">
+			<div class="modal-dialog wow_mat_mdl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+						<h4 class="modal-title"><?php echo $wo['lang']['add_job_preferences'] ?></h4>
+					</div>
+					<form class="form form-horizontal finding_a_job_form" method="post" action="#">
+						<div class="modal-body">
+							<h4><?php echo $wo['lang']['tell_us_kind_work'] ?></h4>
+							<div class="modal_finding_a_job_modal_alert"></div>
+							<div class="clear"></div>
+							<div class="sun_input"></div>
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['job_title']; ?></label>  
+								<input name="job_title" type="text" autocomplete="off">
+							</div>
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['job_location']; ?></label> 
+								<input name="job_location" type="text" autocomplete="off">
+							</div>
+							
+							<div class="sun_input mb-0">
+								<label><?php echo $wo['lang']['workplaces']; ?></label>
+							</div>
+							<span class="round-check">
+								<input type="checkbox" id="on_site" name="workplaces[]" value="on_site">
+								<label for="on_site"><?php echo $wo['lang']['on_site']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="hybrid" name="workplaces[]" value="hybrid">
+								<label for="hybrid"><?php echo $wo['lang']['hybrid']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="remote" name="workplaces[]" value="remote">
+								<label for="remote"><?php echo $wo['lang']['remote']; ?></label>
+							</span>
+							<div class="clear"></div>
+							<div class="sun_input"></div>
+
+							<div class="sun_input mb-0">
+								<label><?php echo $wo['lang']['job_types']; ?></label>
+							</div>
+							<span class="round-check">
+								<input type="checkbox" id="full_time" name="job_type[]" value="full_time">
+								<label for="full_time"><?php echo $wo['lang']['full_time']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="contract" name="job_type[]" value="contract">
+								<label for="contract"><?php echo $wo['lang']['contract']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="part_time" name="job_type[]" value="part_time">
+								<label for="part_time"><?php echo $wo['lang']['part_time']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="internship" name="job_type[]" value="internship">
+								<label for="internship"><?php echo $wo['lang']['internship']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="temporary" name="job_type[]" value="temporary">
+								<label for="temporary"><?php echo $wo['lang']['temporary']; ?></label>
+							</span>
+							<div class="clear"></div>
+						</div>
+						<div class="clear"></div>
+						<div class="modal-footer">
+							<div class="ball-pulse"><div></div><div></div><div></div></div>
+							<button type="submit" class="btn btn-main btn-mat"><?php echo $wo['lang']['add']; ?></button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade sun_modal" id="providing_services_modal" role="dialog" data-keyboard="false">
+			<div class="modal-dialog wow_mat_mdl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+						<h4 class="modal-title"><?php echo $wo['lang']['set_up_services_page'] ?></h4>
+					</div>
+					<form class="form form-horizontal providing_services_form" method="post" action="#">
+						<div class="modal-body">
+							<div class="providing_services_modal_alert"></div>
+							<div class="clear"></div>
+
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['services']; ?></label>  
+								<input name="services" type="text" autocomplete="off" id="providing_services_input">
+							</div>
+
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['location']; ?></label> 
+								<input name="job_location" type="text" autocomplete="on">
+							</div>
+
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['description']; ?></label>
+								<textarea name="description" cols="20" rows="3"></textarea>
+							</div>
+							<div class="clear"></div>
+						</div>
+						<div class="clear"></div>
+						<div class="modal-footer">
+							<div class="ball-pulse"><div></div><div></div><div></div></div>
+							<button type="button" onclick="SubmitAjaxForm('.providing_services_form')" class="btn btn-main btn-mat"><?php echo $wo['lang']['add']; ?></button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+    <?php } ?>
+   <?php if ($wo['config']['website_mode'] == 'linkedin' && $wo['user_profile']['is_open_to_work'] != 0) { ?>
+		<div class="modal fade sun_modal" id="edit_finding_a_job_modal" role="dialog" data-keyboard="false">
+			<div class="modal-dialog wow_mat_mdl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+						<h4 class="modal-title"><?php echo $wo['lang']['edit_job_preferences'] ?></h4>
+					</div>
+					<form class="form form-horizontal edit_finding_a_job_form" method="post" action="#">
+						<div class="modal-body">
+							<div class="modal_edit_finding_a_job_modal_alert"></div>
+							<div class="sun_input"></div>
+							<div class="clear"></div>
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['job_title']; ?></label> 
+								<input name="job_title" type="text" autocomplete="off" value="<?php echo $wo['user_profile']['open_to_work_data']->job_title; ?>">
+							</div>
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['job_location']; ?></label> 
+								<input name="job_location" type="text" autocomplete="off" value="<?php echo $wo['user_profile']['open_to_work_data']->job_location; ?>">
+							</div>
+							
+							<div class="sun_input mb-0">
+								<label><?php echo $wo['lang']['workplaces']; ?></label>
+							</div>
+							<span class="round-check">
+								<input type="checkbox" id="on_site-edit" name="workplaces[]" value="on_site" <?php echo(strpos($wo['user_profile']['open_to_work_data']->workplaces, 'on_site') !== false ? 'checked' : '') ?>>
+								<label for="on_site-edit"><?php echo $wo['lang']['on_site']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="hybrid-edit" name="workplaces[]" value="hybrid" <?php echo(strpos($wo['user_profile']['open_to_work_data']->workplaces, 'hybrid') !== false ? 'checked' : '') ?>>
+								<label for="hybrid-edit"><?php echo $wo['lang']['hybrid']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="remote-edit" name="workplaces[]" value="remote" <?php echo(strpos($wo['user_profile']['open_to_work_data']->workplaces, 'remote') !== false ? 'checked' : '') ?>>
+								<label for="remote-edit"><?php echo $wo['lang']['remote']; ?></label>
+							</span>
+							
+							<div class="sun_input"></div>
+							
+							<div class="sun_input mb-0">
+								<label><?php echo $wo['lang']['job_types']; ?></label>
+							</div>
+							<span class="round-check">
+								<input type="checkbox" id="full_time-edit" name="job_type[]" value="full_time" <?php echo(strpos($wo['user_profile']['open_to_work_data']->job_type, 'full_time') !== false ? 'checked' : '') ?>>
+								<label for="full_time-edit"><?php echo $wo['lang']['full_time']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="contract-edit" name="job_type[]" value="contract" <?php echo(strpos($wo['user_profile']['open_to_work_data']->job_type, 'contract') !== false ? 'checked' : '') ?>>
+								<label for="contract-edit"><?php echo $wo['lang']['contract']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="part_time-edit" name="job_type[]" value="part_time" <?php echo(strpos($wo['user_profile']['open_to_work_data']->job_type, 'part_time') !== false ? 'checked' : '') ?>>
+								<label for="part_time-edit"><?php echo $wo['lang']['part_time']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="internship-edit" name="job_type[]" value="internship" <?php echo(strpos($wo['user_profile']['open_to_work_data']->job_type, 'internship') !== false ? 'checked' : '') ?>>
+								<label for="internship-edit"><?php echo $wo['lang']['internship']; ?></label>
+							</span>&nbsp;&nbsp;
+							<span class="round-check">
+								<input type="checkbox" id="temporary-edit" name="job_type[]" value="temporary" <?php echo(strpos($wo['user_profile']['open_to_work_data']->job_type, 'temporary') !== false ? 'checked' : '') ?>>
+								<label for="temporary-edit"><?php echo $wo['lang']['temporary']; ?></label>
+							</span>
+							<div class="clear"></div>
+						</div>
+						<div class="clear"></div>
+						<div class="modal-footer">
+							<div class="ball-pulse"><div></div><div></div><div></div></div>
+							<input type="hidden" name="id" value="<?php echo $wo['user_profile']['open_to_work_data']->id; ?>">
+							<button type="submit" class="btn btn-main btn-mat"><?php echo $wo['lang']['edit']; ?></button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade sun_modal" id="delete_open_to_work" role="dialog" data-keyboard="false">
+			<div class="modal-dialog modal-md wow_mat_mdl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+						<h4 class="modal-title"><?php echo $wo['lang']['delete'] ?> <?php echo $wo['lang']['open_to_work'] ?></h4>
+					</div>
+					<div class="modal-body">
+						<div class="delete_finding_a_job_modal_alert"></div>
+						<p><?php echo $wo['lang']['are_you_delete_open_work'] ?></p>
+					</div>
+					<div class="modal-footer">
+						<div class="ball-pulse"><div></div><div></div><div></div></div>
+						<button type="button" class="btn btn-main btn-mat" onclick="DeleteOpenToWork();"><?php echo $wo['lang']['delete']; ?></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	<?php } ?>
+   <?php if ($wo['config']['website_mode'] == 'linkedin' && $wo['user_profile']['is_providing_service'] != 0) { ?>
+		<div class="modal fade sun_modal" id="edit_providing_services_modal" role="dialog" data-keyboard="false" style="overflow-y: auto;">
+			<div class="modal-dialog wow_mat_mdl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+						<h4 class="modal-title"><?php echo $wo['lang']['set_up_services_page'] ?></h4>
+					</div>
+					<form class="form form-horizontal edit_providing_services_form" method="post" action="#">
+						<div class="modal-body">
+							<div class="edit_providing_services_modal_alert"></div>
+							<div class="clear"></div>
+
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['services']; ?></label> 
+								<input name="services" type="text" autocomplete="off" value="<?php echo $wo['user_profile']['providing_service']->services; ?>" id="edit_providing_services_input">
+							</div>
+
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['location']; ?></label>  
+								<input name="job_location" type="text" autocomplete="off" value="<?php echo $wo['user_profile']['providing_service']->job_location; ?>">
+							</div>
+
+							<div class="sun_input">
+								<label><?php echo $wo['lang']['description']; ?></label>
+								<textarea name="description" cols="20" rows="3"><?php echo $wo['user_profile']['providing_service']->description; ?></textarea>
+							</div>
+
+							<div class="clear"></div>
+						</div>
+						<div class="clear"></div>
+						<div class="modal-footer">
+							<div class="ball-pulse"><div></div><div></div><div></div></div>
+							<input type="hidden" name="id" value="<?php echo $wo['user_profile']['providing_service']->id; ?>">
+							<button type="button" onclick="SubmitAjaxForm('.edit_providing_services_form')" class="btn btn-main btn-mat"><?php echo $wo['lang']['edit']; ?></button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade sun_modal" id="delete_providing_service" role="dialog" data-keyboard="false">
+			<div class="modal-dialog modal-md wow_mat_mdl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button>
+						<h4 class="modal-title"><?php echo $wo['lang']['delete'] ?> <?php echo $wo['lang']['providing_services'] ?></h4>
+					</div>
+					<div class="modal-body">
+						<div class="delete_finding_a_job_modal_alert"></div>
+						<p><?php echo $wo['lang']['are_you_delete_services'] ?></p>
+					</div>
+					<div class="modal-footer">
+						<div class="ball-pulse"><div></div><div></div><div></div></div>
+						<button type="button" class="btn btn-main btn-mat" onclick="DeleteProvidingService();"><?php echo $wo['lang']['delete']; ?></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	<?php } ?>
 <?php endif; ?>
 <style>
 	.post-youtube iframe {
 		height: 362px !important;
 	}
 </style>
+
 <script>
+
 $(function(){
     var url = window.location.pathname, 
         urlRegExp = new RegExp(url.replace(/\/$/,'') + "$"); // create regexp to match current url pathname and remove trailing slash if present as it could collide with the link in navigation in case trailing slash wasn't present there
@@ -1369,6 +2029,14 @@ $(function () {
             }
         }
       }
+      else{
+        if(data.invalid_file == 3){
+          $("#adult_image_file").modal('show');
+          Wo_Delay(function(){
+            $("#adult_image_file").modal('hide');
+          },3000);
+        }
+      }
 
       $('.user-avatar-uploading-container,.user-avatar-uploading-progress').fadeOut(200);
     }
@@ -1418,6 +2086,14 @@ $(function () {
         $('#full-input-image').val(data.cover_full);
         $('#cover-input-image').val(data.cover_or);
         Wo_StartRepositioner();
+      }
+      else{
+      	if(data.invalid_file == 3){
+          $("#adult_image_file").modal('show');
+          Wo_Delay(function(){
+            $("#adult_image_file").modal('hide');
+          },3000);
+        }
       }
       $('.user-cover-uploading-container,.user-cover-uploading-progress').fadeOut(200);
     }
@@ -1622,5 +2298,166 @@ function Wo_GetMutualFriends(user_id) {
             }, 1000);
         });
     <?php } ?>
+<?php } ?>
+<?php if ($wo['config']['website_mode'] == 'linkedin') { ?>
+	
+	$(document).ready(function() { 
+
+	    var options = { 
+	      url: Wo_Ajax_Requests_File() + '?f=open_to&s=find_job&hash=' + $('.main_session').val() + "&mode_type=linkedin",
+	        beforeSubmit:  function () {
+	          $('.modal_finding_a_job_modal_alert').empty();
+	          $("#finding_a_job_modal").find('.btn-mat').attr('disabled', 'true');
+	          $("#finding_a_job_modal").find('.btn-mat').text("<?php echo($wo['lang']['please_wait']) ?>");
+	        }, 
+	        success: function (data) {
+	          $("#finding_a_job_modal").find('.btn-mat').text("<?php echo $wo['lang']['add'] ?>");
+	          $("#finding_a_job_modal").find('.btn-mat').removeAttr('disabled')
+	          if (data.status == 200) {
+	            $('.modal_finding_a_job_modal_alert').html('<div class="alert alert-success bg-success"><i class="fa fa-check"></i> '+
+	              data.message
+	              +'</div>');
+	            setTimeout(function(){
+	            	location.reload()
+	            },3000);
+	          } else {
+	            $('.modal_finding_a_job_modal_alert').html('<div class="alert alert-danger bg-danger"> '+
+	            data.message
+	            +'</div>');
+	          } 
+	        }
+	    }; 
+	    $('.finding_a_job_form').ajaxForm(options);
+	    var options = { 
+	      url: Wo_Ajax_Requests_File() + '?f=open_to&s=edit_job&hash=' + $('.main_session').val() + "&mode_type=linkedin",
+	        beforeSubmit:  function () {
+	          $('.modal_edit_finding_a_job_modal_alert').empty();
+	          $("#edit_finding_a_job_modal").find('.btn-mat').attr('disabled', 'true');
+	          $("#edit_finding_a_job_modal").find('.btn-mat').text("<?php echo($wo['lang']['please_wait']) ?>");
+	        }, 
+	        success: function (data) {
+	          $("#edit_finding_a_job_modal").find('.btn-mat').text("<?php echo $wo['lang']['edit'] ?>");
+	          $("#edit_finding_a_job_modal").find('.btn-mat').removeAttr('disabled')
+	          if (data.status == 200) {
+	            $('.modal_edit_finding_a_job_modal_alert').html('<div class="alert alert-success bg-success"><i class="fa fa-check"></i> '+
+	              data.message
+	              +'</div>');
+	            setTimeout(function(){
+	            	location.reload()
+	            },3000);
+	          } else {
+	            $('.modal_edit_finding_a_job_modal_alert').html('<div class="alert alert-danger bg-danger"> '+
+	            data.message
+	            +'</div>');
+	          } 
+	        }
+	    }; 
+	    $('.edit_finding_a_job_form').ajaxForm(options); 
+	    var options = { 
+	      url: Wo_Ajax_Requests_File() + '?f=open_to&s=providing_services&hash=' + $('.main_session').val() + "&mode_type=linkedin",
+	        beforeSubmit:  function (formData, jqForm, options) {
+	          $('.providing_services_modal_alert').empty();
+	          $("#providing_services_modal").find('.btn-mat').attr('disabled', 'true');
+	          $("#providing_services_modal").find('.btn-mat').text("<?php echo($wo['lang']['please_wait']) ?>");
+	        }, 
+	        success: function (data) {
+	          $("#providing_services_modal").find('.btn-mat').text("<?php echo $wo['lang']['add'] ?>");
+	          $("#providing_services_modal").find('.btn-mat').removeAttr('disabled')
+	          if (data.status == 200) {
+	            $('.providing_services_modal_alert').html('<div class="alert alert-success bg-success"><i class="fa fa-check"></i> '+
+	              data.message
+	              +'</div>');
+	            setTimeout(function(){
+	            	location.reload()
+	            },3000);
+	          } else {
+	            $('.providing_services_modal_alert').html('<div class="alert alert-danger bg-danger"> '+
+	            data.message
+	            +'</div>');
+	          } 
+	        }
+	    }; 
+	    $('.providing_services_form').ajaxForm(options); 
+	    var options = { 
+	      url: Wo_Ajax_Requests_File() + '?f=open_to&s=edit_providing_services&hash=' + $('.main_session').val() + "&mode_type=linkedin",
+	        beforeSubmit:  function (formData, jqForm, options) {
+	          $('.edit_providing_services_modal_alert').empty();
+	          $("#edit_providing_services_modal").find('.btn-mat').attr('disabled', 'true');
+	          $("#edit_providing_services_modal").find('.btn-mat').text("<?php echo($wo['lang']['please_wait']) ?>");
+	        }, 
+	        success: function (data) {
+	          $("#edit_providing_services_modal").find('.btn-mat').text("<?php echo $wo['lang']['edit'] ?>");
+	          $("#edit_providing_services_modal").find('.btn-mat').removeAttr('disabled')
+	          if (data.status == 200) {
+	            $('.edit_providing_services_modal_alert').html('<div class="alert alert-success bg-success"><i class="fa fa-check"></i> '+
+	              data.message
+	              +'</div>');
+	            setTimeout(function(){
+	            	location.reload()
+	            },3000);
+	          } else {
+	            $('.edit_providing_services_modal_alert').html('<div class="alert alert-danger bg-danger"> '+
+	            data.message
+	            +'</div>');
+	          } 
+	        }
+	    }; 
+	    $('.edit_providing_services_form').ajaxForm(options); 
+	});
+<?php } ?>
+<?php if ($wo['loggedin'] && $wo['config']['website_mode'] == 'linkedin' && $wo['user_profile']['is_open_to_work'] != 0) { ?>
+function DeleteOpenToWork(){
+	$.ajax({
+        url: Wo_Ajax_Requests_File()+"?f=open_to&s=delete_job" + "&mode_type=linkedin",
+        type: 'POST',
+        dataType: 'json',
+        data: {id:<?php echo $wo['user_profile']['user_id']; ?>},
+    })
+    .done(function(data) {
+        if (data.status == 200) {
+            location.reload();
+			$('#delete_open_to_work').modal('hide');
+        }
+        else{
+        	$('.delete_finding_a_job_modal_alert').html('<div class="alert alert-danger bg-danger"> '+
+	            data.message
+	            +'</div>');
+        }
+    })
+    .fail(function() {
+        console.log("error");
+    })
+}
+function EditOpenToWork(){
+	$('#edit_finding_a_job_modal').modal('show');
+}
+<?php } ?>
+<?php if ($wo['loggedin'] && $wo['config']['website_mode'] == 'linkedin' && $wo['user_profile']['is_providing_service'] != 0) { ?>
+function EditProvidingService(){
+	$('#edit_providing_services_input').tagsinput({});
+	$('#edit_providing_services_modal').modal('show');
+}
+function DeleteProvidingService(){
+	$.ajax({
+        url: Wo_Ajax_Requests_File()+"?f=open_to&s=delete_service" + "&mode_type=linkedin",
+        type: 'POST',
+        dataType: 'json',
+        data: {id:<?php echo $wo['user_profile']['user_id']; ?>},
+    })
+    .done(function(data) {
+        if (data.status == 200) {
+            location.reload();
+			$('#delete_providing_service').modal('hide');
+        }
+        else{
+        	$('.delete_finding_a_job_modal_alert').html('<div class="alert alert-danger bg-danger"> '+
+	            data.message
+	            +'</div>');
+        }
+    })
+    .fail(function() {
+        console.log("error");
+    })
+}
 <?php } ?>
 </script>

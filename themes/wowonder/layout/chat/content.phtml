@@ -584,13 +584,18 @@ $(function() {
       },
       success: function(data) {
         if (data['status'] == 200) {
+	        	if (node_socket_flow == "1") {
+			      	for (var i = 0; i < chat_part_array.length; i++) {
+			         socket.emit("user_notification", { to_id: chat_part_array[i], user_id: _getCookie("user_id"), type: "request" });
+					    }
+		      	}
             $("#create_group_chat").modal('hide');
             Wo_OpenChatTab(0,data.group_id);
             $("#insert-caht-parts").find('#reset').trigger('click');
             $(".group_chat_mbr_list").empty();
             $(".group_chat_avatar").empty();
             chat_part_array = [];
-            socket.emit("sync_groups")
+            socket.emit("sync_groups",{from_id: _getCookie("user_id")})
         }
         else if (data.status == 500){
             $("#insert-caht-alert").html('<div class="alert alert-danger">' + data['message'] + '</div>');
@@ -1003,9 +1008,15 @@ function Wo_AddGChatPart(group_id, user_id){
   .done(function(data) {
     if (data.status == 200 && data.code == 1) {
       $("[data-group-chat-part='"+user_id+"']").find('span.status').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="red" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg>');
+      if (node_socket_flow == "1") {
+         socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "request" });
+      }
     }
     else if(data.status == 200 && data.code == 0){
       $("[data-group-chat-part='"+user_id+"']").find('span.status').html('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="green" d="M17,13H13V17H11V13H7V11H11V7H13V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg>');
+      if (node_socket_flow == "1") {
+         socket.emit("user_notification", { to_id: user_id, user_id: _getCookie("user_id"), type: "request_removed" });
+      }
     }
     else{
       return false;

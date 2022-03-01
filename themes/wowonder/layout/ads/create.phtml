@@ -151,8 +151,24 @@
 					<div class="wow_form_fields">
 						<label for="appears"><?php echo $wo['lang']['appears']; ?></label>
 						<select name="appears" id="appears">
-							<option value="post" selected><?php echo $wo['lang']['post']; ?> (<?php echo $wo['lang']['format_image']; ?>)</option>
+							<option value="entire" selected><?php echo $wo['lang']['entire_site']; ?> (<?php echo $wo['lang']['format_image']; ?>)</option>
+							<option value="post"><?php echo $wo['lang']['post']; ?> (<?php echo $wo['lang']['format_image']; ?>)</option>
 							<option value="sidebar"><?php echo $wo['lang']['sidebar']; ?> (<?php echo $wo['lang']['format_image']; ?>)</option>
+							<?php if ($wo['config']['job_system'] == 1) { ?>
+							<option value="jobs"><?php echo $wo['lang']['jobs']; ?> (<?php echo $wo['lang']['format_image']; ?>)</option>
+							<?php } ?>
+							<?php if ($wo['config']['forum'] != 0) { ?>
+							<option value="forum"><?php echo $wo['lang']['forum']; ?> (<?php echo $wo['lang']['format_image']; ?>)</option>
+							<?php } ?>
+							<?php if ($wo['config']['movies'] != 0) { ?>
+							<option value="movies"><?php echo $wo['lang']['movies']; ?> (<?php echo $wo['lang']['format_image']; ?>)</option>
+							<?php } ?>
+							<?php if ($wo['config']['offer_system'] != 0) { ?>
+							<option value="offer"><?php echo $wo['lang']['offer']; ?> (<?php echo $wo['lang']['format_image']; ?>)</option>
+							<?php } ?>
+							<?php if ($wo['config']['funding_system'] != 0) { ?>
+							<option value="funding"><?php echo $wo['lang']['funding']; ?> (<?php echo $wo['lang']['format_image']; ?>)</option>
+							<?php } ?>
 							<!-- <option value="video"><?php echo $wo['lang']['video_player']; ?> (<?php echo $wo['lang']['format_video']; ?>)</option> -->
 						</select>
 					</div>
@@ -162,10 +178,10 @@
 						<span class="help-block"><?php echo $wo['lang']['camp_budget_help'] ?></span>
 					</div>
 					<div class="wow_form_fields">
-						<label for="appears"><?php echo $wo['lang']['bidding']; ?></label>
+						<label for="bidding"><?php echo $wo['lang']['bidding']; ?></label>
 						<select name="bidding" id="bidding">
-							<option value="clicks"><?php echo str_replace('${{PRICE}}',  Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price'], $wo['lang']['pay_per_click']); ?></option>
-							<option value="views"><?php echo str_replace('${{PRICE}}', Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price'], $wo['lang']['pay_per_imprssion']); ?></option>
+							<option value="clicks" class="entire_site_clicks"><?php echo str_replace('${{PRICE}}',  Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price'], $wo['lang']['pay_per_click']); ?></option>
+							<option value="views" class="entire_site_views"><?php echo str_replace('${{PRICE}}', Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price'], $wo['lang']['pay_per_imprssion']); ?></option>
 						</select>
 					</div>
 					<div class="wow_form_fields" id="estimated" style="display: none;">
@@ -275,6 +291,18 @@ $(document).ready(function() {
 });
 
 	jQuery(document).ready(function($) {
+		$('.entire_site_clicks').html("<?php echo str_replace('${{PRICE}}',  Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price'] * 1.5, $wo['lang']['pay_per_click']); ?>");
+		$('.entire_site_views').html("<?php echo str_replace('${{PRICE}}', Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price'] * 1.5, $wo['lang']['pay_per_imprssion']); ?>");
+		$("#appears").change(function(event) {
+			if ($(this).val() == 'entire') {
+				$('.entire_site_clicks').html("<?php echo str_replace('${{PRICE}}',  Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price'] * 1.5, $wo['lang']['pay_per_click']); ?>");
+				$('.entire_site_views').html("<?php echo str_replace('${{PRICE}}', Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price'] * 1.5, $wo['lang']['pay_per_imprssion']); ?>");
+			}
+			else{
+				$('.entire_site_clicks').html("<?php echo str_replace('${{PRICE}}',  Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_c_price'], $wo['lang']['pay_per_click']); ?>");
+				$('.entire_site_views').html("<?php echo str_replace('${{PRICE}}', Wo_GetCurrency($wo['config']['currency']) . $wo['config']['ad_v_price'], $wo['lang']['pay_per_imprssion']); ?>");
+			}
+		});
 		
 		
 		$("#start_date").datepicker({ dateFormat: 'yy-mm-dd', minDate: 'today'});

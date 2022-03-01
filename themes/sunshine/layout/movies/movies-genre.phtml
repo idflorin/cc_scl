@@ -1,6 +1,17 @@
 <div class="page-margin">
 	<div class="row">
 		<div class="col-md-12">
+			<?php if ($wo['config']['user_ads'] == 1): ?>
+				<div id="sidebar-sticky-movies">
+					<?php 
+					  $wo['sidebar-ad'] = Wo_GetAdsByType('movies');
+					  if (!empty($wo['sidebar-ad'])) {
+					  	echo Wo_LoadPage('ads/includes/movies-ad');
+					  }
+					?>
+					<div class="clear"></div>
+				</div>
+		    <?php endif; ?>
 			<div>
 				<ul id="links_cont" class="movies-top-breadcrumb">
 					<li class="links_cont_item"><a href="<?php echo Wo_SeoLink('index.php?link1=movies') ?>"><?php echo $wo['lang']['movies']; ?></a></li>

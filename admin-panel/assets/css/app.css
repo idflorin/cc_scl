@@ -10591,3 +10591,66 @@ input.error, input.error:focus, select.error, select.error:focus, textarea.error
 form.small-p p {
   line-height:  1rem;
 }
+.active_permissions{
+  background: #be3e44 !important;
+  border-color: #be3e44 !important;
+  box-shadow: 0px 2px 8px 0px rgb(190 62 68 / 45%) !important;
+  color: #fff !important;
+}
+.ch_light_color{
+  background-color: #be3e44bf !important;
+}
+.ch_light_color .check-handler{
+  background-color: #ce464a1a !important;
+}
+
+
+/*user permission button*/
+.select_user_perm {
+	box-shadow: none !important;
+    background: rgb(0 0 0 / 5%) !important;
+    border-color: rgb(0 0 0 / 15%) !important;
+    border-radius: 10px;
+    margin: 0 5px;
+    color: #222 !important;flex-direction: column;
+}
+.select_user_perm svg {
+	width: 40px !important;
+    height: auto !important;
+    background-color: cornflowerblue;
+    color: #fff;
+    border-radius: 50%;
+    padding: 9px;
+    margin-bottom: 12px;
+}
+.select_user_perm.btn-info {
+	background-color: cornflowerblue !important;
+    color: #fff !important;
+    border-color: cornflowerblue !important;
+}
+.select_user_perm.btn-info svg {
+	background-color: #fff;
+    color: cornflowerblue;
+}
+body.dark .select_user_perm {
+    background: rgb(255 255 255 / 5%) !important;
+    border-color: rgb(255 255 255 / 15%) !important;
+    color: #e1e1e1 !important;
+}
+body.dark .select_user_perm.btn-info {
+	background-color: cornflowerblue !important;
+    color: #fff !important;
+    border-color: cornflowerblue !important;
+}
+.change_order_status {
+	-webkit-appearance: none;
+    appearance: none;
+    border: 0;
+	cursor: pointer;text-align: initial
+}
+.change_order_status:hover, .change_order_status:active, .change_order_status:focus {
+	background: #2196f3 !important;
+}
+.change_order_status option {
+	background: white;color: #222;
+}

@@ -40,10 +40,10 @@ $IN_CHANNEL_PERMISSION = 4;
     {
         $rawAppID = hex2bin($appID);
         $rawAppCertificate = hex2bin($appCertificate);
-        
+
         $buffer = pack("S", $serviceType);
         $buffer .= pack("S", strlen($rawAppID)) . $rawAppID;
-        $buffer .= pack("I", $ts);
+        $buffer .= pack("I", $ts); 
         $buffer .= pack("I", $salt);
         $buffer .= pack("S", strlen($channelName)) . $channelName;
         $buffer .= pack("I", $uid);
@@ -53,7 +53,7 @@ $IN_CHANNEL_PERMISSION = 4;
         foreach ($extra as $key => $value) {
             $buffer .= pack("S", $key);
             $buffer .= pack("S", strlen($value)) . $value;
-        } 
+        }
 
         return strtoupper(hash_hmac('sha1', $buffer, $rawAppCertificate));
     }
@@ -76,7 +76,7 @@ $IN_CHANNEL_PERMISSION = 4;
         foreach ($extra as $key => $value) {
             $buffer .= pack("S", $key);
             $buffer .= packString($value);
-        } 
+        }
 
         return $buffer;
     }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == "insert-blog") {
     if (Wo_CheckSession($hash_id) === true) {
         $request   = array();
@@ -23,17 +23,30 @@ if ($f == "insert-blog") {
             if (!in_array($_POST['blog_category'], array_keys($wo['blog_categories']))) {
                 $error = $error_icon . $wo['lang']['error_found'];
             }
+            if ($wo['config']['reCaptcha'] == 1) {
+                if (empty($_POST['g-recaptcha-response'])) {
+                    $error = $error_icon . $wo['lang']['please_check_details'];
+                } else {
+                    $recaptcha_data = array(
+                        'secret' => $wo['config']['recaptcha_secret_key'],
+                        'response' => $_POST['g-recaptcha-response']
+                    );
+                    $response       = Check_Recaptcha($recaptcha_data);
+                    if (!$response->success) {
+                        $error = $error_icon . $wo['lang']['reCaptcha_error'];
+                    }
+                }
+            }
         }
         if (empty($error)) {
             $_POST['blog_content'] = preg_replace($wo['regx_attr'], '', $_POST['blog_content']);
-            $active = 1;
+            $active                = 1;
             if ($wo['config']['blog_approval'] == 1 && !Wo_IsAdmin()) {
                 $active = 0;
             }
             $_POST['blog_tags'] = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_POST['blog_tags']);
             $_POST['blog_tags'] = strip_tags($_POST['blog_tags']);
-
-            $registration_data = array(
+            $registration_data  = array(
                 'user' => $wo['user']['id'],
                 'title' => Wo_Secure($_POST['blog_title']),
                 'content' => Wo_Secure($_POST['blog_content'], 0, false),
@@ -43,7 +56,7 @@ if ($f == "insert-blog") {
                 'tags' => Wo_Secure($_POST['blog_tags']),
                 'active' => $active
             );
-            $last_id           = Wo_InsertBlog($registration_data);
+            $last_id            = Wo_InsertBlog($registration_data);
             if ($last_id && is_numeric($last_id)) {
                 if (!empty($_FILES["thumbnail"]["tmp_name"])) {
                     $fileInfo      = array(
@@ -84,7 +97,7 @@ if ($f == "insert-blog") {
                     );
                     if ($active == 0) {
                         $data = array(
-                            'status' => 300,
+                            'status' => 300
                         );
                     }
                 }

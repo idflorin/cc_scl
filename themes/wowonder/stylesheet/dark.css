@@ -3,7 +3,7 @@ body {background: #131313 !important;color: #dfdfdf;}
 .chat-container input, .modal-header {background: #010101 !important;}
 .sidebar-profile-style, .list-group, .create-ads-cont .select-admedai-box, .wo-create-forms .wo_settings_page, .panel-white, .wo_event_profile .event-info-cont, .wo_page_profile .page-info-cont, #members table, .f_topics, .thread-replies, .setting-well input[type=text], .setting-well input[type=password], .setting-well select, #search-nearby-users, .colloape-panel-stg, .sidebar-ad-wrapper, .wo-content-shadow, .wo_loading_post, .movies-navbar-wrapper, .played-film-image-wrap, .played-film-description-wrapper, .related-movies-container, .wo_pokes_cont, .featured-users, .greetalert {box-shadow: 0 1px 0 0 #212121, 0 0 0 1px #212121 !important;}
 .table-striped>tbody>tr:nth-of-type(odd) {background-color: rgba(0, 0, 0, 0.42);}
-.table>caption+thead>tr:first-child>td, .table>caption+thead>tr:first-child>th, .table>colgroup+thead>tr:first-child>td, .table>colgroup+thead>tr:first-child>th, .table>thead:first-child>tr:first-child>td, .table>thead:first-child>tr:first-child>th, .form-control, output, .create-ads-cont .select-admedai-box, .create-ads-cont .select-admedai-box button, .create-ads-cont .select-admedai-box input[readonly], .create-ads-cont .create-ads-inner-right button, .dropdown-menu>li>a, .bootstrap-tagsinput, .wo_my_pages .page_title, .setting-well input[type=text], .setting-well input[type=password], .setting-well select, #search-nearby-users .nearby-users-gender, .admin-panel .col-md-9 .list-group-item:first-child, .setting-panel .col-md-8 .list-group-item:first-child, .profile-lists .list-group-item:first-child, .col-md-8 .list-group-item:first-child, .col-md-3.custom .list-group-item:first-child, .col-sm-4 .list-group-item:first-child, .col-md-7 .list-group-item:first-child, .col-md-9 .list-group-item:first-child, .red-list .list-group-item:first-child, .active.list-group-item:first-child, pre, .messages-recipients-list > span, .related-movies-wrapper h4.related-movies, .related-movies-wrapper .related-movies-carousel .related-film-wrapper h4, .wo_page_profile .first_row .title a, .wo_poke_users .poke_info .user-name, .user-fetch .user-name, .user-fetch .user-name a, .wo_market .market_widget .m_widget_head, .wo_market .market_bottom .market_bottom_header, .products .product .product-title a, .nearby_user_wrapper .user_wrapper_link, .wo_search_page .wo_game_style .game-name, .wo_settings_page .setting-panel .avatar-holder strong, .wo_settings_page .setting-panel .avatar-holder strong a, .sidebar-conatnier .sidebar-profile-style .card.hovercard .info .title p, .second-user-color, .sidebar-ad-wrapper .sidebar-ad-footer p.ad-title, .publisher-box #camera-button-btn, .publisher-box .add-emoticons .dropdown-toggle, .publisher-box #camera-button-btn svg, .publisher-box .publisher-box-footer .poster-left-buttons svg.feather, #video-form div.video-poster-image .thumb-renderer #post_vthumb_droparea, .post-fetched-url .fetched-url-text h4, .wo_post_ad h3, .product-description, .options .poll-option, .login .title, .login input, .login select, .login textarea, .admin-panel .col-md-9 .list-group-item:first-child a, .setting-panel .col-md-8 .list-group-item:first-child a, .profile-lists .list-group-item:first-child a, .col-md-8 .list-group-item:first-child a, .col-md-7 .list-group-item:first-child a, .active.list-group-item:first-child a, .wo_adv_search_filter_side .wo_settings_page .setting-panel input[type=text].age_number, .user-request-list .user-info a, .modal-title, #wo_msg_right_prt .text-sender-container .incoming .message-model .message p {color: #e5e5e5 !important;}
+.table>caption+thead>tr:first-child>td, .table>caption+thead>tr:first-child>th, .table>colgroup+thead>tr:first-child>td, .table>colgroup+thead>tr:first-child>th, .table>thead:first-child>tr:first-child>td, .table>thead:first-child>tr:first-child>th, .form-control, output, .create-ads-cont .select-admedai-box, .create-ads-cont .select-admedai-box button, .create-ads-cont .select-admedai-box input[readonly], .create-ads-cont .create-ads-inner-right button, .dropdown-menu>li>a, .bootstrap-tagsinput, .wo_my_pages .page_title, .setting-well input[type=text], .setting-well input[type=password], .setting-well select, #search-nearby-users .nearby-users-gender, .admin-panel .col-md-9 .list-group-item:first-child, .setting-panel .col-md-8 .list-group-item:first-child, .profile-lists .list-group-item:first-child, .col-md-8 .list-group-item:first-child, .col-md-3.custom .list-group-item:first-child, .col-sm-4 .list-group-item:first-child, .col-md-7 .list-group-item:first-child, .col-md-9 .list-group-item:first-child, .red-list .list-group-item:first-child, .active.list-group-item:first-child, pre, .messages-recipients-list > span, .related-movies-wrapper h4.related-movies, .related-movies-wrapper .related-movies-carousel .related-film-wrapper h4, .wo_page_profile .first_row .title a, .wo_poke_users .poke_info .user-name, .user-fetch .user-name, .user-fetch .user-name a, .wo_market .market_widget .m_widget_head, .wo_market .market_bottom .market_bottom_header, .products .product .product-title a, .nearby_user_wrapper .user_wrapper_link, .wo_search_page .wo_game_style .game-name, .wo_settings_page .setting-panel .avatar-holder strong, .wo_settings_page .setting-panel .avatar-holder strong a, .sidebar-conatnier .sidebar-profile-style .card.hovercard .info .title p, .second-user-color, .sidebar-ad-wrapper .sidebar-ad-footer p.ad-title, .publisher-box #camera-button-btn, .publisher-box .add-emoticons .dropdown-toggle, .publisher-box #camera-button-btn svg, .publisher-box .publisher-box-footer .poster-left-buttons svg.feather, #video-form div.video-poster-image .thumb-renderer #post_vthumb_droparea, .post-fetched-url .fetched-url-text h4, .wo_post_ad h3, .product-description, .options .poll-option, .login input, .login select, .login textarea, .admin-panel .col-md-9 .list-group-item:first-child a, .setting-panel .col-md-8 .list-group-item:first-child a, .profile-lists .list-group-item:first-child a, .col-md-8 .list-group-item:first-child a, .col-md-7 .list-group-item:first-child a, .active.list-group-item:first-child a, .wo_adv_search_filter_side .wo_settings_page .setting-panel input[type=text].age_number, .user-request-list .user-info a, .modal-title, #wo_msg_right_prt .text-sender-container .incoming .message-model .message p {color: #e5e5e5 !important;}
 .publisher-box .add-emoticons .dropdown-toggle svg.feather {fill: #e5e5e5 !important;}
 a, .blog-h-list h3, .main-blog-sidebar .popular-articles li .article-title, .wo_settings_page .setting-panel .avatar-holder .chavatlink, .earn_points .ep_illus .ep_how_many b {color: #c6c6c6;}
 .btn-default, .slide-film-desc, .wo_search_page .wo_game_style .btn-link {background: #363636;color: #c8c8c8;}
@@ -689,4 +689,77 @@ body #wo_nw_msg_page .messages-recipients-list.active .msg_ava_name {
 
 @media (max-width:665px) {
 .event-info-cont-small .info h3 {color: #fff;}
+}
+
+.pr_stars .star path { fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="0"] .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="1"] .star:nth-child(1) ~ .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="2"] .star:nth-child(2) ~ .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="3"] .star:nth-child(3) ~ .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="4"] .star:nth-child(4) ~ .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="5"] .star:nth-child(5) ~ .star path {fill: rgb(255 255 255 / 20%);}
+
+.review_list, .border-bottom, .ch_checkout_title {border-bottom-color: #3e3e3e;}
+.prod_review-meta:before {color: rgb(255 255 255 / 20%);}
+
+.ch_qty_toggle .value-button {
+    background-color: rgb(255 255 255 / 10%);
+}
+.cart_chos_addrs label {border-bottom-color: rgba(255, 255, 255, 0.15);}
+.cart_chos_addrs label:hover {background-color: rgba(255, 255, 255, 0.05);}
+.cart_chos_addrs label:before {border-color: rgba(255, 255, 255, 0.7);}
+.cart_chos_addrs label:after {background: #fff;}
+.cart_chos_addrs input:checked + label:before {border-color: #fff;}
+.cart_chos_addrs input:checked + label {color: #fff;}
+
+.address_book_innr {box-shadow: 0 0 0 1px #3c3c3c;}
+.add_new_addrs {background-color: rgb(255 255 255 / 7%);color: #dadada;}
+.address_box .addrs_name {color: #fff;}
+
+.my_purchased {box-shadow: 0 0 0 1px rgb(255 255 255 / 14%);}
+.my_purchased .foot {border-top-color: #464646;}
+.star_rating label {color: #5c5c5c;}
+
+.wo_ad_header_format {
+    background-color: #212121;
+    border-color: rgb(255 255 255 / 15%);
+}
+
+.review_list {
+    background-color: #383838;
+}
+
+.new_market.wow_main_float_head:after {background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 60"><path fill="%23131313" d="M1920,60H0V0S387,59,960,59,1920,0,1920,0Z"/></svg>') no-repeat center/100% 100%;position: absolute;bottom: 0;left: 0;right: 0;padding-top: 3.125%;}
+.wo_market_head_filter > .market_widget .m_widget_head, .wo_job_head_filter > .wo_job_main_widget .m_widget_head {
+    border-color: #5a5a5a;
+}
+
+.wo_post_prod_full_user {
+    border-color: #444444;
+}
+.wo_post_prod_full_img_slider .is-selected img {
+    box-shadow: 0 0 0 2px #efefef;
+}
+.wo_post_prod_full_related {
+    border-color: #4e4e4e;
+}
+
+.new_jobs.wow_main_float_head:after {
+    background-color: #131313;
+}
+.create_head_menu li a {
+    border-color: #464646;
+}
+.text-sender-container .outgoing .message-model .message.wo_msg_prod_prnt .wo_market .market_bottom .product .product-title a {
+    color: #e5e5e5 !important;
+}
+.text-sender-container .outgoing .message-model .message.wo_msg_prod_prnt .wo_market .market_bottom .product .product-by a {
+    color: #a2a2a2 !important;
+}
+.wo_page_profile .options-buttons .wo_page_admn_btn.btn-default {
+    box-shadow: 0 7px 30px -10px rgb(104 104 104 / 50%) !important;
+    background: linear-gradient(#363636, #222222);
+}
+.login .user-image {
+    box-shadow: 0 0 0 2px #212121;
 }

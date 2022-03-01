@@ -35,7 +35,11 @@
 					</div>
 					<?php if ($wo['loggedin'] == true) { ?>
 						<div class="wo_vew_apld_msg">
-							<button type="button" class="btn btn-main" onclick="Wo_OpenChatTab(0,0,0,<?php echo $wo['page_profile']['page_id']; ?>,<?php echo $wo['job_apply']['user_data']['user_id']; ?>)"><?php echo $wo['lang']['message'] ?></button>
+							<?php if (!empty($wo['page_profile'])) { ?>
+								<button type="button" class="btn btn-main" onclick="Wo_OpenChatTab(0,0,0,<?php echo $wo['page_profile']['page_id']; ?>,<?php echo $wo['job_apply']['user_data']['user_id']; ?>)"><?php echo $wo['lang']['message'] ?></button>
+							<?php }else{ ?>
+								<button type="button" class="btn btn-main" onclick="Wo_OpenChatTab(<?php echo $wo['user_profile']['user_id']; ?>)"><?php echo $wo['lang']['message'] ?></button>
+							<?php } ?>
 						</div>
 					<?php } ?>
 				</div>

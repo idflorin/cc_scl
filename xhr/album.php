@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == 'album') {
     if ($s == 'create_album' && Wo_CheckSession($hash_id) === true) {
         if (empty($_POST['album_name'])) {
@@ -52,20 +52,16 @@ if ($f == 'album') {
                     $file     = Wo_ShareFile($fileInfo, 1);
                     if (!empty($file)) {
                         //$media_album = Wo_RegisterAlbumMedia($id, $file['filename']);
-
                         if (!empty($file)) {
-                            $media_album = Wo_RegisterAlbumMedia($id, $file['filename']);
-                            $post_data['multi_image'] = 0;
+                            $media_album                   = Wo_RegisterAlbumMedia($id, $file['filename']);
+                            $post_data['multi_image']      = 0;
                             $post_data['multi_image_post'] = 1;
-                            $post_data['album_name'] = '';
-                            $post_data['postFile'] = $file['filename'];
-                            $post_data['postFileName'] = $file['name'];
-                            $new_id = Wo_RegisterPost($post_data);
-                            $media_album = Wo_RegisterAlbumMedia($new_id, $file['filename'],$id);
+                            $post_data['album_name']       = '';
+                            $post_data['postFile']         = $file['filename'];
+                            $post_data['postFileName']     = $file['name'];
+                            $new_id                        = Wo_RegisterPost($post_data);
+                            $media_album                   = Wo_RegisterAlbumMedia($new_id, $file['filename'], $id);
                         }
-
-
-
                     }
                 }
             }

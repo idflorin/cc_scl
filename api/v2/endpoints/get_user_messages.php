@@ -93,6 +93,7 @@ if (!empty($_POST['recipient_id']) && is_numeric($_POST['recipient_id']) && $_PO
                 }
 
                 if (!empty($message['reply'])) {
+                    $message['reply']['text'] = openssl_encrypt($message['reply']['text'], "AES-128-ECB", $message['reply']['time']);
                     if (empty($message['reply']['stickers'])) {
                         $message['reply']['stickers'] = '';
                     }

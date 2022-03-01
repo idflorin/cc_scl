@@ -610,11 +610,31 @@ if (($page > $db->totalPages) && !empty($_GET['page-id'])) {
                 </button>
             </div>
             <div class="modal-body">
-                Are you sure you want to ban User?
+                <p>Are you sure you want to ban User?</p>
+                <textarea name="reason" id="ban_reason" class="form-control" cols="30" rows="5" placeholder="Reason"></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Ban</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="UnBanUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModal1Label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModal1Label">Unban User?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to unban User?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Unban</button>
             </div>
         </div>
     </div>
@@ -861,13 +881,28 @@ function Wo_BanUser(user_id,type = 'show') {
     $('#BanUserModal').modal('show');
     return false;
   }
+  reason = $('#ban_reason').val();
   hash_id = $('#hash_id').val();
-  $.get(Wo_Ajax_Requests_File(),{f:'admin_setting', s:'ban_user', user_id: user_id, hash_id: hash_id},function(data) {
+  $.get(Wo_Ajax_Requests_File(),{f:'admin_setting', s:'ban_user', user_id: user_id, hash_id: hash_id, reason: reason},function(data) {
     if (data.status == 200) {
+        location.reload();
       $('.site-settings-alert.alert-success').html('<i class="fa fa-check"></i> User`s notifications are being deleted in the background, please check in a while.');
       setTimeout(function () {
         $('.site-settings-alert.alert-success').html('');
       },3000);
+    }
+  });
+}
+function Wo_UnBanUser(user_id,type = 'show') {
+  if (type == 'hide') {
+    $('#UnBanUserModal').find('.btn-secondary').attr('onclick', "Wo_UnBanUser('"+user_id+"')");
+    $('#UnBanUserModal').modal('show');
+    return false;
+  }
+  hash_id = $('#hash_id').val();
+  $.get(Wo_Ajax_Requests_File(),{f:'admin_setting', s:'unban_user', user_id: user_id, hash_id: hash_id},function(data) {
+    if (data.status == 200) {
+        location.reload();
     }
   });
 }

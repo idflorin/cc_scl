@@ -10,7 +10,7 @@ use Rize\UriTemplate\Parser;
  * | 2   |    {/list*}   /red/green/blue                  | {$value}+(?:{$sep}{$value}+)*
  * | 3   |    {/keys}    /semi,%3B,dot,.,comma,%2C        | /(\w+,?)+
  * | 4   |    {/keys*}   /semi=%3B/dot=./comma=%2C        | /(?:\w+=\w+/?)*
- */
+ */ 
 class UnNamed extends Abstraction
 {
     public function toRegex(Parser $parser, Node\Variable $var)

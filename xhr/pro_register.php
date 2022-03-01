@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == 'pro_register') {
     if ($s == 'register') {
         if (!empty($_SESSION['user_id'])) {
@@ -9,7 +9,7 @@ if ($f == 'pro_register') {
             $_COOKIE['user_id'] = '';
             unset($_COOKIE['user_id']);
             setcookie('user_id', null, -1);
-            setcookie('user_id', null, -1,'/');
+            setcookie('user_id', null, -1, '/');
         }
         $fields = Wo_GetWelcomeFileds();
         if (empty($_POST['email']) || empty($_POST['username']) || empty($_POST['password']) || empty($_POST['confirm_password']) || empty($_POST['gender'])) {
@@ -106,7 +106,7 @@ if ($f == 'pro_register') {
                 }
             }
             $activate = ($wo['config']['emailValidation'] == '1') ? '0' : '1';
-            $code = md5(rand(1111, 9999) . time());
+            $code     = md5(rand(1111, 9999) . time());
             $re_data  = array(
                 'email' => Wo_Secure($_POST['email'], 0),
                 'username' => Wo_Secure($_POST['username'], 0),
@@ -126,29 +126,25 @@ if ($f == 'pro_register') {
                     $update_balance      = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
                     unset($_SESSION['ref']);
                 }
-            }
-            elseif (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 1) {
+            } elseif (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 1) {
                 $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
                 if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
-                    $re_data['ref_user_id']      = Wo_Secure($ref_user_id);
+                    $re_data['ref_user_id'] = Wo_Secure($ref_user_id);
                 }
             }
             if (!empty($_POST['phone_num'])) {
                 $re_data['phone_number'] = Wo_Secure($_POST['phone_num']);
             }
-            $in_code  = (isset($_POST['invited'])) ? Wo_Secure($_POST['invited']) : false;
+            $in_code = (isset($_POST['invited'])) ? Wo_Secure($_POST['invited']) : false;
             if (empty($_POST['phone_num'])) {
                 $register = Wo_RegisterUser($re_data, $in_code);
-            }
-            else{
-                if($activate == 1){
-                   $register = Wo_RegisterUser($re_data, $in_code);
-                }
-                else{
+            } else {
+                if ($activate == 1) {
+                    $register = Wo_RegisterUser($re_data, $in_code);
+                } else {
                     $register = true;
                 }
             }
-            
             if ($register === true) {
                 if ($activate == 1) {
                     $data  = array(
@@ -175,10 +171,10 @@ if ($f == 'pro_register') {
                         $data['location'] = Wo_SeoLink('index.php?link1=go-pro');
                     }
                 } else if ($wo['config']['sms_or_email'] == 'mail') {
-                    $wo['user']        = $_POST;
-                    $wo['code']        = $code;
-                    $body              = Wo_LoadPage('emails/activate');
-                    $send_message_data = array(
+                    $wo['user']          = $_POST;
+                    $wo['code']          = $code;
+                    $body                = Wo_LoadPage('emails/activate');
+                    $send_message_data   = array(
                         'from_email' => $wo['config']['siteEmail'],
                         'from_name' => $wo['config']['siteName'],
                         'to_email' => $_POST['email'],
@@ -188,30 +184,29 @@ if ($f == 'pro_register') {
                         'message_body' => $body,
                         'is_html' => true
                     );
-                    $send              = Wo_SendMessage($send_message_data);
-                    $errors            = $success_icon . $wo['lang']['successfully_joined_verify_label'];
+                    $send                = Wo_SendMessage($send_message_data);
+                    $errors              = $success_icon . $wo['lang']['successfully_joined_verify_label'];
                     $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
                     $_SESSION['user_id'] = $session;
                     setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
                 } else if ($wo['config']['sms_or_email'] == 'sms' && !empty($_POST['phone_num'])) {
                     $random_activation = Wo_Secure(rand(11111, 99999));
                     $message           = "Your confirmation code is: {$random_activation}";
-                    
                     //if ($query) {
-                        if (Wo_SendSMSMessage($_POST['phone_num'], $message) === true) {
-                            $register = Wo_RegisterUser($re_data, $in_code);
-                            $user_id           = Wo_UserIdFromUsername($_POST['username']);
-                            $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
-                            $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
-                            $_SESSION['user_id'] = $session;
-                            setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
-                            $data = array(
-                                'status' => 300,
-                                'location' => Wo_SeoLink('index.php?link1=confirm-sms?code=' . $code)
-                            );
-                        } else {
-                            $errors = $error_icon . $wo['lang']['failed_to_send_code_email'];
-                        }
+                    if (Wo_SendSMSMessage($_POST['phone_num'], $message) === true) {
+                        $register            = Wo_RegisterUser($re_data, $in_code);
+                        $user_id             = Wo_UserIdFromUsername($_POST['username']);
+                        $query               = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
+                        $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
+                        $_SESSION['user_id'] = $session;
+                        setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
+                        $data = array(
+                            'status' => 300,
+                            'location' => Wo_SeoLink('index.php?link1=confirm-sms?code=' . $code)
+                        );
+                    } else {
+                        $errors = $error_icon . $wo['lang']['failed_to_send_code_email'];
+                    }
                     //}
                 }
             }
@@ -230,8 +225,4 @@ if ($f == 'pro_register') {
         }
         exit();
     }
-
-
-
-
 }

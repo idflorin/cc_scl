@@ -95,7 +95,9 @@ if (empty($error_code)) {
                             if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
                                 $account_data['referrer'] = Wo_Secure($ref_user_id);
                                 $account_data['src']      = Wo_Secure('Referrer');
-                                $update_balance      = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
+                                if ($wo['config']['affiliate_level'] < 2) {
+                                    $update_balance      = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
+                                }
                                 unset($_SESSION['ref']);
                             }
                         }
@@ -111,6 +113,19 @@ if (empty($error_code)) {
         }
         $register     = Wo_RegisterUser($account_data);
         if ($register === true) {
+            if (!empty($account_data['referrer']) && is_numeric($wo['config']['affiliate_level']) && $wo['config']['affiliate_level'] > 1) {
+                $user_id = Wo_UserIdFromUsername($username);
+                AddNewRef($account_data['referrer'],$user_id,$wo['config']['amount_ref']);
+            }
+            if (!empty($wo['config']['auto_friend_users'])) {
+                $autoFollow = Wo_AutoFollow(Wo_UserIdFromUsername($_POST['username']));
+            }
+            if (!empty($wo['config']['auto_page_like'])) {
+                Wo_AutoPageLike(Wo_UserIdFromUsername($_POST['username']));
+            }
+            if (!empty($wo['config']['auto_group_join'])) {
+                Wo_AutoGroupJoin(Wo_UserIdFromUsername($_POST['username']));
+            }
             
             if ($activate == 1) {
                 $access_token        = sha1(rand(111111111, 999999999)) . md5(microtime()) . rand(11111111, 99999999) . md5(rand(5555, 9999));

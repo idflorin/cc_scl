@@ -6,7 +6,7 @@ use Rize\UriTemplate\Node;
 use Rize\UriTemplate\Node\Expression;
 use Rize\UriTemplate\Operator;
 use Rize\UriTemplate\Operator\UnNamed;
-
+ 
 class Parser
 {
     const REGEX_VARNAME = '(?:[A-z0-9_\.]|%[0-9a-fA-F]{2})';

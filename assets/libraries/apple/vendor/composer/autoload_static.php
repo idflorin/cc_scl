@@ -7,14 +7,14 @@ namespace Composer\Autoload;
 class ComposerStaticInit9aebcd173b4e6241d497fb34fa1f0de4
 {
     public static $prefixLengthsPsr4 = array (
-        'A' => 
+        'A' =>
         array (
             'AppleSignIn\\' => 12,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'AppleSignIn\\' => 
+        'AppleSignIn\\' =>
         array (
             0 => __DIR__ . '/..' . '/griffinledingham/php-apple-signin',
         ),

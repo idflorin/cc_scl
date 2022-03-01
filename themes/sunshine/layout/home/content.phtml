@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
         <div class="col-md-7 middlecol">
-            
+
             <!-- Stories -->
             <?php if ($wo['config']['user_status'] == 1) { ?>
                 <div class="user-status-home panel sun_mobi_stories_show">
@@ -22,7 +22,7 @@
                             foreach ($get_user_status as $key => $wo['user_status']) {
                                 echo Wo_LoadPage('home/user-status');
                             }
-                            } 
+                            }
                             if (Wo_CountStories() > 8) {
                         ?>
                         <li class="view-more-stories">
@@ -36,9 +36,9 @@
                     </ul>
                 </div>
             <?php } ?>
-            
-            <?php 
-                if (Wo_IsThereAnnouncement() === true) { 
+
+            <?php
+                if (Wo_IsThereAnnouncement() === true) {
                 $announcement = Wo_GetHomeAnnouncements();
             ?>
             <div class="home-announcement">
@@ -51,11 +51,11 @@
             </div>
             <!-- .home-announcement -->
             <?php } ?>
-            
+
             <?php
                 if($wo['loggedin'] == true) {
                     echo Wo_LoadPage('story/publisher-box');
-                } 
+                }
             ?>
             <?php if ($wo['config']['afternoon_system'] == 1) { ?>
             <div class="alert alert-dismissible greetalert hidden" role="alert">
@@ -63,8 +63,8 @@
                 <div id="daynightmsg"></div>
             </div>
             <?php } ?>
-        
-            <?php if ($wo['page'] == 'home') { ?>
+
+            <?php if ($wo['page'] == 'home' && in_array($wo['config']['website_mode'], array('facebook','linkedin'))) { ?>
                 <div id="scroll_filter_click"></div>
                 <ul class="list-group filterby" id="filterby-post">
                     <li class="list-group-item hidden" contenteditable="false">Filter by</li>
@@ -95,7 +95,7 @@
                     <?php } ?>
                 </ul>
             <?php } ?>
-        
+
             <div class="btn btn-main btn-active posts-count" onclick="Wo_GetNewPosts();"></div>
             <div class="posts_load">
                 <div id="posts-laoded">
@@ -114,12 +114,13 @@
 <style>
 .post-youtube iframe {height: 277px !important;}
 </style>
-<?php 
-if ($wo['user']['social_login'] == 1) { 
+<?php
+if ($wo['user']['social_login'] == 1) {
   echo Wo_LoadPage('modals/create-password');
-} 
+}
 ?>
 <script type="text/javascript">
+
 $(function() {
     loadposts();
 });
@@ -127,7 +128,7 @@ $(function() {
 //   event.preventDefault();
 //   $value = $(this).parents(".story-container").attr('data-status-id');
 //   $.post(Wo_Ajax_Requests_File() + '?f=story_view', {id: $value}, function(data, textStatus, xhr) {
-        
+
 //   });
 // });
 /* Standard syntax */
@@ -151,16 +152,12 @@ function loadposts() {
     $("#posts-laoded").load(Wo_Ajax_Requests_File() + '?f=load_posts', function enter() {
         Wo_FinishBar();
         $(".post-description p, .product-description").each(function(index, el) {
-            $(this).readmore({
-              speed: 75,
-              moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
-              lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
-            });
+            ReadMoreText(this);
         });
         $(".post-commet-textarea .textarea").triggeredAutocomplete({
            hidden: '#hidden_inputbox_comment',
            source: Wo_Ajax_Requests_File() + "?f=mention",
-           trigger: "@" 
+           trigger: "@"
         });
         $(".comment-reply textarea").triggeredAutocomplete({
            hidden: '#hidden_inputbox_comment_reply',
@@ -168,8 +165,8 @@ function loadposts() {
            trigger: "@"
         });
         $('#load-more-posts').show();
-        
-        
+
+
     });
 }
 $('.sun_comm_addmore .dropdown-toggle').on('click', function (event) {

@@ -36,6 +36,11 @@ if (empty($_POST['file_type'])) {
 }
 
 if (empty($error_code)) {
+    $amazone_s3                   = $wo['config']['amazone_s3'];
+    $wasabi_storage                   = $wo['config']['wasabi_storage'];
+    $ftp_upload                   = $wo['config']['ftp_upload'];
+    $spaces                       = $wo['config']['spaces'];
+    $cloud_upload                 = $wo['config']['cloud_upload'];
     $story_title       = (!empty($_POST['story_title'])) ? Wo_Secure($_POST['story_title']) : '';
     $story_description = (!empty($_POST['story_description'])) ? Wo_Secure($_POST['story_description']) : '';
     $file_type         = Wo_Secure($_POST['file_type']);
@@ -122,6 +127,32 @@ if (empty($error_code)) {
         if (count($sources) > 0) {
             foreach ($sources as $registration_data) {
                 Wo_InsertUserStoryMedia($registration_data);
+            }
+            if (empty($thumb) && $wo['config']['ffmpeg_system'] == 'on' && $file_type == 'video') {
+                $ffmpeg_b         = $wo['config']['ffmpeg_binary_file'];
+                $total_seconds    = ffmpeg_duration($media['filename']);
+                $thumb_1_duration = (int) ($total_seconds > 10) ? 11 : 1;
+                $dir              = "upload/photos/" . date('Y') . '/' . date('m');
+                $image_thumb      = $dir . '/' . Wo_GenerateKey() . '_' . date('d') . '_' . md5(time()) . "_image.jpeg";
+                $output_thumb     = shell_exec("$ffmpeg_b -ss \"$thumb_1_duration\" -i " . $media['filename'] . " -vframes 1 -f mjpeg $image_thumb 2<&1");
+                if (file_exists($image_thumb) && !empty(getimagesize($image_thumb))) {
+                    $crop_image                   = Wo_Resize_Crop_Image(400, 400, $image_thumb, $image_thumb, 60);
+                    $wo['config']['amazone_s3']   = $amazone_s3;
+                    $wo['config']['wasabi_storage']   = $wasabi_storage;
+                    $wo['config']['ftp_upload']   = $ftp_upload;
+                    $wo['config']['spaces']       = $spaces;
+                    $wo['config']['cloud_upload'] = $cloud_upload;
+                    Wo_UploadToS3($image_thumb);
+                    $thumb = $image_thumb;
+                } else {
+                    @unlink($image_thumb);
+                }
+                $wo['config']['amazone_s3']   = $amazone_s3;
+                $wo['config']['wasabi_storage']   = $wasabi_storage;
+                $wo['config']['ftp_upload']   = $ftp_upload;
+                $wo['config']['spaces']       = $spaces;
+                $wo['config']['cloud_upload'] = $cloud_upload;
+                Wo_UploadToS3($media['filename']);
             }
             if (!empty($thumb)) {
                 $thumb        = Wo_Secure($thumb);

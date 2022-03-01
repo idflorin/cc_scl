@@ -27,12 +27,24 @@ if ($f == 'ads') {
             } else if (!in_array($_POST['appears'], array(
                     'post',
                     'sidebar',
-                    'video'
+                    'video',
+                    'jobs',
+                    'forum',
+                    'movies',
+                    'offer',
+                    'funding',
+                    'entire',
                 ))) {
                 $error = $error_icon . $wo['lang']['please_check_details'];
             } else if (in_array($_POST['appears'], array(
                     'post',
-                    'sidebar'
+                    'sidebar',
+                    'jobs',
+                    'forum',
+                    'movies',
+                    'offer',
+                    'funding',
+                    'entire',
                 ))) {
                 $img_types = array(
                     'image/png',

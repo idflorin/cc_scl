@@ -13,5 +13,4 @@ function getToken($appid, $appcertificate, $account, $validTimeInSeconds){
     array_push($token_items, md5($account.$appid.$appcertificate.$expiredTime));
     return join(":", $token_items);
 }
-
 ?>

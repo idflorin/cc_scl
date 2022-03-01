@@ -288,6 +288,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     if (!empty($comments[$key]['record'])) {
                         $comments[$key]['record'] = Wo_GetMedia($comments[$key]['record']);
                     }
+                    if (!empty($comments[$key]['c_file'])) {
+                        $comments[$key]['c_file'] = Wo_GetMedia($comments[$key]['c_file']);
+                    }
                 }
 
                 $response_data = array(
@@ -319,6 +322,9 @@ if (!empty($_POST['type']) && in_array($_POST['type'], $required_fields)) {
                     }
                 }
                 $replies[$key]['text'] = strip_tags($replies[$key]['text']);
+                if (!empty($replies[$key]['c_file'])) {
+                    $replies[$key]['c_file'] = Wo_GetMedia($replies[$key]['c_file']);
+                }
             }
 
             $response_data = array(

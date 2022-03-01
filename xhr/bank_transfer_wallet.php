@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == "bank_transfer_wallet") {
     if (Wo_CheckSession($hash_id) === true) {
         $request   = array();
@@ -7,7 +7,7 @@ if ($f == "bank_transfer_wallet") {
             $error = $error_icon . $wo['lang']['please_check_details'];
         }
         if (empty($error)) {
-            $description = !empty($_POST['description']) ? Wo_Secure($_POST['description']) : '';
+            $description   = !empty($_POST['description']) ? Wo_Secure($_POST['description']) : '';
             $fileInfo      = array(
                 'file' => $_FILES["thumbnail"]["tmp_name"],
                 'name' => $_FILES['thumbnail']['name'],
@@ -18,21 +18,22 @@ if ($f == "bank_transfer_wallet") {
             $media         = Wo_ShareFile($fileInfo);
             $mediaFilename = $media['filename'];
             if (!empty($mediaFilename)) {
-                $insert_id = Wo_InsertBankTrnsfer(array('user_id' => $wo['user']['id'],
-                                                       'description' => $description,
-                                                       'price'       => Wo_Secure($_POST['price']),
-                                                       'receipt_file' => $mediaFilename,
-                                                       'mode'         => 'wallet'));
+                $insert_id = Wo_InsertBankTrnsfer(array(
+                    'user_id' => $wo['user']['id'],
+                    'description' => $description,
+                    'price' => Wo_Secure($_POST['price']),
+                    'receipt_file' => $mediaFilename,
+                    'mode' => 'wallet'
+                ));
                 if (!empty($insert_id)) {
                     $data = array(
                         'message' => $success_icon . $wo['lang']['bank_transfer_request'],
                         'status' => 200
                     );
                 }
-            }
-            else{
+            } else {
                 $error = $error_icon . $wo['lang']['file_not_supported'];
-                $data = array(
+                $data  = array(
                     'status' => 500,
                     'message' => $error
                 );
@@ -48,4 +49,3 @@ if ($f == "bank_transfer_wallet") {
     echo json_encode($data);
     exit();
 }
-

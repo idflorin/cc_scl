@@ -16,6 +16,5 @@ class Twocheckout_Return extends Twocheckout
             $result = Twocheckout_Message::message('Success', 'Hash Matched');
         }
         return Twocheckout_Util::returnResponse($result);
-    }
-
+    } 
 }

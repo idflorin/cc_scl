@@ -4,7 +4,7 @@
 
 $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
-
+ 
 return array(
     'AppleSignIn\\' => array($vendorDir . '/griffinledingham/php-apple-signin'),
 );

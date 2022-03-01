@@ -1,7 +1,7 @@
 <div class="page-margin">
 	<div class="row">
-		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
-		<div class="col-md-7 middlecol">
+		<div class="col-md-2 "><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
+		<div class="col-md-10 ">
 			<div class="page-margin wow_content mt-0">
 				<div class="wo_page_hdng pag_neg_padd pag_alone">
 					<div class="wo_page_hdng_innr">
@@ -46,12 +46,12 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="hidden">
 						<input name="app_avatar" id="app_avatar" type="file" accept="image/x-png, image/gif, image/jpeg">
 					</div>
 					<div class="app-general-alert setting-update-alert"></div>
-					
+
 					<div class="text-center">
 						<a class="btn btn-mat" data-ajax="?link1=apps" href="<?php echo Wo_SeoLink('index.php?link1=apps');?>">
 							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"></path></svg> My Apps
@@ -64,7 +64,6 @@
 			</div>
 		</div>
 		<!-- .col-md-8 -->
-		<?php echo Wo_LoadPage('sidebar/content');?>
 	</div>
 	<!-- .row -->
 </div>
@@ -73,7 +72,7 @@
 $("#app_avatar").change(function(event) {
 	$("#wow_fcov_img_holder").html("<img src='" + window.URL.createObjectURL(this.files[0]) + "' alt='Picture'>")
 });
-	
+
 $(function() {
   $('form.app-general-form').ajaxForm({
     url: Wo_Ajax_Requests_File() + '?f=apps&s=create_app',

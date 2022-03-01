@@ -21,15 +21,25 @@
 				<?php } ?>
 				<?php } ?>
 				<div class="avatar">
+					<?php if (!empty($wo['story']['job']['page'])) { ?>
 					<a href="<?php echo $wo['story']['job']['page']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['job']['page']['page_name']?>">
 						<img src="<?php echo $wo['story']['job']['page']['avatar'] ; ?>" alt="<?php echo $wo['story']['job']['title']; ?> profile picture">
 					</a>
+					<?php }else{ ?>
+						<a href="<?php echo $wo['story']['job']['user']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['job']['user']['username']?>">
+							<img src="<?php echo $wo['story']['job']['user']['avatar'] ; ?>" alt="<?php echo $wo['story']['job']['title']; ?> profile picture">
+						</a>
+					<?php } ?>
 				</div>
 				<div class="jinfo">
 					<?php if (!empty($wo['story']['job']['title'])) { ?>
 						<h2><?php echo $wo['story']['job']['title']; ?></h2>
 					<?php } ?>
+					<?php if (!empty($wo['story']['job']['page'])) { ?>
 					<h4><a href="<?php echo $wo['story']['job']['page']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['job']['page']['page_name']; ?>"><?php echo $wo['story']['job']['page']['page_title']?></a></h4>
+					<?php }else{ ?>
+						<h4><a href="<?php echo $wo['story']['job']['user']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['job']['user']['username']; ?>"><?php echo $wo['story']['job']['user']['name']?></a></h4>
+					<?php } ?>
 					<div class="jinfo_inner">
 						<?php if (!empty($wo['story']['job']['location'])) { ?>
 							<p class="wo_vew_apld_ico"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#ff5722" d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"></path></svg> <?php echo $wo['story']['job']['location']; ?></p>
@@ -49,7 +59,11 @@
 						<?php if ($wo['loggedin'] == true) { ?>
 							<?php if ($wo['story']['job']['user_id'] == $wo['user']['id']) { ?>
 								<?php if ($wo['story']['job']['apply_count'] > 0) { ?>
+									<?php if (!empty($wo['story']['job']['page'])) { ?>
 									<a type="button" class="btn btn-main form-control" href="<?php echo $wo['story']['job']['page']['url'];?>/job_apply?id=<?php echo $wo['story']['job']['id']; ?>"><?php echo $wo['lang']['view_interested_Candidates'] ?> (<?php echo $wo['story']['job']['apply_count']; ?>)</a>
+									<?php }else{ ?>
+									<a type="button" class="btn btn-main form-control" href="<?php echo $wo['story']['job']['user']['url'];?>/job_apply?id=<?php echo $wo['story']['job']['id']; ?>"><?php echo $wo['lang']['view_interested_Candidates'] ?> (<?php echo $wo['story']['job']['apply_count']; ?>)</a>
+									<?php } ?>
 								<?php }else{ ?>
 									<button type="button" class="btn btn-main form-control" disabled><?php echo $wo['lang']['view_interested_Candidates'] ?> (<?php echo $wo['story']['job']['apply_count']; ?>)</button>
 								<?php } ?>
@@ -101,10 +115,8 @@
 
 <script type="text/javascript">
    $(function () {
-   $("#post-<?php echo $wo['story']['id']; ?> .post-description p, .product-description").readmore({
-         speed: 75,
-         moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
-         lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
-       });
+   	<?php if (!empty($wo['story']['job']['id'])): ?>
+	  ReadMoreText("#post-description-<?php echo $wo['story']['job']['id']; ?>");
+	  <?php endif; ?>
    });
 </script>

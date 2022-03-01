@@ -401,7 +401,7 @@ if (empty($error_code)) {
 
 
 
-	$update = Wo_UpdateUserData($wo['user']['user_id'], $user_data,true);
+	$update = Wo_UpdateUserData($wo['user']['user_id'], $user_data,false);
 
 	$update_last_seen = Wo_LastSeen($wo['user']['user_id']);
 	if ($update || $update2) {

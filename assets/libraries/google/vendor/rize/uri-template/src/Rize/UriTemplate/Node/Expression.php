@@ -7,7 +7,7 @@ use Rize\UriTemplate\Operator;
 
 /**
  * Description
- */
+ */ 
 class Expression extends Abstraction
 {
     /**

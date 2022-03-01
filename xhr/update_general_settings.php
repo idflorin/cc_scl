@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == "update_general_settings") {
     if (isset($_POST) && Wo_CheckSession($hash_id) === true) {
         if (empty($_POST['username']) OR empty($_POST['email'])) {
@@ -34,10 +34,9 @@ if ($f == "update_general_settings") {
                     $errors[] = $error_icon . $wo['lang']['username_invalid_characters'];
                 }
                 if (!empty($_POST['birthday']) && preg_match('@^\s*(3[01]|[12][0-9]|0?[1-9])\-(1[012]|0?[1-9])\-((?:19|20)\d{2})\s*$@', $_POST['birthday'])) {
-                    $newDate = date("Y-m-d", strtotime($_POST['birthday']));
+                    $newDate  = date("Y-m-d", strtotime($_POST['birthday']));
                     $age_data = $newDate;
-                }
-                else{
+                } else {
                     if (!empty($_POST['age_year']) || !empty($_POST['age_day']) || !empty($_POST['age_month'])) {
                         if (empty($_POST['age_year']) || empty($_POST['age_day']) || empty($_POST['age_month'])) {
                             $errors[] = $error_icon . $wo['lang']['please_choose_correct_date'];
@@ -45,8 +44,7 @@ if ($f == "update_general_settings") {
                             $age_data = $_POST['age_year'] . '-' . $_POST['age_month'] . '-' . $_POST['age_day'];
                         }
                     }
-                } 
-                
+                }
                 if ($_POST['phone_number'] != $Userdata['phone_number']) {
                     $is_exist = Wo_IsPhoneExist($_POST['phone_number']);
                     if (in_array(true, $is_exist)) {
@@ -73,7 +71,7 @@ if ($f == "update_general_settings") {
                 if (isset($_POST['wallet']) && (Wo_IsAdmin() || Wo_IsModerator())) {
                     if (is_numeric($_POST['wallet'])) {
                         $wallet = $_POST['wallet'];
-                    } 
+                    }
                 }
                 $type = $Userdata['admin'];
                 if (!empty($_POST['type']) && Wo_IsAdmin()) {
@@ -127,12 +125,11 @@ if ($f == "update_general_settings") {
                 if (empty($errors)) {
                     $save = true;
                     if (!Wo_IsAdmin()) {
-                        $code = rand(111111, 999999);
+                        $code      = rand(111111, 999999);
                         $hash_code = md5($code);
-                        $message = "Your confirmation code is: $code";
-
+                        $message   = "Your confirmation code is: $code";
                         if ($_POST['email'] != $wo['user']['email'] && $wo['config']['sms_or_email'] == 'mail' && $wo['config']['emailValidation'] == 1) {
-                            $send_message_data       = array(
+                            $send_message_data = array(
                                 'from_email' => $wo['config']['siteEmail'],
                                 'from_name' => $wo['config']['siteName'],
                                 'to_email' => $_POST['email'],
@@ -142,74 +139,37 @@ if ($f == "update_general_settings") {
                                 'message_body' => $message,
                                 'is_html' => true
                             );
-                            $send = Wo_SendMessage($send_message_data);
+                            $send              = Wo_SendMessage($send_message_data);
                             if ($send) {
-                                $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
-                                                                                                                     'new_email'      => Wo_Secure($_POST['email'],0)));
-                                $save = false;
-                                $data['type'] = 'email';
+                                $update_code    = $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array(
+                                    'email_code' => $hash_code,
+                                    'new_email' => Wo_Secure($_POST['email'], 0)
+                                ));
+                                $save           = false;
+                                $data['type']   = 'email';
                                 $data['status'] = 200;
                             }
-                        }
-                        elseif (!empty($_POST['phone_number']) && $_POST['phone_number'] != $wo['user']['phone_number'] && $wo['config']['sms_or_email'] == 'sms' && $wo['config']['emailValidation'] == 1) {
+                        } elseif (!empty($_POST['phone_number']) && $_POST['phone_number'] != $wo['user']['phone_number'] && $wo['config']['sms_or_email'] == 'sms' && $wo['config']['emailValidation'] == 1) {
                             preg_match_all('/\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|
                                     2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|
                                     4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/', $_POST['phone_number'], $matches);
                             if (empty($matches[1][0]) && empty($matches[0][0])) {
                                 $errors[] = $error_icon . $wo['lang']['phone_number_error'];
-                            }
-                            else{
+                            } else {
                                 $send = Wo_SendSMSMessage($_POST['phone_number'], $message);
                                 if ($send) {
-                                    $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
-                                                                                                                         'new_phone' => Wo_Secure($_POST['phone_number'])));
-                                    $save = false;
-                                    $data['type'] = 'phone';
+                                    $update_code    = $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array(
+                                        'email_code' => $hash_code,
+                                        'new_phone' => Wo_Secure($_POST['phone_number'])
+                                    ));
+                                    $save           = false;
+                                    $data['type']   = 'phone';
                                     $data['status'] = 200;
                                 }
                             }
                         }
                     }
-                    // elseif ($wo['config']['two_factor_type'] == 'both' && ((!empty($_POST['phone_number']) && $_POST['phone_number'] != $wo['user']['phone_number']) || $_POST['email'] != $wo['user']['email']) && $wo['config']['emailValidation'] == 1) {
-                    //     if (!empty($_POST['phone_number']) && $_POST['phone_number'] != $wo['user']['phone_number']) {
-                    //         preg_match_all('/\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|
-                    //             2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|
-                    //             4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/', $_POST['phone_number'], $matches);
-                    //         if (empty($matches[1][0]) && empty($matches[0][0])) {
-                    //             $errors[] = $error_icon . $wo['lang']['phone_number_error'];
-                    //         }
-                    //         else{
-                    //             $send = Wo_SendSMSMessage($_POST['phone_number'], $message);
-                    //             if ($send) {
-                    //                 $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
-                    //                                                                                                      'new_phone' => Wo_Secure($_POST['phone_number'])));
-                    //                 $data['type'] = 'phone';
-                    //                 $data['status'] = 200;
-                    //             }
-                    //         }
-                    //     }
-                    //     elseif ($_POST['email'] != $wo['user']['email']) {
-                    //         $send_message_data       = array(
-                    //             'from_email' => $wo['config']['siteEmail'],
-                    //             'from_name' => $wo['config']['siteName'],
-                    //             'to_email' => $_POST['email'],
-                    //             'to_name' => $wo['user']['name'],
-                    //             'subject' => 'Please verify that it’s you',
-                    //             'charSet' => 'utf-8',
-                    //             'message_body' => $message,
-                    //             'is_html' => true
-                    //         );
-                    //         $send = Wo_SendMessage($send_message_data);
-                    //         if ($send) {
-                    //             $update_code =  $db->where('user_id', $wo['user']['user_id'])->update(T_USERS, array('email_code' => $hash_code,
-                    //                                                                                                  'new_email'      => Wo_Secure($_POST['email'])));
-                    //             $data['type'] = 'email';
-                    //             $data['status'] = 200;
-                    //         }
-                    //     }
-                    // }
-                    if($save == true){
-
+                    if ($save == true) {
                         $Update_data = array(
                             'username' => $_POST['username'],
                             'email' => $_POST['email'],
@@ -226,12 +186,14 @@ if ($f == "update_general_settings") {
                         if ($Userdata['avatar_org'] == 'upload/photos/f-avatar.jpg' || $Userdata['avatar_org'] == 'upload/photos/d-avatar.jpg') {
                             if ($gender == 'female') {
                                 $Update_data['avatar'] = 'upload/photos/f-avatar.jpg';
-                            }
-                            elseif ($gender == 'male') {
+                            } elseif ($gender == 'male') {
                                 $Update_data['avatar'] = 'upload/photos/d-avatar.jpg';
                             }
                         }
-                        if (!empty($_POST['weather_unit']) && in_array($_POST['weather_unit'], array('uk','us'))) {
+                        if (!empty($_POST['weather_unit']) && in_array($_POST['weather_unit'], array(
+                            'uk',
+                            'us'
+                        ))) {
                             $Update_data['weather_unit'] = Wo_Secure($_POST['weather_unit']);
                         }
                         if (!empty($_POST['verified'])) {
@@ -252,8 +214,6 @@ if ($f == "update_general_settings") {
                         if (!empty($_POST['phone_number'])) {
                             $Update_data['phone_number'] = Wo_Secure($_POST['phone_number']);
                         }
-                        // var_dump(Wo_UpdateUserData($_POST['user_id'], $Update_data,$unverify));
-                        // exit();
                         if (Wo_UpdateUserData($_POST['user_id'], $Update_data, $unverify)) {
                             $field_data = array();
                             if (!empty($_POST['custom_fields'])) {
@@ -278,7 +238,7 @@ if ($f == "update_general_settings") {
                                     'status' => 200,
                                     'message' => $success_icon . $wo['lang']['setting_updated'],
                                     'username' => Wo_SeoLink('index.php?link1=timeline&u=' . Wo_Secure($_POST['username'])),
-                                    'username_or' => Wo_Secure($_POST['username']),
+                                    'username_or' => Wo_Secure($_POST['username'])
                                 );
                             }
                         }

@@ -12,6 +12,15 @@
 
             <div class="page-margin wow_content wow_sett_content">
 				<form class="create-user-story form-horizontal" method="post">
+					<div class="publisher-hidden-option">
+						<div id="progress">
+							<span id="percent">0%</span>
+							<div class="progress">
+								<div id="bar" class="progress-bar progress-bar-striped active"></div> 
+							</div>
+							<div class="clear"></div>
+						</div>
+					</div>
 					<div class="wow_form_fields">
 						<label for="whats_going"><?php echo $wo['lang']['whats_going']; ?></label>
 						<textarea name="description" id="whats_going" rows="3" class="form-control input-md"></textarea>
@@ -102,13 +111,27 @@
             $("#user-story-total-2").removeClass('hidden').slideDown(200);
         }
       });
+      var bar = $('#bar');
+	    var percent = $('#percent');
 
       $('.create-user-story').ajaxForm({
        url: Wo_Ajax_Requests_File() + '?f=status&s=new',
        type:"POST",
        beforeSend: function() {
+       	var percentVal = '0%';
+        bar.width(percentVal);
+        percent.html(percentVal);
         $('.create-user-story').find('.add_wow_loader').addClass('btn-loading');
        },
+       uploadProgress: function (event, position, total, percentComplete) {
+           var percentVal = percentComplete + '%';
+           bar.width(percentVal);
+           $('#progress').slideDown(200);
+           if(percentComplete > 50) {
+             percent.addClass('white');
+           }
+           percent.html(percentVal);
+      },
        success: function(data) {
         scrollToTop();
         if (data['status'] == 200) {
@@ -118,6 +141,14 @@
 
         else if (data['message']) {
           $(".create-status-alert").removeClass('hidden').html('<div class="alert alert-danger">' + data['message'] + '</div>');
+        }
+        else{
+        	if(data.invalid_file == 3){
+	          $("#adult_image_file").modal('show');
+	          Wo_Delay(function(){
+	            $("#adult_image_file").modal('hide');
+	          },3000);
+	        }
         } 
 
         $('.create-user-story').find('.add_wow_loader').removeClass('btn-loading');

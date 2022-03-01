@@ -824,82 +824,10 @@
 
 		
 
-  var create_bar = $('.create-product-bar');
-  var create_percent = $('.create-product-percent');
-
-  $('form.edit-job-form').ajaxForm({
-      url: Wo_Ajax_Requests_File() + '?f=job&s=edit_job',
-      beforeSend: function() {
-       var percentVal = '0%';
-       create_bar.width(percentVal);
-       create_percent.html(percentVal);
-       
-       
-        $('.edit-job-form').find('.last-sett-btn .ball-pulse').fadeIn(100);
-      },
-      uploadProgress: function (event, position, total, percentComplete) {
-         var percentVal = percentComplete + '%';
-         create_bar.width(percentVal);
-         $('.edit-job-form').find('.create-product-progress').slideDown(200);
-         create_percent.html(percentVal);
-      },
-      success: function(data) {
-       if (data.status == 200) {
-         $('.edit-job-form').find('.app-general-alert').html("<div class='alert alert-success'><?php echo($wo['lang']['job_successfully_edited']) ?></div>");
-           $('.edit-job-form').find('.alert-success').fadeIn(300);
-           setTimeout(function (argument) {
-            $('.edit-job-form').find('.alert-success').fadeOut(300);
-            window.location.reload(true);
-
-           },3000);
-       } else {
-        $('.edit-job-form').find('#create-job-modal').animate({
-          scrollTop: $('html, body').offset().top //#DIV_ID is an example. Use the id of your destination on the page
-      });
-           $('.edit-job-form').find('.app-general-alert').html('<div class="alert alert-danger">' + data.error + '</div>');
-           $('.edit-job-form').find('.alert-danger').fadeIn(300);
-           setTimeout(function (argument) {
-            $('.edit-job-form').find('.alert-danger').fadeOut(300);
-
-           },3000);
-       }
-       $('.edit-job-form').find('.last-sett-btn .ball-pulse').fadeOut(100);
-      }
-  });
+  
 
 });
-	function Wo_LoadMoreApplyJobs(){
-		var after_id = ($(".job_apply").length > 0) ? $(".job_apply").last().attr('data-job-apply') : 0;
-		var job_id = $('.apply_job_info').attr('data_apply_job');
-		if (!after_id) { return false;}
-		Wo_progressIconLoader($('#load_more_nearby_users'));
-		$.ajax({
-			url: Wo_Ajax_Requests_File(),
-			type: 'GET',
-			dataType: 'json',
-			data: {
-				f:'job',
-				s:'load',
-				offset:after_id,
-				job_id:job_id
-			},
-		})
-		.done(function(data) {
-
-	        if (data['status'] == 200){
-	        	$(".apply_job_container").append(data.html);
-	        	$("[data-toggle]").tooltip();
-	        	$("#load_more_nearby_users").html('<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg></span> <?php echo $wo['lang']['load_more']; ?>');
-	        	
-	        } 
-	        else{
-	        	$("#load_more_nearby_users").html('<?php echo $wo['lang']['no_result']; ?>');
-	        } 
-		})
-		.fail(function() {
-			console.log("error");
-		})
-	}
+	
 
 function OpenCreateJobModal() {
 	$('#create-job-modal').modal('show');
@@ -1234,7 +1162,6 @@ function Wo_LoadPageReviews(self = false){
 		</div>
 	</div>
 </div>
-<script src="<?php echo $wo['config']['theme_url'];?>/javascript/bootstrap-tagsinput-latest/src/bootstrap-tagsinput.js"></script>
 <script type="text/javascript">
 	
 	var question_one = '<div id="question_one_block"><span><?php echo $wo['lang']['question_one'] ?></span><button type="button" class="close" onclick="HideQuestion(\'one\')"><span aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span></button><select class="form-control" name="question_one_type" id="question_one_type"><option value="free_text_question"><?php echo $wo['lang']['free_text_question'] ?></option><option value="yes_no_question"><?php echo $wo['lang']['yes_no_question'] ?></option><option value="multiple_choice_question"><?php echo $wo['lang']['multiple_choice_question'] ?></option></select><br><textarea class="form-control" name="question_one" rows="3" id="question_one"></textarea><div id="question_one_answers_div" style="display: none;"><br><input class="form-control" type="text" name="question_one_answers" id="question_one_answers" placeholder="<?php echo $wo['lang']['add_an_answers'] ?>"></div></div>';

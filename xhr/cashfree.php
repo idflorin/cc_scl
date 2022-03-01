@@ -304,7 +304,14 @@ if ($f == 'cashfree') {
                 $_GET['amount'] = Wo_Secure($_GET['amount']);
                 $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ('" . $wo['user']['id'] . "', 'WALLET', '" . $_GET['amount'] . "', 'Cashfree')");
                 $_SESSION['replenished_amount'] = $_GET['amount'];
-                header("Location: " . Wo_SeoLink('index.php?link1=wallet'));
+                if (!empty($_COOKIE['redirect_page'])) {
+                	$redirect_page = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_COOKIE['redirect_page']);
+				    $redirect_page = preg_replace('/\((.*?)\)/m', '', $redirect_page);
+                	header("Location: " . $redirect_page);
+                }
+                else{
+                	header("Location: " . Wo_SeoLink('index.php?link1=wallet'));
+                }
                 exit();
             } else {
                 header("Location: " . Wo_SeoLink('index.php?link1=wallet'));

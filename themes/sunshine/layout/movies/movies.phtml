@@ -1,6 +1,17 @@
 <div class="page-margin">
 	<div class="row">
 		<div class="col-md-12">
+			<?php if ($wo['config']['user_ads'] == 1): ?>
+				<div id="sidebar-sticky-movies">
+					<?php 
+					  $wo['sidebar-ad'] = Wo_GetAdsByType('movies');
+					  if (!empty($wo['sidebar-ad'])) {
+					  	echo Wo_LoadPage('ads/includes/movies-ad');
+					  }
+					?>
+					<div class="clear"></div>
+				</div>
+		    <?php endif; ?>
 			<div class="nav navbar-nav pull-right movies-search hidden-xs">
 				<div class="w100">
 					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search" color="#384047"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>

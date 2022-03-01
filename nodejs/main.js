@@ -27,6 +27,19 @@ async function loadConfig(ctx) {
   ctx.globalconfig["site_url"] = configFile.site_url
   ctx.globalconfig['theme_url'] = ctx.globalconfig["site_url"] + '/themes/' + ctx.globalconfig['theme']
 
+  ctx.globalconfig["s3_site_url"]         = "https://test.s3.amazonaws.com";
+  if (ctx.globalconfig["bucket_name"] && ctx.globalconfig["bucket_name"] != '') {
+      ctx.globalconfig["s3_site_url"] = "https://"+ctx.globalconfig["bucket_name"]+".s3.amazonaws.com";
+  }
+  ctx.globalconfig["wasabi_site_url"]         = "https://s3.wasabisys.com";
+  if (ctx.globalconfig["wasabi_bucket_name"] && ctx.globalconfig["wasabi_bucket_name"] != '') {
+      ctx.globalconfig["wasabi_site_url"] = "https://s3.wasabisys.com/"+ctx.globalconfig["wasabi_bucket_name"];
+  }
+  ctx.globalconfig["s3_site_url_2"]          = "https://test.s3.amazonaws.com";
+  if (ctx.globalconfig["bucket_name_2"] && ctx.globalconfig["bucket_name_2"] != '') {
+      ctx.globalconfig["s3_site_url_2"] = "https://"+ctx.globalconfig["bucket_name_2"]+".s3.amazonaws.com";
+  }
+
   // if (ctx.globalconfig["redis"] === "Y") {
   //   const redisAdapter = require('socket.io-redis');
   //   io.adapter(redisAdapter({ host: 'localhost', port: ctx.globalconfig["redis_port"] }));

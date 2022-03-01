@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == "update_profile_setting") {
     if (isset($_POST['user_id']) && is_numeric($_POST['user_id']) && $_POST['user_id'] > 0 && Wo_CheckSession($hash_id) === true) {
         $Userdata = Wo_UserData($_POST['user_id']);
@@ -9,7 +9,7 @@ if ($f == "update_profile_setting") {
                     $errors[] = $error_icon . $wo['lang']['website_invalid_characters'];
                 }
             }
-            if (preg_match('/[^\w\s]+/u',$_POST['first_name']) || preg_match('/[^\w\s]+/u',$_POST['last_name'])) {
+            if (preg_match('/[^\w\s]+/u', $_POST['first_name']) || preg_match('/[^\w\s]+/u', $_POST['last_name'])) {
                 $errors[] = $error_icon . $wo['lang']['username_invalid_characters'];
             }
             if (!empty($_POST['working_link'])) {
@@ -59,6 +59,59 @@ if ($f == "update_profile_setting") {
                     'school' => $_POST['school'],
                     'relationship_id' => $_POST['relationship']
                 );
+                if ($wo['config']['website_mode'] == 'linkedin') {
+                    if (!empty($_POST['skills'])) {
+                        $pieces = explode(",", $_POST['skills']);
+                        if (!empty($pieces)) {
+                            foreach ($pieces as $key => $skill) {
+                                $is_skill_found = $db->where('name', Wo_Secure($skill))->getValue(T_USER_SKILLS, 'COUNT(*)');
+                                if (!$is_skill_found) {
+                                    $db->insert(T_USER_SKILLS, array(
+                                        'name' => Wo_Secure($skill)
+                                    ));
+                                }
+                            }
+                        }
+                    }
+                    $Update_data['skills'] = (!empty($_POST['skills']) ? Wo_Secure(str_replace('#', '', $_POST['skills'])) : '');
+                    if (!empty($_POST['languages'])) {
+                        $_POST['languages'] = str_replace('#', '', $_POST['languages']);
+                        $keys               = array();
+                        $full               = $db->get(T_USER_LANGUAGES, null, array(
+                            'lang_key'
+                        ));
+                        if (!empty($full)) {
+                            foreach ($full as $key => $value) {
+                                $keys[] = $value->lang_key;
+                            }
+                            $insert_lang = array();
+                            $pieces      = explode(",", $_POST['languages']);
+                            if (!empty($pieces)) {
+                                foreach ($pieces as $key => $language) {
+                                    $db->where('lang_key', $keys, 'IN');
+                                    $word = Wo_Secure($language);
+                                    $sql  = "";
+                                    if (!empty($all_langs)) {
+                                        foreach ($all_langs as $key => $value) {
+                                            if (empty($sql)) {
+                                                $sql .= " (`" . $value . "`  = '$word' ";
+                                            } else {
+                                                $sql .= " OR `" . $value . "`  = '$word' ";
+                                            }
+                                        }
+                                    }
+                                    $sql .= " )";
+                                    $u_langs = $db->where($sql)->getOne(T_LANGS);
+                                    if (!empty($u_langs)) {
+                                        $insert_lang[] = $u_langs->lang_key;
+                                    }
+                                }
+                                $insert_lang = implode(",", $insert_lang);
+                            }
+                        }
+                    }
+                    $Update_data['languages'] = (!empty($insert_lang) ? Wo_Secure($insert_lang) : '');
+                }
                 $Update_data['school_completed'] = 0;
                 if (!empty($_POST['school']) && !empty($_POST['completed']) && $_POST['completed'] == 'on') {
                     $Update_data['school_completed'] = 1;

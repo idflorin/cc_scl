@@ -1,0 +1,313 @@
+
+dphp:S103"KSplit this 127 characters long line (which is greater than 120 authorized).(Ûì¿â8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 159 characters long line (which is greater than 120 authorized).(»ôáÄşÿÿÿÿ8ŠáÆàİ/
+‡	Web:S1829"hReplace this absolute URI "href" with a relative one, or move this absolute URI to a configuration file.(´´šÍøÿÿÿÿ8ŠáÆàİ/
+iphp:S103"KSplit this 203 characters long line (which is greater than 120 authorized).(ı¼çÇûÿÿÿÿ8ŠáÆàİ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(¼˜´ûüÿÿÿÿ8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 187 characters long line (which is greater than 120 authorized).(™ñşŠùÿÿÿÿ8‡éˆŞİ/
+wWeb:MaxLineLengthCheck"KSplit this 138 characters long line (which is greater than 120 authorized).(£ºˆıÿÿÿÿ8ŠáÆàİ/
+WWeb:InternationalizationCheck")Define this label in the resource bundle.(°³ºÔ8ŠáÆàİ/
+dphp:S103"KSplit this 169 characters long line (which is greater than 120 authorized).(Ùşÿı8ŠáÆàİ/
+iphp:S103"KSplit this 159 characters long line (which is greater than 120 authorized).(»ôáÄşÿÿÿÿ8ŠáÆàİ/
+W	php:S1799"8Remove this "die()" call or ensure it is really required(à›ñ’şÿÿÿÿ8‡éˆŞİ/
+iphp:S103"KSplit this 154 characters long line (which is greater than 120 authorized).(ŠĞöĞøÿÿÿÿ8ŠáÆàİ/
+\Web:InputWithoutLabelCheck",Associate a valid label to this input field.(»ôáÄşÿÿÿÿ8ŠáÆàİ/
+S	php:S1799"9Remove this "exit()" call or ensure it is really required(Æİ·±8ŠáÆàİ/
+e	php:S2036"QRefactor this file to either declare symbols or cause side effects, but not both.8‡éˆŞİ/
+rWeb:MaxLineLengthCheck"KSplit this 161 characters long line (which is greater than 120 authorized).(í¥¹”8‡éˆŞİ/
+rWeb:MaxLineLengthCheck"KSplit this 132 characters long line (which is greater than 120 authorized).(ÍÎ­İ8ŠáÆàİ/
+dphp:S103"KSplit this 132 characters long line (which is greater than 120 authorized).(ÍÎ­İ8ŠáÆàİ/
+G	php:S1125"(Remove the literal "true" boolean value.(À€¨Êşÿÿÿÿ8ŠáÆàİ/
+8	php:S1997"$Remove the inline HTML in this file.8‡éˆŞİ/
+?	php:S2007" Move this variable into a class.(õõÖïüÿÿÿÿ8ŠáÆàİ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(ŠÆ‰ìÿÿÿÿÿ8ŠáÆàİ/
+D	php:S2070"*Use a stronger hashing algorithm than MD5.(š¬¹‰8ŠáÆàİ/
+mWeb:LongJavaScriptCheck"@The length of this JS script (110) exceeds the maximum set to 5.(İĞ¥úÿÿÿÿ8ŠáÆàİ/
+3php:S113"'Add a new line at the end of this file.
+f	php:S4833"LReplace "require" with namespace import mechanism through the "use" keyword.(ğ¤É8‡éˆŞİ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(Ù‘Ï§8ŠáÆàİ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(ãòí8ŠáÆàİ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(å¥‡8ŠáÆàİ/
+@	php:S2003"&Replace "require" with "require_once".(ğ¤É8‡éˆŞİ/
+iphp:S103"KSplit this 154 characters long line (which is greater than 120 authorized).(ÅË¬Äûÿÿÿÿ8ŠáÆàİ/
+H	php:S1125")Remove the literal "false" boolean value.(ŠÆ‰ìÿÿÿÿÿ8ŠáÆàİ/
+R	php:S1106"9Move this open curly brace to the beginning of next line.(òá¢O8‡éˆŞİ/
+=Web:InlineStyleCheck"Use CSS classes instead.(ÍÎ­İ8ŠáÆàİ/
+_	Web:S5254"@Add "lang" and/or "xml:lang" attributes to this "<html>" element(œ÷Ãûÿÿÿÿ8ŠáÆàİ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(å¥‡8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 234 characters long line (which is greater than 120 authorized).(ïà«çøÿÿÿÿ8ŠáÆàİ/
+dphp:S103"KSplit this 169 characters long line (which is greater than 120 authorized).(á‡»8ŠáÆàİ/
+iphp:S103"KSplit this 234 characters long line (which is greater than 120 authorized).(ïà«çøÿÿÿÿ8ŠáÆàİ/
+?	php:S2043" Do not access "$_POST" directly.(ßÛëøÿÿÿÿ8ŠáÆàİ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(å¥‡8ŠáÆàİ/
+dphp:S103"KSplit this 121 characters long line (which is greater than 120 authorized).(œŞ‘›8ŠáÆàİ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(ßÛëøÿÿÿÿ8ŠáÆàİ/
+dphp:S103"KSplit this 152 characters long line (which is greater than 120 authorized).(¥©ò8ŠáÆàİ/
+WWeb:InternationalizationCheck")Define this label in the resource bundle.(ÍÎ­İ8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 154 characters long line (which is greater than 120 authorized).(ÅË¬Äûÿÿÿÿ8ŠáÆàİ/
+rWeb:MaxLineLengthCheck"KSplit this 169 characters long line (which is greater than 120 authorized).(Ùşÿı8ŠáÆàİ/
+\Web:PageWithoutFaviconCheck"1Add a 'favicon' declaration in this 'header' tag.(Õ¶¯M8ŠáÆàİ/
+iphp:S103"KSplit this 254 characters long line (which is greater than 120 authorized).(šÜ³ÿÿÿÿÿ8ŠáÆàİ/
+S	php:S1799"9Remove this "exit()" call or ensure it is really required(Æİ·±8ŠáÆàİ/
+iphp:S103"KSplit this 187 characters long line (which is greater than 120 authorized).(™ñşŠùÿÿÿÿ8‡éˆŞİ/
+:	php:S2007" Move this variable into a class.(ô„Òƒ8ŠáÆàİ/
+:	php:S2007" Move this function into a class.(¶‘­í8ŠáÆàİ/
+:	php:S2043" Do not access "$_POST" directly.(°¤Òú8ŠáÆàİ/
+?	php:S2043" Do not access "$_POST" directly.(õõÖïüÿÿÿÿ8ŠáÆàİ/
+iphp:S103"KSplit this 138 characters long line (which is greater than 120 authorized).(£ºˆıÿÿÿÿ8ŠáÆàİ/
+fphp:S100"MRename function "check_" to match the regular expression ^[a-z][a-zA-Z0-9]*$.(¶‘­í8ŠáÆàİ/
+?	php:S2043" Do not access "$_POST" directly.(İ«Ì®ùÿÿÿÿ8ŠáÆàİ/
+iphp:S103"KSplit this 272 characters long line (which is greater than 120 authorized).(¨½„úÿÿÿÿ8ŠáÆàİ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(¶‘­í8ŠáÆàİ/
+iphp:S103"KSplit this 361 characters long line (which is greater than 120 authorized).(êñ±Óüÿÿÿÿ8‡éˆŞİ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(À€¨Êşÿÿÿÿ8ŠáÆàİ/
+iphp:S103"KSplit this 181 characters long line (which is greater than 120 authorized).(ùâù—øÿÿÿÿ8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 361 characters long line (which is greater than 120 authorized).(êñ±Óüÿÿÿÿ8‡éˆŞİ/
+rWeb:MaxLineLengthCheck"KSplit this 121 characters long line (which is greater than 120 authorized).(œŞ‘›8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 203 characters long line (which is greater than 120 authorized).(ı¼çÇûÿÿÿÿ8ŠáÆàİ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(İ«Ì®ùÿÿÿÿ8ŠáÆàİ/
+:	php:S2007" Move this variable into a class.(°¤Òú8ŠáÆàİ/
+BWeb:InlineStyleCheck"Use CSS classes instead.(»ôáÄşÿÿÿÿ8ŠáÆàİ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(å¥‡8‡éˆŞİ/
+†	Web:S1829"gReplace this absolute URI "src" with a relative one, or move this absolute URI to a configuration file.(³ù¤üÿÿÿÿ8ŠáÆàİ/
+rWeb:MaxLineLengthCheck"KSplit this 127 characters long line (which is greater than 120 authorized).(Ûì¿â8ŠáÆàİ/
+hWeb:DoctypePresenceCheck":Insert a <!DOCTYPE> declaration to before this <html> tag.(œ÷Ãûÿÿÿÿ8ŠáÆàİ/
+iphp:S103"KSplit this 230 characters long line (which is greater than 120 authorized).(²ÿœõüÿÿÿÿ8ŠáÆàİ/
+cphp:S103"KSplit this 166 characters long line (which is greater than 120 authorized).(üÊ˜|8ŠáÆàİ/
+qWeb:MaxLineLengthCheck"KSplit this 166 characters long line (which is greater than 120 authorized).(üÊ˜|8ŠáÆàİ/
+DWeb:NonConsecutiveHeadingCheck"Do not skip level H3.(°³ºÔ8ŠáÆàİ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(ğ¬ğáùÿÿÿÿ8ŠáÆàİ/
+dphp:S103"KSplit this 197 characters long line (which is greater than 120 authorized).(øÙó¤8ŠáÆàİ/
+rWeb:MaxLineLengthCheck"KSplit this 152 characters long line (which is greater than 120 authorized).(¥©ò8ŠáÆàİ/
+rWeb:MaxLineLengthCheck"KSplit this 197 characters long line (which is greater than 120 authorized).(øÙó¤8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 254 characters long line (which is greater than 120 authorized).(šÜ³ÿÿÿÿÿ8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 272 characters long line (which is greater than 120 authorized).(¨½„úÿÿÿÿ8ŠáÆàİ/
+YWeb:UnclosedTagCheck"/The tag "div" has no corresponding closing tag.(»ßÉ·ÿÿÿÿÿ8ŠáÆàİ/
+:	php:S2007" Move this variable into a class.(š¬¹‰8ŠáÆàİ/
+dphp:S103"KSplit this 161 characters long line (which is greater than 120 authorized).(í¥¹”8‡éˆŞİ/
+>	php:S2043"Do not access "$_GET" directly.(ğ¬ğáùÿÿÿÿ8ŠáÆàİ/
+Q	php:S2918"2Move this configuration into a configuration file.(ñ‹Ôûÿÿÿÿÿ8ŠáÆàİ/
+?	php:S2007" Move this variable into a class.(šÛ¶üÿÿÿÿ8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 140 characters long line (which is greater than 120 authorized).(„üœÄÿÿÿÿÿ8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 181 characters long line (which is greater than 120 authorized).(ùâù—øÿÿÿÿ8ŠáÆàİ/
+Y	php:S1131"@Remove the useless trailing whitespaces at the end of this line.(ïÛÓ 8ŠáÆàİ/
+e	php:S1779"QReplace all non line feed end of line characters in this file "update.php" by LF.8‡éˆŞİ/
+rWeb:MaxLineLengthCheck"KSplit this 169 characters long line (which is greater than 120 authorized).(á‡»8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 154 characters long line (which is greater than 120 authorized).(ŠĞöĞøÿÿÿÿ8ŠáÆàİ/
+iphp:S103"KSplit this 140 characters long line (which is greater than 120 authorized).(„üœÄÿÿÿÿÿ8ŠáÆàİ/
+?	php:S2043" Do not access "$_POST" directly.(´Âÿÿÿÿÿÿ8ŠáÆàİ/
+3	php:S1451"&Add or update the header of this file.
+wWeb:MaxLineLengthCheck"KSplit this 230 characters long line (which is greater than 120 authorized).(²ÿœõüÿÿÿÿ8ŠáÆàİ/
+_	php:S1131"@Remove the useless trailing whitespaces at the end of this line.(İĞ¥úÿÿÿÿ8ŠáÆàİ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(´Âÿÿÿÿÿÿ8ŠáÆàİ/
+wWeb:MaxLineLengthCheck"KSplit this 129 characters long line (which is greater than 120 authorized).(åÒ„Ãûÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 142 characters long line (which is greater than 120 authorized).(Á¬ñ½8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 131 characters long line (which is greater than 120 authorized).(üÆëÏ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 139 characters long line (which is greater than 120 authorized).(ÿ«“œøÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 121 characters long line (which is greater than 120 authorized).(º”Ò8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 122 characters long line (which is greater than 120 authorized).(ÙÊ—’şÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 122 characters long line (which is greater than 120 authorized).(çıÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 132 characters long line (which is greater than 120 authorized).(“Ò×¿8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 140 characters long line (which is greater than 120 authorized).(­§ûıÿÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 134 characters long line (which is greater than 120 authorized).(ÃšÄŞ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 140 characters long line (which is greater than 120 authorized).(ğ£¶õ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 132 characters long line (which is greater than 120 authorized).(Œçˆ«8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 135 characters long line (which is greater than 120 authorized).(˜â‚Ãûÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 128 characters long line (which is greater than 120 authorized).(÷«äô8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 122 characters long line (which is greater than 120 authorized).( ’øŒ8²öõÜŞ/
+qWeb:MaxLineLengthCheck"KSplit this 154 characters long line (which is greater than 120 authorized).(°¢ÌV8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 155 characters long line (which is greater than 120 authorized).(¥À¢¹ùÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 151 characters long line (which is greater than 120 authorized).(±òõÑşÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 150 characters long line (which is greater than 120 authorized).(ÌúŠÔøÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 148 characters long line (which is greater than 120 authorized).(Âçœ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 144 characters long line (which is greater than 120 authorized).(½®Öë8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 123 characters long line (which is greater than 120 authorized).(®‰£µ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 134 characters long line (which is greater than 120 authorized).(§ø—ß8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 133 characters long line (which is greater than 120 authorized).(ÛæÃÑ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 144 characters long line (which is greater than 120 authorized).(ÏÉ€…ıÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 142 characters long line (which is greater than 120 authorized).(É„Ò¢üÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 138 characters long line (which is greater than 120 authorized).(³ğÖöıÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 128 characters long line (which is greater than 120 authorized).(õè¶¡8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 138 characters long line (which is greater than 120 authorized).(İ¹Øüùÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 131 characters long line (which is greater than 120 authorized).(‡ç’Èşÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 135 characters long line (which is greater than 120 authorized).(û‰ àşÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 142 characters long line (which is greater than 120 authorized).(É¢§·8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 144 characters long line (which is greater than 120 authorized).(üØÛ¢øÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 142 characters long line (which is greater than 120 authorized).(ØØ¹Ôøÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 141 characters long line (which is greater than 120 authorized).(Ì‘Åñ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 132 characters long line (which is greater than 120 authorized).(½Ë¢ôÿÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 134 characters long line (which is greater than 120 authorized).(¿ê‚áûÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 134 characters long line (which is greater than 120 authorized).(«ƒ‹üÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 141 characters long line (which is greater than 120 authorized).(ªÈÆ“ùÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 141 characters long line (which is greater than 120 authorized).(…™âûÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 131 characters long line (which is greater than 120 authorized).(¶­Ó¹ÿÿÿÿÿ8²öõÜŞ/
+qWeb:MaxLineLengthCheck"KSplit this 142 characters long line (which is greater than 120 authorized).(¼áùa8²öõÜŞ/
+qWeb:MaxLineLengthCheck"KSplit this 141 characters long line (which is greater than 120 authorized).(ú¨”m8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 136 characters long line (which is greater than 120 authorized).(–Û›É8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 123 characters long line (which is greater than 120 authorized).(ú¡è¤şÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 137 characters long line (which is greater than 120 authorized).(Ê©¥Ùøÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 151 characters long line (which is greater than 120 authorized).(÷‰Çò8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 152 characters long line (which is greater than 120 authorized).(åÂ¦úÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 148 characters long line (which is greater than 120 authorized).(„¥Ê¸8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 145 characters long line (which is greater than 120 authorized).(ñ¡Ù8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 141 characters long line (which is greater than 120 authorized).(ÊÂµ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 139 characters long line (which is greater than 120 authorized).(¹™Û’øÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 122 characters long line (which is greater than 120 authorized).(º«Üúÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 148 characters long line (which is greater than 120 authorized).(ã¶‘®8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 126 characters long line (which is greater than 120 authorized).( ÖÕ¬ıÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 147 characters long line (which is greater than 120 authorized).(ùŠ§û8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 153 characters long line (which is greater than 120 authorized).(ãØßÿÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 137 characters long line (which is greater than 120 authorized).(¸Õº•øÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 148 characters long line (which is greater than 120 authorized).(»­¤ò8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 142 characters long line (which is greater than 120 authorized).(ê™†®ûÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 144 characters long line (which is greater than 120 authorized).(Ï”Ìî8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 121 characters long line (which is greater than 120 authorized).(ÄÎçÏşÿÿÿÿ8²öõÜŞ/
+qWeb:MaxLineLengthCheck"KSplit this 139 characters long line (which is greater than 120 authorized).(‹Ü§8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 154 characters long line (which is greater than 120 authorized).(«¸‡8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 146 characters long line (which is greater than 120 authorized).(ø…Óˆøÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 141 characters long line (which is greater than 120 authorized).(Áæ´ïùÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 138 characters long line (which is greater than 120 authorized).(³ÇŞŒ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 133 characters long line (which is greater than 120 authorized).(´ó«şÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 135 characters long line (which is greater than 120 authorized).(±–ÎÏ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 125 characters long line (which is greater than 120 authorized).(¾·èÈ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 135 characters long line (which is greater than 120 authorized).(®òšƒøÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 133 characters long line (which is greater than 120 authorized).(ô‘÷êûÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 128 characters long line (which is greater than 120 authorized).(ÅæŒ¬8²öõÜŞ/
+qWeb:MaxLineLengthCheck"KSplit this 126 characters long line (which is greater than 120 authorized).(×ª©8²öõÜŞ/
+qWeb:MaxLineLengthCheck"KSplit this 133 characters long line (which is greater than 120 authorized).(¥–ãi8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 131 characters long line (which is greater than 120 authorized).(×ô‚åúÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 122 characters long line (which is greater than 120 authorized).(Ãâøÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 135 characters long line (which is greater than 120 authorized).(®òšƒøÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 133 characters long line (which is greater than 120 authorized).(ô‘÷êûÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 128 characters long line (which is greater than 120 authorized).(ÅæŒ¬8²öõÜŞ/
+qWeb:MaxLineLengthCheck"KSplit this 126 characters long line (which is greater than 120 authorized).(×ª©8²öõÜŞ/
+qWeb:MaxLineLengthCheck"KSplit this 133 characters long line (which is greater than 120 authorized).(¥–ãi8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 131 characters long line (which is greater than 120 authorized).(×ô‚åúÿÿÿÿ8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 122 characters long line (which is greater than 120 authorized).(Ãâøÿÿÿÿ8²öõÜŞ/
+rWeb:MaxLineLengthCheck"KSplit this 123 characters long line (which is greater than 120 authorized).(òÜ–8²öõÜŞ/
+wWeb:MaxLineLengthCheck"KSplit this 147 characters long line (which is greater than 120 authorized).(¾§Óùÿÿÿÿ8²öõÜŞ/
+XWeb:UnclosedTagCheck".The tag "h2" has no corresponding closing tag.(ÓõÙ×ûÿÿÿÿ8²öõÜŞ/
+IWeb:NonConsecutiveHeadingCheck"Do not skip level H1.(ÓõÙ×ûÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 129 characters long line (which is greater than 120 authorized).(åÒ„Ãûÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 142 characters long line (which is greater than 120 authorized).(Á¬ñ½8²öõÜŞ/
+dphp:S103"KSplit this 131 characters long line (which is greater than 120 authorized).(üÆëÏ8²öõÜŞ/
+iphp:S103"KSplit this 139 characters long line (which is greater than 120 authorized).(ÿ«“œøÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 121 characters long line (which is greater than 120 authorized).(º”Ò8²öõÜŞ/
+iphp:S103"KSplit this 122 characters long line (which is greater than 120 authorized).(ÙÊ—’şÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 122 characters long line (which is greater than 120 authorized).(çıÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 132 characters long line (which is greater than 120 authorized).(“Ò×¿8²öõÜŞ/
+iphp:S103"KSplit this 140 characters long line (which is greater than 120 authorized).(­§ûıÿÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 134 characters long line (which is greater than 120 authorized).(ÃšÄŞ8²öõÜŞ/
+dphp:S103"KSplit this 140 characters long line (which is greater than 120 authorized).(ğ£¶õ8²öõÜŞ/
+dphp:S103"KSplit this 132 characters long line (which is greater than 120 authorized).(Œçˆ«8²öõÜŞ/
+iphp:S103"KSplit this 135 characters long line (which is greater than 120 authorized).(˜â‚Ãûÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 128 characters long line (which is greater than 120 authorized).(÷«äô8²öõÜŞ/
+dphp:S103"KSplit this 122 characters long line (which is greater than 120 authorized).( ’øŒ8²öõÜŞ/
+cphp:S103"KSplit this 154 characters long line (which is greater than 120 authorized).(°¢ÌV8²öõÜŞ/
+iphp:S103"KSplit this 155 characters long line (which is greater than 120 authorized).(¥À¢¹ùÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 151 characters long line (which is greater than 120 authorized).(±òõÑşÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 150 characters long line (which is greater than 120 authorized).(ÌúŠÔøÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 148 characters long line (which is greater than 120 authorized).(Âçœ8²öõÜŞ/
+dphp:S103"KSplit this 144 characters long line (which is greater than 120 authorized).(½®Öë8²öõÜŞ/
+dphp:S103"KSplit this 123 characters long line (which is greater than 120 authorized).(®‰£µ8²öõÜŞ/
+dphp:S103"KSplit this 134 characters long line (which is greater than 120 authorized).(§ø—ß8²öõÜŞ/
+dphp:S103"KSplit this 133 characters long line (which is greater than 120 authorized).(ÛæÃÑ8²öõÜŞ/
+iphp:S103"KSplit this 144 characters long line (which is greater than 120 authorized).(ÏÉ€…ıÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 142 characters long line (which is greater than 120 authorized).(É„Ò¢üÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 138 characters long line (which is greater than 120 authorized).(³ğÖöıÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 128 characters long line (which is greater than 120 authorized).(õè¶¡8²öõÜŞ/
+iphp:S103"KSplit this 138 characters long line (which is greater than 120 authorized).(İ¹Øüùÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 131 characters long line (which is greater than 120 authorized).(‡ç’Èşÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 135 characters long line (which is greater than 120 authorized).(û‰ àşÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 142 characters long line (which is greater than 120 authorized).(É¢§·8²öõÜŞ/
+iphp:S103"KSplit this 144 characters long line (which is greater than 120 authorized).(üØÛ¢øÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 142 characters long line (which is greater than 120 authorized).(ØØ¹Ôøÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 141 characters long line (which is greater than 120 authorized).(Ì‘Åñ8²öõÜŞ/
+iphp:S103"KSplit this 132 characters long line (which is greater than 120 authorized).(½Ë¢ôÿÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 134 characters long line (which is greater than 120 authorized).(¿ê‚áûÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 134 characters long line (which is greater than 120 authorized).(«ƒ‹üÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 141 characters long line (which is greater than 120 authorized).(ªÈÆ“ùÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 141 characters long line (which is greater than 120 authorized).(…™âûÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 131 characters long line (which is greater than 120 authorized).(¶­Ó¹ÿÿÿÿÿ8²öõÜŞ/
+cphp:S103"KSplit this 142 characters long line (which is greater than 120 authorized).(¼áùa8²öõÜŞ/
+cphp:S103"KSplit this 141 characters long line (which is greater than 120 authorized).(ú¨”m8²öõÜŞ/
+dphp:S103"KSplit this 136 characters long line (which is greater than 120 authorized).(–Û›É8²öõÜŞ/
+iphp:S103"KSplit this 123 characters long line (which is greater than 120 authorized).(ú¡è¤şÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 137 characters long line (which is greater than 120 authorized).(Ê©¥Ùøÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 151 characters long line (which is greater than 120 authorized).(÷‰Çò8²öõÜŞ/
+iphp:S103"KSplit this 152 characters long line (which is greater than 120 authorized).(åÂ¦úÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 148 characters long line (which is greater than 120 authorized).(„¥Ê¸8²öõÜŞ/
+dphp:S103"KSplit this 145 characters long line (which is greater than 120 authorized).(ñ¡Ù8²öõÜŞ/
+dphp:S103"KSplit this 141 characters long line (which is greater than 120 authorized).(ÊÂµ8²öõÜŞ/
+iphp:S103"KSplit this 139 characters long line (which is greater than 120 authorized).(¹™Û’øÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 122 characters long line (which is greater than 120 authorized).(º«Üúÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 148 characters long line (which is greater than 120 authorized).(ã¶‘®8²öõÜŞ/
+iphp:S103"KSplit this 126 characters long line (which is greater than 120 authorized).( ÖÕ¬ıÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 147 characters long line (which is greater than 120 authorized).(ùŠ§û8²öõÜŞ/
+iphp:S103"KSplit this 153 characters long line (which is greater than 120 authorized).(ãØßÿÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 137 characters long line (which is greater than 120 authorized).(¸Õº•øÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 148 characters long line (which is greater than 120 authorized).(»­¤ò8²öõÜŞ/
+iphp:S103"KSplit this 142 characters long line (which is greater than 120 authorized).(ê™†®ûÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 144 characters long line (which is greater than 120 authorized).(Ï”Ìî8²öõÜŞ/
+iphp:S103"KSplit this 121 characters long line (which is greater than 120 authorized).(ÄÎçÏşÿÿÿÿ8²öõÜŞ/
+cphp:S103"KSplit this 139 characters long line (which is greater than 120 authorized).(‹Ü§8²öõÜŞ/
+dphp:S103"KSplit this 154 characters long line (which is greater than 120 authorized).(«¸‡8²öõÜŞ/
+iphp:S103"KSplit this 146 characters long line (which is greater than 120 authorized).(ø…Óˆøÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 141 characters long line (which is greater than 120 authorized).(Áæ´ïùÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 138 characters long line (which is greater than 120 authorized).(³ÇŞŒ8²öõÜŞ/
+iphp:S103"KSplit this 133 characters long line (which is greater than 120 authorized).(´ó«şÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 135 characters long line (which is greater than 120 authorized).(±–ÎÏ8²öõÜŞ/
+dphp:S103"KSplit this 125 characters long line (which is greater than 120 authorized).(¾·èÈ8²öõÜŞ/
+iphp:S103"KSplit this 135 characters long line (which is greater than 120 authorized).(®òšƒøÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 133 characters long line (which is greater than 120 authorized).(ô‘÷êûÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 128 characters long line (which is greater than 120 authorized).(ÅæŒ¬8²öõÜŞ/
+cphp:S103"KSplit this 126 characters long line (which is greater than 120 authorized).(×ª©8²öõÜŞ/
+cphp:S103"KSplit this 133 characters long line (which is greater than 120 authorized).(¥–ãi8²öõÜŞ/
+iphp:S103"KSplit this 131 characters long line (which is greater than 120 authorized).(×ô‚åúÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 122 characters long line (which is greater than 120 authorized).(Ãâøÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 135 characters long line (which is greater than 120 authorized).(®òšƒøÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 133 characters long line (which is greater than 120 authorized).(ô‘÷êûÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 128 characters long line (which is greater than 120 authorized).(ÅæŒ¬8²öõÜŞ/
+cphp:S103"KSplit this 126 characters long line (which is greater than 120 authorized).(×ª©8²öõÜŞ/
+cphp:S103"KSplit this 133 characters long line (which is greater than 120 authorized).(¥–ãi8²öõÜŞ/
+iphp:S103"KSplit this 131 characters long line (which is greater than 120 authorized).(×ô‚åúÿÿÿÿ8²öõÜŞ/
+iphp:S103"KSplit this 122 characters long line (which is greater than 120 authorized).(Ãâøÿÿÿÿ8²öõÜŞ/
+dphp:S103"KSplit this 123 characters long line (which is greater than 120 authorized).(òÜ–8²öõÜŞ/
+iphp:S103"KSplit this 147 characters long line (which is greater than 120 authorized).(¾§Óùÿÿÿÿ8²öõÜŞ/
+sphp:S100"URename function "Wo_UpdateLangs" to match the regular expression ^[a-z][a-zA-Z0-9]*$.(İíˆÿÿÿÿÿ8²öõÜŞ/
+xphp:S117"_Rename this local variable "$update_query" to match the regular expression ^[a-z][a-zA-Z0-9]*$.(Ş®‡8²öõÜŞ/
+…php:S117"gRename this local variable "$update_replace_array" to match the regular expression ^[a-z][a-zA-Z0-9]*$.(ƒšÀøúÿÿÿÿ8²öõÜŞ/
+l	php:S1871"MThis branch's code block is the same as the block for the branch on line 262.(¥ù½¡øÿÿÿÿ8²öõÜŞ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(„»¦ß8²öõÜŞ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(İíˆÿÿÿÿÿ8²öõÜŞ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(¥ù½¡øÿÿÿÿ8²öõÜŞ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(ış¨8²öõÜŞ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(Øä·÷ûÿÿÿÿ8²öõÜŞ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(©Å»’8²öõÜŞ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(°À…è8²öõÜŞ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(†°ğ½8²öõÜŞ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(æ˜ìñıÿÿÿÿ8²öõÜŞ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(‘ ­úùÿÿÿÿ8²öõÜŞ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(ñ¥æå8²öõÜŞ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(©–”Šûÿÿÿÿ8²öõÜŞ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(šÌ¹ƒ8²öõÜŞ/
+S	php:S1106"9Move this open curly brace to the beginning of next line.(µÊ£8²öõÜŞ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(êôÔõøÿÿÿÿ8²öõÜŞ/
+X	php:S1106"9Move this open curly brace to the beginning of next line.(©ÍÆŒşÿÿÿÿ8²öõÜŞ/
+[	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(©–”Šûÿÿÿÿ8²öõÜŞ/
+V	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(ñ¥æå8²öõÜŞ/
+[	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(‘ ­úùÿÿÿÿ8²öõÜŞ/
+[	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(æ˜ìñıÿÿÿÿ8²öõÜŞ/
+V	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(†°ğ½8²öõÜŞ/
+V	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(°À…è8²öõÜŞ/
+V	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(©Å»’8²öõÜŞ/
+[	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(Øä·÷ûÿÿÿÿ8²öõÜŞ/
+V	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(ış¨8²öõÜŞ/
+[	php:S1793"<Replace this "else if" keyword sequence by "elseif" keyword.(¥ù½¡øÿÿÿÿ8²öõÜŞ/
+<php:S126"Add the missing "else" clause.(¥ù½¡øÿÿÿÿ8²öõÜŞ/
+u	php:S2011"[Pass this global variable to the function as a parameter rather than accessing it directly.(ò÷üœ8²öõÜŞ/
+:	php:S2007" Move this variable into a class.(„»¦ß8²öõÜŞ/
+?	php:S2007" Move this function into a class.(İíˆÿÿÿÿÿ8²öõÜŞ/
+?	php:S2007" Move this variable into a class.(šƒë¸şÿÿÿÿ8²öõÜŞ/
+?	php:S2007" Move this variable into a class.( ì±¹ıÿÿÿÿ8²öõÜŞ/
+?	php:S2007" Move this variable into a class.(œ»µøÿÿÿÿ8²öõÜŞ/

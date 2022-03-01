@@ -29,7 +29,12 @@ if (empty($error_code)) {
             }
         } else {
             if (Wo_RegisterFollow($recipient_id, $wo['user']['user_id'])) {
-                $follow_message = 'followed';
+                if (Wo_IsFollowRequested($recipient_id, $wo['user']['user_id'])) {
+                    $follow_message = 'requested';
+                }
+                else{
+                    $follow_message = 'followed';
+                } 
             }
         }
         $response_data = array(

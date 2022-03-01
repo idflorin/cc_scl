@@ -34,10 +34,10 @@
 						</div>
 					<?php } ?>
 					<div class="terms">
-					<input type="checkbox" name="accept_terms" id="accept_terms" onchange="activateButton(this)">
-						<label for="accept_terms"> 
-							<?php echo str_replace('{privacy}', '<a href="'.Wo_SeoLink('index.php?link1=terms&type=privacy-policy').'">'.$wo['lang']['privacy_policy'].'</a>', $wo['lang']['terms_contact'])  ?>
-						</label>
+						<div class="round-check">
+							<input type="checkbox" name="accept_terms" id="accept_terms" onchange="activateButton(this)">
+							<label for="accept_terms"><?php echo str_replace('{privacy}', '<a href="'.Wo_SeoLink('index.php?link1=terms&type=privacy-policy').'">'.$wo['lang']['privacy_policy'].'</a>', $wo['lang']['terms_contact'])  ?></label>
+						</div>
 						<div class="clear"></div>
 					</div>
 

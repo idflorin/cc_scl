@@ -18,8 +18,8 @@
         $randomStr = substr($randomStr,-8);
 
         $uidStr = "0000000000" . $uid;
-	    $uidStr = substr($uidStr,-10);
-        
+	      $uidStr = substr($uidStr,-10);
+
         $expiredStr = "0000000000" . $expiredTs;
         $expiredStr = substr($expiredStr,-10);
 

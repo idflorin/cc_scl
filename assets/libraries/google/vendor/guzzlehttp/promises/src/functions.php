@@ -55,7 +55,7 @@ function task(callable $task)
 
     return $promise;
 }
-
+ 
 /**
  * Creates a promise for a value if the value is not a promise.
  *

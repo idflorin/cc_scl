@@ -1,5 +1,4 @@
 <?php
-
 if (empty($_GET['app_id']) && empty($_GET['app_secret'])) {
 	die('');
 }

@@ -23,6 +23,7 @@ class Twocheckout_Product extends Twocheckout
         return Twocheckout_Util::returnResponse($result);
     }
 
+
     public static function update($params=array())
     {
         $request = new Twocheckout_Api_Requester();

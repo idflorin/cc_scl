@@ -40,6 +40,10 @@
 					<?php  if($wo['reply']['publisher']['verified'] == 1) {   ?>
 						<span class="verified-color" title="<?php echo $wo['lang']['verified_user'];?>"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="feather feather-check-circle"><path d="M23,12L20.56,9.22L20.9,5.54L17.29,4.72L15.4,1.54L12,3L8.6,1.54L6.71,4.72L3.1,5.53L3.44,9.21L1,12L3.44,14.78L3.1,18.47L6.71,19.29L8.6,22.47L12,21L15.4,22.46L17.29,19.28L20.9,18.46L20.56,14.78L23,12M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9L10,17Z"></path></svg></span>
 					<?php } ?>
+					
+					<?php if (!empty($wo['reply']['publisher']['is_open_to_work']) && $wo['config']['website_mode'] == 'linkedin') { ?>
+			<span class="wo_open_job_badge" title="<?php echo($wo['lang']['open_to_work']); ?>" data-toggle="tooltip"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"><path fill="currentColor" d="M10,2H14A2,2 0 0,1 16,4V6H20A2,2 0 0,1 22,8V19A2,2 0 0,1 20,21H4C2.89,21 2,20.1 2,19V8C2,6.89 2.89,6 4,6H8V4C8,2.89 8.89,2 10,2M14,6V4H10V6H14Z"></path></svg></span>
+		<?php } ?>
 				</span>
 				<?php }else{ ?>
 					<h4 class="user"><?php echo $wo['reply']['publisher']['name']?></h4>

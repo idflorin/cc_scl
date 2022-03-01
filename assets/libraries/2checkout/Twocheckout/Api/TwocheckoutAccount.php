@@ -1,5 +1,5 @@
 <?php
-
+ 
 class Twocheckout_Company extends Twocheckout
 {
 

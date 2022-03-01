@@ -28,6 +28,7 @@ class Twocheckout_Sale extends Twocheckout
         }
         return Twocheckout_Util::returnResponse($result);
     }
+    
 
     public static function stop($params=array()) {
         $request = new Twocheckout_Api_Requester();

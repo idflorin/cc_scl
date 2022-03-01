@@ -30,6 +30,15 @@
 						</div>
 					</div>
 					<div class="forgot_password">
+						<?php if ($wo['config']['remember_device'] == 1) { ?>
+						<div class="terms">
+							<input type="checkbox" name="remember_device" id="remember_device" <?php echo ($wo['config']['remember_device'] == 1 ? 'checked' : ''); ?>>
+							<label for="remember_device"> 
+								<?php echo $wo['lang']['remember_device'] ?>
+							</label>
+							<div class="clear"></div>
+						</div>
+						<?php } ?>
 						<a href="<?php echo Wo_SeoLink('index.php?link1=forgot-password');?>"><?php echo $wo['lang']['forget_password']?></a>
 					</div>
 					<div class="login_signup_combo">

@@ -227,6 +227,26 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         ({ msg, hasHTML } = funcs.Wo_Emo(data.msg))
         data.msg = msg
         // if recepient has chat open then send last seen 
+        if (data.message_reply_id > 0) {
+            let cansendreplyID = await ctx.wo_messages.findOne({
+                where: {
+                    id: data.message_reply_id,
+                    [Op.or]: [
+                        {
+                            from_id: {
+                                [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                            },
+                            to_id: {
+                                [Op.or]: [ ctx.userHashUserId[data.from_id], data.to_id]
+                            }
+                        }
+                    ],
+                }
+            });
+            if (cansendreplyID === null) {
+                data.message_reply_id = 0;
+            }
+        }
         if ((ctx.userIdChatOpen[data.to_id] && ctx.userIdChatOpen[data.to_id].filter(d => d == ctx.userHashUserId[data.from_id]).length) ||
                 ctx.userIdExtra[data.to_id] && ctx.userIdExtra[data.to_id].active_message_user_id && +ctx.userIdExtra[data.to_id].active_message_user_id === +ctx.userHashUserId[data.from_id]) {
             var m_sent = await ctx.wo_messages.create({
@@ -235,7 +255,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 to_id: to_id,
                 text: data.msg,
                 seen: 0,
-                time: Math.floor(Date.now() / 1000)
+                time: Math.floor(Date.now() / 1000),
+                reply_id: data.message_reply_id,
             })
             data.sent_message = m_sent;
         }
@@ -246,12 +267,22 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 to_id: to_id,
                 text: data.msg,
                 seen: 0,
-                time: Math.floor(Date.now() / 1000)
+                time: Math.floor(Date.now() / 1000),
+                reply_id: data.message_reply_id,
             })
             data.sent_message = m_sent;
         }
 
         let nextId = m_sent.id;
+        page_data.avatar = await funcs.Wo_GetMedia(ctx, page_data.avatar);
+        page_data.cover = await funcs.Wo_GetMedia(ctx, page_data.cover);
+        let new_message = await ctx.wo_messages.findOne({
+            where: {
+                id: {
+                    [Op.eq]: nextId
+                }
+            }
+        });
         if (!data.mediaId) {
             let link_regex = new RegExp('(http\:\/\/|https\:\/\/|www\.)([^\ ]+)', 'gi');
             let mention_regex = new RegExp('@([A-Za-z0-9_]+)', 'gi');
@@ -300,42 +331,44 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 }
             }
             let sendable_message = await funcs.Wo_Markup(ctx, data.msg);
+            var lng = 0;
+            var lat = 0;
+            if (data.lng && data.lat && data.lng !== undefined && data.lat !== undefined) {
+                lng = data.lng;
+                lat = data.lat;
+            }
             callback({
                 status: 200,
                 message_id: data.sent_message.id,
                 time_api: data.sent_message.time,
+                message: sendable_message,
+                lng: lng,
+                lat: lat,
+                page_data:page_data,
+                new_message:new_message,
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             })
-            if (ctx.userIdSocket[messageOwner.user_id].filter(d => d.id === client).length) {
-                await io.to(client).emit('page_message', {
-                    status: 200,
-                    message: sendable_message,
-                    message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
-                    time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
-                });
-            } else {
-                await io.to(client).emit('page_message', {
-                    status: 200,
-                    message: sendable_message,
-                    message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
-                    time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
-                });
-            }
+            await io.to(to_id).emit('page_message', {
+                status: 200,
+                message: sendable_message,
+                lng: lng,
+                lat: lat,
+                page_data:page_data,
+                new_message:new_message,
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
+            });
         } else {
-            if (ctx.userIdSocket[messageOwner.user_id].filter(d => d.id === client).length) {
-                await io.to(client).emit('page_message', {
-                    status: 200,
-                    message: sendable_message,
-                    message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
-                    time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
-                });
-            } else {
-                await io.to(client).emit('page_message', {
-                    status: 200,
-                    message: sendable_message,
-                    message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
-                    time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
-                });
-            }
+            await io.to(to_id).emit('page_message', {
+                status: 200,
+                message: sendable_message,
+                lng: lng,
+                lat: lat,
+                page_data:page_data,
+                new_message:new_message,
+                message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
+                time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
+            });
         }
     })
     socket.on("group_message", async (data, callback) => {
@@ -412,6 +445,21 @@ module.exports.registerListeners = async (socket, io, ctx) => {
         }
 
         let nextId = m_sent.id;
+        data.new_message = await ctx.wo_messages.findOne({
+            where: {
+                id: {
+                    [Op.eq]: nextId
+                }
+            }
+        });
+        data.group_data = await ctx.wo_groupchat.findOne({
+            where: {
+                group_id: {
+                    [Op.eq]: data.group_id
+                }
+            }
+        });
+        data.group_data.avatar = await funcs.Wo_GetMedia(ctx, data.group_data.avatar);
         if (!data.mediaId) {
             let link_regex = new RegExp('(http\:\/\/|https\:\/\/|www\.)([^\ ]+)', 'gi');
             let mention_regex = new RegExp('@([A-Za-z0-9_]+)', 'gi');
@@ -465,6 +513,8 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 html: await compiledTemplates.groupListOwnerTrue(ctx, messageOwner, nextId, data, hasHTML, sendable_message, data.color),
                 message_id: data.sent_message.id,
                 time_api: data.sent_message.time,
+                new_message: data.new_message,
+                group_data: data.group_data,
             })
             
             await socketEvents.groupMessage(ctx, io, socket, data, messageOwner, nextId, hasHTML, sendable_message);
@@ -957,7 +1007,7 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     lng: lng,
                     lat: lat,
                     message_id: data.sent_message.id,
-                    time_api: data.sent_message.time,
+                    time_api: ((data && data.sent_message !== undefined && data.sent_message.time !== undefined) ? data.sent_message.time : '') ,
                 });
                 await userSocket.emit('private_message_page', {
                     html: await compiledTemplates.messageListOwnerTrue(ctx, data, fromUser, nextId, hasHTML, sendable_message, data.color),
@@ -972,7 +1022,7 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                     lng: lng,
                     lat: lat,
                     message_id: data.sent_message.id,
-                    time_api: data.sent_message.time,
+                    time_api: ((data && data.sent_message !== undefined && data.sent_message.time !== undefined) ? data.sent_message.time : '') ,
                 });
             }
 
@@ -2394,6 +2444,30 @@ module.exports.registerListeners = async (socket, io, ctx) => {
                 }
             }
         }
+    })
+    socket.on("checkout_notification", async (data) => {
+        if (!data.user_id || !data.users || !data.type) {
+            return;
+        }
+        user_id = ctx.userHashUserId[data.user_id]
+        let notification_type = "new_notification";
+        if (data.type == 'removed') {
+            notification_type = "new_notification_removed";
+        }
+        for (let user of data.users) {
+            await io.to(user).emit(notification_type, {});
+        }
+    })
+    socket.on("main_notification", async (data) => {
+        if (!data.user_id || !data.to_id || !data.type) {
+            return;
+        }
+        user_id = ctx.userHashUserId[data.user_id]
+        let notification_type = "new_notification";
+        if (data.type == 'removed') {
+            notification_type = "new_notification_removed";
+        }
+        await io.to(data.to_id).emit(notification_type, {});
     })
 
     socket.on("post_notification", async (data) => {

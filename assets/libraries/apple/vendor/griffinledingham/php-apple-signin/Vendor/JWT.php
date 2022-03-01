@@ -9,6 +9,7 @@ use \InvalidArgumentException;
 use \UnexpectedValueException;
 use \DateTime;
 
+
 /**
  * JSON Web Token implementation, based on this spec:
  * https://tools.ietf.org/html/rfc7519
@@ -157,7 +158,7 @@ class JWT
         }
         return $header->kid;
     }
-    
+
     /**
      * Converts and signs a PHP object or array into a JWT string.
      *

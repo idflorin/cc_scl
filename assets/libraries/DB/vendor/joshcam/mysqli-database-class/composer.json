@@ -22,4 +22,4 @@
 	"autoload": {
 		"files": ["MysqliDb.php", "dbObject.php"]
 	}
-}
+} 

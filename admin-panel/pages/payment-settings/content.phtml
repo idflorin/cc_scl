@@ -366,16 +366,41 @@
                     </form>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-body">
+                  <h6 class="card-title">Coinbase Payment</h6>
+                    <form class="coinbase_payment-settings" method="POST">
+                        <div class="float-left">
+                            <label for="coinbase_payment" class="main-label">Coinbase Payment Method</label>
+                            <br><small class="admin-info">Get paid by Coinbase, simple and easy.</small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="coinbase_payment" value="0" />
+                            <input type="checkbox" name="coinbase_payment" id="chck-coinbase_payment" value="1" <?php echo ($wo['config']['coinbase_payment'] == '1') ? 'checked': '';?>>
+                            <label for="chck-coinbase_payment" class="check-trail"><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                              <label class="form-label">API key </label>
+                                <input type="text" id="coinbase_key" name="coinbase_key" class="form-control" value="<?php echo $wo['config']['coinbase_key'];?>">
+                                <small class="admin-info">Your Coinbase API key.</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
 
         <div class="col-lg-6 col-md-6">
             <div class="card">
                 <div class="card-body">
-                  <h6 class="card-title">Configure Bitcoin Payment Method <div class="pull-right mobile-hidden"><a href="https://www.coinpayments.net/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png" style="width: 40px; margin-top: -10px"></a></div></h6>
+                  <h6 class="card-title">Configure CoinPayments Payment Method <div class="pull-right mobile-hidden"><a href="https://www.coinpayments.net/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png" style="width: 40px; margin-top: -10px"></a></div></h6>
                     <form class="bitcoin-settings" method="POST">
                         <div class="float-left">
-                            <label for="bitcoin" class="main-label">Bitcoin Payment Method</label>
+                            <label for="bitcoin" class="main-label">CoinPayments Payment Method</label>
                             <br><small class="admin-info">Get paid by bitcoin, simple and easy.</small>
                         </div>
                         <div class="form-group float-right switcher">
@@ -387,16 +412,16 @@
                         <hr>
                         <div class="form-group form-float">
                             <div class="form-line">
-                              <label class="form-label">API Secret Key </label>
+                              <label class="form-label">Secret Key </label>
                                 <input type="text" id="coinpayments_secret" name="coinpayments_secret" class="form-control" value="<?php echo $wo['config']['coinpayments_secret'];?>">
-                                <small class="admin-info">Your CoinPayments Merchant ID.</small>
+                                <small class="admin-info">Your CoinPayments Secret Key.</small>
                             </div>
                         </div>
                         <div class="form-group form-float">
                             <div class="form-line">
-                              <label class="form-label">Publishable Key <small></small></label>
+                              <label class="form-label">Merchant ID <small></small></label>
                                 <input type="text" id="coinpayments_id" name="coinpayments_id" class="form-control" value="<?php echo $wo['config']['coinpayments_id'];?>">
-                                <small class="admin-info">Your CoinPayments secret key.</small>
+                                <small class="admin-info">Your CoinPayments Merchant ID.</small>
                             </div>
                         </div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -563,13 +588,13 @@ $(function() {
         var configName = $(this).attr('name');
         var hash_id = $('input[name=hash_id]').val();
         var objData = {};
-        if (configName == 'transaction_log' || configName == 'paypal' || 
-          configName == 'bitcoin' || configName == 'credit_card' || 
-          configName == 'alipay' || configName == 'checkout_payment' || 
-          configName == 'paystack_payment' || 
-          configName == 'razorpay_payment' || 
-          configName == 'cashfree_payment'|| 
-          configName == 'paysera_payment') { 
+        if (configName == 'transaction_log' || configName == 'paypal' ||
+          configName == 'bitcoin' || configName == 'credit_card' ||
+          configName == 'alipay' || configName == 'checkout_payment' ||
+          configName == 'paystack_payment' ||
+          configName == 'razorpay_payment' ||
+          configName == 'cashfree_payment'||
+          configName == 'paysera_payment') {
             setToTrue = 'no';
             if ($(this).is(":checked") === true) {
               setToTrue = 'yes';

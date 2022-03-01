@@ -3,10 +3,10 @@
 // | @author Deen Doughouz (DoughouzForest)
 // | @author_url 1: http://www.wowonder.com
 // | @author_url 2: http://codecanyon.net/user/doughouzforest
-// | @author_email: wowondersocial@gmail.com   
+// | @author_email: wowondersocial@gmail.com
 // +------------------------------------------------------------------------+
 // | WoWonder - The Ultimate Social Networking Platform
-// | Copyright (c) 2016 WoWonder. All rights reserved.
+// | Copyright (c) 2022 WoWonder. All rights reserved.
 // +------------------------------------------------------------------------+
 define('T_USERS','Wo_Users');
 define('T_COUNTRIES', 'Wo_Countries');
@@ -130,4 +130,17 @@ define('T_MUTE_STORY', 'Wo_Mute_Story');
 define('T_CAST', 'broadcast');
 define('T_CAST_USERS', 'broadcast_users');
 define('T_HTML_EMAILS', 'Wo_HTML_Emails');
+define('T_USERCARD', 'Wo_UserCard');
+define('T_USER_ADDRESS', 'Wo_UserAddress');
+define('T_USER_ORDERS', 'Wo_UserOrders');
+define('T_PURCHAES', 'Wo_Purchases');
+define('T_PRODUCT_REVIEW', 'Wo_ProductReview');
+define('T_PATREON_SUBSCRIBERS', 'Wo_PatreonSubscribers');
+define('T_USER_EXPERIENCE', 'Wo_UserExperience');
+define('T_USER_CERTIFICATION', 'Wo_UserCertification');
+define('T_USER_PROJECTS', 'Wo_UserProjects');
+define('T_USER_OPEN_TO', 'Wo_UserOpenTo');
+define('T_USER_TIERS', 'Wo_UserTiers');
+define('T_USER_SKILLS', 'Wo_UserSkills');
+define('T_USER_LANGUAGES', 'Wo_UserLanguages');
 ?>

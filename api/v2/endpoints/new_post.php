@@ -151,18 +151,65 @@ if (isset($_FILES['postFile']['name'])) {
 		$error_message = 'invalid file';
     }
 }
+$not_video = true;
+$ffmpeg_convert_video = '';
 if (isset($_FILES['postVideo']['name']) && empty($mediaFilename)) {
+    $mimeType = mime_content_type($_FILES['postVideo']['tmp_name']);
+    $fileType = explode('/', $mimeType)[0]; // video|image
+    if ($fileType === 'video' && Wo_IsFfmpegFileAllowed($_FILES['postVideo']['name']) && !Wo_IsVideoNotAllowedMime($_FILES["postVideo"]["type"])) {
+        $not_video = false;
+    }
+    if ($wo['config']['ffmpeg_system'] == 'on' && $not_video) {
+        $error_code    = 8;
+        $error_message = 'invalid file';
+        $response_data = array(
+            'api_status' => '404',
+            'errors' => array(
+                'error_id' => $error_code,
+                'error_text' => $error_message
+            )
+        );
+        echo json_encode($response_data, JSON_PRETTY_PRINT);
+        exit();
+    }
     $fileInfo = array(
         'file' => $_FILES["postVideo"]["tmp_name"],
         'name' => $_FILES['postVideo']['name'],
         'size' => $_FILES["postVideo"]["size"],
-        'type' => $_FILES["postVideo"]["type"],
-        'types' => 'mp4,m4v,webm,flv,mov,mpeg'
+        'type' => $_FILES["postVideo"]["type"]
     );
+    if ($wo['config']['ffmpeg_system'] != 'on') {
+        $fileInfo['types'] = 'mp4,m4v,webm,flv,mov,mpeg,mkv';
+    }
+    if ($wo['config']['ffmpeg_system'] == 'on') {
+        if ($not_video == false) {
+            $fileInfo['is_video'] = 1;
+        }
+        $amazone_s3                   = $wo['config']['amazone_s3'];
+        $wasabi_storage               = $wo['config']['wasabi_storage'];
+        $ftp_upload                   = $wo['config']['ftp_upload'];
+        $spaces                       = $wo['config']['spaces'];
+        $cloud_upload                 = $wo['config']['cloud_upload'];
+        $wo['config']['amazone_s3']   = 0;
+        $wo['config']['wasabi_storage']   = 0;
+        $wo['config']['ftp_upload']   = 0;
+        $wo['config']['spaces']       = 0;
+        $wo['config']['cloud_upload'] = 0;
+    }
     $media    = Wo_ShareFile($fileInfo);
+    if ($wo['config']['ffmpeg_system'] == 'on') {
+        $wo['config']['amazone_s3']   = $amazone_s3;
+        $wo['config']['wasabi_storage']   = $wasabi_storage;
+        $wo['config']['ftp_upload']   = $ftp_upload;
+        $wo['config']['spaces']       = $spaces;
+        $wo['config']['cloud_upload'] = $cloud_upload;
+    }
     if (!empty($media)) {
         $mediaFilename = $media['filename'];
         $mediaName     = $media['name'];
+        if (!empty($mediaFilename) && $wo['config']['ffmpeg_system'] == 'on') {
+            $ffmpeg_convert_video = $mediaFilename;
+        }
     }
     if (empty($mediaFilename)) {
     	$error_code    = 8;
@@ -374,7 +421,55 @@ if (empty($error_message)) {
     if (!empty($_POST['post_color']) && !empty($post_text) && empty($_POST['postRecord']) && empty($mediaFilename) && empty($mediaName) && empty($post_map) && empty($url_title) && empty($url_content) && empty($url_link) && empty($import_url_image) && empty($album_name) && empty($multi) && empty($video_thumb) && empty($post_data['postPhoto'])) {
         $post_data['color_id'] = Wo_Secure($_POST['post_color']);
     }
-    $id = Wo_RegisterPost($post_data);
+    if (!empty($ffmpeg_convert_video)) {
+        $ffmpeg_b             = $wo['config']['ffmpeg_binary_file'];
+        $video_file_full_path = dirname(__DIR__) . '/' . $ffmpeg_convert_video;
+        $video_info           = shell_exec("$ffmpeg_b -i " . $video_file_full_path . " 2>&1");
+        $re                   = '/[0-9]{3}+x[0-9]{3}/m';
+        preg_match_all($re, $video_info, $min_str);
+        $resolution = 0;
+        if (!empty($min_str) && !empty($min_str[0]) && !empty($min_str[0][0])) {
+            $substr = substr($video_info, strpos($video_info, $min_str[0][0]) - 3, 15);
+            $re     = '/[0-9]+x[0-9]+/m';
+            preg_match_all($re, $substr, $resolutions);
+            if (!empty($resolutions) && !empty($resolutions[0]) && !empty($resolutions[0][0])) {
+                $resolution = substr($resolutions[0][0], 0, strpos($resolutions[0][0], 'x'));
+            }
+        }
+        $ret = array(
+            'status' => 300
+        );
+        if ($resolution >= 640 || $resolution == 0) {
+            $ret = array(
+                'status' => 200,
+                'message' => 'Your video is in process'
+            );
+        }
+        ob_end_clean();
+        header("Content-Encoding: none");
+        header("Connection: close");
+        ignore_user_abort();
+        ob_start();
+        header('Content-Type: application/json');
+        echo json_encode($ret);
+        $size = ob_get_length();
+        header("Content-Length: $size");
+        ob_end_flush();
+        flush();
+        session_write_close();
+        if (is_callable('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+        $id = FFMPEGUpload(array(
+            'filename' => $ffmpeg_convert_video,
+            'id' => $id,
+            'video_thumb' => $video_thumb,
+            'post_data' => $post_data
+        ));
+    } else {
+        $id = Wo_RegisterPost($post_data);
+    }
+    
     if ($id) {
         if ($is_option == true) {
             foreach ($_POST['answer'] as $key => $value) {

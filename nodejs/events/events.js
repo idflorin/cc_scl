@@ -336,6 +336,8 @@ module.exports.groupMessage = async (ctx, io, socket, data, messageOwner, nextId
                 status: 200,
                 html: await compiledTemplates.groupListOwnerTrue(ctx, messageOwner, nextId, data, hasHTML, sendable_message),
                 id: data.group_id,
+                new_message: (data.new_message && data.new_message !== undefined ? data.new_message : ''),
+                group_data: (data.group_data && data.group_data !== undefined ? data.group_data : ''),
                 message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
                 time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
 
@@ -354,6 +356,8 @@ module.exports.groupMessage = async (ctx, io, socket, data, messageOwner, nextId
                 status: 200,
                 html: await compiledTemplates.groupListOwnerFalse(ctx, messageOwner, nextId, data, hasHTML, sendable_message),
                 id: data.group_id,
+                new_message: (data.new_message && data.new_message !== undefined ? data.new_message : ''),
+                group_data: (data.group_data && data.group_data !== undefined ? data.group_data : ''),
                 message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
                 time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
@@ -386,6 +390,8 @@ module.exports.groupMessageWithMedia = async (ctx, io, socket, data, messageOwne
                 status: 200,
                 html: await compiledTemplates.groupListOwnerTrueWithMedia(ctx, messageOwner, nextId, data, isSticker),
                 id: data.group_id,
+                new_message: (data.new_message && data.new_message !== undefined ? data.new_message : ''),
+                group_data: (data.group_data && data.group_data !== undefined ? data.group_data : ''),
                 message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
                 time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
@@ -403,6 +409,8 @@ module.exports.groupMessageWithMedia = async (ctx, io, socket, data, messageOwne
                 status: 200,
                 html: await compiledTemplates.groupListOwnerFalseWithMedia(ctx, messageOwner, nextId, data, isSticker),
                 id: data.group_id,
+                new_message: (data.new_message && data.new_message !== undefined ? data.new_message : ''),
+                group_data: (data.group_data && data.group_data !== undefined ? data.group_data : ''),
                 message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
                 time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
@@ -434,6 +442,8 @@ module.exports.groupMessagePage = async (ctx, io, socket, data, messageOwner, ne
                 receiver: ctx.userHashUserId[data.from_id],
                 sender: ctx.userHashUserId[data.from_id],
                 self: true,
+                new_message: (data.new_message && data.new_message !== undefined ? data.new_message : ''),
+                group_data: (data.group_data && data.group_data !== undefined ? data.group_data : ''),
                 message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
                 time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
@@ -455,6 +465,8 @@ module.exports.groupMessagePage = async (ctx, io, socket, data, messageOwner, ne
                 id: data.group_id,
                 receiver: data.group_id,
                 sender: ctx.userHashUserId[data.from_id],
+                new_message: (data.new_message && data.new_message !== undefined ? data.new_message : ''),
+                group_data: (data.group_data && data.group_data !== undefined ? data.group_data : ''),
                 message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
                 time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
@@ -489,6 +501,8 @@ module.exports.groupMessagePageWithMedia = async (ctx, io, socket, data, message
                 receiver: ctx.userHashUserId[data.from_id],
                 sender: ctx.userHashUserId[data.from_id],
                 self: true,
+                new_message: (data.new_message && data.new_message !== undefined ? data.new_message : ''),
+                group_data: (data.group_data && data.group_data !== undefined ? data.group_data : ''),
                 message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
                 time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });
@@ -508,6 +522,8 @@ module.exports.groupMessagePageWithMedia = async (ctx, io, socket, data, message
                 id: data.group_id,
                 receiver: data.group_id,
                 sender: ctx.userHashUserId[data.from_id],
+                new_message: (data.new_message && data.new_message !== undefined ? data.new_message : ''),
+                group_data: (data.group_data && data.group_data !== undefined ? data.group_data : ''),
                 message_id: ((data.sent_message && data.sent_message !== undefined && data.sent_message.id && data.sent_message.id !== undefined ) ? data.sent_message.id : 0),
                 time_api: ((data.sent_message && data.sent_message !== undefined && data.sent_message.time && data.sent_message.time !== undefined ) ? data.sent_message.time : 0),
             });

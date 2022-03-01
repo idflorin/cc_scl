@@ -31,6 +31,19 @@ if ($_GET['link1'] == 'showthread') {
  ?>
 
 <div class="page-margin" id="forum-cont">
+	
+	<?php if ($wo['config']['user_ads'] == 1): ?>
+		<div id="sidebar-sticky-forum">
+			<?php 
+			  $wo['sidebar-ad'] = Wo_GetAdsByType('forum');
+			  if (!empty($wo['sidebar-ad'])) {
+			  	echo Wo_LoadPage('ads/includes/forum-ad');
+			  }
+			?>
+			<div class="clear"></div>
+		</div>
+    <?php endif; ?>
+	
 	<div class="my_pages_header row">
 		<ul class="<?php echo Wo_RightToLeft('pull-left'); ?>">
 			<li class="<?php if ($wo['active'] == 'forums') echo 'active'; ?>"><a href="<?php echo Wo_SeoLink('index.php?link1=forum'); ?>" data-ajax="?link1=forum"><?php echo $wo['lang']['forum'] ?></a></li>

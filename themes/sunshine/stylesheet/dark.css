@@ -478,3 +478,56 @@ body .sun_pub_mid_foot .poster-left-buttons {
 }
 .dt_bank_trans_modal .dt_user_profile{background: rgba(0, 0, 0, 0.42);}
 .lightbox-content .comment-section .post-info p {color: #ccc !important;}
+
+
+.pr_stars .star path { fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="0"] .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="1"] .star:nth-child(1) ~ .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="2"] .star:nth-child(2) ~ .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="3"] .star:nth-child(3) ~ .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="4"] .star:nth-child(4) ~ .star path {fill: rgb(255 255 255 / 20%);}
+.pr_stars[data-stars="5"] .star:nth-child(5) ~ .star path {fill: rgb(255 255 255 / 20%);}
+
+
+.review_list, .border-bottom, .ch_checkout_title {border-bottom-color: #3e3e3e;}
+.prod_review-meta:before {color: rgb(255 255 255 / 20%);}
+
+.ch_qty_toggle .value-button {
+    background-color: rgb(255 255 255 / 10%);
+}
+.cart_chos_addrs label {border-bottom-color: rgba(255, 255, 255, 0.15);}
+.cart_chos_addrs label:hover {background-color: rgba(255, 255, 255, 0.05);}
+.cart_chos_addrs label:before {border-color: rgba(255, 255, 255, 0.7);}
+.cart_chos_addrs label:after {background: #fff;}
+.cart_chos_addrs input:checked + label:before {border-color: #fff;}
+.cart_chos_addrs input:checked + label {color: #fff;}
+
+.address_book_innr {box-shadow: 0 0 0 1px #3c3c3c;}
+.add_new_addrs {background-color: rgb(255 255 255 / 7%);color: #dadada;}
+.address_box .addrs_name {color: #fff;}
+
+.my_purchased {box-shadow: 0 0 0 1px rgb(255 255 255 / 14%);}
+.my_purchased .foot {border-top-color: #464646;}
+.star_rating label {color: #5c5c5c;}
+
+.wo_ad_header_format {
+    background-color: #212121;
+    border-color: rgb(255 255 255 / 15%);
+}
+
+.review_list {
+    background-color: #383838;
+}
+.wo_user_side_prods a {
+    box-shadow: 0 0 0 1px #484848;
+}
+
+.wo_post_prod_full_user {
+    border-color: #444444;
+}
+.wo_post_prod_full_img_slider .is-selected img {
+    box-shadow: 0 0 0 2px #efefef;
+}
+.wo_post_prod_full_related {
+    border-color: #4e4e4e;
+}

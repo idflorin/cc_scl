@@ -1,14 +1,14 @@
-<?php 
+<?php
 
 namespace Rize\UriTemplate\Node;
 
 /**
  * Description
- */
+ */ 
 class Variable extends Abstraction
 {
            /**
-            * Variable name without modifier 
+            * Variable name without modifier
             * e.g. 'term:1' becomes 'term'
             */
      public $name,

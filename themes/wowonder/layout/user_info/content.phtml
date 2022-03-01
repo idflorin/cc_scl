@@ -323,7 +323,235 @@ footer {
 						</div>
 					<?php } ?>
 				</div>
-			<?php } ?>   
+			<?php } ?>
+			<?php if (!empty($wo['user_info']['setting']['providing_service'])) { ?>
+				<style>
+					.active_sessions {padding: 0 15px;margin-bottom: 10px;}
+					.active_sessions .as_list {padding: 13px 10px;position: relative;border-bottom: 1px solid rgba(0, 0, 0, 0.07);}
+					.active_sessions .as_list:last-child {border: 0;}
+					.active_sessions .as_list .platform_icon {margin-right: 15px;float: left;width: 36px;height: 36px;display: flex;align-items: center;justify-content: center;}
+					.active_sessions .as_list .platform_icon svg {width: 28px;height: 28px;}
+					.active_sessions .as_list .log_out_session {float: right;width: 35px;height: 35px;display: flex;align-items: center;justify-content: center;padding: 0;border-radius: 50%;margin: 1px 0;}
+					.active_sessions .as_list .session_info {display: block;margin-left: 51px;}
+					.active_sessions .as_list .session_info h4 {margin-top: 0;margin-bottom: 4px;font-weight: 600;}
+					.active_sessions .as_list .session_info p {margin-bottom: 8px;line-height: 1;margin-top: 0;font-size: 13px;color: #717171;}
+				</style>
+				<h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z" /></svg> <?php echo $wo['lang']['services']; ?></h2>
+				<div class="active_sessions">
+					<div class="as_list">
+						<div class="session_info">
+							<h4><?php echo $wo['user_info']['setting']['providing_service']->services ?></h4>
+							<p><?php echo $wo['lang']['location']; ?> - <?php echo $wo['user_info']['setting']['providing_service']->job_location; ?></p>
+							<p><?php echo $wo['lang']['description']; ?> - <?php echo $wo['user_info']['setting']['providing_service']->description; ?></p>
+						</div>
+					</div>
+				</div>
+			<?php } ?> 
+                                      
+			<?php if (!empty($wo['user_info']['setting']['open_to_work_data'])) { ?>
+				<style>
+					.active_sessions {padding: 0 15px;margin-bottom: 10px;}
+					.active_sessions .as_list {padding: 13px 10px;position: relative;border-bottom: 1px solid rgba(0, 0, 0, 0.07);}
+					.active_sessions .as_list:last-child {border: 0;}
+					.active_sessions .as_list .platform_icon {margin-right: 15px;float: left;width: 36px;height: 36px;display: flex;align-items: center;justify-content: center;}
+					.active_sessions .as_list .platform_icon svg {width: 28px;height: 28px;}
+					.active_sessions .as_list .log_out_session {float: right;width: 35px;height: 35px;display: flex;align-items: center;justify-content: center;padding: 0;border-radius: 50%;margin: 1px 0;}
+					.active_sessions .as_list .session_info {display: block;margin-left: 51px;}
+					.active_sessions .as_list .session_info h4 {margin-top: 0;margin-bottom: 4px;font-weight: 600;}
+					.active_sessions .as_list .session_info p {margin-bottom: 8px;line-height: 1;margin-top: 0;font-size: 13px;color: #717171;}
+				</style>
+				<h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z" /></svg> <?php echo $wo['lang']['open_to_work']; ?></h2>
+				<div class="active_sessions">
+					<div class="as_list">
+						<div class="session_info">
+							<h4><?php echo $wo['user_info']['setting']['open_to_work_data']->job_title ?></h4>
+							<p><?php echo $wo['lang']['location']; ?> - <?php echo $wo['user_info']['setting']['open_to_work_data']->job_location; ?></p>
+							<p><?php echo $wo['lang']['workplaces']; ?> - <?php echo $wo['user_info']['setting']['open_to_work_data']->workplaces; ?></p>
+							<p><?php echo $wo['lang']['job_type']; ?> - <?php echo $wo['user_info']['setting']['open_to_work_data']->job_type; ?></p>
+						</div>
+					</div>
+				</div>
+			<?php } ?> 
+                                      
+			<?php if (!empty($wo['user_info']['setting']['formated_langs'])) { ?>
+				<style>
+					.active_sessions {padding: 0 15px;margin-bottom: 10px;}
+					.active_sessions .as_list {padding: 13px 10px;position: relative;border-bottom: 1px solid rgba(0, 0, 0, 0.07);}
+					.active_sessions .as_list:last-child {border: 0;}
+					.active_sessions .as_list .platform_icon {margin-right: 15px;float: left;width: 36px;height: 36px;display: flex;align-items: center;justify-content: center;}
+					.active_sessions .as_list .platform_icon svg {width: 28px;height: 28px;}
+					.active_sessions .as_list .log_out_session {float: right;width: 35px;height: 35px;display: flex;align-items: center;justify-content: center;padding: 0;border-radius: 50%;margin: 1px 0;}
+					.active_sessions .as_list .session_info {display: block;margin-left: 51px;}
+					.active_sessions .as_list .session_info h4 {margin-top: 0;margin-bottom: 4px;font-weight: 600;}
+					.active_sessions .as_list .session_info p {margin-bottom: 8px;line-height: 1;margin-top: 0;font-size: 13px;color: #717171;}
+				</style>
+				<h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z" /></svg> <?php echo $wo['lang']['languages']; ?></h2>
+				<div class="active_sessions">
+					<div class="as_list">
+						<div class="session_info">
+							<p><?php echo implode(",", $wo['user_info']['setting']['formated_langs']); ?></p>
+						</div>
+					</div>
+				</div>
+			<?php } ?> 
+                                      
+			<?php if (!empty($wo['user_info']['setting']['skills'])) { ?>
+				<style>
+					.active_sessions {padding: 0 15px;margin-bottom: 10px;}
+					.active_sessions .as_list {padding: 13px 10px;position: relative;border-bottom: 1px solid rgba(0, 0, 0, 0.07);}
+					.active_sessions .as_list:last-child {border: 0;}
+					.active_sessions .as_list .platform_icon {margin-right: 15px;float: left;width: 36px;height: 36px;display: flex;align-items: center;justify-content: center;}
+					.active_sessions .as_list .platform_icon svg {width: 28px;height: 28px;}
+					.active_sessions .as_list .log_out_session {float: right;width: 35px;height: 35px;display: flex;align-items: center;justify-content: center;padding: 0;border-radius: 50%;margin: 1px 0;}
+					.active_sessions .as_list .session_info {display: block;margin-left: 51px;}
+					.active_sessions .as_list .session_info h4 {margin-top: 0;margin-bottom: 4px;font-weight: 600;}
+					.active_sessions .as_list .session_info p {margin-bottom: 8px;line-height: 1;margin-top: 0;font-size: 13px;color: #717171;}
+				</style>
+				<h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z" /></svg> <?php echo $wo['lang']['skills']; ?></h2>
+				<div class="active_sessions">
+					<div class="as_list">
+						<div class="session_info">
+							<p><?php echo $wo['user_info']['setting']['skills']; ?></p>
+						</div>
+					</div>
+				</div>
+			<?php } ?> 
+                                      
+			<?php 
+			$experience = $db->where('user_id',$wo['user_info']['setting']['user_id'])->get(T_USER_EXPERIENCE);
+			if (!empty($experience)) { ?>
+				<style>
+					.active_sessions {padding: 0 15px;margin-bottom: 10px;}
+					.active_sessions .as_list {padding: 13px 10px;position: relative;border-bottom: 1px solid rgba(0, 0, 0, 0.07);}
+					.active_sessions .as_list:last-child {border: 0;}
+					.active_sessions .as_list .platform_icon {margin-right: 15px;float: left;width: 36px;height: 36px;display: flex;align-items: center;justify-content: center;}
+					.active_sessions .as_list .platform_icon svg {width: 28px;height: 28px;}
+					.active_sessions .as_list .log_out_session {float: right;width: 35px;height: 35px;display: flex;align-items: center;justify-content: center;padding: 0;border-radius: 50%;margin: 1px 0;}
+					.active_sessions .as_list .session_info {display: block;margin-left: 51px;}
+					.active_sessions .as_list .session_info h4 {margin-top: 0;margin-bottom: 4px;font-weight: 600;}
+					.active_sessions .as_list .session_info p {margin-bottom: 8px;line-height: 1;margin-top: 0;font-size: 13px;color: #717171;}
+				</style>
+				<h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z" /></svg> <?php echo $wo['lang']['experience']; ?></h2>
+				<div class="active_sessions">
+					<?php foreach ($experience as $key => $wo['experience']) { ?>
+					<div class="as_list">
+						<div class="session_info">
+							<h4><?php echo $wo['lang']['title']; ?> : <?php echo $wo['experience']->title ?></h4>
+							<p><?php echo $wo['lang']['company_name']; ?> : <?php echo $wo['experience']->company_name; ?></p>
+							<p>
+								<?php if (!empty($wo['experience']->employment_type) && in_array($wo['experience']->employment_type, array_keys($wo['employment_type']))) { ?>
+									<?php echo $wo['lang']['employment_type']; ?> : <?php echo $wo['lang'][$wo['employment_type'][$wo['experience']->employment_type]]; ?>
+								<?php } ?>
+							</p>
+							<p>
+								<?php echo $wo['lang']['location']; ?> : <?php echo $wo['experience']->location; ?>
+							</p>
+							<p>
+								<?php echo $wo['lang']['start_date']; ?> : <?php echo $wo['experience']->experience_start; ?>
+							</p>
+							<?php if (!empty($wo['experience']->experience_end) && strpos($wo['experience']->experience_end, 00) != 0) { ?>
+							<p>
+								<?php echo $wo['lang']['end_date']; ?> : <?php echo $wo['experience']->experience_end; ?>
+							</p>
+							<?php } ?>
+							<?php if (!empty($wo['experience']->link)) { ?>
+								<p><?php echo $wo['lang']['link']; ?> : <a href="<?php echo $wo['experience']->link; ?>"><?php echo $wo['experience']->link; ?></a></p>
+							<?php } ?>
+							<?php if (!empty($wo['experience']->headline)) { ?>
+								<p><?php echo $wo['lang']['headline']; ?> : <?php echo $wo['experience']->headline; ?></p>
+							<?php } ?>
+								<p><?php echo $wo['lang']['industry']; ?> : <?php echo $wo['experience']->industry; ?></p>
+							<?php if (!empty($wo['experience']->image)) { ?>
+								<img src="<?php echo Wo_GetMedia($wo['experience']->image); ?>" width="200px" height="200px">
+							<?php } ?>
+							<p><?php echo $wo['lang']['description']; ?> : <?php echo $wo['experience']->description; ?></p>
+						</div>
+					</div>
+				    <?php } ?>
+				</div>
+			<?php } ?> 
+
+			<?php $certifications = $db->where('user_id',$wo['user_info']['setting']['user_id'])->get(T_USER_CERTIFICATION);
+			if (!empty($certifications)) { ?>
+				<style>
+					.active_sessions {padding: 0 15px;margin-bottom: 10px;}
+					.active_sessions .as_list {padding: 13px 10px;position: relative;border-bottom: 1px solid rgba(0, 0, 0, 0.07);}
+					.active_sessions .as_list:last-child {border: 0;}
+					.active_sessions .as_list .platform_icon {margin-right: 15px;float: left;width: 36px;height: 36px;display: flex;align-items: center;justify-content: center;}
+					.active_sessions .as_list .platform_icon svg {width: 28px;height: 28px;}
+					.active_sessions .as_list .log_out_session {float: right;width: 35px;height: 35px;display: flex;align-items: center;justify-content: center;padding: 0;border-radius: 50%;margin: 1px 0;}
+					.active_sessions .as_list .session_info {display: block;margin-left: 51px;}
+					.active_sessions .as_list .session_info h4 {margin-top: 0;margin-bottom: 4px;font-weight: 600;}
+					.active_sessions .as_list .session_info p {margin-bottom: 8px;line-height: 1;margin-top: 0;font-size: 13px;color: #717171;}
+				</style>
+				<h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z" /></svg> <?php echo $wo['lang']['licenses_certifications']; ?></h2>
+				<div class="active_sessions">
+					<?php foreach ($certifications as $key => $wo['certification']) { ?>
+					<div class="as_list">
+						<div class="session_info">
+							<h4><?php echo $wo['lang']['name']; ?> : <?php echo $wo['certification']->name ?></h4>
+							<p><?php echo $wo['lang']['issuing_organization']; ?> : <?php echo $wo['certification']->issuing_organization; ?></p>
+							<p>
+								<?php echo $wo['lang']['issue_date']; ?> : <?php echo $wo['certification']->certification_start; ?>
+							</p>
+							<?php if (!empty($wo['certification']->certification_end) && strpos($wo['certification']->certification_end, 00) != 0) { ?>
+							<p>
+								<?php echo $wo['lang']['expiration_date']; ?> : <?php echo $wo['certification']->certification_end; ?>
+							</p>
+							<?php } ?>
+							<?php if (!empty($wo['certification']->credential_url)) { ?>
+								<p><?php echo $wo['lang']['credential_url']; ?> : <a href="<?php echo $wo['certification']->credential_url; ?>"><?php echo(!empty($wo['certification']->credential_id) ? $wo['certification']->credential_id : $wo['certification']->credential_url); ?></a></p>
+							<?php } ?>
+							<?php if (!empty($wo['certification']->credential_id)) { ?>
+								<p><?php echo $wo['lang']['credential_id']; ?> : <?php echo $wo['certification']->credential_id; ?></p>
+							<?php } ?>
+						</div>
+					</div>
+					<?php } ?>
+				</div>
+			<?php } ?>
+
+			<?php $projects = $db->where('user_id',$wo['user_info']['setting']['user_id'])->get(T_USER_PROJECTS);
+			if (!empty($projects)) { ?>
+				<style>
+					.active_sessions {padding: 0 15px;margin-bottom: 10px;}
+					.active_sessions .as_list {padding: 13px 10px;position: relative;border-bottom: 1px solid rgba(0, 0, 0, 0.07);}
+					.active_sessions .as_list:last-child {border: 0;}
+					.active_sessions .as_list .platform_icon {margin-right: 15px;float: left;width: 36px;height: 36px;display: flex;align-items: center;justify-content: center;}
+					.active_sessions .as_list .platform_icon svg {width: 28px;height: 28px;}
+					.active_sessions .as_list .log_out_session {float: right;width: 35px;height: 35px;display: flex;align-items: center;justify-content: center;padding: 0;border-radius: 50%;margin: 1px 0;}
+					.active_sessions .as_list .session_info {display: block;margin-left: 51px;}
+					.active_sessions .as_list .session_info h4 {margin-top: 0;margin-bottom: 4px;font-weight: 600;}
+					.active_sessions .as_list .session_info p {margin-bottom: 8px;line-height: 1;margin-top: 0;font-size: 13px;color: #717171;}
+				</style>
+				<h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.1 14.8,9.5V11C15.4,11 16,11.6 16,12.3V15.8C16,16.4 15.4,17 14.7,17H9.2C8.6,17 8,16.4 8,15.7V12.2C8,11.6 8.6,11 9.2,11V9.5C9.2,8.1 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,9.5V11H13.5V9.5C13.5,8.7 12.8,8.2 12,8.2Z" /></svg> <?php echo $wo['lang']['projects']; ?></h2>
+				<div class="active_sessions">
+					<?php foreach ($projects as $key => $wo['project']) { ?>
+					<div class="as_list">
+						<div class="session_info">
+							<h4><?php echo $wo['lang']['name']; ?> : <?php echo $wo['project']->name ?></h4>
+							<p>
+								<?php echo $wo['lang']['start_date']; ?> : <?php echo $wo['project']->project_start; ?>
+							</p>
+							<?php if (!empty($wo['project']->project_end) && strpos($wo['project']->project_end, 00) != 0) { ?>
+							<p>
+								<?php echo $wo['lang']['end_date']; ?> : <?php echo $wo['project']->project_end; ?>
+							</p>
+							<?php } ?>
+							<?php if (!empty($wo['project']->project_url)) { ?>
+								<p><?php echo $wo['lang']['project_url']; ?> : <a href="<?php echo $wo['project']->project_url; ?>"><?php echo($wo['project']->project_url); ?></a></p>
+							<?php } ?>
+							<?php if (!empty($wo['project']->associated_with)) { ?>
+								<p><?php echo $wo['lang']['associated_with']; ?> : <?php echo $wo['project']->associated_with; ?></p>
+							<?php } ?>
+							<?php if (!empty($wo['project']->description)) { ?>
+								<p><?php echo $wo['lang']['description']; ?> : <?php echo $wo['project']->description; ?></p>
+							<?php } ?>
+						</div>
+					</div>
+					<?php } ?>
+				</div>
+			<?php } ?>    
 			
 			<?php if (!empty($wo['user_info']['setting']['block'])) { ?>
 				<h2><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15,14C17.67,14 23,15.33 23,18V20H7V18C7,15.33 12.33,14 15,14M15,12A4,4 0 0,1 11,8A4,4 0 0,1 15,4A4,4 0 0,1 19,8A4,4 0 0,1 15,12M5,9.59L7.12,7.46L8.54,8.88L6.41,11L8.54,13.12L7.12,14.54L5,12.41L2.88,14.54L1.46,13.12L3.59,11L1.46,8.88L2.88,7.46L5,9.59Z" /></svg> <?php echo $wo['lang']['blocked_users']; ?></h2>

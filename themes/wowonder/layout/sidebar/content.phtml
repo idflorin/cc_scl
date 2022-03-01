@@ -25,7 +25,10 @@ if (!empty($user_stories)) {
                     <img id="updateImage-<?php echo $wo['user']['user_id']?>" alt="<?php echo $wo['user']['name']?> Profile Picture" src="<?php echo $wo['user']['avatar']?>" <?php if ($wo['have_stories'] == true) { ?> class="<?php echo($wo['story_seen_class']); ?> see_all_stories" data_story_user_id="<?php echo $wo['user']['user_id']?>"  data_story_type="user" <?php } ?>>
                 </div>
 				<div class="title">
-					<a id="user-full-name" data-ajax="?link1=timeline&u=<?php echo $wo['user']['username'];?>" href="<?php echo $wo['user']['url'];?>"><?php echo $wo['user']['name']?></a>
+					<a id="user-full-name" data-ajax="?link1=timeline&u=<?php echo $wo['user']['username'];?>" href="<?php echo $wo['user']['url'];?>"><?php echo $wo['user']['name']?>
+						<?php if (!empty($wo['user']['is_open_to_work']) && $wo['config']['website_mode'] == 'linkedin') { ?>
+						<span class="wo_open_job_badge" title="<?php echo($wo['lang']['open_to_work']); ?>" data-toggle="tooltip"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"><path fill="currentColor" d="M10,2H14A2,2 0 0,1 16,4V6H20A2,2 0 0,1 22,8V19A2,2 0 0,1 20,21H4C2.89,21 2,20.1 2,19V8C2,6.89 2.89,6 4,6H8V4C8,2.89 8.89,2 10,2M14,6V4H10V6H14Z"></path></svg></span><?php } ?>
+					</a>
 					<p>@<?php echo $wo['user']['username']?></p>
 				</div>
 			</div>
@@ -92,7 +95,7 @@ if (!empty($user_stories)) {
 				<li class="list-group-item wow_htag" dir="auto">
 					<a href="<?php echo $wo['hashtag']['url'];?>" data-ajax="?link1=hashtag&hash=<?php echo $wo['hashtag']['tag'];?>">
 						<span class="htag_top"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z" /></svg> #<?php echo $wo['hashtag']['tag'];?></span>
-						<span class="htag_bottom"><?php echo $wo['hashtag']['trend_use_num']; ?> <?php echo $wo['lang']['posts'];?></span>
+						<span class="htag_bottom"><?php echo $wo['hashtag']['trend_use_num']; ?> <?php echo TextForMode('posts'); ?></span>
 					</a>
 				</li>
             <?php } ?>
@@ -104,7 +107,7 @@ if (!empty($user_stories)) {
 		<div class="featured-users">
 			<li class="list-group-item sidebar-title-back" contenteditable="false">
 				<?php if ($wo['user']['is_pro'] == 0) { ?>
-					<a class="pro-me-here pull-right" href="<?php echo Wo_SeoLink('index.php?link1=go-pro');?>"><?php echo $wo['lang']['put_me_here'];?></a>
+					<a class="pro-me-here pull-right" href="<?php echo Wo_SeoLink('index.php?link1=go-pro');?>" data-ajax="?link1=go-pro"><?php echo $wo['lang']['put_me_here'];?></a>
 				<?php } ?>
 				<?php echo $wo['lang']['pro_members']; ?>
 			</li>
@@ -236,8 +239,31 @@ if (!empty($user_stories)) {
                 <div class="clear"></div>
             </li>
         </ul>
+    <?php } ?>
+        <?php 
+        if ($wo['config']['website_mode'] == 'linkedin') {
+            $users = Wo_UserSugServices(5);
+            if (count($users) != 0) {
+		?>
+			<ul class="list-group" id="sidebar-user-service-container">
+				<li class="text-muted sidebar-title-back" contenteditable="false">
+					<?php echo $wo['lang']['services_you_may_know'];?>
+					<span onclick="Wo_ReloadSideBarServices();" class="<?php echo Wo_RightToLeft('pull-right');?> refresh"><i class="fa fa-repeat progress-icon" data-icon="repeat"></i></span>
+				</li>
+				<li>
+					<div class="sidebar-users-may-service-container">
+						<?php 
+							foreach ($users as $wo['UsersList']) {
+								$wo['UsersList']['user_name'] = mb_substr($wo['UsersList']['name'],0,10, "utf-8");
+								echo Wo_LoadPage('sidebar/sidebar-user-service');
+							} 
+                        ?>
+					</div>
+					<div class="clear"></div>
+				</li>
+			</ul>
+		<?php } } ?>
         <?php
-            }
             if ($wo['config']['pages'] == 1) {
             $pages = Wo_PageSug(1);
             if (count($pages) != 0) {
@@ -289,10 +315,10 @@ if (!empty($user_stories)) {
         <?php if ($wo['config']['online_sidebar'] == 1) { ?>
         <ul class="list-group">
             <?php $online = Wo_CountOnlineData();?>
-            <li class="list-group-item sidebar-title-back" contenteditable="false"><?php echo $wo['lang']['online_users'];?> <?php echo $online;?></li>
-            <li>
-                <div class="clear"></div>
-            </li>
+			<div class="wow_side_online">
+				<svg clip-rule="evenodd" fill-rule="evenodd" height="512" stroke-linejoin="round" stroke-miterlimit="2" viewBox="0 0 48 48" width="512" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="_Linear1" gradientTransform="matrix(27 -20 20 27 552 310)" gradientUnits="userSpaceOnUse" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#0056e0"/><stop offset=".01" stop-color="#0056e0"/><stop offset="1" stop-color="#00e5b8"/></linearGradient><g transform="translate(-159 -212)"><g transform="translate(-385 -60)"><g id="ngicon"><path d="m574.118 303.571c0-5.937-5.882-10.939-13.309-10.939s-13.309 5.002-13.309 10.939c0 .199.172 2.279.346 4.29.189 2.89 2.589 5.139 5.488 5.139 4.132 0 10.818 0 14.95-.002 2.899 0 5.299-2.251 5.486-5.142.175-2.006.348-4.086.348-4.285zm.076-7.914c1.854 2.286 2.924 5.036 2.924 7.914 0 .211-.172 2.398-.356 4.51-.129 1.877-.86 3.578-1.999 4.918 2.718 0 5.712-.001 7.973-.002 2.886 0 5.28-2.234 5.482-5.112.153-1.454.282-2.798.282-2.944 0-2.133-1.003-4.126-2.775-5.725-2.38-2.146-6.205-3.584-10.534-3.584-.335 0-.668.008-.997.025zm.997-11.657c-2.398 0-4.376 1.999-4.376 4.5s1.978 4.5 4.376 4.5 4.377-1.999 4.377-4.5-1.979-4.5-4.377-4.5zm-14.382-5c-2.983 0-5.436 2.495-5.436 5.605 0 3.111 2.453 5.606 5.436 5.606 2.982 0 5.436-2.495 5.436-5.606 0-3.11-2.454-5.605-5.436-5.605z" fill="url(#_Linear1)"/></g></g></g></svg>
+				<p><?php echo $online;?> <?php echo $wo['lang']['online_users'];?></p>
+			</div>
         </ul>
         <?php
             }

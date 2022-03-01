@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == "insert-event") {
     if (Wo_CheckSession($hash_id) === true) {
         if (empty($_POST['event-name']) || empty($_POST['event-locat']) || empty($_POST['event-description'])) {
@@ -24,35 +24,28 @@ if ($f == "insert-event") {
             }
             if (empty($error)) {
                 $date_start = explode('-', $_POST['event-start-date']);
-                $date_end = explode('-', $_POST['event-end-date']);
+                $date_end   = explode('-', $_POST['event-end-date']);
                 if ($date_start[0] < $date_end[0]) {
-                }
-                else{
+                } else {
                     if ($date_start[0] > $date_end[0]) {
                         $error = $error_icon . $wo['lang']['please_check_details'];
-                    }
-                    else{
+                    } else {
                         if ($date_start[1] < $date_end[1]) {
-                        }
-                        else{
+                        } else {
                             if ($date_start[1] > $date_end[1]) {
                                 $error = $error_icon . $wo['lang']['please_check_details'];
-                            }
-                            else{
+                            } else {
                                 if ($date_start[2] < $date_end[2]) {
-
-                                }
-                                else{
+                                } else {
                                     if ($date_start[2] > $date_end[2]) {
                                         $error = $error_icon . $wo['lang']['please_check_details'];
                                     }
                                 }
                             }
                         }
-                    } 
+                    }
                 }
             }
-
         }
         if (empty($error)) {
             $registration_data = array(

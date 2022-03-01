@@ -61,7 +61,7 @@ foreach ($users as $u) ...
 ```php
 //$user = dbObject::table('users')->byId(1);
 $user = user::byId(1);
-echo $user->login;
+echo $user->login; 
 ```
 
 dbObject will also assume that each table has a primary key column named "id". You may define a primaryKey property to override this assumption.

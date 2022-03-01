@@ -32,6 +32,7 @@ class Twocheckout_Util extends Twocheckout
         }
         return $array;
     }
+    
 
     public static function objectToJson($object)
     {

@@ -131,7 +131,11 @@ $pages_array = array(
    'notifications-settings',
    'two-factor',
    'my_info',
-   'invitation_links'
+   'invitation_links',
+   'experience',
+   'certifications',
+   'projects',
+   'tiers',
 );
 if ($wo['setting']['user_id'] == $wo['user']['user_id']) {
   $pages_array = array(
@@ -152,8 +156,15 @@ if ($wo['setting']['user_id'] == $wo['user']['user_id']) {
    'notifications-settings',
    'two-factor',
    'my_info',
-   'invitation_links'
+   'invitation_links',
+   'experience',
+   'certifications',
+   'projects',
+   'tiers',
    );
+}
+if ($wo['config']['store_system'] == 'on') {
+  $pages_array[] = 'addresses';
 }
 if ($wo['config']['affiliate_system'] == 1) {
   $pages_array[] = 'affiliates';
@@ -183,12 +194,56 @@ if ($wo['setting_page'] == 'invitation_links') {
 	}
 	$wo['used_links'] = Wo_GetUsedLinks($wo['setting']['user_id']);
 }
+if ($wo['setting_page'] == 'addresses' && $wo['config']['store_system'] == 'on') {
+	$wo['address_html'] = '';
+    $wo['addresses'] = $db->where('user_id',$wo['setting']['user_id'])->orderBy('id','DESC')->get(T_USER_ADDRESS);
+    if (!empty($wo['addresses'])) {
+        foreach ($wo['addresses'] as $key => $wo['address']) {
+            $wo['address_html'] .= Wo_LoadPage("setting/includes/addresses_list");
+        }
+    }
+}
+if ($wo['setting_page'] == 'tiers' && $wo['config']['website_mode'] == 'patreon') {
+	$wo['tiers_html'] = '';
+    $wo['tiers'] = $db->where('user_id',$wo['setting']['user_id'])->orderBy('id','DESC')->get(T_USER_TIERS);
+    if (!empty($wo['tiers'])) {
+        foreach ($wo['tiers'] as $key => $wo['tier']) {
+            $wo['tiers_html'] .= Wo_LoadPage("setting/includes/tiers_list");
+        }
+    }
+}
+if ($wo['setting_page'] == 'experience') {
+	$wo['experience_html'] = '';
+    $wo['experiences'] = $db->where('user_id',$wo['setting']['user_id'])->orderBy('id','DESC')->get(T_USER_EXPERIENCE);
+    if (!empty($wo['experiences'])) {
+        foreach ($wo['experiences'] as $key => $wo['experience']) {
+            $wo['experience_html'] .= Wo_LoadPage("setting/includes/experience_list");
+        }
+    }
+}
+if ($wo['setting_page'] == 'certifications') {
+	$wo['certification_html'] = '';
+    $wo['certifications'] = $db->where('user_id',$wo['setting']['user_id'])->orderBy('id','DESC')->get(T_USER_CERTIFICATION);
+    if (!empty($wo['certifications'])) {
+        foreach ($wo['certifications'] as $key => $wo['certification']) {
+            $wo['certification_html'] .= Wo_LoadPage("setting/includes/certification_list");
+        }
+    }
+}
+if ($wo['setting_page'] == 'projects') {
+	$wo['projects_html'] = '';
+    $wo['projects'] = $db->where('user_id',$wo['setting']['user_id'])->orderBy('id','DESC')->get(T_USER_PROJECTS);
+    if (!empty($wo['projects'])) {
+        foreach ($wo['projects'] as $key => $wo['project']) {
+            $wo['projects_html'] .= Wo_LoadPage("setting/includes/project_list");
+        }
+    }
+}
 ?>
 
 <div class="page-margin">
 	<div class="row setting-panel" style="position:relative;">
-		<div class="col-md-2 leftcol"><?php echo Wo_LoadPage("sidebar/left-sidebar"); ?></div>
-		<div class="col-md-7 middlecol sett_page" id="wo_main_sett_mid"><?php echo Wo_LoadPage("setting/" . $wo['setting_page']); ?></div>
-		<div class="col-md-3 sidebar rightcol sett_page" id="wo_main_sett_side"><?php echo Wo_LoadPage('setting/user-setting-sidebar');?></div>
+		<div class="col-md-9 sett_page" id="wo_main_sett_mid"><?php echo Wo_LoadPage("setting/" . $wo['setting_page']); ?></div>
+		<div class="col-md-3 sidebar sett_page" id="wo_main_sett_side"><?php echo Wo_LoadPage('setting/user-setting-sidebar');?></div>
 	</div>
 </div>

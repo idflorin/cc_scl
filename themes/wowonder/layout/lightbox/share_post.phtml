@@ -979,19 +979,10 @@
 
 <script type="text/javascript">
 $(function () {
-	$("#post-<?php echo $wo['story']['id']; ?> .post-description p, .product-description").readmore({
-      speed: 75,
-      moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
-      lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
-    });
-
-    <?php if (!empty($wo['story']['product_id'])): ?>
-       $(".product-description-<?php echo $wo['story']['product_id']; ?>").readmore({
-        speed: 75,
-        moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
-        lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
-      });
-    <?php endif; ?>
+	<?php if (!empty($wo['story']['product_id'])): ?>
+  ReadMoreText("#post-<?php echo $wo['story']['id']; ?> .product-description-<?php echo $wo['story']['product_id']; ?>");
+  <?php endif; ?>
+  ReadMoreText("#post-<?php echo $wo['story']['id']; ?> .post-description p");
     $("#post-<?php echo $wo['story']['id']; ?> .textarea").triggeredAutocomplete({
        hidden: '#hidden_inputbox_comment',
        source: Wo_Ajax_Requests_File() + "?f=mention",

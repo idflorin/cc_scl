@@ -77,12 +77,12 @@
 					<span class="user-follow-button page-message-btn"><?php echo Wo_GetPageMessageButton($wo['page_profile']['page_id']);?></span>
 					<?php if ($wo['page_profile']['is_page_onwer'] == true) { ?>
 						<?php if ($wo['config']['job_system'] == 1) { ?>
-							<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=jobs" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=jobs');?>" class="btn btn-success btn-sm btn-mat btn-mat-raised"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> <?php echo $wo['lang']['create_job']; ?></a>
+							<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=jobs" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=jobs');?>" class="btn btn-success btn-sm btn-mat wo_page_admn_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-briefcase"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> <?php echo $wo['lang']['create_job']; ?></a>
 						<?php } ?>
 						<?php if ($wo['config']['offer_system'] == 1) { ?>
-							<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=offer" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=offer');?>" class="btn btn-info btn-sm btn-mat btn-mat-raised"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> <?php echo $wo['lang']['offer']; ?></a>
+							<a data-ajax="?link1=timeline&u=<?php echo $wo['page_profile']['page_name'];?>&type=offer" href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['page_profile']['page_name'] . '&type=offer');?>" class="btn btn-info btn-sm btn-mat wo_page_admn_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-package"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg> <?php echo $wo['lang']['offer']; ?></a>
 						<?php } ?>
-						<a href="<?php echo Wo_SeoLink('index.php?link1=page-setting&page=' .  $wo['page_profile']['page_name']); ?>" data-ajax="?link1=page-setting&page=<?php echo $wo['page_profile']['page_name'];?>" class="btn btn-default btn-sm btn-mat btn-mat-raised"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg> <?php echo $wo['lang']['edit']; ?></a>
+						<a href="<?php echo Wo_SeoLink('index.php?link1=page-setting&page=' .  $wo['page_profile']['page_name']); ?>" data-ajax="?link1=page-setting&page=<?php echo $wo['page_profile']['page_name'];?>" class="btn btn-default btn-sm btn-mat wo_page_admn_btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg> <?php echo $wo['lang']['edit']; ?></a>
 					<?php } ?>
 					<span class="user-follow-button page_info_cta" style="display:none">
 						<?php echo Wo_GetCallInAction($wo['page_profile']['call_action_type'], $wo['page_profile']['call_action_type_url']);?>
@@ -854,82 +854,9 @@ $(document).ready(function() {
 		$( ".date1" ).datepicker({ dateFormat: 'yy-mm-dd', minDate: '+1day',prevText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z" /></svg>',nextText: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" /></svg>'});
       $( ".time1" ).timepicker();
 
-  var create_bar = $('.create-product-bar');
-  var create_percent = $('.create-product-percent');
-
-  $('form.edit-job-form').ajaxForm({
-      url: Wo_Ajax_Requests_File() + '?f=job&s=edit_job',
-      beforeSend: function() {
-       var percentVal = '0%';
-       create_bar.width(percentVal);
-       create_percent.html(percentVal);
-       
-       
-        $('.edit-job-form').find('.last-sett-btn .ball-pulse').fadeIn(100);
-      },
-      uploadProgress: function (event, position, total, percentComplete) {
-         var percentVal = percentComplete + '%';
-         create_bar.width(percentVal);
-         $('.edit-job-form').find('.create-product-progress').slideDown(200);
-         create_percent.html(percentVal);
-      },
-      success: function(data) {
-       if (data.status == 200) {
-         $('.edit-job-form').find('.app-general-alert').html("<div class='alert alert-success'><?php echo($wo['lang']['job_successfully_edited']) ?></div>");
-           $('.edit-job-form').find('.alert-success').fadeIn(300);
-           setTimeout(function (argument) {
-            $('.edit-job-form').find('.alert-success').fadeOut(300);
-            window.location.reload(true);
-
-           },3000);
-       } else {
-        $('.edit-job-form').find('#create-job-modal').animate({
-          scrollTop: $('html, body').offset().top //#DIV_ID is an example. Use the id of your destination on the page
-      });
-           $('.edit-job-form').find('.app-general-alert').html('<div class="alert alert-danger">' + data.error + '</div>');
-           $('.edit-job-form').find('.alert-danger').fadeIn(300);
-           setTimeout(function (argument) {
-            $('.edit-job-form').find('.alert-danger').fadeOut(300);
-
-           },3000);
-       }
-       $('.edit-job-form').find('.last-sett-btn .ball-pulse').fadeOut(100);
-      }
-  });
 
 });
-function Wo_LoadMoreApplyJobs(){
-	var after_id = ($(".job_apply").length > 0) ? $(".job_apply").last().attr('data-job-apply') : 0;
-	var job_id = $('.apply_job_info').attr('data_apply_job');
-	if (!after_id) { return false;}
-	Wo_progressIconLoader($('#load_more_nearby_users'));
-	$.ajax({
-		url: Wo_Ajax_Requests_File(),
-		type: 'GET',
-		dataType: 'json',
-		data: {
-			f:'job',
-			s:'load',
-			offset:after_id,
-			job_id:job_id
-		},
-	})
-	.done(function(data) {
 
-        if (data['status'] == 200){
-        	$(".apply_job_container").append(data.html);
-        	$("[data-toggle]").tooltip();
-        	$("#load_more_nearby_users").html('<span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg></span> <?php echo $wo['lang']['load_more']; ?>');
-        	
-        } 
-        else{
-        	$("#load_more_nearby_users").html('<?php echo $wo['lang']['no_result']; ?>');
-        } 
-	})
-	.fail(function() {
-		console.log("error");
-	})
-}
 
 
 	function OpenCreateJobModal() {

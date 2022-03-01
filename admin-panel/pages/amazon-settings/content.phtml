@@ -1,4 +1,4 @@
-<?php 
+<?php
 $wo['config']['ffmpeg']  = is_executable($wo['config']['ffmpeg_binary_file']);
 function isEnabled($func) {
     return is_callable($func) && false === stripos(ini_get('disable_functions'), $func);
@@ -37,8 +37,8 @@ if (!isEnabled('shell_exec')) {
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="fileSharing" value="0" />
-                            <input type="checkbox" name="fileSharing" id="chck-fileSharing" value="1" <?php echo ($wo['config']['fileSharing'] == 1) ? 'checked': '';?>>
-                            <label for="chck-fileSharing" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="fileSharing" id="chck-fileSharing" value="1" <?php echo ($wo['config']['fileSharing'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('fileSharing')) ?>>
+                            <label for="chck-fileSharing" class="check-trail <?php echo(EnableForMode('fileSharing',true)) ?>" <?php echo(EnableForMode('fileSharing',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -49,8 +49,8 @@ if (!isEnabled('shell_exec')) {
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="video_upload" value="0" />
-                            <input type="checkbox" name="video_upload" id="chck-video_upload" value="1" <?php echo ($wo['config']['video_upload'] == 1) ? 'checked': '';?>>
-                            <label for="chck-video_upload" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="video_upload" id="chck-video_upload" value="1" <?php echo ($wo['config']['video_upload'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('video_upload')) ?>>
+                            <label for="chck-video_upload" class="check-trail <?php echo(EnableForMode('video_upload',true)) ?>" <?php echo(EnableForMode('video_upload',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -61,8 +61,8 @@ if (!isEnabled('shell_exec')) {
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="audio_upload" value="0" />
-                            <input type="checkbox" name="audio_upload" id="chck-audio_upload" value="1" <?php echo ($wo['config']['audio_upload'] == 1) ? 'checked': '';?>>
-                            <label for="chck-audio_upload" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="audio_upload" id="chck-audio_upload" value="1" <?php echo ($wo['config']['audio_upload'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('audio_upload')) ?>>
+                            <label for="chck-audio_upload" class="check-trail <?php echo(EnableForMode('audio_upload',true)) ?>" <?php echo(EnableForMode('audio_upload',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -73,8 +73,8 @@ if (!isEnabled('shell_exec')) {
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="css_upload" value="0" />
-                            <input type="checkbox" name="css_upload" id="chck-css_upload" value="1" <?php echo ($wo['config']['css_upload'] == 1) ? 'checked': '';?>>
-                            <label for="chck-css_upload" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="css_upload" id="chck-css_upload" value="1" <?php echo ($wo['config']['css_upload'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('css_upload')) ?>>
+                            <label for="chck-css_upload" class="check-trail <?php echo(EnableForMode('css_upload',true)) ?>" <?php echo(EnableForMode('css_upload',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
@@ -132,7 +132,7 @@ if (!isEnabled('shell_exec')) {
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">FFMPEG Configuration</h6>
-                    
+
                     <form class="ffmpeg-settings" method="POST">
                         <div class="float-left">
                             <label for="ffmpeg_system" class="main-label">FFMPEG System</label>
@@ -158,10 +158,10 @@ if (!isEnabled('shell_exec')) {
                                 <label class="form-label ">FFMPEG Binary File Path</label>
                                 <?php endif; ?>
                                 <input type="text" id="ffmpeg_binary_file" name="ffmpeg_binary_file" class="form-control" value="<?php echo $wo['config']['ffmpeg_binary_file'] ?>">
-                                <small class="admin-info">Example: Linux(/usr/bin/ffmpeg) or Windows(C:\\ffmpeg\bin\ffmpeg.exe)</small> 
+                                <small class="admin-info">Example: Linux(/usr/bin/ffmpeg) or Windows(C:\\ffmpeg\bin\ffmpeg.exe)</small>
                             </div>
                         </div>
-                        
+
                         <?php if ($wo['config']['ffmpeg'] && $enabled == true): ?>
                             <hr>
                         <label for="comments_default_num" class="">Convert video speed</label>
@@ -177,7 +177,7 @@ if (!isEnabled('shell_exec')) {
                             <option value="veryslow" <?php echo ($wo['config']['convert_speed'] == 'veryslow') ? 'selected': '';?>>Veryslow</option>
                         </select>
                         <small class="admin-info">This affect the encoding speed. Using a slower preset gives you better compression, or quality per filesize, whereas faster presets give you worse compression and higher filesize.</small><?php endif; ?>
-                        
+
                         <hr>
                         <div class="form-group form-float">
                             <div class="form-line">
@@ -194,10 +194,13 @@ if (!isEnabled('shell_exec')) {
                             </div>
                         </div>
                         <hr>
-                        <label>How to install FFMPEG?</label><br>
-                        <small class="admin-info"><a href="https://www.vultr.com/docs/how-to-install-ffmpeg-on-centos" target="_blank">Install FFMPEG on Linux Centos</a><br></small>
-                        <small class="admin-info"><a href="https://github.com/adaptlearning/adapt_authoring/wiki/Installing-FFmpeg" target="_blank">Install FFMPEG on Linux Ubuntu | Windows</a></small>
-                        <small class="admin-info">If you still can't install FFMPEG, please contact your hosting provider, and they shall install it.</small>
+                        <div class="alert alert-info">
+                           <i class="fa fa-fw fa-exclamation-triangle"></i> <strong>Info: </strong> For more information on how to setup FFMPEG, please visit our <a href="https://docs.wowonder.com/#idocs_ffmpeg" target="_blank">Documentation</a> page.
+
+                       </div>
+                       <div class="alert alert-warning">
+                          Make sure to debug FFMPEG below after configuring ffmpeg.
+                      </div>
                         <div class="ffmpeg-settings-alert"></div>
                         <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
                     </form>
@@ -228,6 +231,9 @@ if (!isEnabled('shell_exec')) {
              <div class="alert alert-warning">
                 <i class="fa fa-fw fa-exclamation-triangle"></i> <strong>Important:</strong> You can't enable two or three storages at the same time, if you enable FTP, amazon s3 will be automatically disabled, same for amazon s3, Digitalocean and Google.
             </div>
+            <div class="alert alert-info">
+               <i class="fa fa-fw fa-exclamation-triangle"></i> <strong>Info: </strong> For more information on how to setup third party storage, please visit our <a href="https://docs.wowonder.com/#idocs_storage" target="_blank">Documentation</a> page.
+           </div>
         </div>
         <div class="col-lg-6 col-md-6">
             <div class="card">
@@ -354,6 +360,66 @@ if (!isEnabled('shell_exec')) {
                     </form>
                 </div>
             </div>
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">Wasabi Configuration</h6>
+                    <form class="wasabi_storage-settings" method="POST">
+                         <div class="float-left">
+                            <label for="wasabi_storage" class="main-label">Wasabi Storage</label>
+                            <br><small class="admin-info">Enable Wasabi Storage to store your files in Wasabi Spaces.</small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="wasabi_storage" value="0" />
+                            <input type="checkbox" name="wasabi_storage" id="chck-wasabi_storage" value="1" <?php echo ($wo['config']['wasabi_storage'] == 1) ? 'checked': '';?>>
+                            <label for="chck-wasabi_storage" class="check-trail"><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Wasabi Bucket Name</label>
+                                <input type="text" id="wasabi_bucket_name" name="wasabi_bucket_name" class="form-control" value="<?php echo $wo['config']['wasabi_bucket_name']?>">
+                                <small class="admin-info">Your Wasabi Bucket Name.</small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Wasabi Access Key</label>
+                                <input type="text" id="wasabi_access_key" name="wasabi_access_key" class="form-control" value="<?php echo $wo['config']['wasabi_access_key']?>">
+                                <small class="admin-info">Your Wasabi Access Key.</small>
+                            </div>
+                        </div>
+                        <div class="form-group form-float">
+                            <div class="form-line">
+                                <label class="form-label">Wasabi Secret Key</label>
+                                <input type="text" id="wasabi_secret_key" name="wasabi_secret_key" class="form-control" value="<?php echo $wo['config']['wasabi_secret_key']?>">
+                                <small class="admin-info">Your Wasabi Secret Key.</small>
+                            </div>
+                        </div>
+                        <label for="wasabi_bucket_region">Wasabi bucket region</label>
+                        <select class="form-control show-tick" id="wasabi_bucket_region" name="wasabi_bucket_region">
+                          <option value="us-west-1" <?php echo ($wo['config']['wasabi_bucket_region'] == 'us-west-1')   ? ' selected' : '';?> >us-west-1</option>
+                          <option value="ap-northeast-1" <?php echo ($wo['config']['wasabi_bucket_region'] == 'ap-northeast-1')   ? ' selected' : '';?> >ap-northeast-1</option>
+                          <option value="ap-northeast-2" <?php echo ($wo['config']['wasabi_bucket_region'] == 'ap-northeast-2')   ? ' selected' : '';?> >ap-northeast-2</option>
+                          <option value="eu-central-1" <?php echo ($wo['config']['wasabi_bucket_region'] == 'eu-central-1')   ? ' selected' : '';?> >eu-central-1</option>
+                          <option value="eu-west-1" <?php echo ($wo['config']['wasabi_bucket_region'] == 'eu-west-1')   ? ' selected' : '';?> >eu-west-1</option>
+                          <option value="eu-west-2" <?php echo ($wo['config']['wasabi_bucket_region'] == 'eu-west-2')   ? ' selected' : '';?> >eu-west-2</option>
+                          <option value="us-central-1" <?php echo ($wo['config']['wasabi_bucket_region'] == 'us-central-1')   ? ' selected' : '';?> >us-central-1</option>
+                          <option value="us-east-1" <?php echo ($wo['config']['wasabi_bucket_region'] == 'us-east-1')   ? ' selected' : '';?> >us-east-1</option>
+                          <option value="us-east-2" <?php echo ($wo['config']['wasabi_bucket_region'] == 'us-east-2')   ? ' selected' : '';?> >us-east-2</option>
+                        </select>
+                        <div class="clearfix"></div>
+                        <br>
+                        <div class="alert alert-info">
+                            Before enabling Wasabi, make sure you upload the whole "upload/" folder to your bucket. <br><br>
+                            Before disabling Wasabi, make sure you download the whole "upload/" folder to your server. <br><br>
+                        </div>
+                        <input type="hidden" name="hash_id" value="<?php echo Wo_CreateSession();?>">
+                        <div class="wasabi_storage_alert"></div>
+                        <button type="button" class="btn btn-success m-t-15 waves-effect" onclick="Wo_TestWasabi()">Test & Verify Connection</button>
+                    </form>
+                </div>
+            </div>
         </div>
         <div class="col-lg-6 col-md-6">
             <div class="card">
@@ -431,7 +497,7 @@ if (!isEnabled('shell_exec')) {
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">Google Cloud Settings</h6>
-                    
+
                     <form class="drive-settings" method="POST">
                          <div class="float-left">
                             <label for="cloud_upload" class="main-label">Google Cloud Storage</label>
@@ -481,6 +547,38 @@ if (!isEnabled('shell_exec')) {
     </div>
     <!-- #END# Vertical Layout -->
 <script>
+function Wo_TestWasabi() {
+    $('form.wasabi_storage-settings').find('.btn-success').text('Please wait..');
+    $.get(Wo_Ajax_Requests_File(), {f:'admin_setting', s: 'test_wasabi'}, function (data) {
+        if (data.status == 200) {
+            $('.wasabi_storage_alert').html('<div class="alert alert-success"><i class="fa fa-check"></i> Connection established!</div>');
+            setTimeout(function () {
+                $('.wasabi_storage_alert').empty();
+            }, 2000);
+        } else if (data.status == 300) {
+            $('.wasabi_storage_alert').html('<div class="alert alert-danger">Bucket doesn\'t exists</div>');
+            setTimeout(function () {
+                $('.wasabi_storage_alert').empty();
+            }, 5000);
+        } else if (data.status == 500) {
+            $('.wasabi_storage_alert').html('<div class="alert alert-danger">Your s3 account doesn\'t have any buckets, please create one.</div>');
+            setTimeout(function () {
+                $('.wasabi_storage_alert').empty();
+            }, 5000);
+        } else if (data.status == 400) {
+            $('.wasabi_storage_alert').html('<div class="alert alert-danger">'+data.message+'</div>');
+            setTimeout(function () {
+                $('.wasabi_storage_alert').empty();
+            }, 5000);
+        } else  {
+            $('.wasabi_storage_alert').html('<div class="alert alert-danger">Error while connecting to amazone, please check your details</div>');
+            setTimeout(function () {
+                $('.wasabi_storage_alert').empty();
+            }, 5000);
+        }
+        $('form.wasabi_storage-settings').find('.btn-success').text('Test & Verify Connection');
+    });
+}
 function Wo_TestCloud() {
     $('form.drive-settings').find('.btn-warning').text('Please wait..');
     $.get(Wo_Ajax_Requests_File(), {f:'admin_setting', s: 'test_cloud'}, function (data) {
@@ -651,7 +749,7 @@ $(function() {
             });
     }, 500));
 
-    $('input[type=file]').on('change', function(){ 
+    $('input[type=file]').on('change', function(){
         var objData = new FormData();
         var thisElement = $(this);
         var file = $(this)[0].files[0];

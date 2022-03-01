@@ -20,6 +20,33 @@
       <?php include 'header.phtml'; ?>
     <!-- header -->
       <div class="post-description" id="post-description-<?php echo $wo['story']['id']; ?>">
+        <div style="position: relative;">
+          <?php if (!PatreonPostSubscribed($wo['story']['user_id'],$wo['story']['id'])) { ?>
+          <div style="min-height: 150px;">
+            <div data-tag="locked-post-icon" class="sc-jrAGrp HEAiT">
+              <div class="sc-jrAGrp iylycj">
+                <div class="sc-jrAGrp gOFcxw">
+                  <div class="sc-1de6id1-2 dIPYOR">
+                    <div class="sc-crrsfI ejVMUJ">
+                      <span class="sc-iqHYGH jBzsQN">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect data-fill="1" data-stroke="1" height="12" rx="1.5" stroke-linecap="round" stroke-linejoin="round" width="14.67" x="5" y="10"></rect><path d="M7.667 10V6.667a4.667 4.667 0 1 1 9.333 0V10M12.333 14.667v2.666" data-stroke="1" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="sc-jrAGrp RrcPe">
+                  <span color="dark" class="sc-gsTCUz jcfRER"><?php echo $wo['lang']['unlock_content_post_text'] ?></span>
+                </div>
+                <div class="sc-bBrOnJ cXbAib" color="tertiary" tabindex="0" type="button">
+                  <div tabindex="-1" class="sc-jNMdTA jLYHuC">
+                    <svg aria-label="Loading" viewBox="0 0 64 64" class="sc-hBEYos tJRfY"><circle cx="32" cy="32" r="32" class="sc-fodVxV ckHrzE"></circle><circle color="primary" cx="32" cy="32" r="32" stroke-linecap="round" class="sc-fFubgz kmlhvQ"></circle></svg>
+                  </div>
+                  <div class="sc-cTkwdZ cEwkgS"><?php echo $wo['lang']['join_now'] ?></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php }else { ?>
          <?php if (!empty($wo['story']['parent_id'])) { ?>
          <div>
             <p class="edited_text"><?php echo $wo['story']['postText']; ?></p>
@@ -303,6 +330,14 @@
             ?>
         <!-- poll -->
          <?php } ?>
+         <?php } ?>
+        </div>
+
+
+
+
+
+
          <div class="clear"></div>
          <!-- footer -->
          <?php include 'footer.phtml'; ?>
@@ -318,19 +353,10 @@
 </div>
 <script type="text/javascript">
    $(function () {
-    $("#post-<?php echo $wo['story']['id']; ?> .post-description p, .product-description").readmore({
-         speed: 75,
-         moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
-         lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
-       });
-   
-       <?php if (!empty($wo['story']['product_id'])): ?>
-          $(".product-description-<?php echo $wo['story']['product_id']; ?>").readmore({
-           speed: 75,
-           moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
-           lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
-         });
-       <?php endif; ?>
+    <?php if (!empty($wo['story']['product_id'])): ?>
+  ReadMoreText("#post-<?php echo $wo['story']['id']; ?> .product-description-<?php echo $wo['story']['product_id']; ?>");
+  <?php endif; ?>
+  ReadMoreText("#post-<?php echo $wo['story']['id']; ?> .post-description p");
        $("#post-<?php echo $wo['story']['id']; ?> .textarea").triggeredAutocomplete({
           hidden: '#hidden_inputbox_comment',
           source: Wo_Ajax_Requests_File() + "?f=mention",

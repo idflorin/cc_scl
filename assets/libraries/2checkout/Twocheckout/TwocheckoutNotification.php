@@ -16,5 +16,5 @@ class Twocheckout_Notification extends Twocheckout
         }
         return Twocheckout_Util::returnResponse($result);
     }
-
+ 
 }

@@ -99,10 +99,8 @@
 
 <script type="text/javascript">
    $(function () {
-   $("#post-<?php echo $wo['story']['id']; ?> .post-description p, .product-description").readmore({
-         speed: 75,
-         moreLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_more"];?></a>',
-         lessLink: '<a href="#" class="hash"><?php echo $wo["lang"]["read_less"];?></a>'
-       });
+   	<?php if (!empty($wo['story']['job']['id'])): ?>
+	  ReadMoreText("#post-description-<?php echo $wo['story']['job']['id']; ?>");
+	  <?php endif; ?>
    });
 </script>

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Rize\UriTemplate\Node;
 
@@ -8,4 +8,4 @@ namespace Rize\UriTemplate\Node;
 class Literal extends Abstraction
 {
 
-}
+} 

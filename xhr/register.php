@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == 'register') {
     if (!empty($_SESSION['user_id'])) {
         $_SESSION['user_id'] = '';
@@ -8,10 +8,10 @@ if ($f == 'register') {
         $_COOKIE['user_id'] = '';
         unset($_COOKIE['user_id']);
         setcookie('user_id', null, -1);
-        setcookie('user_id', null, -1,'/');
+        setcookie('user_id', null, -1, '/');
     }
     if ($wo['config']['auto_username'] == 1) {
-        $_POST['username'] = time().rand(111111,999999);
+        $_POST['username'] = time() . rand(111111, 999999);
         if (empty($_POST['first_name']) || empty($_POST['last_name'])) {
             $errors = $error_icon . $wo['lang']['first_name_last_name_empty'];
             header("Content-type: application/json");
@@ -20,7 +20,7 @@ if ($f == 'register') {
             ));
             exit();
         }
-        if (preg_match('/[^\w\s]+/u',$_POST['first_name']) || preg_match('/[^\w\s]+/u',$_POST['last_name'])) {
+        if (preg_match('/[^\w\s]+/u', $_POST['first_name']) || preg_match('/[^\w\s]+/u', $_POST['last_name'])) {
             $errors = $error_icon . $wo['lang']['username_invalid_characters'];
         }
     }
@@ -86,13 +86,6 @@ if ($f == 'register') {
         if (in_array($_POST['gender'], array_keys($wo['genders']))) {
             $gender = $_POST['gender'];
         }
-        // if (!empty($_POST['gender'])) {
-        //     if ($_POST['gender'] != 'male' && $_POST['gender'] != 'female') {
-        //         $gender = 'male';
-        //     } else {
-        //         $gender = $_POST['gender'];
-        //     }
-        // }
         if (!empty($fields) && count($fields) > 0) {
             foreach ($fields as $key => $field) {
                 if (empty($_POST[$field['fid']])) {
@@ -119,7 +112,7 @@ if ($f == 'register') {
             }
         }
         $activate = ($wo['config']['emailValidation'] == '1') ? '0' : '1';
-        $code = md5(rand(1111, 9999) . time());
+        $code     = md5(rand(1111, 9999) . time());
         $re_data  = array(
             'email' => Wo_Secure($_POST['email'], 0),
             'username' => Wo_Secure($_POST['username'], 0),
@@ -131,6 +124,13 @@ if ($f == 'register') {
             'active' => Wo_Secure($activate),
             'birthday' => '0000-00-00'
         );
+        if ($wo['config']['website_mode'] == 'linkedin' && !empty($_POST['currently_working']) && in_array($_POST['currently_working'], array(
+            'yes',
+            'am_looking_to_work',
+            'am_looking_for_employees'
+        ))) {
+            $re_data['currently_working'] = Wo_Secure($_POST['currently_working'], 0);
+        }
         if ($wo['config']['auto_username'] == 1) {
             if (!empty($_POST['first_name'])) {
                 $re_data['first_name'] = Wo_Secure($_POST['first_name']);
@@ -139,7 +139,6 @@ if ($f == 'register') {
                 $re_data['last_name'] = Wo_Secure($_POST['last_name']);
             }
         }
-            
         if ($gender == 'female') {
             $re_data['avatar'] = "upload/photos/f-avatar.jpg";
         }
@@ -148,40 +147,43 @@ if ($f == 'register') {
             if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
                 $re_data['referrer'] = Wo_Secure($ref_user_id);
                 $re_data['src']      = Wo_Secure('Referrer');
-                $update_balance      = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
+                if ($wo['config']['affiliate_level'] < 2) {
+                    $update_balance = Wo_UpdateBalance($ref_user_id, $wo['config']['amount_ref']);
+                }
                 unset($_SESSION['ref']);
             }
-        }
-        elseif (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 1) {
+        } elseif (!empty($_SESSION['ref']) && $wo['config']['affiliate_type'] == 1) {
             $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
             if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
-                $re_data['ref_user_id']      = Wo_Secure($ref_user_id);
+                $re_data['ref_user_id'] = Wo_Secure($ref_user_id);
             }
         }
         if (!empty($_POST['phone_num'])) {
             $re_data['phone_number'] = Wo_Secure($_POST['phone_num']);
         }
-        $in_code  = (isset($_POST['invited'])) ? Wo_Secure($_POST['invited']) : false;
+        $in_code = (isset($_POST['invited'])) ? Wo_Secure($_POST['invited']) : false;
         if (empty($_POST['phone_num'])) {
             $register = Wo_RegisterUser($re_data, $in_code);
-        }
-        else{
-            if($activate == 1){
-               $register = Wo_RegisterUser($re_data, $in_code);
-            }
-            else{
+        } else {
+            if ($activate == 1) {
+                $register = Wo_RegisterUser($re_data, $in_code);
+            } else {
                 $register = true;
             }
         }
-        
         if ($register === true) {
-            if ($activate == 1 || ($wo['config']['sms_or_email'] == 'mail' && $activate != 1)) { 
+            $r_id = Wo_UserIdFromUsername($_POST['username']);
+            if (!empty($re_data['referrer']) && is_numeric($wo['config']['affiliate_level']) && $wo['config']['affiliate_level'] > 1) {
+                AddNewRef($re_data['referrer'], $r_id, $wo['config']['amount_ref']);
+            }
+            if ($activate == 1 || ($wo['config']['sms_or_email'] == 'mail' && $activate != 1)) {
+                $wo['user'] = Wo_UserData($r_id);
                 if ($wo['config']['auto_username'] == 1) {
-                    $r_id = Wo_UserIdFromUsername($_POST['username']);
-                    $_POST['username'] = $_POST['username']."_".$r_id;
-                    $db->where('user_id',$r_id)->update(T_USERS,array('username' => $_POST['username']));
+                    $_POST['username'] = $_POST['username'] . "_" . $r_id;
+                    $db->where('user_id', $r_id)->update(T_USERS, array(
+                        'username' => $_POST['username']
+                    ));
                 }
-                
                 if (!empty($wo['config']['auto_friend_users'])) {
                     $autoFollow = Wo_AutoFollow(Wo_UserIdFromUsername($_POST['username']));
                 }
@@ -192,7 +194,6 @@ if ($f == 'register') {
                     Wo_AutoGroupJoin(Wo_UserIdFromUsername($_POST['username']));
                 }
             }
-                
             if ($activate == 1) {
                 $data  = array(
                     'status' => 200,
@@ -204,7 +205,6 @@ if ($f == 'register') {
                     $_SESSION['user_id'] = $session;
                     setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
                 }
-                
                 $data['location'] = Wo_SeoLink('index.php?link1=start-up');
                 if ($wo['config']['membership_system'] == 1) {
                     $data['location'] = Wo_SeoLink('index.php?link1=go-pro');
@@ -225,38 +225,27 @@ if ($f == 'register') {
                 );
                 $send              = Wo_SendMessage($send_message_data);
                 $errors            = $success_icon . $wo['lang']['successfully_joined_verify_label'];
-                // if ($wo['config']['membership_system'] == 1) {
-                //     $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
-                //     $_SESSION['user_id'] = $session;
-                //     setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
-                // }
             } else if ($wo['config']['sms_or_email'] == 'sms' && !empty($_POST['phone_num'])) {
                 $random_activation = Wo_Secure(rand(11111, 99999));
                 $message           = "Your confirmation code is: {$random_activation}";
-                
-                //if ($query) {
-                    if (Wo_SendSMSMessage($_POST['phone_num'], $message) === true) {
-                        $register = Wo_RegisterUser($re_data, $in_code);
-                        if ($wo['config']['auto_username'] == 1) {
-                            $r_id = Wo_UserIdFromUsername($_POST['username']);
-                            $_POST['username'] = $_POST['username']."_".$r_id;
-                            $db->where('user_id',$r_id)->update(T_USERS,array('username' => $_POST['username']));
-                        }
-                        $user_id           = Wo_UserIdFromUsername($_POST['username']);
-                        $query             = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
-                        $data = array(
-                            'status' => 300,
-                            'location' => Wo_SeoLink('index.php?link1=confirm-sms?code=' . $code)
-                        );
-                        // if ($wo['config']['membership_system'] == 1) {
-                        //     $session             = Wo_CreateLoginSession(Wo_UserIdFromUsername($_POST['username']));
-                        //     $_SESSION['user_id'] = $session;
-                        //     setcookie("user_id", $session, time() + (10 * 365 * 24 * 60 * 60));
-                        // }
-                    } else {
-                        $errors = $error_icon . $wo['lang']['failed_to_send_code_email'];
+                if (Wo_SendSMSMessage($_POST['phone_num'], $message) === true) {
+                    $register = Wo_RegisterUser($re_data, $in_code);
+                    if ($wo['config']['auto_username'] == 1) {
+                        $r_id              = Wo_UserIdFromUsername($_POST['username']);
+                        $_POST['username'] = $_POST['username'] . "_" . $r_id;
+                        $db->where('user_id', $r_id)->update(T_USERS, array(
+                            'username' => $_POST['username']
+                        ));
                     }
-                //}
+                    $user_id = Wo_UserIdFromUsername($_POST['username']);
+                    $query   = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `sms_code` = '{$random_activation}' WHERE `user_id` = {$user_id}");
+                    $data    = array(
+                        'status' => 300,
+                        'location' => Wo_SeoLink('index.php?link1=confirm-sms?code=' . $code)
+                    );
+                } else {
+                    $errors = $error_icon . $wo['lang']['failed_to_send_code_email'];
+                }
             }
         }
         if (!empty($field_data)) {

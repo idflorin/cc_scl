@@ -8,6 +8,7 @@ if (!version_compare(PHP_VERSION, '5.5.0', '>=')) {
 date_default_timezone_set('UTC');
 session_start();
 @ini_set('gd.jpeg_ignore_warning', 1);
+require_once('assets/libraries/DB/vendor/joshcam/mysqli-database-class/MySQL-Maria.php');
 require_once('includes/cache.php');
 require_once('includes/functions_general.php');
 require_once('includes/tabels.php');

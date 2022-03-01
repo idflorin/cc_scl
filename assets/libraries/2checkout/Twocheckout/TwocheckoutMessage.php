@@ -10,4 +10,4 @@ class Twocheckout_Message
         $response = json_encode($response);
         return $response;
     }
-}
+} 

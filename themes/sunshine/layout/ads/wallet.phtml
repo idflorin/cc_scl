@@ -1,10 +1,7 @@
 <script src="https://js.stripe.com/v3/"></script>
 <?php $loadPage = Wo_LoadPage('thirdparty/paypal-demo'); echo (!empty($loadPage)) ? $loadPage : '';?>
 <div class="row">
-	<div class="col-md-3">
-		<?php echo Wo_LoadPage('ads/includes/header'); ?>
-	</div>
-	<div class="col-md-9">
+	<div class="col-md-12">
 		<div class="list-group wo_ads_wallet page-margin">
 			<?php if (isset($wo['replenishment_notif'])): ?>
 				<div class="col-md-12" id="replenish-user-account-alert">
@@ -68,7 +65,12 @@
 				$wo['trans'] = Wo_GetMytransactions();
 			?>
 			<div class="wallet_transactions">
-				<h3><?php echo $wo['lang']['transaction_log']; ?></h3>
+				<h3>
+					<?php echo $wo['lang']['transaction_log']; ?>
+					<?php if ($wo['config']['affiliate_system'] == 1 || $wo['config']['point_allow_withdrawal'] == 1 || $wo['config']['funding_system'] == 1 || $wo['config']['store_system'] == 'on') { ?>
+						<a href="<?php echo Wo_SeoLink('index.php?link1=withdrawal'); ?>" data-ajax="?link1=withdrawal" class="btn btn-sm btn-main"><?php echo($wo['lang']['withdrawal']) ?></a>
+					<?php } ?>
+				</h3>
 				<div class="tabbable">
 					<?php echo Wo_LoadPage('ads/includes/latest_activities');?>
 				</div>
@@ -570,6 +572,17 @@ $(function() {
     // Pull in the public encryption key for our environment
     TCO.loadPubKey("<?php echo($wo['config']['checkout_mode']) ?>");
 });
+<?php } ?>
+<?php if ($wo['config']['coinbase_payment'] == '1' && !empty($wo['config']['coinbase_key'])) { ?>
+function pay_using_coinbase() {
+    $('#pay-go-pro').modal({show: false});
+    amount = $('#amount').val();
+    $.get(Wo_Ajax_Requests_File() + '?f=coinbase&s=create',{amount:amount}, function (data) {
+	    if (data.status == 200) {
+	        window.location.href = data.url;
+	    }
+    });
+}
 <?php } ?>
 </script>
 

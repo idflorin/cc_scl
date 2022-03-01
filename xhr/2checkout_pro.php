@@ -119,12 +119,9 @@ if ($f == "2checkout_pro") {
                             if ((!empty($_SESSION['ref']) || !empty($wo['user']['ref_user_id'])) && $wo['config']['affiliate_type'] == 1 && $wo['user']['referrer'] == 0) {
                                 if (!empty($_SESSION['ref'])) {
                                     $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
-                                }
-                                elseif (!empty($wo['user']['ref_user_id'])) {
+                                } elseif (!empty($wo['user']['ref_user_id'])) {
                                     $ref_user_id = Wo_UserIdFromUsername($wo['user']['ref_user_id']);
                                 }
-
-
                                 if ($wo['config']['amount_percent_ref'] > 0) {
                                     if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
                                         $update_user    = Wo_UpdateUserData($wo['user']['user_id'], array(
@@ -145,7 +142,6 @@ if ($f == "2checkout_pro") {
                                         unset($_SESSION['ref']);
                                     }
                                 }
-                                
                             }
                             $notes              = $wo['lang']['upgrade_to_pro'] . " " . $img . " : Credit Card";
                             $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$wo['user']['user_id']}, 'PRO', {$amount1}, '{$notes}')");
@@ -196,4 +192,3 @@ if ($f == "2checkout_pro") {
     echo json_encode($data);
     exit();
 }
-

@@ -52,6 +52,12 @@
 						<?php echo $wo['lang']['bitcoin'] ?>
 					</button>
 				<?php } ?>
+				<?php if ($wo['config']['coinbase_payment'] == '1' && !empty($wo['config']['coinbase_key'])) { ?>
+				<!-- Coinbase -->
+					<button class="btn-coinbase btn" onclick="pay_using_coinbase();">
+						<img src="<?php echo $wo['config']['theme_url'];?>/img/coinbase.png"> <?php echo $wo['lang']['coinbase'] ?>
+					</button>
+				<?php } ?>
 				
 				<?php if ($wo['config']['alipay'] == 'yes') { ?>
 				<!-- Alipay -->

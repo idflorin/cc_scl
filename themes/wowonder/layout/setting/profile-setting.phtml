@@ -1,5 +1,5 @@
 <div class="wo_settings_page wow_content">
-	<div class="avatar-holder">
+	<div class="avatar-holder profile">
 		<img src="<?php echo $wo['setting']['avatar']?>" alt="<?php echo $wo['setting']['name']?> Profile Picture" class="avatar">
 		<div class="infoz">
 			<h5 title="<?php echo $wo['setting']['name']?>"><a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['setting']['username'] . '');?>" data-ajax="?link1=timeline&u=<?php echo $wo['setting']['username'] ?>"><?php echo $wo['setting']['name']?></a></h5>
@@ -88,6 +88,22 @@
 					</select>
 				</div>
 			</div>
+			<?php if ($wo['config']['website_mode'] == 'linkedin') { ?>
+				<div class="col-md-12 skills_div">
+					<div class="wow_form_fields">
+						<label for="skills"><?php echo $wo['lang']['skills']; ?></label>
+						<input id="skills" name="skills" type="text" value="<?php echo $wo['setting']['skills'];?>">
+						<div class="skills_result"></div>
+					</div>
+				</div>
+				<div class="col-md-12 languages_div">
+					<div class="wow_form_fields">
+						<label for="languages"><?php echo $wo['lang']['languages']; ?></label>
+						<input id="languages" name="languages" type="text" value="<?php echo implode(",", $wo['setting']['formated_langs']);?>">
+						<div class="dropdown-menu languages_result"></div>
+					</div>
+				</div>
+		  <?php } ?>
 		</div>
 
 		<?php
@@ -154,6 +170,18 @@
 </div>
 
 <script type="text/javascript">
+<?php if ($wo['config']['website_mode'] == 'linkedin') { ?>
+	$("#skills").tagsinput({});
+	$("#languages").tagsinput({});
+
+	$($('.skills_div .bootstrap-tagsinput').find('input')).on('keyup', function(event) {
+			SearchSkill($(this).val())
+	});
+
+	$($('.languages_div .bootstrap-tagsinput').find('input')).on('keyup', function(event) {
+			SearchLanguages($(this).val())
+	});
+<?php } ?>
 var relationship_users = [];
 var relationship_user  = 0;
 function Wo_RelationshipSearch(name = ''){
@@ -199,6 +227,7 @@ $(function() {
       $('.wo_settings_page').find('.add_wow_loader').addClass('btn-loading');
     },
     success: function(data) {
+    	$('.skills_result').html('');
       if (data.status == 200) {
         <?php if($wo['user']['user_id'] == $wo['setting']['user_id']) { ?>
         if (data.first_name != '' || data.last_name != '') {

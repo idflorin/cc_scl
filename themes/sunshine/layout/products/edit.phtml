@@ -44,7 +44,7 @@
 								</select>
 							</div>
 						</div>
-						<div class="form-group col-lg-8">
+						<div class="form-group col-lg-8 product_sub_category_class" style="<?php echo((empty($wo['products_sub_categories'][$wo['product']['category']]) ? 'display: none;' : '')) ?>">
 							<label class="col-md-12" for="product_sub_category"><?php echo $wo['lang']['sub_category'] ?></label>  
 							<div class="col-md-12">
 								<select class="form-control" name="product_sub_category" id="product_sub_category">
@@ -169,11 +169,13 @@ echo "var sub_categories_array = ". $js_array . ";\n";
 ?>
 	function GetProductSubCategory(self) {
 		id = $(self).val();
+		$('.product_sub_category_class').slideUp();
 		var text = "";
 		if (typeof(sub_categories_array[id]) == 'undefined') {
 		    $('#product_sub_category').html('');
 		}
 		else{
+			$('.product_sub_category_class').slideDown();
 		   	sub_categories_array[id].forEach(function(entry) {
 				text = text + "<option value='"+entry.id+"'>"+entry.lang+"</option>";
 			});

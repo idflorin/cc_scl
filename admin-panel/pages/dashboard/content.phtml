@@ -641,7 +641,7 @@ function users() {
                     <?php }elseif ($main_range == 'This Year') { ?>
                     categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct','Nov','Dec']
                     <?php }elseif ($main_range == 'Custom') {
-                        echo "categories: [".implode(array_keys($array), ',')."]";
+                        echo "categories: [".implode(',',array_keys($array))."]";
                     } ?>
             },
             tooltip: {

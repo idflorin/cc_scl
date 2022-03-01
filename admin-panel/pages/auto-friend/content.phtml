@@ -29,7 +29,7 @@
                         <hr>
                         <div class="alert alert-warning">This process might take some time, you can check for your site changes after few minutes.</div>
                         <div class="clearfix"></div>
-                  <button type="submit" class="btn btn-danger waves-effect waves-light m-t-20" id="users-btn">Save</button>
+                  <button type="submit" class="btn btn-danger waves-effect waves-light m-t-20" id="users-btn-friend">Save</button>
                 </div>
             </div>
         </div>
@@ -37,13 +37,13 @@
     </div>
     </div>
 <script>
-$(document).on('click', '#users-btn', function(event) {
+$(document).on('click', '#users-btn-friend', function(event) {
 	event.preventDefault();
 	$(this).text('Please wait..');
 	$.get(Wo_Ajax_Requests_File(), {f:'admin_setting', s: 'auto_friend', users: $('#users').val()}, function(data, textStatus, xhr) {
-		$('#users-btn').text('Saved!');
+		$('#users-btn-friend').text('Saved!');
 		setTimeout(function () {
-			$('#users-btn').text('Save');
+			$('#users-btn-friend').text('Save');
 		}, 4000);
 	});
 });

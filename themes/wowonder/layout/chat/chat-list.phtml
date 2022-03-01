@@ -93,10 +93,20 @@ if ($wo['chatMessage']['from_id'] != $wo['user']['user_id']) {
 			</div>
 		<?php endif ?>
 		<div class="clear"></div>
-		<?php if (!empty($wo['chatMessage']['story'])) { ?>
+		<?php if (!empty($wo['chatMessage']['story'])) {
+			if (!empty($wo['chatMessage']['story']['thumbnail'])) {
+				$wo['chatMessage']['story']['thumbnail'] = Wo_GetMedia($wo['chatMessage']['story']['thumbnail']);
+			}
+			else{
+				$u = Wo_UserData($wo['chatMessage']['story']['user_id']);
+				if (!empty($u)) {
+					$wo['chatMessage']['story']['thumbnail'] = $u['avatar'];
+				}
+			}
+		 ?>
 			<div class="wo_chat_story">
 				<div class="wo_chat_story_innr" onclick="Get_CurrentStory(<?php echo $wo['chatMessage']['story']['id']?>,'user')">
-					<img src="<?php echo Wo_GetMedia($wo['chatMessage']['story']['thumbnail']);?>">
+					<img src="<?php echo $wo['chatMessage']['story']['thumbnail'];?>">
 					<p><?php echo $wo['lang']['view_story'];?></p>
 				</div>
 			</div>

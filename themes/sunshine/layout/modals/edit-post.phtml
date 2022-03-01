@@ -8,6 +8,7 @@
 				</div>
 				<?php //var_dump($wo['story']); ?>
 				<div class="modal-body edit-textarea-<?php echo $wo['story']['id'];?>">
+					<div class="edit_alert"></div>
 					<textarea class="form-control" style="padding: 0px; border: 0" placeholder="<?php echo $wo['lang']['edit_post']?>" dir="auto" rows="5" onkeyup="Wo_Get_Mention(this)" name="text"><?php
 
 
@@ -28,7 +29,7 @@
 					?>
 					<br>
 					<div class="wow_prod_imgs">
-						<input type="file" name="images[]" id="publisher-post-photos-<?php echo $wo['story']['id']; ?>" class="hidden">
+						<input type="file" name="images[]" id="publisher-post-photos-<?php echo $wo['story']['id']; ?>" class="hidden" class="edit_post_r_images" multiple="multiple" accept="image/x-png, image/gif, image/jpeg">
 						<div class="upload-product-image" onclick="document.getElementById('publisher-post-photos-<?php echo $wo['story']['id']; ?>').click(); return false">
 							<div class="upload-image-content">
 								<svg xmlns="http://www.w3.org/2000/svg" class="feather" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" /></svg>
@@ -47,7 +48,7 @@
 						    }
 						    if (!empty($wo['story']['photo_multi'])) {
 						    	foreach ($wo['story']['photo_multi'] as $key => $value) { ?>
-						    	<span class="thumb-image thumb-image-delete" id="delete_image_by_id_<?php echo $value['id']; ?>">
+						    	<span class="thumb-image thumb-image-delete thumb-image-old" id="delete_image_by_id_<?php echo $value['id']; ?>">
 									<span onclick="DeletePostImage(<?php echo $wo['story']['id']; ?>,<?php echo $value['id']; ?>)" class="pointer thumb-image-delete-btn"><i class="fa fa-remove"></i></span>
 									<div class="background_image_product" style="background-image: url('<?php echo $value['image']; ?>');"></div>
 								</span>
@@ -57,6 +58,7 @@
 					</div>
 				    <?php } ?>
 				    <input type="hidden" name="post_id" value="<?php echo $wo['story']['id']; ?>">
+				    <input type="hidden" name="all_images" value="0" id="all_images">
 				</div>
 				<div class="modal-footer" style="border: none">
 					<div class="ball-pulse"><div></div><div></div><div></div></div>
@@ -78,6 +80,12 @@
 		  var type = post.attr('data-post-type');
 		$('#edit-post-form-<?php echo $wo['story']['id'];?>').ajaxForm({
 	      url: Wo_Ajax_Requests_File() + '?f=posts&s=edit_post',
+	      beforeSubmit: function(arr, $form, options) { 
+	      	if ($('#edit-post-form-'+<?php echo $wo['story']['id'];?>).find('.thumb-image').length < 1 && $('#edit-post-form-'+<?php echo $wo['story']['id'];?>).find('textarea').val() == '') {
+		      $('#edit-post-form-'+<?php echo $wo['story']['id'];?>).find('.edit_alert').html("<div class='alert alert-danger'><?php echo $wo['lang']['you_must_add_text_or_image_first']; ?></div>");
+		      return false;
+		    }
+	      },
 	      beforeSend: function() {
 	      	
 		  if (type == 'share') {
@@ -123,7 +131,7 @@
 						product_reader.onload = function(e) {
 						name = "'"+$("#publisher-post-photos-<?php echo $wo['story']['id']; ?>")[0].files[ii].name+"'";
 						src = "'"+e.target.result+"'";
-						$(product_image_holder).prepend('<span class="thumb-image thumb-image-delete" id="delete_uploaded_image_by_id_'+ii+'"><span class="pointer thumb-image-delete-btn" onclick="DeleteUploadedImageById('+name+','+ii+')"><i class="fa fa-remove"></i></span><div class="background_image_product" style="background-image: url('+src+');"></div></span>');
+						$(product_image_holder).prepend('<span class="thumb-image thumb-image-delete" id="delete_uploaded_image_by_id_'+ii+'"><span class="pointer thumb-image-delete-btn" onclick="DeleteUploadedImageById('+name+','+ii+',<?php echo $wo['story']['id']; ?>)"><i class="fa fa-remove"></i></span><div class="background_image_product" style="background-image: url('+src+');"></div></span>');
 						ii = ii +1;
 		                };
 		                product_image_holder.show();

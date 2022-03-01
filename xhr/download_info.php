@@ -13,6 +13,8 @@ if ($f == 'download_info') {
             $wo['user_info']['setting']['block'] = Wo_GetBlockedMembers($wo['user']['user_id']);
             $wo['user_info']['setting']['trans'] = Wo_GetMytransactions();
             $wo['user_info']['setting']['refs'] = Wo_GetReferrers();
+            // print_r($wo['user_info']['setting']['open_to_work_datajob_type']);
+            // exit();
         }
         if (!empty($_POST['posts'])) {
             $wo['user_info']['posts'] = Wo_GetPosts(array('filter_by' => 'all','publisher_id' => $wo['user']['user_id'],'limit' => 100000)); 

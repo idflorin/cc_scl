@@ -22,7 +22,7 @@
         "installation-source": "dist",
         "autoload": {
             "files": [
-                "MysqliDb.php",
+                "MysqliDb.php", 
                 "dbObject.php"
             ]
         },

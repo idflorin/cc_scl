@@ -15,6 +15,23 @@
 .movies h3.latest-movies{width: 100%;padding-left: 9px;	font-size: 18px;color: #222d34;	margin-bottom: 50px;font-family: OpenSansSemiBold,Arial;}
 h3.recommended-movies{width: 100%;margin-left: 0px;	padding-left: 9px;font-size: 18px;color: #222d34;font-family: OpenSansSemiBold,Arial;}
 .movies {height: 100%;overflow: hidden;}
+
+.wo_movie_head_filter {
+	justify-content: center;
+}
+.wo_movie_head_filter > svg {
+	position: absolute;
+    width: 100px;
+    right: 10px;
+    bottom: calc(100% - 6px);
+    filter: drop-shadow(2px 4px 6px rgb(0 0 0 / 20%));
+}
+.wo_movie_head_filter .search-blog {
+	display: flex;
+    align-items: center;    padding: 14px 2px 0;
+}
+
+.movies-search {position: relative;flex: 1 1 auto;margin: 0 5px;}
 .movies-search .search-result{position: absolute;top: 45px;right:0;z-index: 1000;display: none;width: 100%;padding: 5px 0;font-size: 13px;text-align: left;list-style: none;background-color: #fff;background-clip: padding-box;border-radius: 0px;-webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);box-shadow: 0 6px 12px rgba(0,0,0,.175);}
 .visible{display: block !important;}
 .unvisible{display:none !important;}
@@ -22,19 +39,56 @@ h3.recommended-movies{width: 100%;margin-left: 0px;	padding-left: 9px;font-size:
 .movies-search .search-result li a{	width: 100%;text-decoration: none;display: block;}
 .movies-search .search-result li:hover{	background-color: #444;}
 .movies-search .search-result li:hover > a{	color: #fff;}
+
+.wo_movie_head_filter > .wo_job_main_widget {
+    flex: none;
+}
+.wo_movie_head_filter > .wo_job_main_widget .movies-subheadnav {
+	cursor: pointer;border-radius: 2em;
+}
+.wo_movie_head_filter > .wo_job_main_widget .movies-subheadnav svg {
+	width: 16px;
+	height: auto;
+}
+.wo_movie_head_filter > .wo_job_main_widget .movies-subheadnav.btn-main {
+	color: white;
+}
+
 .movies .movies-inner {margin: 0 -6px 24px;display: flex;flex-wrap: wrap;}
-.movies .movies-inner .movies-film-wrapper {padding: 0 6px;width: 16.6666667%;margin-bottom: 15px;}
+.movies .movies-inner .movies-film-wrapper {padding: 0 6px;width: 20%;margin-bottom: 15px;}
 .movies .movies-inner .empty_state {width: 100%;}
 .movies .movies-film-wrapper figure{position: relative;width: 100%;	height: 100%;margin-bottom: 20px;}
-.movies .movies-film-wrapper figure h3{	color: #535353;font-size: 14px;display: block;padding: 0px 5px 0px 0px;margin: 4px 0px 7px;width: 100%;font-weight: bold;font-family: lato;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;}
-.movies .movies-film-wrapper figure h3 a{text-decoration:none;}
-.movies .movies-film-wrapper figure p{text-transform: capitalize;font-size: 13px;font-family: lato;margin: -4px 0px 5px;}
-.movies .movies-film-wrapper figure img{width: 100%;height: 230px;box-shadow: 0 2px 6px 0px rgba(50, 50, 50, 0.14);margin-bottom: 5px;border-radius: 4px;}
+.movies .movies-film-wrapper figure h3{	font-size: 16px;display: block;padding: 0px 5px 0px 0px;margin: 4px 0px 7px;width: 100%;font-weight: bold;font-family: lato;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;text-align: center;}
+.movies .movies-film-wrapper figure h3 a{text-decoration:none;color: inherit}
+.movies .movies-film-wrapper figure p{text-transform: capitalize;margin: -4px 0px 5px;text-align: center;}
+.movies .movies-film-wrapper figure img{width: 100%;aspect-ratio: 0.67;box-shadow: 0 4px 10px 0px rgb(50 50 50 / 18%);margin-bottom: 10px;border-radius: 8px;}
+.movies .movies-film-wrapper figure .movie_rating_sml {
+	    display: flex;
+    position: absolute;
+    top: 0;
+    margin: 10px;
+    border-radius: 50%;
+    background-color: rgb(255 255 255 / 40%);
+    color: #ffffff;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+}
+.movies .movies-film-wrapper figure .movie_rating_sml svg {
+	width: 20px;
+    height: 20px;
+    min-width: 20px;
+    min-height: 20px;
+}
 .movies .movies-nav{width: 100%;padding: 15px 0;overflow: hidden;}
 .most-viewed-movies{width: 100%;overflow: hidden;} 
 .movies .movies-nav input{width: 100%;	border-top: none !important;border-left:none !important;border-right:none !important;border-radius: 0;font-family: OpenSansLight,Arial;padding: 20px 15px;height: 50px;font-size: 20px;}
 
-.movies-top-breadcrumb li{cursor: pointer;}
+
 .semibold{	font-family: OpenSansBold,Arial;}
 .film-player-wrapper{width: 100%;overflow: hidden;background-color: #fff;}
 
@@ -66,7 +120,16 @@ h3.recommended-movies{width: 100%;margin-left: 0px;	padding-left: 9px;font-size:
 .movies-nav-wrapper .movies-nav-item{-webkit-transition: all .27s ease;transition: all .27s ease;padding: 10px 5px;	background: #f5f7fa;color: #222D34;	border-radius: 3px;font-family: OpenSansLight,Arial;margin-right: 20px;	font-size: 16px;}
 .movies-nav-wrapper .movies-nav-item:hover{	background: #444;color:#f6f6f6;text-decoration: none;}
 .film-player-wrapper iframe{width: 100%;border: none;min-height: 500px;	margin: 0;padding: 0;}
-.wow_movie_filter {margin-left: auto;}
+
+.wow_movie_filter {flex: 0 0 auto;margin: 0 5px;}
+.wow_movie_filter .dropdown-toggle {
+	display: flex;
+    height: 38px;
+    width: 38px;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+}
 .wow_movie_filters > li > a {display: flex;align-items: center;justify-content: space-between;font-size: 14px;}
 .wow_movie_filters > li .collapse {padding: 0 30px;max-height: 225px;overflow-y: auto;}
 .wow_movie_filters > li .collapse a {text-decoration: none;display: block;line-height: 25px;}
@@ -88,18 +151,9 @@ h3.recommended-movies{width: 100%;margin-left: 0px;	padding-left: 9px;font-size:
 
 
 
-@media (max-width: 1270px) {
-.movies .movies-film-wrapper figure img {
-    height: 200px;
-}
-}
-
 @media (max-width: 985px) {
 .movies .movies-inner .movies-film-wrapper {
 	width: 20%;
-}
-.movies .movies-film-wrapper figure img {
-    height: 230px;
 }
 .watch_player_movie{
 	position: relative;
@@ -149,10 +203,4 @@ h3.recommended-movies{width: 100%;margin-left: 0px;	padding-left: 9px;font-size:
 .movies .movies-inner .movies-film-wrapper {
     width: 50%;
 }	
-}
-
-@media (max-width: 380px) {
-.movies .movies-film-wrapper figure img {
-    height: 210px;
-}
 }

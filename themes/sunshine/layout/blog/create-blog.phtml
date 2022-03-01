@@ -77,6 +77,17 @@
 								<textarea name="blog_content" id="blog" placeholder="<?php echo $wo['lang']['content'] ?>"></textarea> 
 							</div>
 						</div>
+						<?php if($wo['config']['reCaptcha'] == 1) {?>
+							<div class="col-md-3">
+							</div>
+							<div class="col-md-6">
+								<div class="wow_form_fields">
+									<div class="form-group" style="margin-top:10px;">
+										<div class="g-recaptcha" data-sitekey="<?php echo $wo['config']['reCaptchaKey']?>"></div>
+									</div>
+								</div>
+							</div>
+						<?php } ?>
 						
 						<input type="file" class="hidden" id="thumbnail" name="thumbnail" accept="image/*">
 					</div>
@@ -95,8 +106,6 @@
 	</div>
 	<!-- .row -->
 </div>
-
-<script src="<?php echo $wo['config']['theme_url'];?>/javascript/bootstrap-tagsinput-latest/src/bootstrap-tagsinput.js"></script>
 <script>
 jQuery(document).ready(function($) {
     var thumb_drop_block = $("[data-block='thumdrop-zone']");

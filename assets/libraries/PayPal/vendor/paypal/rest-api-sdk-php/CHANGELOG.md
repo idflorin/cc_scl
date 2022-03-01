@@ -21,7 +21,7 @@ PayPal PHP SDK release notes
 * Fixed annotation bug [#872](https://github.com/paypal/PayPal-PHP-SDK/pull/872).
 * Update PHPUnit [#979](https://github.com/paypal/PayPal-PHP-SDK/pull/979).
 
-1.12.0
+1.12.0 
 -----
 * Add `getToken` method to `Payment` class to retrieve EC token from approval URL.
 * Add TLSv1.2 to cipher list [#844](https://github.com/paypal/PayPal-PHP-SDK/pull/844).

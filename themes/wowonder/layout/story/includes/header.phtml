@@ -174,6 +174,11 @@ if (!empty($wo['story']['parent_id'])) {
          <span class="user-popover" data-type="<?php echo $wo['story']['publisher']['type']; ?>" data-id="<?php echo $wo['story']['publisher']['id']; ?>">
             <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
          </span>
+		 
+		 <?php if (!empty($wo['story']['publisher']['is_open_to_work']) && $wo['config']['website_mode'] == 'linkedin') { ?>
+			<span class="wo_open_job_badge" title="<?php echo($wo['lang']['open_to_work']); ?>" data-toggle="tooltip"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"><path fill="currentColor" d="M10,2H14A2,2 0 0,1 16,4V6H20A2,2 0 0,1 22,8V19A2,2 0 0,1 20,21H4C2.89,21 2,20.1 2,19V8C2,6.89 2.89,6 4,6H8V4C8,2.89 8.89,2 10,2M14,6V4H10V6H14Z"></path></svg></span>
+		<?php } ?>
+		 
          <?php if (isset($wo['story']['publisher']['is_pro'])) { 
             if(Wo_IsUserPro($wo['story']['publisher']['is_pro']) === true) { ?>
          <?php 
@@ -735,6 +740,10 @@ if (!empty($wo['story']['parent_id'])) {
          <span class="user-popover" data-type="<?php echo $wo['story']['publisher']['type']; ?>" data-id="<?php echo $wo['story']['publisher']['id']; ?>">
             <a href="<?php echo $wo['story']['publisher']['url']; ?>" data-ajax="?link1=timeline&u=<?php echo $wo['story']['publisher']['username']; ?>"><b><?php echo $wo['story']['publisher']['name']; ?></b></a>
          </span>
+		 
+		 <?php if (!empty($wo['story']['publisher']['is_open_to_work']) && $wo['config']['website_mode'] == 'linkedin') { ?>
+			<span class="wo_open_job_badge" title="<?php echo($wo['lang']['open_to_work']); ?>" data-toggle="tooltip"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"><path fill="currentColor" d="M10,2H14A2,2 0 0,1 16,4V6H20A2,2 0 0,1 22,8V19A2,2 0 0,1 20,21H4C2.89,21 2,20.1 2,19V8C2,6.89 2.89,6 4,6H8V4C8,2.89 8.89,2 10,2M14,6V4H10V6H14Z"></path></svg></span>
+		<?php } ?>
       <?php }else{ ?>
          <b><?php echo $wo['story']['publisher']['name']; ?></b>
          <?php } ?>
@@ -983,6 +992,9 @@ if (!empty($wo['story']['parent_id'])) {
                      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                   </svg>
                   <?php  }  ?>
+                  <?php  if($wo['story']['postPrivacy'] == 5 && $wo['config']['website_mode'] == 'linkedin') { ?>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" title="<?php echo $wo['lang']['hiring'];?>" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="feather feather-dollar"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                  <?php  }  ?>
                </span>
                <span class="caret" style="color:#9197a3"></span>
             </span>
@@ -1039,6 +1051,14 @@ if (!empty($wo['story']['parent_id'])) {
                      <?php echo $wo['lang']['people_follow_me'];?>
                   </div>
                </li>
+               <?php } ?>
+               <?php if($wo['config']['website_mode'] == 'linkedin') { ?>
+                  <li>
+                     <div class="pointer" onclick="Wo_UpdatePostPrivacy(<?php echo $wo['story']['id']; ?>,5,event);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="feather feather-dollar"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <?php echo $wo['lang']['hiring'];?>
+                     </div>
+                  </li>
                <?php } ?>
                <?php if ($wo['config']['shout_box_system'] == 1) { ?>
                <li>

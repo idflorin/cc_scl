@@ -67,15 +67,14 @@ svg {vertical-align: middle;}
 
 /*Wallet Transactions*/
 .wallet_transactions {padding: 15px 15px 0;border-top: 1px solid #e7e7e7;margin-top: 20px;}
-.wallet_transactions h3 {margin-top: 0;font-family: "Lato", sans-serif;font-weight: 600;font-size: 16px;color: #676767;}
+.wallet_transactions h3 {margin-top: 0;font-family: "Lato", sans-serif;font-weight: 600;font-size: 16px;color: #676767;display: flex;justify-content: space-between;align-items: center;}
 .wallet_transactions .tabbable {margin-bottom: -10px;}
 
 /*Create Ads*/
 .select_radio_btn {font-family: "Lato", sans-serif;padding: 20px 0 0;margin-bottom: 20px;}
 .select_radio_btn h4 {text-align: center;font-size: 22px;font-weight: 600;margin: 0 0 21px;}
 .select_radio_btn .select_radio_btn_innr {display: flex;justify-content: center;flex-wrap: wrap;}
-.select_radio_btn label {margin: 0;margin-right: 10px;margin-bottom: 10px;}
-.select_radio_btn label:last-child {margin: 0;}
+.select_radio_btn label {margin: 0 10px 20px;}
 .select_radio_btn .sr_btn_lab_innr {width: 180px;margin: 0;border: 1px solid rgba(0,20,51,.12);border-radius: 6px;position: relative;text-align: center;background-color: #fff;cursor: pointer;transition: all 0.2s ease;display:block;padding: 20px 15px;}
 .select_radio_btn .sr_btn_lab_innr:hover {box-shadow: 0 4px 4px 0 rgba(0,0,0,.04), 0 1px 1px 0 rgba(0,0,0,.02);transform: translateY(-3px);}
 .select_radio_btn label > input {opacity: 0;width: 0;height: 0;display: none;}

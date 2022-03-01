@@ -14,6 +14,8 @@
 	 	}
 	 	
 	 	echo Wo_LoadPage('story/includes/post-layout');
+	 }else if (!empty($wo['story']['product_id']) && !empty($wo['story']['product']) && !empty($wo['story']['product']['images']) && $wo['page']  == 'story') {
+		 echo Wo_LoadPage('story/includes/product_full');
 	 }else if ( is_array($wo['story']) ): ?>
   <?php echo Wo_LoadPage('story/includes/post-layout'); ?>
   <?php endif; ?>

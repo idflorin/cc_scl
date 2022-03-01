@@ -8,7 +8,7 @@ if (!function_exists('getallheaders')) {
      * @return string[string] The HTTP header key/value pairs.
      */
     function getallheaders()
-    {
+    { 
         $headers = array();
 
         $copy_server = array(

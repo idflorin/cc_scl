@@ -1,4 +1,4 @@
-<?php 
+<?php
 if ($f == 'popover') {
     $html        = '';
     $array_types = array(
@@ -32,5 +32,3 @@ if ($f == 'popover') {
     echo json_encode($data);
     exit();
 }
-
-

@@ -2022,6 +2022,11 @@ jQuery(document).ready(function($) {
       },
       success: function(data) {
         if (data['status'] == 200) {
+        	if (node_socket_flow == "1") {
+		      	for (var i = 0; i < chat_part_array.length; i++) {
+		         socket.emit("user_notification", { to_id: chat_part_array[i], user_id: _getCookie("user_id"), type: "request" });
+			    }
+	      	}
             $("#create_group_chat").modal('hide');
             Wo_OpenChatTab(0,data.group_id);
             $("#insert-caht-parts").find('#reset').trigger('click');

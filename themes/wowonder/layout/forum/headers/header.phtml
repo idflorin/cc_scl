@@ -23,6 +23,18 @@ if ($_GET['link1'] == 'showthread') {
 
  ?>
 <div class="page-margin" id="forum-cont">
+	<?php if ($wo['config']['user_ads'] == 1): ?>
+			<div id="sidebar-sticky-forum">
+				<?php 
+				  $wo['sidebar-ad'] = Wo_GetAdsByType('forum');
+				  if (!empty($wo['sidebar-ad'])) {
+				  	echo Wo_LoadPage('ads/includes/forum-ad');
+				  }
+				?>
+				<div class="clear"></div>
+			</div>
+	    <?php endif; ?>
+	
 	<div class="page-margin wow_content mt-0">
 		<div class="wo_page_hdng pag_neg_padd pag_alone">
 			<div class="wo_page_hdng_innr big_size">

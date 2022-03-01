@@ -71,6 +71,7 @@ if (empty($error_code)) {
     }
     if (!empty($social_id)) {
     	$create_session = false;
+        $is_new = false;
     	if (Wo_EmailExists($social_email) === true) {
     		$create_session = true;
     	} else {
@@ -91,6 +92,7 @@ if (empty($error_code)) {
             );
             if (Wo_RegisterUser($re_data) === true) {
             	$create_session = true;
+                $is_new = true;
             }
     	}
 
@@ -129,6 +131,7 @@ if (empty($error_code)) {
                     'timezone' => $timezone,
                     'access_token' => $access_token,
                     'user_id' => $user_id,
+                    'is_new' => $is_new,
                 );
             }
     	}

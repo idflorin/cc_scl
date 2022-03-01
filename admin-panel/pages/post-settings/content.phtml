@@ -151,6 +151,7 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-title">General Posts & Comments Settings</h6>
+                    <div class="store-settings-alert"></div>
                     <form class="site-settings2" method="POST">
                         <div class="float-left">
                             <label for="memories_system" class="main-label">Memories System</label>
@@ -158,8 +159,8 @@
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="memories_system" value="0" />
-                            <input type="checkbox" name="memories_system" id="chck-memories_system" value="1" <?php echo ($wo['config']['memories_system'] == 1) ? 'checked': '';?>>
-                            <label for="chck-memories_system" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="memories_system" id="chck-memories_system" value="1" <?php echo ($wo['config']['memories_system'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('memories_system')) ?>>
+                            <label for="chck-memories_system" class="check-trail <?php echo(EnableForMode('memories_system',true)) ?>" <?php echo(EnableForMode('memories_system',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -169,8 +170,8 @@
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="watermark" value="0" />
-                            <input type="checkbox" name="watermark" id="chck-watermark" value="1" <?php echo ($wo['config']['watermark'] == 1) ? 'checked': '';?>>
-                            <label for="chck-watermark" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="watermark" id="chck-watermark" value="1" <?php echo ($wo['config']['watermark'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('watermark')) ?>>
+                            <label for="chck-watermark" class="check-trail <?php echo(EnableForMode('watermark',true)) ?>" <?php echo(EnableForMode('watermark',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -180,8 +181,8 @@
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="shout_box_system" value="0" />
-                            <input type="checkbox" name="shout_box_system" id="chck-shout_box_system" value="1" <?php echo ($wo['config']['shout_box_system'] == 1) ? 'checked': '';?>>
-                            <label for="chck-shout_box_system" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="shout_box_system" id="chck-shout_box_system" value="1" <?php echo ($wo['config']['shout_box_system'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('shout_box_system')) ?>>
+                            <label for="chck-shout_box_system" class="check-trail <?php echo(EnableForMode('shout_box_system',true)) ?>" <?php echo(EnableForMode('shout_box_system',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -191,8 +192,8 @@
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="colored_posts_system" value="0" />
-                            <input type="checkbox" name="colored_posts_system" id="chck-colored_posts_system" value="1" <?php echo ($wo['config']['colored_posts_system'] == 1) ? 'checked': '';?>>
-                            <label for="chck-colored_posts_system" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="colored_posts_system" id="chck-colored_posts_system" value="1" <?php echo ($wo['config']['colored_posts_system'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('colored_posts_system')) ?>>
+                            <label for="chck-colored_posts_system" class="check-trail <?php echo(EnableForMode('colored_posts_system',true)) ?>" <?php echo(EnableForMode('colored_posts_system',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -203,8 +204,8 @@
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="post_approval" value="0" />
-                            <input type="checkbox" name="post_approval" id="chck-post_approval" value="1" <?php echo ($wo['config']['post_approval'] == 1) ? 'checked': '';?>>
-                            <label for="chck-post_approval" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="post_approval" id="chck-post_approval" value="1" <?php echo ($wo['config']['post_approval'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('post_approval')) ?>>
+                            <label for="chck-post_approval" class="check-trail <?php echo(EnableForMode('post_approval',true)) ?>" <?php echo(EnableForMode('post_approval',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -215,8 +216,8 @@
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="popular_posts" value="0" />
-                            <input type="checkbox" name="popular_posts" id="chck-popular_posts" value="1" <?php echo ($wo['config']['popular_posts'] == 1) ? 'checked': '';?>>
-                            <label for="chck-popular_posts" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="popular_posts" id="chck-popular_posts" value="1" <?php echo ($wo['config']['popular_posts'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('popular_posts')) ?>>
+                            <label for="chck-popular_posts" class="check-trail <?php echo(EnableForMode('popular_posts',true)) ?>" <?php echo(EnableForMode('popular_posts',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -227,8 +228,44 @@
                         </div>
                         <div class="form-group float-right switcher">
                             <input type="hidden" name="comment_reports" value="0" />
-                            <input type="checkbox" name="comment_reports" id="chck-comment_reports" value="1" <?php echo ($wo['config']['comment_reports'] == 1) ? 'checked': '';?>>
-                            <label for="chck-comment_reports" class="check-trail"><span class="check-handler"></span></label>
+                            <input type="checkbox" name="comment_reports" id="chck-comment_reports" value="1" <?php echo ($wo['config']['comment_reports'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('comment_reports')) ?>>
+                            <label for="chck-comment_reports" class="check-trail <?php echo(EnableForMode('comment_reports',true)) ?>" <?php echo(EnableForMode('comment_reports',false,true)) ?>><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+
+                        <div class="float-left">
+                            <label for="post_location" class="main-label">Location</label>
+                            <br><small class="admin-info">Allow users to post location.</small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="post_location" value="0" />
+                            <input type="checkbox" name="post_location" id="chck-post_location" value="1" <?php echo ($wo['config']['post_location'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('post_location')) ?>>
+                            <label for="chck-post_location" class="check-trail <?php echo(EnableForMode('post_location',true)) ?>" <?php echo(EnableForMode('post_location',false,true)) ?>><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+
+                        <div class="float-left">
+                            <label for="post_feelings" class="main-label">Feelings</label>
+                            <br><small class="admin-info">Allow users to post feelings.</small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="post_feelings" value="0" />
+                            <input type="checkbox" name="post_feelings" id="chck-post_feelings" value="1" <?php echo ($wo['config']['post_feelings'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('post_feelings')) ?>>
+                            <label for="chck-post_feelings" class="check-trail <?php echo(EnableForMode('post_feelings',true)) ?>" <?php echo(EnableForMode('post_feelings',false,true)) ?>><span class="check-handler"></span></label>
+                        </div>
+                        <div class="clearfix"></div>
+                        <hr>
+
+                        <div class="float-left">
+                            <label for="post_poll" class="main-label">Poll</label>
+                            <br><small class="admin-info">Allow users to post poll.</small>
+                        </div>
+                        <div class="form-group float-right switcher">
+                            <input type="hidden" name="post_poll" value="0" />
+                            <input type="checkbox" name="post_poll" id="chck-post_poll" value="1" <?php echo ($wo['config']['post_poll'] == 1) ? 'checked': '';?> <?php echo(EnableForMode('post_poll')) ?>>
+                            <label for="chck-post_poll" class="check-trail <?php echo(EnableForMode('post_poll',true)) ?>" <?php echo(EnableForMode('post_poll',false,true)) ?>><span class="check-handler"></span></label>
                         </div>
                         <div class="clearfix"></div>
                         <hr>
@@ -255,7 +292,7 @@
                         <div class="clearfix"></div>
                         <hr>
                         <label class="form-check-label" for="second_post_button">Second Post Button</label>
-                        <select class="form-control show-tick" id="second_post_button" name="second_post_button">
+                        <select class="form-control show-tick" id="second_post_button" name="second_post_button" <?php echo(EnableForMode('second_post_button')) ?> <?php echo(EnableForMode('second_post_button',false,true)) ?>>
                           <option value="wonder" <?php echo ($wo['config']['second_post_button'] == 'wonder')   ? ' selected' : '';?> >Wonder</option>
                           <option value="dislike" <?php echo ($wo['config']['second_post_button'] == 'dislike')   ? ' selected' : '';?> >Dislike</option>
                           <option value="reaction" <?php echo ($wo['config']['second_post_button'] == 'reaction')   ? ' selected' : '';?> >Reaction System</option>

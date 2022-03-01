@@ -114,7 +114,14 @@ if ($f == 'stripe') {
 			            if ($result) {
 			                $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ('" . $wo['user']['id'] . "', 'WALLET', '" . $amount . "', 'stripe')");
 			            }
-						header("Location: " . Wo_SeoLink('index.php?link1=wallet'));
+			            if (!empty($_COOKIE['redirect_page'])) {
+		                	$redirect_page = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_COOKIE['redirect_page']);
+						    $redirect_page = preg_replace('/\((.*?)\)/m', '', $redirect_page);
+		                	header("Location: " . $redirect_page);
+		                }
+		                else{
+		                	header("Location: " . Wo_SeoLink('index.php?link1=wallet'));
+		                }
 				        exit();
 					}
 					if ($_GET['type'] == 'fund' && !empty($_GET['fund_id']) && is_numeric($_GET['fund_id']) && $_GET['fund_id'] > 0) {

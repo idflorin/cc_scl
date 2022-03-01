@@ -13,7 +13,7 @@ use Rize\UriTemplate\Parser;
  * | 5   |    {?list*}   ?list[]=red&list[]=green&list[]=blue | {name[]}+=(?:{$value}+(?:{sep}{name[]}+={$value}*))*
  */
 class Named extends Abstraction
-{
+{ 
     public function toRegex(Parser $parser, Node\Variable $var)
     {
         $regex   = null;

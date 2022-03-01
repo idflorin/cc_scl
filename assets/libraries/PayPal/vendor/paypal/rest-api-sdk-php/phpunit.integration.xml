@@ -32,5 +32,5 @@
             <exclude>
             </exclude>
         </whitelist>
-    </filter>
+    </filter> 
 </phpunit>

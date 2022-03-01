@@ -39,7 +39,7 @@
 						<form class="navbar-form form-group" data-toggle="dropdown" role="button" id="navbar-searchbox" role="search">
 							<div class="form-group inner-addon <?php echo Wo_RightToLeft('left-addon');?> ">
 								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search glyphicon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-								<input type="text" class="form-control search-input" onkeyup="Wo_DetectSearchType(this.value), document.getElementById('wo_repeat_search').innerHTML = escapeHtml(this.value)" placeholder="<?php echo $wo['lang']['search_header_label']; ?>" dir="auto" <?php if ($wo['loggedin'] == true) { echo 'onfocus="Wo_GetRecentSearchs()"';}?>>
+								<input type="text" class="form-control search-input" onkeyup="Wo_DetectSearchType(this.value), document.getElementById('wo_repeat_search').innerHTML = escapeHtml(this.value)" placeholder="<?php echo TextForMode('search_header_label'); ?>" dir="auto" <?php if ($wo['loggedin'] == true) { echo 'onfocus="Wo_GetRecentSearchs()"';}?>>
 							</div>
 						</form>
 						<ul class="dropdown-menu search-dropdown-container" style="margin-left:7px;" role="menu">

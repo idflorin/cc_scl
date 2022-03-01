@@ -58,13 +58,18 @@ $db->where('recipient_id',0)->where('admin',1)->where('seen',0)->where('type','r
                                 <?php 
                                 
                                 if (!empty($requests)) {
-          				                foreach ($requests as $wo['verification']) {
-                                    $wo['verification'] = (Array)$wo['verification'];
-                                    $wo['verification']['user_data'] = Wo_UserData($wo['verification']['user_id']);
-                                    $user_pro_type = Wo_GetUserProType($wo['verification']['user_data']['pro_type']);
-                                    $wo['verification']['type_name'] = $user_pro_type['type_name'];
-          				                    echo Wo_LoadAdminPage('pro-refund/list');
-          				                }
+          				            foreach ($requests as $wo['verification']) {
+                                        $wo['verification'] = (Array)$wo['verification'];
+                                        $wo['verification']['user_data'] = Wo_UserData($wo['verification']['user_id']);
+                                        if (empty($wo['verification']['order_hash_id'])) {
+                                            $user_pro_type = Wo_GetUserProType($wo['verification']['user_data']['pro_type']);
+                                            $wo['verification']['type_name'] = $user_pro_type['type_name'];
+                                        }
+                                        else{
+                                            $wo['verification']['type_name'] = '';
+                                        }
+          				                echo Wo_LoadAdminPage('pro-refund/list');
+          				            }
                                 }
 				                ?>
                             </tbody>

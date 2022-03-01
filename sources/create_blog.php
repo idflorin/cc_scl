@@ -1,13 +1,12 @@
-<?php 
+<?php
 if (Wo_CanBlog() == false) {
-	header("Location: " . $wo['config']['site_url']);
+    header("Location: " . $wo['config']['site_url']);
     exit();
 }
 if ($wo['loggedin'] == false) {
-  header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
-  exit();
+    header("Location: " . Wo_SeoLink('index.php?link1=welcome'));
+    exit();
 }
-
 $wo['description'] = $wo['config']['siteDesc'];
 $wo['keywords']    = $wo['config']['siteKeywords'];
 $wo['page']        = 'create_blog';

@@ -1,9 +1,10 @@
 <?php 
 if ($f == 're_cover') {
    if (isset($_POST['pos'])) {
-       if (($_POST['cover_image'] != $wo['userDefaultCover']) &&
-       ($_POST['cover_image'] == $wo['user']['cover_org'] || Wo_IsAdmin()) &&
-       (Wo_GetMedia($wo['user']['cover_full']) == $_POST['real_image']) || Wo_IsAdmin()) {
+       if (($_POST['cover_image'] != $wo['userDefaultCover']) && ($_POST['cover_image'] == $wo['user']['cover_org'] || Wo_IsAdmin()) && (Wo_GetMedia($wo['user']['cover_full']) == $_POST['real_image']) || Wo_IsAdmin()) {
+           if(Wo_IsAdmin() && !empty($_POST['user_id']) && is_numeric($_POST['user_id'])){
+            $wo['user'] = Wo_UserData(Wo_Secure($_POST['user_id']));
+           }
            $from_top             = abs($_POST['pos']);
            $cover_image          = $wo['user']['cover_org'];
            $full_url_image       = $wo['user']['cover'];

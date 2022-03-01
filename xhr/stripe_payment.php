@@ -1,20 +1,18 @@
-<?php 
+<?php
 if ($f == 'stripe_payment') {
     include_once('assets/includes/stripe_config.php');
     if (empty($_POST['stripeToken'])) {
         header("Location: " . Wo_SeoLink('index.php?link1=oops'));
         exit();
     }
-
     $token = $_POST['stripeToken'];
     try {
-
         $pro_types_array = array(
-                    1,
-                    2,
-                    3,
-                    4
-                );
+            1,
+            2,
+            3,
+            4
+        );
         $pro_type        = 0;
         if (!isset($_GET['pro_type']) || !in_array($_GET['pro_type'], $pro_types_array)) {
             $data = array(
@@ -26,7 +24,7 @@ if ($f == 'stripe_payment') {
             exit();
         }
         $pro_type = $_GET['pro_type'];
-        $amount1 = 0;
+        $amount1  = 0;
         if ($pro_type == 1) {
             $img     = $wo['lang']['star'];
             $amount1 = $wo['pro_packages']['star']['price'];
@@ -42,17 +40,15 @@ if ($f == 'stripe_payment') {
         }
         $amount2 = $amount1;
         $amount1 = $amount1 . '00';
-
         if ($_POST['amount'] != $amount1) {
-           $data = array(
-                        'status' => 200,
-                        'location' => Wo_SeoLink('index.php?link1=oops')
-                    );
-                    header("Content-type: application/json");
-                    echo json_encode($data);
-                    exit();
+            $data = array(
+                'status' => 200,
+                'location' => Wo_SeoLink('index.php?link1=oops')
+            );
+            header("Content-type: application/json");
+            echo json_encode($data);
+            exit();
         }
-
         $customer = \Stripe\Customer::create(array(
             'source' => $token
         ));
@@ -114,7 +110,7 @@ if ($f == 'stripe_payment') {
             if ($stop == 0) {
                 $time = time();
                 if ($is_pro == 1) {
-                    $update_array   = array(
+                    $update_array = array(
                         'is_pro' => 1,
                         'pro_time' => time(),
                         'pro_' => 1,
@@ -123,21 +119,17 @@ if ($f == 'stripe_payment') {
                     if (in_array($pro_type, array_keys($wo['pro_packages_types'])) && $wo['pro_packages'][$wo['pro_packages_types'][$pro_type]]['verified_badge'] == 1) {
                         $update_array['verified'] = 1;
                     }
-                    $mysqli         = Wo_UpdateUserData($wo['user']['user_id'], $update_array);
+                    $mysqli             = Wo_UpdateUserData($wo['user']['user_id'], $update_array);
                     $notes              = $wo['lang']['upgrade_to_pro'] . " " . $img . " : Stripe";
-            $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$wo['user']['user_id']}, 'PRO', {$amount2}, '{$notes}')");
-                    $create_payment = Wo_CreatePayment($pro_type);
+                    $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$wo['user']['user_id']}, 'PRO', {$amount2}, '{$notes}')");
+                    $create_payment     = Wo_CreatePayment($pro_type);
                     if ($mysqli) {
-
                         if ((!empty($_SESSION['ref']) || !empty($wo['user']['ref_user_id'])) && $wo['config']['affiliate_type'] == 1 && $wo['user']['referrer'] == 0) {
                             if (!empty($_SESSION['ref'])) {
                                 $ref_user_id = Wo_UserIdFromUsername($_SESSION['ref']);
-                            }
-                            elseif (!empty($wo['user']['ref_user_id'])) {
+                            } elseif (!empty($wo['user']['ref_user_id'])) {
                                 $ref_user_id = Wo_UserIdFromUsername($wo['user']['ref_user_id']);
                             }
-
-
                             if ($wo['config']['amount_percent_ref'] > 0) {
                                 if (!empty($ref_user_id) && is_numeric($ref_user_id)) {
                                     $update_user    = Wo_UpdateUserData($wo['user']['user_id'], array(
@@ -158,10 +150,7 @@ if ($f == 'stripe_payment') {
                                     unset($_SESSION['ref']);
                                 }
                             }
-                            
                         }
-                        
-
                         $data = array(
                             'status' => 200,
                             'location' => Wo_SeoLink('index.php?link1=upgraded')

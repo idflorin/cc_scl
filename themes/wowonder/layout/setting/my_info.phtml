@@ -1,9 +1,9 @@
 <div class="wo_settings_page wow_content">
-	<div class="avatar-holder">
+	<div class="avatar-holder addresses">
 		<img src="<?php echo $wo['setting']['avatar']?>" alt="<?php echo $wo['setting']['name']?> Profile Picture" class="avatar">
 		<div class="infoz">
 			<h5 title="<?php echo $wo['setting']['name']?>"><a href="<?php echo Wo_SeoLink('index.php?link1=timeline&u=' . $wo['setting']['username'] . '');?>" data-ajax="?link1=timeline&u=<?php echo $wo['setting']['username'] ?>"><?php echo $wo['setting']['name']?></a></h5>
-			<p><?php echo $wo['lang']['download'].' '.$wo['lang']['my_info']; ?></p>
+			<p><?php  echo $wo['lang']['my_info']; ?></p>
 		</div>
 	</div>
 	<hr>
@@ -15,7 +15,7 @@
 	?>
 	<form class="setting-general-form form-horizontal" method="post">
 		<div class="setting-general-alert setting-update-alert"></div>
-		
+
 		<div class="select_radio_btn small_rbtn setting_down_info_btns" id="download_steps_comp">
 				<h4><?php echo $wo['lang']['to_download']?></h4>
 				<div class="select_radio_btn_innr">
@@ -96,7 +96,7 @@
 			<p></p>
 			<a href="<?php echo($wo['config']['site_url'].'/requests.php?f=download_user_info'); ?>" class="btn btn-main" id="download_file"  target="_blank" onclick="DeleteUserFile()"><?php echo  $wo['lang']['download_file']; ?></a>
 		 </div>
-		 
+
 		<div class="text-center hiddddddddd">
 			<button type="submit" class="btn btn-main btn-mat btn-mat-raised add_wow_loader"><?php echo $wo['lang']['generate_file']; ?></button>
 		</div>
@@ -130,7 +130,7 @@ $(function() {
 		$('.ready_to_down_info').fadeIn(200);
 		$('.ready_to_down_info p').html(data.message);
 		$('.wo_settings_page .hiddddddddd').fadeOut(200);
-      } 
+      }
       $('.wo_settings_page').find('.add_wow_loader').removeClass('btn-loading');
     }
   });

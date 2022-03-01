@@ -121,7 +121,15 @@
 						$story = $db->where('id',$story_id)->getOne(T_USER_STORY);
 					} 
 					if (!empty($story)) {
-						$story->thumbnail = Wo_GetMedia($story->thumbnail);
+						if (!empty($story->thumbnail)) {
+							$story->thumbnail = Wo_GetMedia($story->thumbnail);
+						}
+						else{
+							$u = Wo_UserData($story->user_id);
+							if (!empty($u)) {
+								$story->thumbnail = $u['avatar'];
+							}
+						}
 				?>
 					<input type="hidden" id="story_id" name="story_id" value="<?php echo($story->id) ?>" />
 					<div class="message_reply_story_text">
@@ -186,8 +194,8 @@
 									<ul class="dropdown-menu drop-up" role="menu" onclick="event.stopPropagation()">
 										<li>
 											<div class="w100" id="chat-box-stickers">
-												<input type="text" class="form-control" placeholder="<?php echo $wo['lang']['search'] ?> GIFs" onkeyup="Wo_GetChatStickers(this)" data-user-id="<?php echo($wo['chat']['recipient']['user_id']) ?>">
-												<div id="chat-box-stickers-cont-<?php echo($wo['chat']['recipient']['user_id']) ?>" class="chat-box-stickers-cont"></div>
+												<input type="text" class="form-control" placeholder="<?php echo $wo['lang']['search'] ?> GIFs" onkeyup="Wo_GetChatStickers(<?php echo $wo['chat']['recipient']['user_id'];?>,this.value)">
+												<div id="chat-box-stickers-cont-<?php echo $wo['chat']['recipient']['user_id'];?>" class="chat-box-stickers-cont"></div>
 											</div>
 										</li>
 									</ul>
@@ -639,20 +647,20 @@ function escapeHTML(string) {
     return pre.innerHTML;
 }
 
-function Wo_ChatSticker(self){
+function Wo_ChatSticker(id,self){
   if (!self) {
     return false;
   }
-  $('#chatSticker_'+$(self).attr('data-user-id')).val($(self).attr('data-gif'));
-  Wo_RegisterTabMessage($(self).attr('data-user-id'));
-  $("#chat-sticker-system").removeClass("open");
+  $('.chat_'+id).find('#chatSticker').val($(self).attr('data-gif'));
+  Wo_RegisterTabMessage(id);
+  $('.chat_'+id).find('#chatSticker').val('');
+  $('.chat_'+id).find("#chat-sticker-system").removeClass("open");
 }
 
-function Wo_GetChatStickers(self){
-  if (!self) {
+function Wo_GetChatStickers(id,keyword = ''){
+  if (!keyword) {
     return false;
   }
-  keyword = $(self).val();
   var chat_gif_loading =  '\
   <div class="sk-circle">\
     <div class="sk-circle1 sk-child"></div>\
@@ -668,7 +676,7 @@ function Wo_GetChatStickers(self){
     <div class="sk-circle11 sk-child"></div>\
     <div class="sk-circle12 sk-child"></div>\
   </div>';
-  $('#chat-box-stickers-cont-'+$(self).attr('data-user-id')).html(chat_gif_loading);
+ $('#chat-box-stickers-cont-'+id).html(chat_gif_loading);
   Wo_Delay(function(){
     $.ajax({
       url: 'https://api.giphy.com/v1/gifs/search?',
@@ -678,18 +686,18 @@ function Wo_GetChatStickers(self){
     })
     .done(function(data) {
       if (data.meta.status == 200 && data.data.length > 0) {
-        $('#chat-box-stickers-cont-'+$(self).attr('data-user-id')).empty();
+        $('#chat-box-stickers-cont-'+id).empty();
         for (var i = 0; i < data.data.length; i++) {
           appended = true;
           if (appended == true) {
               appended = false;
-            $('#chat-box-stickers-cont-'+$(self).attr('data-user-id')).append($('<img alt="gif" src="'+data.data[i].images.fixed_height_small.url+'" data-gif="' + data.data[i].images.fixed_height.url + '" onclick="Wo_ChatSticker(this)" data-user-id="'+$(self).attr('data-user-id')+'" autoplay loop>'));
+            $('#chat-box-stickers-cont-'+id).append($('<img alt="gif" src="'+data.data[i].images.fixed_height_small.url+'" data-gif="' + data.data[i].images.fixed_height.url + '" onclick="Wo_ChatSticker('+id+',this)" autoplay loop>'));
             appended = true;
           } 
         }
       }
       else{
-        $('#chat-box-stickers-cont-'+$(self).attr('data-user-id')).html('<p class="no_chat_gifs_found"><i class="fa fa-frown-o"></i> <?php echo $wo['lang']['no_result']; ?></p>');
+        $('#chat-box-stickers-cont-'+id).html('<div class="empty_state"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M11,8H13V16H11V8M7.67,8H4.33C3.53,8 3,8.67 3,9.33V14.67C3,15.33 3.53,16 4.33,16H7.67C8.47,16 9,15.33 9,14.67V12H7V14H5V10H9V9.33C9,8.67 8.47,8 7.67,8M21,10V8H15V16H17V14H19.5V12H17V10H21Z" /></svg><?php echo $wo['lang']['no_result']; ?></div>');
       }
     })
     .fail(function() {

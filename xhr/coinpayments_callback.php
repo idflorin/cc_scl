@@ -25,7 +25,14 @@ if ($f == 'coinpayments_callback') {
                     $result    = mysqli_query($sqlConnect, "UPDATE " . T_USERS . " SET `wallet` = `wallet` + " . $amount1 . " WHERE `user_id` = '$user_id'");
                     if ($result) {
                         $create_payment_log = mysqli_query($sqlConnect, "INSERT INTO " . T_PAYMENT_TRANSACTIONS . " (`userid`, `kind`, `amount`, `notes`) VALUES ({$user_id}, 'WALLET', {$amount1}, 'coinpayments')");
-                        header("Location: " . Wo_SeoLink('index.php?link1=wallet'));
+                        if (!empty($_COOKIE['redirect_page'])) {
+                            $redirect_page = preg_replace('/on[^<>=]+=[^<>]*/m', '', $_COOKIE['redirect_page']);
+                            $redirect_page = preg_replace('/\((.*?)\)/m', '', $redirect_page);
+                            header("Location: " . $redirect_page);
+                        }
+                        else{
+                            header("Location: " . Wo_SeoLink('index.php?link1=wallet'));
+                        } 
                         exit();
                     }
                     $data = array(

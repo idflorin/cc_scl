@@ -15,7 +15,8 @@ $response_data = array(
 $required_fields =  array(
                         'post',
                         'comment',
-                        'reply'
+                        'reply',
+                        'story'
                     );
 
 $limit = (!empty($_POST['limit']) && is_numeric($_POST['limit']) && $_POST['limit'] > 0 && $_POST['limit'] <= 50 ? Wo_Secure($_POST['limit']) : 20);

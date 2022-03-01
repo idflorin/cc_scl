@@ -26,7 +26,7 @@ if (empty($error_code)) {
 	$confirm_code = $_POST['code'];
 	$user_id      = $_POST['user_id'];
 
-    $confirm_code = Wo_ConfirmUserSMS($user_id, $confirm_code);
+    $confirm_code = Wo_ConfirmUser($user_id, $confirm_code);
     if (empty($confirm_code)) {
     	$error_code    = 3;
         $error_message = 'Wrong confirmation code.';

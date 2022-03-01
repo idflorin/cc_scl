@@ -26,7 +26,7 @@ class Twocheckout_Charge extends Twocheckout
 
         foreach ($params as $key => $value)
         {
-            echo '<input type="hidden" name="'.$key.'" value="'.$value.'"/>';
+            echo '<input type="hidden" name="'.$key.'" value="'.$value.'"/>'; 
         }
 
         if ($type == 'auto') {

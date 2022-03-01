@@ -109,6 +109,14 @@ $(function () {
         $('.skip-step').hide();
         window.location.href = '<?php echo Wo_SeoLink('index.php?link1=start-up');?>';
       }
+      else{
+        if(data.invalid_file == 3){
+          $("#adult_image_file").modal('show');
+          Wo_Delay(function(){
+            $("#adult_image_file").modal('hide');
+          },3000);
+        }
+      }
     }
   });
 });
